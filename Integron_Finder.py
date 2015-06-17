@@ -11,7 +11,7 @@ import psutil
 import os
 import argparse
 import matplotlib.pyplot as plt
-import sys
+import distutils
 
 class Integron:
     """Integron object represente an object composed of an integrase, attC sites and gene cassettes. 
@@ -929,21 +929,21 @@ def local_max(window_beg, window_end, strand_search="both"):
         SeqIO.write(subseq, f, "fasta")
     
     if strand_search == "both" :
-        call([ BIN_DIR + "cmsearch", "-Z", str(SIZE_REPLICON/1000000.), "--max",
+        call([CMSEARCH, "-Z", str(SIZE_REPLICON/1000000.), "--max",
               "--cpu", N_CPU, "-o",
               out_dir + name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res",
               "--tblout", out_dir + name + "_subseq_attc_table.res", "-E" "10",
               MODEL_attc, out_dir + name + "_subseq.fst"])
     
     elif strand_search == "top":
-        call([ BIN_DIR + "cmsearch", "-Z", str(SIZE_REPLICON/1000000.), "--toponly",
+        call([CMSEARCH, "-Z", str(SIZE_REPLICON/1000000.), "--toponly",
               "--max", "--cpu", N_CPU, "-o",
               out_dir + name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res",
               "--tblout", out_dir + name  + "_subseq_attc_table.res", "-E" "10",
               MODEL_attc, out_dir + name + "_subseq.fst"])
     
     elif strand_search == "bottom":
-        call([ BIN_DIR + "cmsearch", "-Z", str(SIZE_REPLICON/1000000.), "--bottomonly",
+        call([CMSEARCH, "-Z", str(SIZE_REPLICON/1000000.), "--bottomonly",
               "--max", "--cpu", N_CPU, "-o",
               out_dir + name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res",
               "--tblout", out_dir + name + "_subseq_attc_table.res", "-E" "10",
@@ -964,7 +964,7 @@ def find_attc(name, in_dir = ".", out_dir = "."):
     Return nothing, the results are written on the disk
     """      
 
-    call([ BIN_DIR + "cmsearch", "--cpu", N_CPU, "-o", out_dir + name + "_attc.res",
+    call([CMSEARCH, "--cpu", N_CPU, "-o", out_dir + name + "_attc.res",
           "--tblout", out_dir + name + "_attc_table.res", "-E" "10",
           MODEL_attc, in_dir + name + ".fst"])
 
@@ -983,40 +983,44 @@ def find_integrase(name, in_dir = ".", out_dir = "."):
         if os.path.isfile(out_dir + "/" + name + ".prt") == False:
             if SIZE_REPLICON > 200000:
 
-                call([BIN_DIR + "prodigal", "-i",  in_dir + name + ".fst",
+                call([PRODIGAL, "-i",  in_dir + name + ".fst",
                       "-a", out_dir + "/" + name + ".prt", "-o", "/dev/null"])
 
             else: # if small genome, prodigal annotate it as contig.
-                call([BIN_DIR + "prodigal", "-p", "meta", "-i",  in_dir + name + ".fst",
+                call([PRODIGAL, "-p", "meta", "-i",  in_dir + name + ".fst",
                       "-a", out_dir + "/" + name + ".prt", "-o", "/dev/null"])
+    
+    if os.path.isfile(out_dir + name + "_intI_table.res") == False:
                     
-    call([BIN_DIR + "hmmsearch", "--cpu", N_CPU, "--tblout", out_dir + name + "_intI_table.res",
-          "-o", out_dir + name + "_intI.res", MODEL_integrase,
-          PROT_file])
-    call([BIN_DIR + "hmmsearch", "--cpu", N_CPU, "--tblout", out_dir + name + "_phage_int_table.res",
-          "-o", out_dir + name + "_phage_int.res", MODEL_phage_int,
-          PROT_file])
+        call([HMMSEARCH, "--cpu", N_CPU, "--tblout", out_dir + name + "_intI_table.res",
+              "-o", out_dir + name + "_intI.res", MODEL_integrase,
+              PROT_file])
+    if os.path.isfile(out_dir + name + "_phage_int_table.res") == False:
+        call([HMMSEARCH, "--cpu", N_CPU, "--tblout",
+              out_dir + name + "_phage_int_table.res",
+              "-o", out_dir + name + "_phage_int.res", MODEL_phage_int,
+              PROT_file])
     
 
 def find_resfams(name, in_dir=".", out_dir=".", hmm_file="Resfams.hmm"):
     """
     Call hmmmer to annotate antibiotique resistance gene with the model from Resfams (Gibson et al, ISME J.,  2014)
     """
-    call([BIN_DIR + "hmmsearch", "--cpu", N_CPU, "--tblout", out_dir + name + "_atb_table.res",
+    call([HMMSEARCH, "--cpu", N_CPU, "--tblout", out_dir + name + "_atb_table.res",
           "-o", out_dir + name + "_atb.res", MODEL_DIR + hmm_file,
           PROT_file])
 
-def read_hmm(file):
+def read_hmm(infile):
     """
     Function that parse hmmer --tblout output and returns a pandas DataFrame
     """
     try:
-        _ = pd.read_table(file, comment="#")
+        _ = pd.read_table(infile, comment="#")
     except:
         return pd.DataFrame(columns = ["Accession_number","query_name", "ID_query", "ID_prot","strand","pos_beg","pos_end","evalue"])
         
     if not args.gembase:
-        df = pd.read_table(file, sep="\s*", engine="python", header=None, skipfooter=10, skiprows=3)
+        df = pd.read_table(infile, sep="\s*", engine="python", header=None, skipfooter=10, skiprows=3)
         df = df[[2,3,0,23,19,21,4]]
         df = df[df[4] < 10]
         df["Accession_number"] = name
@@ -1027,7 +1031,7 @@ def read_hmm(file):
         df.columns = ["Accession_number","query_name", "ID_query", "ID_prot","strand","pos_beg","pos_end","evalue"]
         return df
     else:
-        df_tmp = pd.read_table(file, sep="|", engine="python", header=None, skipfooter=10, skiprows=3)
+        df_tmp = pd.read_table(infile, sep="|", engine="python", header=None, skipfooter=10, skiprows=3)
         df = pd.DataFrame(df_tmp[0].str.split().tolist())
         df = df[[2,3,0,18,21,22,4]]
         df[[21,22,4]] = df[[21,22,4]].astype("float")
@@ -1045,7 +1049,6 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
     """
     Function that parse cmsearch --tblout output and returns a pandas DataFrame
     """
-    
    
     try:
         _ = pd.read_table(infile, comment="#")
@@ -1062,7 +1065,9 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
     df = df[c[-1:] + c[:-1]]
     df.sort([8,15], inplace=True)
     df.index = range(0,len(df))
-    df.columns = ["Accession_number","cm_attC","cm_debut","cm_fin","pos_beg","pos_end","sens","evalue"]
+    df.columns = ["Accession_number", "cm_attC", "cm_debut", "cm_fin",
+                  "pos_beg", "pos_end",
+                  "sens", "evalue"]
     idx = (df.pos_beg > df.pos_end)
     df.loc[idx, ['pos_beg', 'pos_end']] = df.loc[idx, ['pos_end','pos_beg']].values  
     return df
@@ -1120,28 +1125,18 @@ def to_gbk(df, sequence):
         else:
             type_integron = df.loc[i].type.values[0]
             # Should only be true if integron over edge of sequence:
-            diff_int = df.loc[i].query('type_elt=="protein"'
-                                   ).pos_beg.diff() > DISTANCE_THRESHOLD
-            diff_attc = df.loc[i].query('type_elt=="attC"'
-                                   ).pos_beg.diff() > DISTANCE_THRESHOLD
+            diff = df.loc[i].pos_beg.diff() > DISTANCE_THRESHOLD
             
-            if diff_int.any() and diff_attc.any():
+            if diff.any():
                 pos = np.where(diff)[0][0]
 
-                start_integron_1 = df.loc[i].query('type_elt=="protein"').pos_beg.values[pos]
+                start_integron_1 =  df.loc[i].pos_beg.values[pos]
                 
-                if any((start_integron_1 - df.loc[i].query('annotation=="intI"').pos_beg.values
-                        )%SIZE_REPLICON < DISTANCE_THRESHOLD ):
-                    start_integron_1 = df.loc[i].query('annotation=="intI"').pos_beg.values[0]            
-
                 end_integron_1 = SIZE_REPLICON
 
                 start_integron_2 = 1            
 
-                end_integron_2 = df.loc[i].query('type_elt=="protein"').pos_end.values[pos-1]
-                if any((df.loc[i].query('annotation=="intI"').pos_beg.values - end_integron_2
-                        )%SIZE_REPLICON < DISTANCE_THRESHOLD ):
-                    end_integron_2 = df.loc[i].query('annotation=="intI"').pos_beg.values[0]            
+                end_integron_2 =  df.loc[i].pos_end.values[pos-1]
                 
                 f1 = SeqFeature.FeatureLocation(start_integron_1-1, end_integron_1)
                 f2 = SeqFeature.FeatureLocation(start_integron_2-1, end_integron_2)
@@ -1155,23 +1150,9 @@ def to_gbk(df, sequence):
                 
             else:
                 
-                start_integron = df.loc[i].query('type_elt=="protein"').pos_beg.min()
-                end_integron = df.loc[i].query('type_elt=="protein"').pos_end.max()
+                start_integron = df.loc[i].pos_beg.values[0]
+                end_integron = df.loc[i].pos_end.values[-1]
                 
-                if type_integron != "In0":
-                    attc_left = df.loc[i].query('type_elt=="attC"').pos_beg.values[0]
-                    attc_right = df.loc[i].query('type_elt=="attC"').pos_end.values[-1]
-
-                    if ((start_integron - attc_left)%SIZE_REPLICON <
-                        (attc_left - start_integron)%SIZE_REPLICON):
-                        # are there attC before the first proteins?
-                        start_integron = attc_left
-                
-                    if ((attc_right - end_integron)%SIZE_REPLICON <
-                        (end_integron - attc_right)%SIZE_REPLICON):
-                        # are there attC after the last proteins?
-                        end_integron = attc_right
-
                 tmp = SeqFeature.SeqFeature(location=
                                SeqFeature.FeatureLocation(start_integron-1,
                                                          end_integron),
@@ -1225,35 +1206,72 @@ if __name__ == "__main__":
                     action="store_true")
     parser.add_argument("--resfams", help="Detect antibiotic resistances with Resfams HMM profiles",
                     action="store_true")
-    parser.add_argument("--gembase", help="Use gembase formatted protein file. Folder structure must be preserved",
-                    action="store_true")
-    parser.add_argument("--union_integrases", help="Instead of taking intersection of hits from Phage_int profile (Tyr recombinases) and integron_integrase profile, use the union of the hits",
-                    action="store_true")
-                    
-    parser.add_argument('--attc_model',
-                    default='attc_4.cm',
+
+    parser.add_argument('--cpu',
+                    default='1',
                     action='store',
                     type=str,
-                    metavar='file.cm',
-                    help='path or file to the attc model (Covariance Matrix)')
-    parser.add_argument('--evalue_attc',
-                    default=1.,
+                    help='Number of CPUs used by INFERNAL and HMMER')
+                    
+    parser.add_argument('-dt', '--distance_thresh',
+                    default=4000,
                     action='store',
-                    type=float,
-                    metavar='1',
-                    help='set evalue threshold to filter out hits above it (default: 1)')
+                    type=int,
+                    help='Two element are aggregated if they are distant of DISTANCE_THRESH [4kb] or less')
+                    
+                    
     parser.add_argument('--outdir',
                     default=".",
                     action='store',
                     type=str,
                     metavar='.',
                     help='set the output directory (default: current)')
+    
+    parser.add_argument("--linear", help="consider replicon as linear. If replicon smaller than 20kb, it will be considered as linear",
+                        action="store_true")                        
+    
+    parser.add_argument("--union_integrases", help="Instead of taking intersection of hits from Phage_int profile (Tyr recombinases) and integron_integrase profile, use the union of the hits",
+                    action="store_true")
+
+    parser.add_argument('--cmsearch',
+                    default=distutils.spawn.find_executable("cmsearch"),
+                    action='store',
+                    type=str,
+                    help='Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch')
+
+    parser.add_argument('--hmmsearch',
+                    default=distutils.spawn.find_executable("hmmsearch"),
+                    action='store',
+                    type=str,
+                    help='Complete path to hmmsearch if not in PATH. eg: /usr/local/bin/hmmsearch')
+
+    parser.add_argument('--prodigal',
+                    default=distutils.spawn.find_executable("prodigal"),
+                    action='store',
+                    type=str,
+                    help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
+   
+    parser.add_argument("--gembase", help="Use gembase formatted protein file instead of Prodigal. Folder structure must be preserved",
+                    action="store_true")
+                    
+    
+    parser.add_argument('--attc_model',
+                    default='attc_4.cm',
+                    action='store',
+                    type=str,
+                    metavar='file.cm',
+                    help='path or file to the attc model (Covariance Matrix)')
+                    
+    parser.add_argument('--evalue_attc',
+                    default=1.,
+                    action='store',
+                    type=float,
+                    metavar='1',
+                    help='set evalue threshold to filter out hits above it (default: 1)')
 
     parser.add_argument("--keep_palindromes", help="for a given hit, if the palindromic version is found, don't remove the one with highest evalue ",
                         action="store_true")
                         
-    parser.add_argument("--linear", help="consider replicon as linear. If replicon smaller than 20kb, it will be considered as linear",
-                        action="store_true")                        
         
     args = parser.parse_args()
     replicon = args.replicon    
@@ -1269,12 +1287,12 @@ if __name__ == "__main__":
         pass
         
     try:
-        os.mkdir(args.outdir + "/Results_attc_finder_" + name + "/")
+        os.mkdir(args.outdir + "/Results_Integron_Finder_" + name + "/")
     except OSError:
         pass
     
     
-    out_dir = args.outdir + "/Results_attc_finder_" + name + "/"
+    out_dir = args.outdir + "/Results_Integron_Finder_" + name + "/"
 
     if len(replicon.split("/")) > 1:
         in_dir = "/".join(replicon.split("/")[:-1]) + "/"
@@ -1283,21 +1301,28 @@ if __name__ == "__main__":
 
     SEQUENCE = SeqIO.read(in_dir + "/" + name + "." + extension, "fasta",
                           alphabet = Seq.IUPAC.unambiguous_dna)
-    if len(SEQUENCE) > 20000:
-        circular = not args.linear
-    else:
-        circular = False
+    
     
     ############### Definitions ###############
     
-    N_CPU = "20"
+    N_CPU = args.cpu
     SIZE_REPLICON = len(SEQUENCE)
-    DISTANCE_THRESHOLD = 4000
-   
+    DISTANCE_THRESHOLD = args.distance_thresh
+    
+    # If sequence is too small, it can be problematic when using circularity
+    if len(SEQUENCE) > 4 * DISTANCE_THRESHOLD:
+        circular = not args.linear
+    else:
+        circular = False
+
     MODEL_DIR = os.path.abspath(os.path.dirname(__file__)) + "/Models/"
     MODEL_integrase = MODEL_DIR + "integron_integrase.hmm"
     MODEL_phage_int = MODEL_DIR + "phage-int.hmm"
-    BIN_DIR = os.path.abspath(os.path.dirname(__file__)) + "/bin/"
+    
+    CMSEARCH = args.cmsearch
+    HMMSEARCH = args.hmmsearch
+    PRODIGAL = args.prodigal
+
     RESFAMS_HMM = "Resfams.hmm"
     
     if len(args.attc_model.split("/")) > 1: #contain path
@@ -1369,12 +1394,13 @@ if __name__ == "__main__":
                                                  "type", "default", "distance_2attC"]]
         integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
         integrons_describe.index = range(len(integrons_describe))
-        to_gbk(integrons_describe, SEQUENCE)
-        SeqIO.write(SEQUENCE, out_dir + name + ".gbk", "genbank")
 
         integrons_describe['evalue'] = integrons_describe['evalue'].map(lambda x: '%.3e' % x)
         integrons_describe.sort(["ID_integron","pos_beg", "evalue"], inplace=True)
         integrons_describe.to_csv(out_dir + outfile, sep="\t", index=0, fillna="NA")
+        to_gbk(integrons_describe, SEQUENCE)
+        SeqIO.write(SEQUENCE, out_dir + name + ".gbk", "genbank")
+
 
     else:
         out_f = open(out_dir + outfile, "w")
