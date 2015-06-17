@@ -64,7 +64,7 @@ optional arguments:
 
 ### Example
 
-python attc_finder.py myfastafile.fst --resfams --max
+    python Integron_Finder.py myfastafile.fst --resfams --max
 
 ## Output :
 
