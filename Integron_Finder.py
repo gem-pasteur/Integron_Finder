@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""
+integron_finder is a program that looks for integron in DNA sequences.
+"""
+
 import numpy as np
 import pandas as pd
 from Bio import SeqIO
@@ -93,7 +97,9 @@ class Integron:
         Function that looks for known promoters if they exists within your integrons element. 
         It takes 1s for about 13kb.
         """
+        
         dist_prom = 500 # pb distance from edge of the element for which we seek promoter
+        
         ######## Promoter of integrase #########
 
         if self.has_integrase():
@@ -1002,7 +1008,7 @@ def find_integrase(name, in_dir = ".", out_dir = "."):
               PROT_file])
     
 
-def find_resfams(name, in_dir=".", out_dir=".", hmm_file="Resfams.hmm"):
+def find_resfams(name, in_dir=".", out_dir=".", evalue=10,  hmm_file="Resfams.hmm"):
     """
     Call hmmmer to annotate antibiotique resistance gene with the model from Resfams (Gibson et al, ISME J.,  2014)
     """
@@ -1010,7 +1016,7 @@ def find_resfams(name, in_dir=".", out_dir=".", hmm_file="Resfams.hmm"):
           "-o", out_dir + name + "_atb.res", MODEL_DIR + hmm_file,
           PROT_file])
 
-def read_hmm(infile):
+def read_hmm(infile, evalue=1):
     """
     Function that parse hmmer --tblout output and returns a pandas DataFrame
     """
@@ -1022,7 +1028,7 @@ def read_hmm(infile):
     if not args.gembase:
         df = pd.read_table(infile, sep="\s*", engine="python", header=None, skipfooter=10, skiprows=3)
         df = df[[2,3,0,23,19,21,4]]
-        df = df[df[4] < 10]
+        df = df[df[4] < evalue]
         df["Accession_number"] = name
         c = df.columns.tolist()
         df = df[c[-1:] + c[:-1]]
@@ -1035,7 +1041,7 @@ def read_hmm(infile):
         df = pd.DataFrame(df_tmp[0].str.split().tolist())
         df = df[[2,3,0,18,21,22,4]]
         df[[21,22,4]] = df[[21,22,4]].astype("float")
-        df = df[df[4] < 10]
+        df = df[df[4] < evalue]
         df["Accession_number"] = name
         c = df.columns.tolist()
         df = df[c[-1:] + c[:-1]]
@@ -1374,10 +1380,10 @@ if __name__ == "__main__":
         for i in integrons:
             if i.type() != "In0": # complete & attC0
                 i.add_proteins()
+                
+            if i.type() == "complete":
                 i.add_promoter()
                 i.add_attI()
-            if i.type() == "complete":
-
                 i.draw_integron(file=out_dir + name + "_" + str(j) + ".pdf")
                 j += 1
             if i.type() == "In0":
