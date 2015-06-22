@@ -14,7 +14,10 @@ from subprocess import call
 import psutil
 import os
 import argparse
+from matplotlib import use as m_use
+m_use("Agg")
 import matplotlib.pyplot as plt
+
 import distutils
 
 class Integron:
@@ -415,7 +418,7 @@ class Integron:
         """
         full = self.describe()
         full["evalue"] = full["evalue"].astype("float")
-        h = [i + (0.5*i) if j.startswith("P") else i for i,j in zip(full.strand, full.element)]
+        h = [i + (0.5*i) if j == "Promoter" else i for i,j in zip(full.strand, full.type_elt)]
         fig, ax = plt.subplots(1,1, figsize=(16,9))
         alpha = [i if i<1 else 1 for i in (
                  (np.log10(full.evalue) - np.ones(len(full))*-1)/
@@ -424,12 +427,12 @@ class Integron:
                  # normalize alpha value with 0.2 as min value
                  
         colors = ["#749FCD" if i=="attC" else
-                  "#DD654B" if i=="integrase" else
+                  "#DD654B" if i=="intI" else
                   "#6BC865" if i[-2:]=="_1" else
                   "#D06CC0" if i[-2:]=="_2" else
                   "#C3B639" if i[-2:]=="_3" else
                   "#e8950e" if i != "protein" else
-                  "#d3d3d3" for i in full.type_elt]
+                  "#d3d3d3" for i in full.annotation]
         
         colors_alpha = [j+[i] for j,i in zip([[ord(c)/255. for c in i[1:].decode("hex")] for i in colors],
                                               alpha)]          
