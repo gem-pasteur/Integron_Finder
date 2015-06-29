@@ -1358,7 +1358,7 @@ if __name__ == "__main__":
                               out_dir + name + "_phage_int_table.res")
     if args.resfams:
         
-        if os.path.isfile(out_dir + "/" + name + "_atb_table.res") == False:
+        if not os.path.isfile(os,path.join(out_dir, "/", name + "_atb_table.res")):
             find_resfams(name, in_dir, out_dir, RESFAMS_HMM)
         
         resfams_hits = read_hmm(out_dir + name + "_atb_table.res")
