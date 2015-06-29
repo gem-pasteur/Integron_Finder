@@ -972,10 +972,9 @@ def find_attc(name, in_dir = ".", out_dir = "."):
     Call cmsearch to find attC site in a single replicon.
     Return nothing, the results are written on the disk
     """      
-
     call([CMSEARCH, "--cpu", N_CPU, "-o", out_dir + name + "_attc.res",
           "--tblout", out_dir + name + "_attc_table.res", "-E" "10",
-          MODEL_attc, in_dir + name + ".fst"])
+          MODEL_attc, os.path.abspath(in_dir + name + ".fst")])
 
 def find_integrase(name, in_dir = ".", out_dir = "."):
     """
@@ -1324,10 +1323,10 @@ if __name__ == "__main__":
     else:
         circular = False
 
-    MODEL_DIR = os.path.abspath(os.path.dirname(__file__)) + "/Models/"
-    MODEL_integrase = MODEL_DIR + "integron_integrase.hmm"
-    MODEL_phage_int = MODEL_DIR + "phage-int.hmm"
-    
+    MODEL_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "Models")
+    MODEL_integrase = os.path.join(MODEL_DIR, "integron_integrase.hmm")
+    MODEL_phage_int = os.path.join(MODEL_DIR, "phage-int.hmm")
+
     CMSEARCH = args.cmsearch
     HMMSEARCH = args.hmmsearch
     PRODIGAL = args.prodigal
@@ -1337,15 +1336,15 @@ if __name__ == "__main__":
     if len(args.attc_model.split("/")) > 1: #contain path
         MODEL_attc = args.attc_model
     else:
-        MODEL_attc = MODEL_DIR + args.attc_model
+        MODEL_attc = os.path.join(MODEL_DIR, args.attc_model)
 
     model_attc_name = MODEL_attc.split("/")[-1].split(".cm")[0]
     
     if args.gembase:
-        PROT_dir = in_dir + "../Proteins/"
-        PROT_file = PROT_dir + name + ".prt"
+        PROT_dir = os.path.jon(in_dir, "..", "Proteins")
+        PROT_file = os.path.join(PROT_dir, name + ".prt")
     else:
-        PROT_file = out_dir + name + ".prt"
+        PROT_file = os.path.join(out_dir, name + ".prt")
 
     ############### Default search ###############
 
