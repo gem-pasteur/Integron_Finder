@@ -18,10 +18,10 @@ from matplotlib import use as m_use
 m_use("Agg")
 import matplotlib.pyplot as plt
 
-import distutils
+import distutils.spawn
 
 class Integron:
-    """Integron object represente an object composed of an integrase, attC sites and gene cassettes. 
+    """Integron object represents an object composed of an integrase, attC sites and gene cassettes.
     Each element is characterized by their coordinates in the replicon, the strand (+ or -),
     the ID of the gene (except attC).
     The object Integron is also characterized by the ID of the replicon."""
