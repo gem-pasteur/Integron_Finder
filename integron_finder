@@ -1097,40 +1097,6 @@ def read_hmm(infile, evalue=1, coverage=0.5):
 
     return df_out
 
-
-    # try:
-    #     _ = pd.read_table(infile, comment="#")
-    # except:
-    #     return pd.DataFrame(columns = ["Accession_number","query_name", "ID_query", "ID_prot","strand","pos_beg","pos_end","evalue"])
-    #
-    # if not args.gembase:
-    #     df = pd.read_table(infile, sep="\s*", engine="python", header=None, skipfooter=10, skiprows=3)
-    #     df = df[[2,3,0,23,19,21,4]]
-    #     df = df[df[4] < evalue]
-    #     df["Accession_number"] = name
-    #     c = df.columns.tolist()
-    #     df = df[c[-1:] + c[:-1]]
-    #     df.sort([19,4], inplace=True)
-    #     df.index = range(0,len(df))
-    #     df.columns = ["Accession_number", "query_name", "ID_query", "ID_prot",
-    #                   "strand", "pos_beg", "pos_end", "evalue"]
-    #     return df
-    # else:
-    #     df_tmp = pd.read_table(infile, sep="|", engine="python", header=None, skipfooter=10, skiprows=3)
-    #     df = pd.DataFrame(df_tmp[0].str.split().tolist())
-    #     df = df[[2, 3, 0, 18, 21, 22, 4]]
-    #     df[[21,22,4]] = df[[21,22,4]].astype("float")
-    #     df = df[df[4] < evalue]
-    #     df["Accession_number"] = name
-    #     c = df.columns.tolist()
-    #     df = df[c[-1:] + c[:-1]]
-    #     df.sort([21,4], inplace=True)
-    #     df.index = range(0,len(df))
-    #     df.columns = ["Accession_number","query_name", "ID_query", "ID_prot",
-    #                   "strand", "pos_beg", "pos_end", "evalue"]
-    #     df["strand"] = df["strand"].apply(lambda x: 1 if x =="D" else -1)
-    #     return df
-
 def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
     """
     Function that parse cmsearch --tblout output and returns a pandas DataFrame
@@ -1335,6 +1301,13 @@ if __name__ == "__main__":
                     type=str,
                     help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
 
+    parser.add_argument('--dir_func_annot',
+                        default="./Functional_annotation"
+                        action='store',
+                        type=str,
+                        help='Complete path to a directory containing HMM profiles')
+
+
     parser.add_argument("--gembase", help="Use gembase formatted protein file instead of Prodigal. Folder structure must be preserved",
                     action="store_true")
 
@@ -1400,7 +1373,6 @@ if __name__ == "__main__":
         circular = False
 
     MODEL_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "Models/")
-    FA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "Functional_annotation/")
     MODEL_integrase = os.path.join(MODEL_DIR, "integron_integrase.hmm")
     MODEL_phage_int = os.path.join(MODEL_DIR, "phage-int.hmm")
 
@@ -1408,7 +1380,10 @@ if __name__ == "__main__":
     HMMSEARCH = args.hmmsearch
     PRODIGAL = args.prodigal
 
-    FA_HMM = [f for f in os.listdir(FA_DIR) if f.endswith("hmm")  or f.endswith("HMM")]
+    if args.func_annot or args.dir_func_annot == "./Functional_annotation":
+        FA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), args.dir_func_annot)
+        FA_HMM = [f for f in os.listdir(FA_DIR) if f.endswith("hmm")  or f.endswith("HMM")]
+        is_func_annot = True
 
     if len(args.attc_model.split("/")) > 1: #contain path
         MODEL_attc = args.attc_model
@@ -1464,7 +1439,7 @@ if __name__ == "__main__":
 
         ############### Functional annotation ###############
 
-        if args.func_annot and len(FA_HMM) > 0:
+        if is_func_annot and len(FA_HMM) > 0:
 
             if os.path.isfile(os.path.join(out_dir, "/", name + "_fa_table.res")) == False:
                 func_annot(name, in_dir, out_dir, FA_HMM)
