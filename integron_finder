@@ -6,6 +6,7 @@ integron_finder is a program that looks for integron in DNA sequences.
 
 import numpy as np
 import pandas as pd
+import re
 from Bio import SeqIO
 from Bio import motifs
 from Bio import Seq
@@ -989,7 +990,7 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
     """
     Call hmmmer to annotate CDS associated with the integron. Use Resfams per default (Gibson et al, ISME J.,  2014)
     """
-
+    print "# Start Functional annotation... : "
     for integron in integrons:
 
         func_annotate_res = pd.DataFrame(columns = ["Accession_number",
@@ -1007,15 +1008,15 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
         SeqIO.write(prot_to_annotate,
                     prot_tmp,
                      "fasta")
+
         for hmm in hmm_files:
-            print hmm
+            print "... with ", hmm
             call([HMMSEARCH, "-Z", str(n_prot), "--cpu", N_CPU, "--tblout", out_dir + name + "_fa_table.res",
                   "-o", out_dir + name + "_fa.res", FA_DIR + hmm,
                   prot_tmp])
-            hmm_in = read_hmm(out_dir + name + "_fa_table.res"
+            hmm_in = read_hmm(out_dir + name + "_fa.res"
                              ).sort("evalue"
                                    ).drop_duplicates(subset="ID_prot")
-            print len(hmm_in)
             func_annotate_res = pd.concat([func_annotate_res, hmm_in])
 
         func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
@@ -1023,44 +1024,102 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
         integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
         integron.proteins.loc[func_annotate_res.ID_prot, "model"] = func_annotate_res.ID_query.values
 
-def read_hmm(infile, evalue=1):
+def read_hmm(infile, evalue=1, coverage=0.5):
     """
-    Function that parse hmmer --tblout output and returns a pandas DataFrame
-    TODO: Add coverage filter
-
+    Function that parse hmmer --out output and returns a pandas DataFrame
+    filter output by evalue and coverage. (Being % of the profile aligned)
     """
-    try:
-        _ = pd.read_table(infile, comment="#")
-    except:
-        return pd.DataFrame(columns = ["Accession_number","query_name", "ID_query", "ID_prot","strand","pos_beg","pos_end","evalue"])
 
-    if not args.gembase:
-        df = pd.read_table(infile, sep="\s*", engine="python", header=None, skipfooter=10, skiprows=3)
-        df = df[[2,3,0,23,19,21,4]]
-        df = df[df[4] < evalue]
-        df["Accession_number"] = name
-        c = df.columns.tolist()
-        df = df[c[-1:] + c[:-1]]
-        df.sort([19,4], inplace=True)
-        df.index = range(0,len(df))
-        df.columns = ["Accession_number", "query_name", "ID_query", "ID_prot",
-                      "strand", "pos_beg", "pos_end", "evalue"]
-        return df
-    else:
-        df_tmp = pd.read_table(infile, sep="|", engine="python", header=None, skipfooter=10, skiprows=3)
-        df = pd.DataFrame(df_tmp[0].str.split().tolist())
-        df = df[[2, 3, 0, 18, 21, 22, 4]]
-        df[[21,22,4]] = df[[21,22,4]].astype("float")
-        df = df[df[4] < evalue]
-        df["Accession_number"] = name
-        c = df.columns.tolist()
-        df = df[c[-1:] + c[:-1]]
-        df.sort([21,4], inplace=True)
-        df.index = range(0,len(df))
-        df.columns = ["Accession_number","query_name", "ID_query", "ID_prot",
-                      "strand", "pos_beg", "pos_end", "evalue"]
-        df["strand"] = df["strand"].apply(lambda x: 1 if x =="D" else -1)
-        return df
+    df = pd.DataFrame(columns = ["Accession_number", "query_name", "ID_query",
+                                 "ID_prot", "strand", "pos_beg", "pos_end",
+                                 "evalue", "hmmfrom", "hmmto", "alifrom",
+                                 "alito", "len_profile"])
+
+    hmm_file = open(infile, "r") # no split
+
+    _re_ID = re.compile("^>>\s([\w\_\.]*)\s*#\s*(\d*)\s*#\s*(\d*)\s*#\s*([-\d]{1,2})")
+    _re_data = re.compile("^\s*[\d]*\s[!?]\s*[\d\.\e\-]*\s*[\d\.\e\-]*\s*[\d\.e\-]*\s*([\d\.e\-]*)\s*([\d]*)\s*([\d]*)\s..\s*([\d]*)\s*([\d]*)")
+    _re_query = re.compile("^Query:\s*(\w*)\s*\[\w*\=(\d*)\]\n.*")
+
+    idx = 0
+    for line in hmm_file.readlines():
+
+        try:
+            id_prot, pos_beg, pos_end, strand = re.search(_re_ID, line).groups()
+        except AttributeError:
+            pass
+
+        try:
+            query, len_profile = re.search(_re_query, line).groups()
+        except AttributeError:
+            pass
+
+        try:
+            evalue, hmmfrom, hmmto, alifrom, alito = re.search(_re_data, line
+                                                              ).groups()
+
+            df.loc[idx, "ID_prot"]  = id_prot
+            df.loc[idx, "ID_query"] = "-" # remnant of ancient parsing function to keep data structure
+            df.loc[idx, "pos_beg"]  = int(pos_beg)
+            df.loc[idx, "pos_end"]  = int(pos_end)
+            df.loc[idx, "strand"]   = int(strand)
+
+            df.loc[idx, "evalue"]  = float(evalue)   # i-evalue
+            df.loc[idx, "hmmfrom"] =   int(hmmfrom)  # hmmfrom
+            df.loc[idx, "hmmto"]   =   int(hmmto)    # hmm to
+            df.loc[idx, "alifrom"] =   int(alifrom)  # alifrom
+            df.loc[idx, "alito"]   =   int(alito)    # ali
+            df.loc[idx, "len_profile"] = float(len_profile)
+            df.loc[idx, "Accession_number"] = name
+            df.loc[idx, "query_name"] = query
+
+            idx += 1
+
+        except AttributeError:
+            pass
+
+    df = df[((df.hmmto - df.hmmfrom)/df.len_profile > coverage) &
+             (df.evalue < evalue)]
+    df.index = range(len(df))
+
+    df_out = df[["Accession_number", "query_name", "ID_query", "ID_prot",
+                 "strand", "pos_beg", "pos_end", "evalue"]]
+
+    return df_out
+
+
+    # try:
+    #     _ = pd.read_table(infile, comment="#")
+    # except:
+    #     return pd.DataFrame(columns = ["Accession_number","query_name", "ID_query", "ID_prot","strand","pos_beg","pos_end","evalue"])
+    #
+    # if not args.gembase:
+    #     df = pd.read_table(infile, sep="\s*", engine="python", header=None, skipfooter=10, skiprows=3)
+    #     df = df[[2,3,0,23,19,21,4]]
+    #     df = df[df[4] < evalue]
+    #     df["Accession_number"] = name
+    #     c = df.columns.tolist()
+    #     df = df[c[-1:] + c[:-1]]
+    #     df.sort([19,4], inplace=True)
+    #     df.index = range(0,len(df))
+    #     df.columns = ["Accession_number", "query_name", "ID_query", "ID_prot",
+    #                   "strand", "pos_beg", "pos_end", "evalue"]
+    #     return df
+    # else:
+    #     df_tmp = pd.read_table(infile, sep="|", engine="python", header=None, skipfooter=10, skiprows=3)
+    #     df = pd.DataFrame(df_tmp[0].str.split().tolist())
+    #     df = df[[2, 3, 0, 18, 21, 22, 4]]
+    #     df[[21,22,4]] = df[[21,22,4]].astype("float")
+    #     df = df[df[4] < evalue]
+    #     df["Accession_number"] = name
+    #     c = df.columns.tolist()
+    #     df = df[c[-1:] + c[:-1]]
+    #     df.sort([21,4], inplace=True)
+    #     df.index = range(0,len(df))
+    #     df.columns = ["Accession_number","query_name", "ID_query", "ID_prot",
+    #                   "strand", "pos_beg", "pos_end", "evalue"]
+    #     df["strand"] = df["strand"].apply(lambda x: 1 if x =="D" else -1)
+    #     return df
 
 def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
     """
@@ -1361,8 +1420,8 @@ if __name__ == "__main__":
 
     print "Default search done... : \n"
     integrons = find_integron(out_dir + name + "_attc_table.res",
-                              out_dir + name + "_intI_table.res",
-                              out_dir + name + "_phage_int_table.res")
+                              out_dir + name + "_intI.res",
+                              out_dir + name + "_phage_int.res")
 
     ############### Max search ###############
     if args.max:
