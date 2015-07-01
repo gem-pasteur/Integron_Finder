@@ -1372,7 +1372,17 @@ if __name__ == "__main__":
     else:
         circular = False
 
-    MODEL_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "Models/")
+    _prefix_data = '$PREFIXDATA'
+
+    # integron was not installed using the setup.py
+    # it's a developement version using environment variable
+    if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
+        _prefix_data = os.path.join(os.environ['INTEGRON_HOME'], 'data')
+
+    if not os.path.exists(_prefix_data):
+        raise Exception("cannot find integron_finder data check your installation")
+
+    MODEL_DIR = os.path.join(os.path.abspath(_prefix_data, "Models/")
     MODEL_integrase = os.path.join(MODEL_DIR, "integron_integrase.hmm")
     MODEL_phage_int = os.path.join(MODEL_DIR, "phage-int.hmm")
 
@@ -1381,7 +1391,8 @@ if __name__ == "__main__":
     PRODIGAL = args.prodigal
 
     if args.func_annot or args.dir_func_annot == "./Functional_annotation":
-        FA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), args.dir_func_annot)
+
+        FA_DIR = os.path.join(os.path.abspath(_prefix_data, args.dir_func_annot)
         FA_HMM = [f for f in os.listdir(FA_DIR) if f.endswith("hmm")  or f.endswith("HMM")]
         is_func_annot = True
 
