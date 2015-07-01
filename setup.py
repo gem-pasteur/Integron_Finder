@@ -91,9 +91,9 @@ class install_integron_finder(install):
     def run(self):
         inst = self.distribution.command_options.get('install')
         vars_2_subst = {'PREFIX': inst['prefix'][1] if 'prefix' in inst else '',
-                        #'PREFIXCONF' : os.path.join(get_install_conf_dir(inst), 'macsyfinder'),
-                        'PREFIXDATA' : os.path.join(get_install_data_dir(inst), 'macsyfinder'),
-                        #'PREFIXDOC' : os.path.join(get_install_doc_dir(inst), 'macsyfinder'),
+                        #'PREFIXCONF' : os.path.join(get_install_conf_dir(inst), 'integron_finder'),
+                        'PREFIXDATA' : os.path.join(get_install_data_dir(inst), 'integron_finder'),
+                        #'PREFIXDOC' : os.path.join(get_install_doc_dir(inst), 'integron_finder'),
                         }
         print "@@@ install self.distribution.fix_prefix = ",self.distribution.fix_prefix
         if self.distribution.fix_prefix:
@@ -119,9 +119,9 @@ class install_scripts(_install_scripts):
     def run(self):
         inst = self.distribution.command_options.get('install')
         vars_2_subst = {'PREFIX': inst['prefix'][1] if 'prefix' in inst else '',
-                        #'PREFIXCONF' : os.path.join(get_install_conf_dir(inst), 'macsyfinder'),
-                        'PREFIXDATA' : os.path.join(get_install_data_dir(inst), 'macsyfinder'),
-                        #'PREFIXDOC' : os.path.join(get_install_doc_dir(inst), 'macsyfinder'),
+                        #'PREFIXCONF' : os.path.join(get_install_conf_dir(inst), 'integron_finder'),
+                        'PREFIXDATA' : os.path.join(get_install_data_dir(inst), 'integron_finder'),
+                        #'PREFIXDOC' : os.path.join(get_install_doc_dir(inst), 'integron_finder'),
                         }
         print "@@@ install_scripts self.distribution.fix_prefix = ",self.distribution.fix_prefix
         for _file in self.distribution.fix_scripts:
@@ -363,10 +363,12 @@ setup(name='integron_finder',
                     ],
       scripts=['integron_finder'],
       #(dataprefix +'where to put the data in the install, [where to find the data in the tar ball]
-      data_files=[('integron_finder/Functional_annotation', ['data/Functional_annotation/'])],
+      data_files=[('integron_finder/Functional_annotation', ['data/Functional_annotation/']),
+                  ('integron_finder/Models', ['data/Models/']),
+                  ],
       #file where some variable must be fix by install_conf
-      #fix_conf=['etc/macsyfinder.conf'],
-      #file where some variable must be fix by macsyfinder_install
+      #fix_conf=['etc/integron_finder.conf'],
+      #file where some variable must be fix by integron_finder_install
       #fix_prefix=['integron_finder'],
       fix_scripts=['integron_finder'],
       cmdclass={'build' : check_and_build,
