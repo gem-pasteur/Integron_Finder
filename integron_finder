@@ -975,12 +975,12 @@ def find_integrase(name, in_dir = ".", out_dir = "."):
                 call([PRODIGAL, "-p", "meta", "-i",  in_dir + name + ".fst",
                       "-a", out_dir + "/" + name + ".prt", "-o", "/dev/null"])
 
-    if os.path.isfile(out_dir + name + "_intI_table.res") == False:
+    if os.path.isfile(out_dir + name + "_intI.res") == False:
 
         call([HMMSEARCH, "--cpu", N_CPU, "--tblout", out_dir + name + "_intI_table.res",
               "-o", out_dir + name + "_intI.res", MODEL_integrase,
               PROT_file])
-    if os.path.isfile(out_dir + name + "_phage_int_table.res") == False:
+    if os.path.isfile(out_dir + name + "_phage_int.res") == False:
         call([HMMSEARCH, "--cpu", N_CPU, "--tblout",
               out_dir + name + "_phage_int_table.res",
               "-o", out_dir + name + "_phage_int.res", MODEL_phage_int,
@@ -1019,7 +1019,8 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
                                    ).drop_duplicates(subset="ID_prot")
             func_annotate_res = pd.concat([func_annotate_res, hmm_in])
 
-            print "... {} CDS annotated".format(len(hmm_in))
+            print "... {} CDS analyzed and {} annotated".format(len(prot_to_annotate),
+                                                                len(hmm_in))
 
         func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
         integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
@@ -1049,7 +1050,7 @@ def read_hmm(infile, evalue=1, coverage=0.5):
     _re_query = re.compile("^Query:\s*(\w*)\s*\[\w*\=(\d*)\]\n.*")
 
     idx = 0
-    for line in hmm_file.readlines():
+    for line in hmm_file:
 
         try:
             if args.gembase:
@@ -1094,6 +1095,8 @@ def read_hmm(infile, evalue=1, coverage=0.5):
 
     df_out = df[["Accession_number", "query_name", "ID_query", "ID_prot",
                  "strand", "pos_beg", "pos_end", "evalue"]]
+
+    hmm_file.close()
 
     return df_out
 
@@ -1247,6 +1250,18 @@ def to_gbk(df, sequence):
 
 if __name__ == "__main__":
 
+    ############### setup ###############
+
+    _prefix_data = '$PREFIXDATA'
+
+    # integron was not installed using the setup.py
+    # it's a developement version using environment variable
+    if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
+        _prefix_data = os.path.join(os.environ['INTEGRON_HOME'], 'data')
+
+    if not os.path.exists(_prefix_data):
+        raise Exception("cannot find integron_finder data check your installation")
+
 
     ############### Arguments and declarations ###############
 
@@ -1302,7 +1317,7 @@ if __name__ == "__main__":
                     help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
 
     parser.add_argument('--dir_func_annot',
-                        default="./Functional_annotation",
+                        default="Functional_annotation/",
                         action='store',
                         type=str,
                         help='Complete path to a directory containing HMM profiles')
@@ -1372,16 +1387,6 @@ if __name__ == "__main__":
     else:
         circular = False
 
-    _prefix_data = '$PREFIXDATA'
-
-    # integron was not installed using the setup.py
-    # it's a developement version using environment variable
-    if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
-        _prefix_data = os.path.join(os.environ['INTEGRON_HOME'], 'data')
-
-    if not os.path.exists(_prefix_data):
-        raise Exception("cannot find integron_finder data check your installation")
-
     MODEL_DIR = os.path.join(_prefix_data, "Models/")
     MODEL_integrase = os.path.join(MODEL_DIR, "integron_integrase.hmm")
     MODEL_phage_int = os.path.join(MODEL_DIR, "phage-int.hmm")
@@ -1390,7 +1395,7 @@ if __name__ == "__main__":
     HMMSEARCH = args.hmmsearch
     PRODIGAL = args.prodigal
 
-    if args.func_annot or args.dir_func_annot == "./Functional_annotation":
+    if args.func_annot or args.dir_func_annot != "Functional_annotation/":
 
         FA_DIR = os.path.join(_prefix_data, args.dir_func_annot)
         FA_HMM = [f for f in os.listdir(FA_DIR) if f.endswith("hmm")  or f.endswith("HMM")]
@@ -1426,8 +1431,8 @@ if __name__ == "__main__":
         print "Max search done... : \n"
 
         integrons = find_integron(integron_max,
-                                  out_dir + name + "_intI_table.res",
-                                  out_dir + name + "_phage_int_table.res")
+                                  out_dir + name + "_intI.res",
+                                  out_dir + name + "_phage_int.res")
 
 
     ############### Add promoters and attI ###############
@@ -1442,7 +1447,6 @@ if __name__ == "__main__":
             if i.type() == "complete":
                 i.add_promoter( )
                 i.add_attI()
-                i.draw_integron(file=out_dir + name + "_" + str(j) + ".pdf")
                 j += 1
             if i.type() == "In0":
                 i.add_attI()
@@ -1452,10 +1456,14 @@ if __name__ == "__main__":
 
         if is_func_annot and len(FA_HMM) > 0:
 
-            if os.path.isfile(os.path.join(out_dir, "/", name + "_fa_table.res")) == False:
+            if os.path.isfile(os.path.join(out_dir, "/", name + "_fa.res")) == False:
                 func_annot(name, in_dir, out_dir, FA_HMM)
-
-
+        j = 1
+        for i in integrons:
+            if i.type() == "complete":
+                i.draw_integron(file=out_dir + name + "_" + str(j) + ".pdf")
+                j += 1
+             
         ############### Writing out results ###############
 
 
