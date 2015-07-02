@@ -83,27 +83,10 @@ class install_integron_finder(install):
         self.record = self.distribution.uninstall_files
         with open(self.distribution.uninstall_prefix, "w") as _f:
             _f.write("[install]\n")
-            _f.write('install_scripts = {}\n'.format(os.path.normpath(self.install_scripts)))
             _f.write('install_lib = {}\n'.format(os.path.normpath(self.install_lib)))
-            _f.write('install_data = {}\n'.format(os.path.normpath(self.install_data)))
-
 
     def run(self):
         inst = self.distribution.command_options.get('install')
-        vars_2_subst = {'PREFIX': inst['prefix'][1] if 'prefix' in inst else '',
-                        #'PREFIXCONF' : os.path.join(get_install_conf_dir(inst), 'integron_finder'),
-                        'PREFIXDATA' : os.path.join(get_install_data_dir(inst), 'integron_finder'),
-                        #'PREFIXDOC' : os.path.join(get_install_doc_dir(inst), 'integron_finder'),
-                        }
-        print "@@@ install self.distribution.fix_prefix = ",self.distribution.fix_prefix
-        if self.distribution.fix_prefix:
-            for _file in self.distribution.fix_prefix:
-                input_file = os.path.join(self.build_lib, _file)
-                output_file = input_file + '.tmp'
-                print "@@@ install input_file =",input_file,"  output_file =",output_file
-                subst_vars(input_file, output_file, vars_2_subst)
-                os.unlink(input_file)
-                self.move_file(output_file, input_file)
         install.run(self)
 
 
@@ -115,6 +98,8 @@ class install_scripts(_install_scripts):
 
     def finalize_options(self):
         _install_scripts.finalize_options(self)
+        with open(self.distribution.uninstall_prefix, "a") as _f:
+            _f.write('install_scripts = {}\n'.format(os.path.normpath(self.install_dir)))
 
     def run(self):
         inst = self.distribution.command_options.get('install')
@@ -122,13 +107,11 @@ class install_scripts(_install_scripts):
                         #'PREFIXCONF' : os.path.join(get_install_conf_dir(inst), 'integron_finder'),
                         'PREFIXDATA' : os.path.join(get_install_data_dir(inst), 'integron_finder'),
                         #'PREFIXDOC' : os.path.join(get_install_doc_dir(inst), 'integron_finder'),
+                        'VERSION' : self.distribution.get_version(),
                         }
-        print "@@@ install_scripts self.distribution.fix_prefix = ",self.distribution.fix_prefix
         for _file in self.distribution.fix_scripts:
-            print "@@@ install_scripts self.build_dir ",self.build_dir
             input_file = os.path.join(self.build_dir, _file)
             output_file = input_file + '.tmp'
-            print "@@@ install_scripts input_file =",input_file,"  output_file =",output_file
             subst_vars(input_file, output_file, vars_2_subst)
             os.unlink(input_file)
             self.move_file(output_file, input_file)
@@ -211,17 +194,17 @@ class Uninstall(Command):
 
     def initialize_options (self):
         self.install_scripts = None
-        #self.install_lib = None
+        self.install_lib = None
         self.install_data = None
-        self.install_doc = None
+        #self.install_doc = None
 
 
     def finalize_options(self):
         self.parser = SafeConfigParser()
         if not os.path.exists(self.distribution.uninstall_prefix):
-            raise DistutilsFileError( "Cannot unistall integron_finder.\n{}: No such file".format(self.distribution.uninstall_prefix))
+            raise DistutilsFileError("Cannot unistall integron_finder.\n{}: No such file".format(self.distribution.uninstall_prefix))
         used_files = self.parser.read(self.distribution.uninstall_prefix)
-        for attr in [ attr for attr in vars(self) if attr.startswith('install_')]:
+        for attr in [attr for attr in vars(self) if attr.startswith('install_')]:
             try:
                 value = self.parser.get('install', attr)
             except(NoSectionError, NoOptionError):
@@ -237,12 +220,12 @@ class Uninstall(Command):
         def clean_tree(_dir):
             find_prefix = False
             for prefix in prefixes:
-                print "== ", prefix, ".find(",_dir,") = ",prefix.find(_dir)
+                #print "== ", prefix, ".find(",_dir,") = ",prefix.find(_dir)
                 if prefix.find(_dir) != -1:
                     find_prefix = True
                     return prefix
 
-            print "find_prefix =",prefix
+            #print "find_prefix =",prefix
             if find_prefix:
                 return
             try:

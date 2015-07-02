@@ -4,6 +4,8 @@
 integron_finder is a program that looks for integron in DNA sequences.
 """
 
+__version__ = '$VERSION'
+
 import numpy as np
 import pandas as pd
 import re
@@ -1263,58 +1265,78 @@ if __name__ == "__main__":
         raise Exception("cannot find integron_finder data check your installation")
 
 
+    def get_version_message():
+        import sys
+        if __version__ == '$' + 'VERSION':
+            version = "NOT packaged, it should be development version"
+        else:
+            version = __version__
+        version_text = """integron_finder {0}
+Python {1}
+######### TODO ############
+ - licence,
+ - authors,
+ - citation
+####### END TODO ##########
+ """.format(version, sys.version)
+        return version_text
+
     ############### Arguments and declarations ###############
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("replicon", help="Path and/or fasta file to the replicon, eg : path/to/file.fst or file.fst")
-    parser.add_argument("--max", help="Allows exact local detection (slower)",
-                    action="store_true")
-    parser.add_argument("--func_annot", help="Functional annotation of CDS associated with integrons HMM files are needed in Func_annot folder.",
-                    action="store_true")
-
-    parser.add_argument('--cpu',
-                    default='1',
-                    action='store',
-                    type=str,
-                    help='Number of CPUs used by INFERNAL and HMMER')
-
-    parser.add_argument('-dt', '--distance_thresh',
-                    default=4000,
-                    action='store',
-                    type=int,
-                    help='Two element are aggregated if they are distant of DISTANCE_THRESH [4kb] or less')
-
-
-    parser.add_argument('--outdir',
-                    default=".",
-                    action='store',
-                    type=str,
-                    metavar='.',
-                    help='set the output directory (default: current)')
-
-    parser.add_argument("--linear", help="consider replicon as linear. If replicon smaller than 20kb, it will be considered as linear",
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("replicon",
+                        help="Path and/or fasta file to the replicon, eg : path/to/file.fst or file.fst")
+    parser.add_argument("--max",
+                        help="Allows exact local detection (slower)",
+                        action="store_true")
+    parser.add_argument("--func_annot",
+                        help="Functional annotation of CDS associated with integrons HMM files are needed in Func_annot folder.",
                         action="store_true")
 
-    parser.add_argument("--union_integrases", help="Instead of taking intersection of hits from Phage_int profile (Tyr recombinases) and integron_integrase profile, use the union of the hits",
-                    action="store_true")
+    parser.add_argument('--cpu',
+                        default='1',
+                        action='store',
+                        type=str,
+                        help='Number of CPUs used by INFERNAL and HMMER')
+
+    parser.add_argument('-dt', '--distance_thresh',
+                        default=4000,
+                        action='store',
+                        type=int,
+                        help='Two element are aggregated if they are distant of DISTANCE_THRESH [4kb] or less')
+
+    parser.add_argument('--outdir',
+                        default=".",
+                        action='store',
+                        type=str,
+                        metavar='.',
+                        help='set the output directory (default: current)')
+
+    parser.add_argument("--linear",
+                        help="consider replicon as linear. If replicon smaller than 20kb, it will be considered as linear",
+                        action="store_true")
+
+    parser.add_argument("--union_integrases",
+                        help="Instead of taking intersection of hits from Phage_int profile (Tyr recombinases) and integron_integrase profile, use the union of the hits",
+                        action="store_true")
 
     parser.add_argument('--cmsearch',
-                    default=distutils.spawn.find_executable("cmsearch"),
-                    action='store',
-                    type=str,
-                    help='Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch')
+                        default=distutils.spawn.find_executable("cmsearch"),
+                        action='store',
+                        type=str,
+                        help='Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch')
 
     parser.add_argument('--hmmsearch',
-                    default=distutils.spawn.find_executable("hmmsearch"),
-                    action='store',
-                    type=str,
-                    help='Complete path to hmmsearch if not in PATH. eg: /usr/local/bin/hmmsearch')
+                        default=distutils.spawn.find_executable("hmmsearch"),
+                        action='store',
+                        type=str,
+                        help='Complete path to hmmsearch if not in PATH. eg: /usr/local/bin/hmmsearch')
 
     parser.add_argument('--prodigal',
-                    default=distutils.spawn.find_executable("prodigal"),
-                    action='store',
-                    type=str,
-                    help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
+                        default=distutils.spawn.find_executable("prodigal"),
+                        action='store',
+                        type=str,
+                        help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
 
     parser.add_argument('--dir_func_annot',
                         default="Functional_annotation/",
@@ -1322,30 +1344,35 @@ if __name__ == "__main__":
                         type=str,
                         help='Complete path to a directory containing HMM profiles')
 
-
-    parser.add_argument("--gembase", help="Use gembase formatted protein file instead of Prodigal. Folder structure must be preserved",
-                    action="store_true")
-
-
-    parser.add_argument('--attc_model',
-                    default='attc_4.cm',
-                    action='store',
-                    type=str,
-                    metavar='file.cm',
-                    help='path or file to the attc model (Covariance Matrix)')
-
-    parser.add_argument('--evalue_attc',
-                    default=1.,
-                    action='store',
-                    type=float,
-                    metavar='1',
-                    help='set evalue threshold to filter out hits above it (default: 1)')
-
-    parser.add_argument("--keep_palindromes", help="for a given hit, if the palindromic version is found, don't remove the one with highest evalue ",
+    parser.add_argument("--gembase",
+                        help="Use gembase formatted protein file instead of Prodigal. Folder structure must be preserved",
                         action="store_true")
 
+    parser.add_argument('--attc_model',
+                        default='attc_4.cm',
+                        action='store',
+                        type=str,
+                        metavar='file.cm',
+                        help='path or file to the attc model (Covariance Matrix)')
+
+    parser.add_argument('--evalue_attc',
+                        default=1.,
+                        action='store',
+                        type=float,
+                        metavar='1',
+                        help='set evalue threshold to filter out hits above it (default: 1)')
+
+    parser.add_argument("--keep_palindromes",
+                        help="for a given hit, if the palindromic version is found, don't remove the one with highest evalue ",
+                        action="store_true")
+
+    parser.add_argument("-V", "--version",
+                        action= "version",
+                        version = get_version_message() )
 
     args = parser.parse_args()
+
+
     replicon = args.replicon
     evalue_attc = args.evalue_attc
 
