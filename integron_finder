@@ -1012,7 +1012,6 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
                      "fasta")
 
         for hmm in hmm_files:
-            print "... with ", hmm,
             call([HMMSEARCH, "-Z", str(n_prot), "--cpu", N_CPU, "--tblout", out_dir + name + "_fa_table.res",
                   "-o", out_dir + name + "_fa.res", FA_DIR + hmm,
                   prot_tmp])
@@ -1020,9 +1019,6 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
                              ).sort("evalue"
                                    ).drop_duplicates(subset="ID_prot")
             func_annotate_res = pd.concat([func_annotate_res, hmm_in])
-
-            print "... {} CDS analyzed and {} annotated".format(len(prot_to_annotate),
-                                                                len(hmm_in))
 
         func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
         integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
