@@ -1460,6 +1460,7 @@ Python {1}
 
     ############### Add promoters and attI ###############
 
+    outfile = name + ".integrons"
 
     if len(integrons):
         j = 1
@@ -1503,7 +1504,6 @@ Python {1}
         integrons_describe['evalue'] = integrons_describe['evalue'].map(lambda x: '%.3e' % x)
         integrons_describe.sort(["ID_integron","pos_beg", "evalue"], inplace=True)
 
-        outfile = name + ".integrons"
         integrons_describe.to_csv(out_dir + outfile, sep="\t", index=0, fillna="NA")
 
         to_gbk(integrons_describe, SEQUENCE)
