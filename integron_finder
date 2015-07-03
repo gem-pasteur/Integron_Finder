@@ -1307,7 +1307,7 @@ Python {1}
                         default=distutils.spawn.find_executable("cmsearch"),
                         action='store',
                         type=str,
-                        help='Complete path to cmsearch if not in PATH. eg: 134usr/local/bin/cmsearch')
+                        help='Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch')
 
     parser.add_argument('--hmmsearch',
                         default=distutils.spawn.find_executable("hmmsearch"),
@@ -1374,12 +1374,10 @@ Python {1}
         pass
 
     out_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + name)
-    print " @@@ L1358 out_dir", out_dir
     if len(replicon.split("/")) > 1:
         in_dir = "/".join(replicon.split("/")[:-1])
     else:
         in_dir = os.getcwd()
-    print "@@@ L1363 SEQUENCE ", os.path.join(in_dir, name + "." + extension)
     SEQUENCE = SeqIO.read(os.path.join(in_dir, name + "." + extension),
                             "fasta",
                             alphabet=Seq.IUPAC.unambiguous_dna)
@@ -1430,8 +1428,6 @@ Python {1}
     find_integrase(name, in_dir, out_dir)
 
     print "Default search done... : \n"
-    print "@@@ out_dir",out_dir,"  name",name
-    print "@@@ ",os.path.join(out_dir, name + "_attc_table.res")
     integrons = find_integron(os.path.join(out_dir, name + "_attc_table.res"),
                               os.path.join(out_dir, name + "_intI.res"),
                               os.path.join(out_dir, name + "_phage_int.res"))
