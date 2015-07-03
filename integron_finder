@@ -9,6 +9,8 @@ __version__ = '$VERSION'
 import numpy as np
 import pandas as pd
 import re
+import platform
+
 from Bio import SeqIO
 from Bio import motifs
 from Bio import Seq
@@ -871,32 +873,47 @@ def local_max(window_beg, window_end, strand_search="both"):
     with open(out_dir + name + "_subseq.fst", "w") as f:
         SeqIO.write(subseq, f, "fasta")
 
-    if strand_search == "both" :
-        call([CMSEARCH, "-Z", str(SIZE_REPLICON/1000000.), "--max",
-              "--cpu", N_CPU, "-o",
-              out_dir + name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res",
-              "--tblout", out_dir + name + "_subseq_attc_table.res", "-E" "10",
-              MODEL_attc, out_dir + name + "_subseq.fst"])
+    if strand_search == "both":
+        call([CMSEARCH,
+              "-Z", str(SIZE_REPLICON/1000000.),
+              "--max",
+              "--cpu", N_CPU,
+              "-o", os.path.join(out_dir, name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res"),
+              "--tblout", os.path.join(out_dir, name + "_subseq_attc_table.res"),
+              "-E" "10",
+              MODEL_attc,
+              os.path.join(out_dir, name + "_subseq.fst")])
 
     elif strand_search == "top":
-        call([CMSEARCH, "-Z", str(SIZE_REPLICON/1000000.), "--toponly",
-              "--max", "--cpu", N_CPU, "-o",
-              out_dir + name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res",
-              "--tblout", out_dir + name  + "_subseq_attc_table.res", "-E" "10",
-              MODEL_attc, out_dir + name + "_subseq.fst"])
+        call([CMSEARCH,
+              "-Z", str(SIZE_REPLICON/1000000.),
+              "--toponly",
+              "--max",
+              "--cpu", N_CPU,
+              "-o", os.path.join(out_dir, name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res"),
+              "--tblout", os.path.join(out_dir, name + "_subseq_attc_table.res"),
+              "-E" "10",
+              MODEL_attc,
+              os.path.join(out_dir, name + "_subseq.fst")])
 
     elif strand_search == "bottom":
-        call([CMSEARCH, "-Z", str(SIZE_REPLICON/1000000.), "--bottomonly",
-              "--max", "--cpu", N_CPU, "-o",
-              out_dir + name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res",
-              "--tblout", out_dir + name + "_subseq_attc_table.res", "-E" "10",
-              MODEL_attc, out_dir + name + "_subseq.fst"])
+        call([CMSEARCH,
+              "-Z", str(SIZE_REPLICON/1000000.),
+              "--bottomonly",
+              "--max",
+              "--cpu", N_CPU,
+              "-o", os.path.join(out_dir, name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res"),
+              "--tblout", os.path.join(out_dir, name + "_subseq_attc_table.res"),
+              "-E" "10",
+              MODEL_attc,
+              os.path.join(os.path.join(out_dir, name + "_subseq.fst"))])
 
-    df_max = read_infernal(out_dir + name + "_subseq_attc_table.res", evalue = evalue_attc)
-    df_max.pos_beg = (df_max.pos_beg + window_beg)%SIZE_REPLICON
-    df_max.pos_end = (df_max.pos_end + window_beg)%SIZE_REPLICON
-    df_max.to_csv(out_dir + name + "_" + "subseq_attc_table_end.res", sep="\t", index=0, mode="a", header=0)
-    df_max = df_max[(abs(df_max.pos_end - df_max.pos_beg)>40) & (abs(df_max.pos_end - df_max.pos_beg)<200)] # filter on size
+    df_max = read_infernal(os.path.join(out_dir, name + "_subseq_attc_table.res", evalue = evalue_attc))
+    df_max.pos_beg = (df_max.pos_beg + window_beg) % SIZE_REPLICON
+    df_max.pos_end = (df_max.pos_end + window_beg) % SIZE_REPLICON
+    df_max.to_csv(os.path.join(out_dir, name + "_" + "subseq_attc_table_end.res"),
+                  sep="\t", index=0, mode="a", header=0)
+    df_max = df_max[(abs(df_max.pos_end - df_max.pos_beg)>40) & (abs(df_max.pos_end - df_max.pos_beg) < 200)] # filter on size
     #print df_max
 
     return df_max
@@ -906,9 +923,13 @@ def find_attc(name, in_dir = ".", out_dir = "."):
     Call cmsearch to find attC site in a single replicon.
     Return nothing, the results are written on the disk
     """
-    call([CMSEARCH, "--cpu", N_CPU, "-o", out_dir + name + "_attc.res",
-          "--tblout", out_dir + name + "_attc_table.res", "-E" "10",
-          MODEL_attc, os.path.abspath(in_dir + name + ".fst")])
+    call([CMSEARCH,
+          "--cpu", N_CPU,
+          "-o", os.path.join(out_dir, name + "_attc.res"),
+          "--tblout", os.path.join(out_dir, name + "_attc_table.res"),
+          "-E" "10",
+          MODEL_attc,
+          os.path.abspath(os.path.join(in_dir, name + ".fst"))])
 
 def find_integrase(name, in_dir = ".", out_dir = "."):
     """
@@ -922,25 +943,36 @@ def find_integrase(name, in_dir = ".", out_dir = "."):
 
     if not args.gembase:
         # Test whether the protein file exist to avoid new annotation for each run on the same replicon
-        if os.path.isfile(out_dir + "/" + name + ".prt") == False:
+        if not os.path.isfile(os.path.join(out_dir, name + ".prt")):
+            dev_null = 'NUL' if platform.system() == 'Windows' else '/dev/null'
             if SIZE_REPLICON > 200000:
-                dev_null = 'NUL' if platform.system() == 'Windows' else '/dev/null'
-                call([PRODIGAL, "-i",  in_dir + name + ".fst",
-                      "-a", os.path.join(out_dir, name + ".prt"), "-o", dev_null])
+                call([PRODIGAL,
+                      "-i", os.path.join(in_dir, name + ".fst"),
+                      "-a", os.path.join(out_dir, name + ".prt"),
+                      "-o", dev_null])
 
             else: # if small genome, prodigal annotate it as contig.
-                call([PRODIGAL, "-p", "meta", "-i",  in_dir + name + ".fst",
-                      "-a", os.path.join(out_dir, name + ".prt"), "-o", dev_null])
+                call([PRODIGAL,
+                      "-p", "meta",
+                      "-i",  os.path.join(in_dir, name + ".fst"),
+                      "-a", os.path.join(out_dir, name + ".prt"),
+                      "-o", dev_null])
 
-    if os.path.isfile(out_dir + name + "_intI.res") == False:
+    if not os.path.isfile(out_dir + name + "_intI.res"):
 
-        call([HMMSEARCH, "--cpu", N_CPU, "--tblout", out_dir + name + "_intI_table.res",
-              "-o", os.path.join(out_dir, name + "_intI.res"), MODEL_integrase,
+        call([HMMSEARCH,
+              "--cpu", N_CPU,
+              "--tblout", os.path.join(out_dir, name + "_intI_table.res"),
+              "-o", os.path.join(out_dir, name + "_intI.res"),
+              MODEL_integrase,
               PROT_file])
-    if os.path.isfile(out_dir + name + "_phage_int.res") == False:
-        call([HMMSEARCH, "--cpu", N_CPU, "--tblout",
+    if not os.path.isfile(os.path.join(out_dir, name + "_phage_int.res")):
+        call([HMMSEARCH,
+              "--cpu", N_CPU,
+              "--tblout",
               os.path.join(out_dir, name + "_phage_int_table.res"),
-              "-o", out_dir + name + "_phage_int.res", MODEL_phage_int,
+              "-o", os.path.join(out_dir, name + "_phage_int.res"),
+              MODEL_phage_int,
               PROT_file])
 
 def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
@@ -955,7 +987,7 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
                                                    "ID_prot","strand",
                                                    "pos_beg","pos_end","evalue"])
         prot_to_annotate = []
-        prot_tmp = out_dir + name + "_subseqprot.tmp"
+        prot_tmp = os.path.join(out_dir, name + "_subseqprot.tmp")
         prot = SeqIO.parse(PROT_file, "fasta")
         n_prot = 0
         for p in prot:
@@ -968,10 +1000,13 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
 
         for hmm in hmm_files:
             print "... with ", hmm,
-            call([HMMSEARCH, "-Z", str(n_prot), "--cpu", N_CPU,
+            call([HMMSEARCH,
+                  "-Z", str(n_prot),
+                  "--cpu", N_CPU,
                   "--tblout", os.path.join(out_dir, name + "_fa_table.res"),
                   "-o", os.path.join(out_dir, name + "_fa.res"),
-                  FA_DIR + hmm, prot_tmp])
+                  FA_DIR + hmm,
+                  prot_tmp])
             hmm_in = read_hmm(os.path.join(out_dir, name + "_fa.res")).sort(
                 "evalue").drop_duplicates(subset="ID_prot")
             func_annotate_res = pd.concat([func_annotate_res, hmm_in])
@@ -1211,6 +1246,9 @@ if __name__ == "__main__":
 
     def get_version_message():
         import sys
+        # if week keep '$VERSION' as is
+        # the setup.py will replace it by the value set in setup
+        # so the test become True even if integron_finder is installed using setup.py
         if __version__ == '$' + 'VERSION':
             version = "NOT packaged, it should be development version"
         else:
@@ -1269,7 +1307,7 @@ Python {1}
                         default=distutils.spawn.find_executable("cmsearch"),
                         action='store',
                         type=str,
-                        help='Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch')
+                        help='Complete path to cmsearch if not in PATH. eg: 134usr/local/bin/cmsearch')
 
     parser.add_argument('--hmmsearch',
                         default=distutils.spawn.find_executable("hmmsearch"),
@@ -1335,15 +1373,14 @@ Python {1}
     except OSError:
         pass
 
-
     out_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + name)
-
+    print " @@@ L1358 out_dir", out_dir
     if len(replicon.split("/")) > 1:
         in_dir = "/".join(replicon.split("/")[:-1])
     else:
         in_dir = os.getcwd()
-
-    SEQUENCE = SeqIO.read(os.path.join(in_dir, + name + "." + extension),
+    print "@@@ L1363 SEQUENCE ", os.path.join(in_dir, name + "." + extension)
+    SEQUENCE = SeqIO.read(os.path.join(in_dir, name + "." + extension),
                             "fasta",
                             alphabet=Seq.IUPAC.unambiguous_dna)
 
@@ -1393,6 +1430,8 @@ Python {1}
     find_integrase(name, in_dir, out_dir)
 
     print "Default search done... : \n"
+    print "@@@ out_dir",out_dir,"  name",name
+    print "@@@ ",os.path.join(out_dir, name + "_attc_table.res")
     integrons = find_integron(os.path.join(out_dir, name + "_attc_table.res"),
                               os.path.join(out_dir, name + "_intI.res"),
                               os.path.join(out_dir, name + "_phage_int.res"))
