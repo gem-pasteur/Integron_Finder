@@ -1226,7 +1226,7 @@ Python {1}
         return version_text
 
     ############### Arguments and declarations ###############
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("replicon",
                         help="Path and/or fasta file to the replicon, eg : path/to/file.fst or file.fst")
 
