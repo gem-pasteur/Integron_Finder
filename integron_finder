@@ -4,6 +4,8 @@
 integron_finder is a program that looks for integron in DNA sequences.
 """
 
+__version__ = '$VERSION'
+
 import numpy as np
 import pandas as pd
 import re
@@ -974,9 +976,6 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
                 "evalue").drop_duplicates(subset="ID_prot")
             func_annotate_res = pd.concat([func_annotate_res, hmm_in])
 
-            print "... {} CDS analyzed and {} annotated".format(len(prot_to_annotate),
-                                                                len(hmm_in))
-
         func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
         integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
         integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
@@ -1001,7 +1000,7 @@ def read_hmm(infile, evalue=1, coverage=0.5):
     else:
         _re_ID = re.compile("^>>\s([\w\_\.]*)\s*#\s*(\d*)\s*#\s*(\d*)\s*#\s*([-\d]{1,2})")
         strand_f = lambda x: int(x)
-    _re_data = re.compile("^\s*[\d]*\s[!?]\s*[\d\.\e\-]*\s*[\d\.\e\-]*\s*[\d\.e\-]*\s*([\d\.e\-]*)\s*([\d]*)\s*([\d]*)\s..\s*([\d]*)\s*([\d]*)")
+    _re_data = re.compile("^\s*[\d]*\s[!?]\s*[\d\.\e\-\+]*\s*[\d\.\e\-\+]*\s*[\d\.e\-\+]*\s*([\d\.e\-\+]*)\s*([\d]*)\s*([\d]*)\s..\s*([\d]*)\s*([\d]*)")
     _re_query = re.compile("^Query:\s*(\w*)\s*\[\w*\=(\d*)\]\n.*")
 
     idx = 0
@@ -1024,15 +1023,15 @@ def read_hmm(infile, evalue=1, coverage=0.5):
 
             df.loc[idx, "ID_prot"] = id_prot
             df.loc[idx, "ID_query"] = "-" # remnant of ancient parsing function to keep data structure
-            df.loc[idx, "pos_beg"] = int(pos_beg)
-            df.loc[idx, "pos_end"] = int(pos_end)
-            df.loc[idx, "strand"] = strand_f(strand)
+            df.loc[idx, "pos_beg"]  = int(pos_beg)
+            df.loc[idx, "pos_end"]  = int(pos_end)
+            df.loc[idx, "strand"]   = strand_f(strand)
 
-            df.loc[idx, "evalue"] = float(evalue)   # i-evalue
-            df.loc[idx, "hmmfrom"] = int(hmmfrom)  # hmmfrom
-            df.loc[idx, "hmmto"] = int(hmmto)    # hmm to
-            df.loc[idx, "alifrom"] = int(alifrom)  # alifrom
-            df.loc[idx, "alito"] = int(alito)    # ali
+            df.loc[idx, "evalue"]  = float(evalue)   # i-evalue
+            df.loc[idx, "hmmfrom"] =   int(hmmfrom)  # hmmfrom
+            df.loc[idx, "hmmto"]   =   int(hmmto)    # hmm to
+            df.loc[idx, "alifrom"] =   int(alifrom)  # alifrom
+            df.loc[idx, "alito"]   =   int(alito)    # ali to
             df.loc[idx, "len_profile"] = float(len_profile)
             df.loc[idx, "Accession_number"] = name
             df.loc[idx, "query_name"] = query
@@ -1210,6 +1209,22 @@ if __name__ == "__main__":
         raise Exception("cannot find integron_finder data check your installation")
 
 
+    def get_version_message():
+        import sys
+        if __version__ == '$' + 'VERSION':
+            version = "NOT packaged, it should be development version"
+        else:
+            version = __version__
+        version_text = """integron_finder {0}
+Python {1}
+######### TODO ############
+ - licence,
+ - authors,
+ - citation
+####### END TODO ##########
+ """.format(version, sys.version)
+        return version_text
+
     ############### Arguments and declarations ###############
     parser = argparse.ArgumentParser()
     parser.add_argument("replicon",
@@ -1224,23 +1239,23 @@ if __name__ == "__main__":
                         action="store_true")
 
     parser.add_argument('--cpu',
-                    default='1',
-                    action='store',
-                    type=str,
-                    help='Number of CPUs used by INFERNAL and HMMER')
+                        default='1',
+                        action='store',
+                        type=str,
+                        help='Number of CPUs used by INFERNAL and HMMER')
 
     parser.add_argument('-dt', '--distance_thresh',
-                    default=4000,
-                    action='store',
-                    type=int,
-                    help='Two element are aggregated if they are distant of DISTANCE_THRESH [4kb] or less')
+                        default=4000,
+                        action='store',
+                        type=int,
+                        help='Two element are aggregated if they are distant of DISTANCE_THRESH [4kb] or less')
 
     parser.add_argument('--outdir',
-                    default=".",
-                    action='store',
-                    type=str,
-                    metavar='.',
-                    help='set the output directory (default: current)')
+                        default=".",
+                        action='store',
+                        type=str,
+                        metavar='.',
+                        help='set the output directory (default: current)')
 
     parser.add_argument("--linear",
                         help="consider replicon as linear. If replicon smaller than 20kb, it will be considered as linear",
@@ -1296,7 +1311,13 @@ if __name__ == "__main__":
                         help="for a given hit, if the palindromic version is found, don't remove the one with highest evalue ",
                         action="store_true")
 
+    parser.add_argument("-V", "--version",
+                        action= "version",
+                        version = get_version_message() )
+
     args = parser.parse_args()
+
+
     replicon = args.replicon
     evalue_attc = args.evalue_attc
 
@@ -1389,6 +1410,7 @@ if __name__ == "__main__":
 
     ############### Add promoters and attI ###############
 
+    outfile = name + ".integrons"
 
     if len(integrons):
         j = 1
@@ -1414,7 +1436,7 @@ if __name__ == "__main__":
             if i.type() == "complete":
                 i.draw_integron(file=os.path.join(out_dir, name + "_" + str(j) + ".pdf"))
                 j += 1
-             
+
         ############### Writing out results ###############
 
         integrons_describe = pd.concat([i.describe() for i in integrons])
