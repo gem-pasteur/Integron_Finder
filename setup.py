@@ -85,21 +85,8 @@ class install_integron_finder(install):
             _f.write("[install]\n")
             _f.write('install_lib = {}\n'.format(os.path.normpath(self.install_lib)))
 
-
     def run(self):
         inst = self.distribution.command_options.get('install')
-        vars_2_subst = {'PREFIX': inst['prefix'][1] if 'prefix' in inst else '',
-                        #'PREFIXCONF' : os.path.join(get_install_conf_dir(inst), 'integron_finder'),
-                        'PREFIXDATA' : os.path.join(get_install_data_dir(inst), 'integron_finder'),
-                        #'PREFIXDOC' : os.path.join(get_install_doc_dir(inst), 'integron_finder'),
-                        }
-        if self.distribution.fix_prefix:
-            for _file in self.distribution.fix_prefix:
-                input_file = os.path.join(self.build_lib, _file)
-                output_file = input_file + '.tmp'
-                subst_vars(input_file, output_file, vars_2_subst)
-                os.unlink(input_file)
-                self.move_file(output_file, input_file)
         install.run(self)
 
 
@@ -120,6 +107,7 @@ class install_scripts(_install_scripts):
                         #'PREFIXCONF' : os.path.join(get_install_conf_dir(inst), 'integron_finder'),
                         'PREFIXDATA' : os.path.join(get_install_data_dir(inst), 'integron_finder'),
                         #'PREFIXDOC' : os.path.join(get_install_doc_dir(inst), 'integron_finder'),
+                        'VERSION' : self.distribution.get_version(),
                         }
         for _file in self.distribution.fix_scripts:
             input_file = os.path.join(self.build_dir, _file)
