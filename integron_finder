@@ -254,7 +254,7 @@ class Integron:
         motif_attI = [attI1, attI2, attI3]
 
         if self.type() == "complete":
-            if ((self.attC.pos_beg.values[0] - self.integrase.pos_end.values[0] ) % SIZE_REPLICON >
+            if ((self.attC.pos_beg.values[0] - self.integrase.pos_end.values[0]) % SIZE_REPLICON >
                 (self.integrase.pos_beg.values[0] - self.attC.pos_end.values[-1]) % SIZE_REPLICON):
                 # if integrase after attcs (on the right)
 
