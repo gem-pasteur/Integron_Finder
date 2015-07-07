@@ -56,7 +56,7 @@ class Test(pd.util.testing.TestCase):
 
     def test_add_attc(self):
         id_replicon = "acba.007.p01.13"
-        data_integrase = {"pos_beg" : 10,
+        data_attc = {"pos_beg" : 10,
                           "pos_end" : 100,
                           "strand" : -1,
                           "evalue" : 1.1e-07,
@@ -67,13 +67,13 @@ class Test(pd.util.testing.TestCase):
         df = pd.DataFrame(columns=["pos_beg", "pos_end", "strand", "evalue", "type_elt",
                                    "model", "distance_2attC", "annotation"])
         tmp_df = pd.DataFrame()
-        tmp_df["pos_beg"] = [data_integrase["pos_beg"]]
-        tmp_df["pos_end"] = [data_integrase["pos_end"]]
-        tmp_df["strand"] = [data_integrase["strand"]]
-        tmp_df["evalue"] = [data_integrase["evalue"]]
+        tmp_df["pos_beg"] = [data_attc["pos_beg"]]
+        tmp_df["pos_end"] = [data_attc["pos_end"]]
+        tmp_df["strand"] = [data_attc["strand"]]
+        tmp_df["evalue"] = [data_attc["evalue"]]
         tmp_df["type_elt"] = "attC"
         tmp_df["annotation"] = "attC"
-        tmp_df["model"] = [data_integrase["model"]]
+        tmp_df["model"] = [data_attc["model"]]
 
         df = df.append(tmp_df, ignore_index=True)
         sizes_cassettes = [np.nan]
@@ -81,11 +81,11 @@ class Test(pd.util.testing.TestCase):
         df.index = ["attc_%03i" % int(j + 1) for j in df.index]
 
         integron = Integron(id_replicon)
-        integron.add_attC(data_integrase["pos_beg"],
-                          data_integrase["pos_end"],
-                          data_integrase["strand"],
-                          data_integrase["evalue"],
-                          data_integrase["model"])
+        integron.add_attC(data_attc["pos_beg"],
+                          data_attc["pos_end"],
+                          data_attc["strand"],
+                          data_attc["evalue"],
+                          data_attc["model"])
 
         self.assert_frame_equal(df, integron.attC, check_dtype=False)
         self.assertListEqual(sizes_cassettes, integron.sizes_cassettes)
@@ -93,33 +93,66 @@ class Test(pd.util.testing.TestCase):
         integron_finder.SIZE_REPLICON = 3
 
         tmp_df2 = pd.DataFrame()
-        tmp_df2["pos_beg"] = [data_integrase["pos_beg"] + 100]
-        tmp_df2["pos_end"] = [data_integrase["pos_end"] + 100]
-        tmp_df2["strand"] = [data_integrase["strand"]]
-        tmp_df2["evalue"] = [data_integrase["evalue"]]
+        tmp_df2["pos_beg"] = [data_attc["pos_beg"] + 100]
+        tmp_df2["pos_end"] = [data_attc["pos_end"] + 100]
+        tmp_df2["strand"] = [data_attc["strand"]]
+        tmp_df2["evalue"] = [data_attc["evalue"]]
         tmp_df2["type_elt"] = "attC"
         tmp_df2["annotation"] = "attC"
-        tmp_df2["model"] = [data_integrase["model"]]
+        tmp_df2["model"] = [data_attc["model"]]
         sizes_cassettes.append((
-                                (data_integrase["pos_beg"] + 100) -
-                                (data_integrase["pos_end"])) %
+                                (data_attc["pos_beg"] + 100) -
+                                (data_attc["pos_end"])) %
                                 integron_finder.SIZE_REPLICON)
 
         df = df.append(tmp_df2, ignore_index=True)
         df["distance_2attC"] = sizes_cassettes
         df.index = ["attc_%03i" % int(j + 1) for j in df.index]
-        integron.add_attC(data_integrase["pos_beg"] + 100,
-                          data_integrase["pos_end"] + 100,
-                          data_integrase["strand"],
-                          data_integrase["evalue"],
-                          data_integrase["model"])
+        integron.add_attC(data_attc["pos_beg"] + 100,
+                          data_attc["pos_end"] + 100,
+                          data_attc["strand"],
+                          data_attc["evalue"],
+                          data_attc["model"])
 
         self.assert_frame_equal(df, integron.attC, check_dtype=False)
         self.assertListEqual(sizes_cassettes, integron.sizes_cassettes)
-    #
-    # def test_type(self):
-    #     pass
-    #
+
+    def test_type(self):
+        integron = Integron("foo")
+        self.assertEqual(integron.type(), "In0")
+
+        just_one_integrase = Integron("just_one_integrase")
+        just_one_integrase.add_integrase(10,
+                                         100,
+                                         'foo',
+                                         1,
+                                         1e-2,
+                                         "intersection_tyr_intI")
+        self.assertEqual(just_one_integrase.type(), "In0")
+
+        just_one_attC = Integron("just_one_attC")
+        just_one_attC.add_attC(10,
+                               100,
+                               1,
+                               1e-2,
+                               "intersection_tyr_intI")
+        self.assertEqual(just_one_attC.type(), "attC0")
+
+        one_integrase_one_attC = Integron("one_integrase_one_attC")
+        one_integrase_one_attC.add_integrase(10,
+                                             100,
+                                             'foo',
+                                             1,
+                                             1e-2,
+                                             "intersection_tyr_intI")
+        one_integrase_one_attC.add_attC(10,
+                                        100,
+                                        1,
+                                        1e-2,
+                                        "intersection_tyr_intI")
+        self.assertEqual(one_integrase_one_attC.type(), "complete")
+
+
     # def test_add_promoter(self):
     #     pass
     #
