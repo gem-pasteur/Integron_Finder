@@ -168,3 +168,28 @@ class Test(pd.util.testing.TestCase):
     # def test_draw_integron(self):
     #     pass
 
+    def test_has_integrase(self):
+        integron = Integron("foo")
+        self.assertFalse(integron.has_integrase())
+
+        just_one_integrase = Integron("just_one_integrase")
+        just_one_integrase.add_integrase(10,
+                                         100,
+                                         'foo',
+                                         1,
+                                         1e-2,
+                                         "intersection_tyr_intI")
+        self.assertTrue(just_one_integrase.has_integrase())
+
+
+    def test_has_attC(self):
+        integron = Integron("foo")
+        self.assertFalse(integron.has_attC())
+
+        just_one_attC = Integron("just_one_attC")
+        just_one_attC.add_attC(10,
+                               100,
+                               1,
+                               1e-2,
+                               "intersection_tyr_intI")
+        self.assertTrue(just_one_attC.has_attC())
