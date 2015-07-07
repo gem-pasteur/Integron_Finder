@@ -985,40 +985,36 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
     """
     print "# Start Functional annotation... : "
     for integron in integrons:
+        if integron.type() != "In0":
+            func_annotate_res = pd.DataFrame(columns = ["Accession_number",
+                                                        "query_name", "ID_query",
+                                                        "ID_prot","strand",
+                                                        "pos_beg","pos_end","evalue"])
+            prot_to_annotate = []
+            prot_tmp = out_dir + name + "_subseqprot.tmp"
+            prot = SeqIO.parse(PROT_file, "fasta")
+            n_prot = 0
+            for p in prot:
+                n_prot += 1
+                if p.id in integron.proteins.index:
+                    prot_to_annotate.append(p)
+            SeqIO.write(prot_to_annotate,
+                        prot_tmp,
+                         "fasta")
 
-        func_annotate_res = pd.DataFrame(columns=["Accession_number",
-                                                   "query_name", "ID_query",
-                                                   "ID_prot","strand",
-                                                   "pos_beg","pos_end","evalue"])
-        prot_to_annotate = []
-        prot_tmp = os.path.join(out_dir, name + "_subseqprot.tmp")
-        prot = SeqIO.parse(PROT_file, "fasta")
-        n_prot = 0
-        for p in prot:
-            n_prot += 1
-            if p.id in integron.proteins.index:
-                prot_to_annotate.append(p)
-        SeqIO.write(prot_to_annotate,
-                    prot_tmp,
-                     "fasta")
+            for hmm in hmm_files:
+                call([HMMSEARCH, "-Z", str(n_prot), "--cpu", N_CPU, "--tblout", out_dir + name + "_fa_table.res",
+                      "-o", out_dir + name + "_fa.res", FA_DIR + hmm,
+                      prot_tmp])
+                hmm_in = read_hmm(out_dir + name + "_fa.res"
+                                 ).sort("evalue"
+                                       ).drop_duplicates(subset="ID_prot")
+                func_annotate_res = pd.concat([func_annotate_res, hmm_in])
 
-        for hmm in hmm_files:
-            print "... with ", hmm,
-            call([HMMSEARCH,
-                  "-Z", str(n_prot),
-                  "--cpu", N_CPU,
-                  "--tblout", os.path.join(out_dir, name + "_fa_table.res"),
-                  "-o", os.path.join(out_dir, name + "_fa.res"),
-                  FA_DIR + hmm,
-                  prot_tmp])
-            hmm_in = read_hmm(os.path.join(out_dir, name + "_fa.res")).sort(
-                "evalue").drop_duplicates(subset="ID_prot")
-            func_annotate_res = pd.concat([func_annotate_res, hmm_in])
-
-        func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
-        integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
-        integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
-        integron.proteins.loc[func_annotate_res.ID_prot, "model"] = func_annotate_res.ID_query.values
+            func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
+            integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
+            integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
+            integron.proteins.loc[func_annotate_res.ID_prot, "model"] = func_annotate_res.ID_query.values
 
 def read_hmm(infile, evalue=1, coverage=0.5):
     """
@@ -1037,7 +1033,7 @@ def read_hmm(infile, evalue=1, coverage=0.5):
         _re_ID = re.compile("^>>\s([\w\_\.]*)\s*([DC])\s*\w*\s*\w*\s*(\d*)\s*(\d*)")
         strand_f = lambda x: 1 if x == "D" else -1
     else:
-        _re_ID = re.compile("^>>\s([\w\_\.]*)\s*#\s*(\d*)\s*#\s*(\d*)\s*#\s*([-\d]{1,2})")
+        _re_ID = re.compile("^>>\s([.\S]*)\s*#\s*(\d*)\s*#\s*(\d*)\s*#\s*([-\d]{1,2})")
         strand_f = lambda x: int(x)
     _re_data = re.compile("^\s*[\d]*\s[!?]\s*[\d\.\e\-\+]*\s*[\d\.\e\-\+]*\s*[\d\.e\-\+]*\s*([\d\.e\-\+]*)\s*([\d]*)\s*([\d]*)\s..\s*([\d]*)\s*([\d]*)")
     _re_query = re.compile("^Query:\s*(\w*)\s*\[\w*\=(\d*)\]\n.*")
@@ -1233,6 +1229,11 @@ def to_gbk(df, sequence):
 
                     sequence.features.append(tmp)
 
+    # We get a ValueError otherwise, eg:
+    # ValueError: Locus identifier 'gi|00000000|gb|XX123456.2|' is too long
+    if len(SEQUENCE.name) > 16:
+        SEQUENCE.name = SEQUENCE.name[-16:]
+
 if __name__ == "__main__":
 
     ############### setup ###############
@@ -1412,6 +1413,8 @@ Python {1}
         FA_DIR = os.path.join(_prefix_data, args.dir_func_annot)
         FA_HMM = [f for f in os.listdir(FA_DIR) if f.lower().endswith("hmm")]
         is_func_annot = True
+    else:
+        is_func_annot = False
 
     if len(args.attc_model.split("/")) > 1: #contain path
         MODEL_attc = args.attc_model
