@@ -246,12 +246,12 @@ class Integron:
         attI1.name = "attI1"
 
         ## attI2
-        instances_attI2 =  [Seq.Seq('TTAATTAACGGTAAGCATCAGCGGGTGACAAAACGAGCATGCTTACTAATAAAATGTT')]
+        instances_attI2 = [Seq.Seq('TTAATTAACGGTAAGCATCAGCGGGTGACAAAACGAGCATGCTTACTAATAAAATGTT')]
         attI2 = motifs.create(instances_attI2)
         attI2.name = "attI2"
 
         ## attI3
-        instances_attI3 =  [Seq.Seq('CTTTGTTTAACGACCACGGTTGTGGGTATCCGGTGTTTGGTCAGATAAACCACAAGTT')]
+        instances_attI3 = [Seq.Seq('CTTTGTTTAACGACCACGGTTGTGGGTATCCGGTGTTTGGTCAGATAAACCACAAGTT')]
         attI3 = motifs.create(instances_attI3)
         attI3.name = "attI3"
 
@@ -264,9 +264,7 @@ class Integron:
 
                 left = int(self.attC.pos_end.values[-1])
                 right = int(self.integrase.pos_beg.values[0])
-
             else:
-
                 left = int(self.integrase.pos_end.values[-1])
                 right = int(self.attC.pos_beg.values[0])
 
@@ -315,19 +313,15 @@ class Integron:
     def add_proteins(self):
 
         debut = self.attC.pos_beg.values[0]
-        fin   = self.attC.pos_end.values[-1]
+        fin = self.attC.pos_end.values[-1]
 
         if self.has_integrase():
-
             if ((debut - self.integrase.pos_end.values[0]) % SIZE_REPLICON >
                 (self.integrase.pos_beg.values[0] - fin) % SIZE_REPLICON):
                  # integrase on the right of attC cluster.
-
                 fin = self.integrase.pos_beg.min()
                 debut -= 200
-
             else:
-
                 debut = self.integrase.pos_end.max()
                 fin += 200
         else:
@@ -441,16 +435,10 @@ class Integron:
             fig.show()
 
     def has_integrase(self):
-        if len(self.integrase) >= 1:
-            return True
-        else:
-            return False
+        return len(self.integrase) >= 1
 
     def has_attC(self):
-        if len(self.attC) >= 1:
-            return True
-        else:
-            return False
+        return len(self.attC) >= 1
 
 
 def search_attc(attc_df, replicon, keep_palindromes):
