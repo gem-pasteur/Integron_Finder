@@ -89,13 +89,13 @@ class Integron:
         - In0 : Just an integrase intI
         """
 
-        if len(self.attC) >= 1 and len(self.integrase) >= 1:
+        if len(self.attC) >= 1 and len(self.integrase) == 1:
             return "complete"
 
-        elif len(self.attC) == 0:
+        elif len(self.attC) == 0 and len(self.integrase) == 1 :
             return "In0"
 
-        elif len(self.integrase) == 0:
+        elif len(self.attC) >= 1 and len(self.integrase) == 0:
             return "attC0"
 
     def add_promoter(self):
