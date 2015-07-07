@@ -89,7 +89,7 @@ class Integron:
     def type(self):
         """
         Tells you whether the integrons is :
-        - complet : Have one integrase and at least one attC
+        - complete : Have one integrase and at least one attC
         - attC0 : Have at least one attC
         - In0 : Just an integrase intI
         """
