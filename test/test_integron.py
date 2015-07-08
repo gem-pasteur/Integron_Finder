@@ -118,8 +118,8 @@ class Test(pd.util.testing.TestCase):
         self.assertListEqual(sizes_cassettes, integron.sizes_cassettes)
 
     def test_type(self):
-        integron = Integron("foo")
-        self.assertEqual(integron.type(), "In0")
+        no_integrase = Integron("foo")
+        self.assertIsNone(no_integrase.type())
 
         just_one_integrase = Integron("just_one_integrase")
         just_one_integrase.add_integrase(10,
