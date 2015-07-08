@@ -870,7 +870,7 @@ def local_max(window_beg, window_end, strand_search="both"):
         subseq2 = SEQUENCE[:window_end]
         subseq = subseq1 + subseq2
 
-    with open(out_dir + name + "_subseq.fst", "w") as f:
+    with open(os.path.join(out_dir, name + "_subseq.fst"), "w") as f:
         SeqIO.write(subseq, f, "fasta")
 
     if strand_search == "both":
@@ -908,7 +908,7 @@ def local_max(window_beg, window_end, strand_search="both"):
               MODEL_attc,
               os.path.join(os.path.join(out_dir, name + "_subseq.fst"))])
 
-    df_max = read_infernal(os.path.join(out_dir, name + "_subseq_attc_table.res", evalue = evalue_attc))
+    df_max = read_infernal(os.path.join(out_dir, name + "_subseq_attc_table.res"), evalue = evalue_attc)
     df_max.pos_beg = (df_max.pos_beg + window_beg) % SIZE_REPLICON
     df_max.pos_end = (df_max.pos_end + window_beg) % SIZE_REPLICON
     df_max.to_csv(os.path.join(out_dir, name + "_" + "subseq_attc_table_end.res"),
