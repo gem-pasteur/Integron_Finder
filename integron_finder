@@ -1356,12 +1356,13 @@ Python {1}
 
     args = parser.parse_args()
 
-
     replicon = args.replicon
     evalue_attc = args.evalue_attc
 
-    name = ".".join(replicon.split("/")[-1].split(".")[:-1])
-    extension = replicon.split("/")[-1].split(".")[-1]
+    in_dir, sequence_file = os.path.split(replicon)
+    name, extension = os.path.splitext(sequence_file)
+    in_dir = os.path.abspath(in_dir)
+
     mode_name = "max" if args.max else "default"
 
     try:
@@ -1375,11 +1376,8 @@ Python {1}
         pass
 
     out_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + name)
-    if len(replicon.split("/")) > 1:
-        in_dir = "/".join(replicon.split("/")[:-1])
-    else:
-        in_dir = os.getcwd()
-    SEQUENCE = SeqIO.read(os.path.join(in_dir, name + "." + extension),
+
+    SEQUENCE = SeqIO.read(os.path.join(in_dir, name + extension),
                             "fasta",
                             alphabet=Seq.IUPAC.unambiguous_dna)
 
