@@ -518,7 +518,7 @@ def search_attc(attc_df, replicon, keep_palindromes):
 
         return attc_array
 
-def find_integron(attc_file, intI_file, phage_int_file):
+def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
     """ Fonction that looks for integrons given rules :
     - presence of intI
     - presence of attC
@@ -531,14 +531,14 @@ def find_integron(attc_file, intI_file, phage_int_file):
     attc_file :
         Accession_number    attC    cm_debut    cm_fin    pos_beg    pos_end    sens    evalue
     """
-    intI = read_hmm(intI_file)
+    intI = read_hmm(replicon_name, intI_file)
     intI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-    phageI = read_hmm(phage_int_file)
+    phageI = read_hmm(replicon_name, phage_int_file)
     phageI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
-    tmp.loc[:,"query_name"] = "intersection_tyr_intI"
+    tmp.loc[:,"query_replicon_name"] = "intersection_tyr_intI"
 
     if args.union_integrases:
         intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0
@@ -556,7 +556,7 @@ def find_integron(attc_file, intI_file, phage_int_file):
         attc = read_infernal(attc_file, evalue = evalue_attc)
         attc.sort(["Accession_number","pos_beg", "evalue"], inplace=True)
 
-    attc_ac = search_attc(attc, name, args.keep_palindromes) # list of Dataframe, each have an array of attC
+    attc_ac = search_attc(attc, replicon_name, args.keep_palindromes) # list of Dataframe, each have an array of attC
     integrons = []
 
     if len(intI_ac) >= 1 and len(attc_ac) >=1:
@@ -568,7 +568,7 @@ def find_integron(attc_file, intI_file, phage_int_file):
 
             if n_attc_array == 0: # No more array to attribut to an integrase
 
-                integrons.append(Integron(name))
+                integrons.append(Integron(replicon_name))
                 integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                        intI_ac.pos_end.values[i],
                                        id_int,
@@ -604,7 +604,7 @@ def find_integron(attc_file, intI_file, phage_int_file):
                     side = np.argmin(distances)
 
                 if distances[side, idx_attc] < DISTANCE_THRESHOLD:
-                    integrons.append(Integron(name))
+                    integrons.append(Integron(replicon_name))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
                                                 id_int,
@@ -622,7 +622,7 @@ def find_integron(attc_file, intI_file, phage_int_file):
                     n_attc_array -= 1
 
                 else: # no array close to the integrase on both side
-                    integrons.append(Integron(name))
+                    integrons.append(Integron(replicon_name))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
                                                 id_int,
@@ -631,7 +631,7 @@ def find_integron(attc_file, intI_file, phage_int_file):
 
         if n_attc_array > 0: # after the integrase loop (<=> no more integrases)
             for attc_array in attc_ac:
-                integrons.append(Integron(name))
+                integrons.append(Integron(replicon_name))
 
                 for a_tmp in attc_array.values:
                     integrons[-1].add_attC(a_tmp[4],
@@ -641,7 +641,7 @@ def find_integron(attc_file, intI_file, phage_int_file):
 
     elif len(intI_ac.pos_end.values) == 0 and len(attc_ac) >=1 : # Si attC seulement
         for attc_array in attc_ac:
-            integrons.append(Integron(name))
+            integrons.append(Integron(replicon_name))
             for a_tmp in attc_array.values:
                 integrons[-1].add_attC(a_tmp[4],
                                               a_tmp[5],
@@ -650,7 +650,7 @@ def find_integron(attc_file, intI_file, phage_int_file):
 
     elif len(intI_ac.pos_end.values) >= 1 and len(attc_ac) == 0: # Si intI seulement
         for i,id_int in enumerate(intI_ac.ID_prot.values):
-            integrons.append(Integron(name))
+            integrons.append(Integron(replicon_name))
             integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                        intI_ac.pos_end.values[i],
                                        id_int,
@@ -658,7 +658,7 @@ def find_integron(attc_file, intI_file, phage_int_file):
                                        intI_ac.evalue.values[i],
                                        intI_ac.query_name.values[i])
 
-    print "In replicon {}, there are:".format(name)
+    print "In replicon {}, there are:".format(replicon_name)
     print "- {} complete integron(s) found with {} attC site(s)".format(sum([1 if i.type()=="complete" else 0 for i in integrons]),
                                                                   sum([len(i.attC) if i.type()=="complete" else 0 for i in integrons]))
     print "- {} attC0 integron(s) found with {} attC site(s)".format(sum([1 if i.type()=="attC0" else 0 for i in integrons]),
@@ -727,7 +727,7 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
     max_elt.index = range(len(max_elt))
     return max_elt
 
-def find_attc_max(integrons, name, in_dir, outfile="attC_max_1.res"):
+def find_attc_max(integrons, replicon_name, in_dir, outfile="attC_max_1.res"):
     """
     Look for attC site with cmsearch --max option wich remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
@@ -861,7 +861,7 @@ def find_attc_max(integrons, name, in_dir, outfile="attC_max_1.res"):
     return max_final
 
 
-def local_max(window_beg, window_end, strand_search="both"):
+def local_max(replicon_name, window_beg, window_end, strand_search="both"):
 
     if window_beg < window_end:
         subseq = SEQUENCE[window_beg : window_end]
@@ -870,19 +870,24 @@ def local_max(window_beg, window_end, strand_search="both"):
         subseq2 = SEQUENCE[:window_end]
         subseq = subseq1 + subseq2
 
-    with open(os.path.join(out_dir, name + "_subseq.fst"), "w") as f:
+    with open(os.path.join(out_dir, replicon_name + "_subseq.fst"), "w") as f:
         SeqIO.write(subseq, f, "fasta")
 
+    output_path = os.path.join(out_dir, "{name}_{win_beg}_{win_end}_subseq_attc.res".format(name=replicon_name,
+                                                                                            win_beg=window_beg,
+                                                                                            win_end=window_end))
+    tblout_path = os.path.join(out_dir, replicon_name + "_subseq_attc_table.res")
+    infile_path = os.path.join(out_dir, replicon_name + "_subseq.fst")
     if strand_search == "both":
         call([CMSEARCH,
               "-Z", str(SIZE_REPLICON/1000000.),
               "--max",
               "--cpu", N_CPU,
-              "-o", os.path.join(out_dir, name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res"),
-              "--tblout", os.path.join(out_dir, name + "_subseq_attc_table.res"),
+              "-o", output_path,
+              "--tblout", tblout_path,
               "-E" "10",
               MODEL_attc,
-              os.path.join(out_dir, name + "_subseq.fst")])
+              infile_path])
 
     elif strand_search == "top":
         call([CMSEARCH,
@@ -890,11 +895,11 @@ def local_max(window_beg, window_end, strand_search="both"):
               "--toponly",
               "--max",
               "--cpu", N_CPU,
-              "-o", os.path.join(out_dir, name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res"),
-              "--tblout", os.path.join(out_dir, name + "_subseq_attc_table.res"),
+              "-o", output_path,
+              "--tblout", tblout_path,
               "-E" "10",
               MODEL_attc,
-              os.path.join(out_dir, name + "_subseq.fst")])
+              infile_path])
 
     elif strand_search == "bottom":
         call([CMSEARCH,
@@ -902,109 +907,122 @@ def local_max(window_beg, window_end, strand_search="both"):
               "--bottomonly",
               "--max",
               "--cpu", N_CPU,
-              "-o", os.path.join(out_dir, name + "_" + str(window_beg) + "_" + str(window_end) + "_subseq_attc.res"),
-              "--tblout", os.path.join(out_dir, name + "_subseq_attc_table.res"),
+              "-o", output_path,
+              "--tblout", tblout_path,
               "-E" "10",
               MODEL_attc,
-              os.path.join(os.path.join(out_dir, name + "_subseq.fst"))])
+              infile_path])
 
-    df_max = read_infernal(os.path.join(out_dir, name + "_subseq_attc_table.res"), evalue = evalue_attc)
+    df_max = read_infernal(tblout_path, evalue=evalue_attc)
     df_max.pos_beg = (df_max.pos_beg + window_beg) % SIZE_REPLICON
     df_max.pos_end = (df_max.pos_end + window_beg) % SIZE_REPLICON
-    df_max.to_csv(os.path.join(out_dir, name + "_" + "subseq_attc_table_end.res"),
+    df_max.to_csv(os.path.join(out_dir, replicon_name + "_subseq_attc_table_end.res"),
                   sep="\t", index=0, mode="a", header=0)
     df_max = df_max[(abs(df_max.pos_end - df_max.pos_beg)>40) & (abs(df_max.pos_end - df_max.pos_beg) < 200)] # filter on size
-    #print df_max
-
     return df_max
 
-def find_attc(name, in_dir = ".", out_dir = "."):
+
+def find_attc(replicon_path, replicon_name, out_dir):
     """
-    Call cmsearch to find attC site in a single replicon.
-    Return nothing, the results are written on the disk
+    Call cmsearch to find attC sites in a single replicon.
+
+    :param replicon_path: the path of the replicon to analyse
+    :type replicon_path: string
+    :param replicon_name: the name of the replicon to analyse
+    :type replicon_name: string
+    :returns: None, the results are written on the disk
+
     """
     call([CMSEARCH,
           "--cpu", N_CPU,
-          "-o", os.path.join(out_dir, name + "_attc.res"),
-          "--tblout", os.path.join(out_dir, name + "_attc_table.res"),
+          "-o", os.path.join(out_dir, replicon_name + "_attc.res"),
+          "--tblout", os.path.join(out_dir, replicon_name + "_attc_table.res"),
           "-E" "10",
           MODEL_attc,
-          os.path.abspath(os.path.join(in_dir, name + ".fst"))])
+          replicon_path])
 
-def find_integrase(name, in_dir = ".", out_dir = "."):
+
+def find_integrase(replicon_path, replicon_name, out_dir):
     """
     Call Prodigal for Gene annotation and hmmer to find integrase, either with phage_int
     HMM profile or with intI profile.
 
-    replicon is the in_dir to the replicon file, or just the file if in current dir.
-
-    Return nothing, the results are written on the disk
+    :param replicon_path: the path of the replicon to analyse
+    :type replicon_path: string
+    :param replicon_name: the name of the replicon to analyse
+    :type replicon_name: string
+    :returns: None, the results are written on the disk
     """
 
     if not args.gembase:
         # Test whether the protein file exist to avoid new annotation for each run on the same replicon
-        if not os.path.isfile(os.path.join(out_dir, name + ".prt")):
+        prot_tr_path = os.path.join(out_dir, replicon_name + ".prt")
+        if not os.path.isfile(prot_tr_path):
             dev_null = 'NUL' if platform.system() == 'Windows' else '/dev/null'
+
             if SIZE_REPLICON > 200000:
                 call([PRODIGAL,
-                      "-i", os.path.join(in_dir, name + ".fst"),
-                      "-a", os.path.join(out_dir, name + ".prt"),
+                      "-i", replicon_path,
+                      "-a", prot_tr_path,
                       "-o", dev_null])
 
             else: # if small genome, prodigal annotate it as contig.
                 call([PRODIGAL,
                       "-p", "meta",
-                      "-i",  os.path.join(in_dir, name + ".fst"),
-                      "-a", os.path.join(out_dir, name + ".prt"),
+                      "-i", replicon_path,
+                      "-a", prot_tr_path,
                       "-o", dev_null])
 
-    if not os.path.isfile(out_dir + name + "_intI.res"):
-
+    intI_hmm_out = os.path.join(out_dir, replicon_name + "_intI.res")
+    if not os.path.isfile(intI_hmm_out):
         call([HMMSEARCH,
               "--cpu", N_CPU,
-              "--tblout", os.path.join(out_dir, name + "_intI_table.res"),
-              "-o", os.path.join(out_dir, name + "_intI.res"),
+              "--tblout", os.path.join(out_dir, replicon_name + "_intI_table.res"),
+              "-o", intI_hmm_out,
               MODEL_integrase,
               PROT_file])
-    if not os.path.isfile(os.path.join(out_dir, name + "_phage_int.res")):
+
+    phage_hmm_out = os.path.join(out_dir, replicon_name + "_phage_int.res")
+    if not os.path.isfile(phage_hmm_out):
         call([HMMSEARCH,
               "--cpu", N_CPU,
               "--tblout",
-              os.path.join(out_dir, name + "_phage_int_table.res"),
-              "-o", os.path.join(out_dir, name + "_phage_int.res"),
+              os.path.join(out_dir, replicon_name + "_phage_int_table.res"),
+              "-o", phage_hmm_out,
               MODEL_phage_int,
               PROT_file])
 
-def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
+def func_annot(replicon_name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
     """
     Call hmmmer to annotate CDS associated with the integron. Use Resfams per default (Gibson et al, ISME J.,  2014)
     """
     print "# Start Functional annotation... : "
     for integron in integrons:
         if integron.type() != "In0":
-            func_annotate_res = pd.DataFrame(columns = ["Accession_number",
-                                                        "query_name", "ID_query",
-                                                        "ID_prot","strand",
-                                                        "pos_beg","pos_end","evalue"])
+            func_annotate_res = pd.DataFrame(columns=["Accession_number",
+                                                      "query_name", "ID_query",
+                                                      "ID_prot", "strand",
+                                                      "pos_beg", "pos_end", "evalue"])
             prot_to_annotate = []
-            prot_tmp = out_dir + name + "_subseqprot.tmp"
+            prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
             prot = SeqIO.parse(PROT_file, "fasta")
             n_prot = 0
             for p in prot:
                 n_prot += 1
                 if p.id in integron.proteins.index:
                     prot_to_annotate.append(p)
-            SeqIO.write(prot_to_annotate,
-                        prot_tmp,
-                         "fasta")
+            SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
 
             for hmm in hmm_files:
-                call([HMMSEARCH, "-Z", str(n_prot), "--cpu", N_CPU, "--tblout", out_dir + name + "_fa_table.res",
-                      "-o", out_dir + name + "_fa.res", FA_DIR + hmm,
+                hmm_out = os.path.join(out_dir, replicon_name + "_fa.res")
+                call([HMMSEARCH,
+                      "-Z", str(n_prot),
+                      "--cpu", N_CPU,
+                      "--tblout", os.path.join(out_dir, replicon_name + "_fa_table.res"),
+                      "-o", hmm_out,
+                      os.path.join(FA_DIR, hmm),
                       prot_tmp])
-                hmm_in = read_hmm(out_dir + name + "_fa.res"
-                                 ).sort("evalue"
-                                       ).drop_duplicates(subset="ID_prot")
+                hmm_in = read_hmm(read_hmm, hmm_out).sort("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
 
             func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
@@ -1012,7 +1030,8 @@ def func_annot(name, in_dir, out_dir, hmm_files, evalue=10, coverage="todo"):
             integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
             integron.proteins.loc[func_annotate_res.ID_prot, "model"] = func_annotate_res.ID_query.values
 
-def read_hmm(infile, evalue=1, coverage=0.5):
+
+def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
     """
     Function that parse hmmer --out output and returns a pandas DataFrame
     filter output by evalue and coverage. (Being % of the profile aligned)
@@ -1049,8 +1068,7 @@ def read_hmm(infile, evalue=1, coverage=0.5):
             pass
 
         try:
-            evalue, hmmfrom, hmmto, alifrom, alito = re.search(_re_data, line
-                                                              ).groups()
+            evalue, hmmfrom, hmmto, alifrom, alito = re.search(_re_data, line).groups()
 
             df.loc[idx, "ID_prot"] = id_prot
             df.loc[idx, "ID_query"] = "-" # remnant of ancient parsing function to keep data structure
@@ -1064,7 +1082,7 @@ def read_hmm(infile, evalue=1, coverage=0.5):
             df.loc[idx, "alifrom"] =   int(alifrom)  # alifrom
             df.loc[idx, "alito"]   =   int(alito)    # ali to
             df.loc[idx, "len_profile"] = float(len_profile)
-            df.loc[idx, "Accession_number"] = name
+            df.loc[idx, "Accession_number"] = replicon_name
             df.loc[idx, "query_name"] = query
 
             idx += 1
@@ -1081,6 +1099,7 @@ def read_hmm(infile, evalue=1, coverage=0.5):
     hmm_file.close()
     return df_out
 
+
 def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
     """
     Function that parse cmsearch --tblout output and returns a pandas DataFrame
@@ -1089,15 +1108,15 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
     try:
         _ = pd.read_table(infile, comment="#")
     except:
-        return pd.DataFrame(columns=["Accession_number","cm_attC","cm_debut",
-                                     "cm_fin","pos_beg","pos_end","sens","evalue"])
+        return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
+                                     "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
 
     df = pd.read_table(infile, sep="\s*", engine="python",
                        header=None, skipfooter=10, skiprows=2)
     df = df[[2, 5, 6, 7, 8, 9, 15]]
     df = df[(df[15] < evalue)]
     df = df[(abs(df[8]-df[7]) < size_max_attc) & (size_min_attc < abs(df[8]-df[7]))] # filter on evalue
-    df["Accession_number"] = name
+    df["Accession_number"] = replicon_name
     c = df.columns.tolist()
     df = df[c[-1:] + c[:-1]]
     df.sort([8, 15], inplace=True)
@@ -1106,8 +1125,9 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
                   "pos_beg", "pos_end",
                   "sens", "evalue"]
     idx = (df.pos_beg > df.pos_end)
-    df.loc[idx, ['pos_beg', 'pos_end']] = df.loc[idx, ['pos_end','pos_beg']].values
+    df.loc[idx, ['pos_beg', 'pos_end']] = df.loc[idx, ['pos_end', 'pos_beg']].values
     return df
+
 
 def to_gbk(df, sequence):
 
@@ -1267,7 +1287,7 @@ Python {1}
     ############### Arguments and declarations ###############
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("replicon",
-                        help="Path and/or fasta file to the replicon, eg : path/to/file.fst or file.fst")
+                        help="path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst")
 
     parser.add_argument("--max",
                         help="Allows exact local detection (slower)",
@@ -1351,16 +1371,16 @@ Python {1}
                         action="store_true")
 
     parser.add_argument("-V", "--version",
-                        action= "version",
-                        version = get_version_message() )
+                        action="version",
+                        version=get_version_message() )
 
     args = parser.parse_args()
 
-    replicon = args.replicon
+    replicon_path = os.path.abspath(args.replicon)
     evalue_attc = args.evalue_attc
 
-    in_dir, sequence_file = os.path.split(replicon)
-    name, extension = os.path.splitext(sequence_file)
+    in_dir, sequence_file = os.path.split(replicon_path)
+    replicon_name, extension = os.path.splitext(sequence_file)
     in_dir = os.path.abspath(in_dir)
 
     mode_name = "max" if args.max else "default"
@@ -1371,16 +1391,15 @@ Python {1}
         pass
 
     try:
-        os.mkdir(os.path.join(args.outdir, "Results_Integron_Finder_" + name))
+        os.mkdir(os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name))
     except OSError:
         pass
 
-    out_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + name)
+    out_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name)
 
-    SEQUENCE = SeqIO.read(os.path.join(in_dir, name + extension),
-                            "fasta",
-                            alphabet=Seq.IUPAC.unambiguous_dna)
-
+    SEQUENCE = SeqIO.read(replicon_path,
+                          "fasta",
+                          alphabet=Seq.IUPAC.unambiguous_dna)
 
     ############### Definitions ###############
 
@@ -1419,34 +1438,35 @@ Python {1}
 
     if args.gembase:
         PROT_dir = os.path.join(in_dir, "..", "Proteins")
-        PROT_file = os.path.join(PROT_dir, name + ".prt")
+        PROT_file = os.path.join(PROT_dir, replicon_name + ".prt")
     else:
-        PROT_file = os.path.join(out_dir, name + ".prt")
+        PROT_file = os.path.join(out_dir, replicon_name + ".prt")
 
     ############### Default search ###############
 
-    find_attc(name, in_dir, out_dir)
-    find_integrase(name, in_dir, out_dir)
+    find_attc(replicon_path, replicon_name, out_dir)
+    find_integrase(replicon_path, replicon_name, out_dir)
 
     print "Default search done... : \n"
-    integrons = find_integron(os.path.join(out_dir, name + "_attc_table.res"),
-                              os.path.join(out_dir, name + "_intI.res"),
-                              os.path.join(out_dir, name + "_phage_int.res"))
+    integrons = find_integron(replicon_name,
+                              os.path.join(out_dir, replicon_name + "_attc_table.res"),
+                              os.path.join(out_dir, replicon_name + "_intI.res"),
+                              os.path.join(out_dir, replicon_name + "_phage_int.res"))
 
     ############### Max search ###############
     if args.max:
-        integron_max = find_attc_max(integrons, name, in_dir)
+        integron_max = find_attc_max(integrons, replicon_name, in_dir)
 
         print "Max search done... : \n"
 
         integrons = find_integron(integron_max,
-                                  os.path.join(out_dir, name + "_intI.res"),
-                                  os.path.join(out_dir, name + "_phage_int.res"))
+                                  os.path.join(out_dir, replicon_name + "_intI.res"),
+                                  os.path.join(out_dir, replicon_name + "_phage_int.res"))
 
 
     ############### Add promoters and attI ###############
 
-    outfile = name + ".integrons"
+    outfile = replicon_name + ".integrons"
 
     if len(integrons):
         j = 1
@@ -1465,12 +1485,12 @@ Python {1}
         ############### Functional annotation ###############
 
         if is_func_annot and len(FA_HMM) > 0:
-            if os.path.isfile(os.path.join(out_dir, name + "_fa.res")) == False:
-                func_annot(name, in_dir, out_dir, FA_HMM)
+            if os.path.isfile(os.path.join(out_dir, replicon_name + "_fa.res")) == False:
+                func_annot(replicon_name, in_dir, out_dir, FA_HMM)
         j = 1
         for i in integrons:
             if i.type() == "complete":
-                i.draw_integron(file=os.path.join(out_dir, name + "_" + str(j) + ".pdf"))
+                i.draw_integron(file=os.path.join(out_dir, replicon_name + "_" + str(j) + ".pdf"))
                 j += 1
 
         ############### Writing out results ###############
@@ -1488,11 +1508,11 @@ Python {1}
         integrons_describe['evalue'] = integrons_describe['evalue'].map(lambda x: '%.3e' % x)
         integrons_describe.sort(["ID_integron","pos_beg", "evalue"], inplace=True)
 
-        outfile = name + ".integrons"
+        outfile = replicon_name + ".integrons"
         integrons_describe.to_csv(os.path.join(out_dir, outfile), sep="\t", index=0, fillna="NA")
 
         to_gbk(integrons_describe, SEQUENCE)
-        SeqIO.write(SEQUENCE, os.path.join(out_dir, name + ".gbk"), "genbank")
+        SeqIO.write(SEQUENCE, os.path.join(out_dir, replicon_name + ".gbk"), "genbank")
     else:
         out_f = open(os.path.join(out_dir, outfile), "w")
         out_f.write("# No Integron found\n")
