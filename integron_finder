@@ -870,7 +870,7 @@ def local_max(replicon_name, window_beg, window_end, strand_search="both"):
         subseq2 = SEQUENCE[:window_end]
         subseq = subseq1 + subseq2
 
-    with open(out_dir + replicon_name + "_subseq.fst", "w") as f:
+    with open(os.path.join(out_dir, replicon_name + "_subseq.fst"), "w") as f:
         SeqIO.write(subseq, f, "fasta")
 
     output_path = os.path.join(out_dir, "{name}_{win_beg}_{win_end}_subseq_attc.res".format(name=replicon_name,
