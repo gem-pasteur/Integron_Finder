@@ -61,6 +61,7 @@ class Integron(object):
         tmp_df["distance_2attC"] = [np.nan]
         self.integrase = self.integrase.append(tmp_df)
 
+
     def add_attC(self, pos_beg_attC, pos_end_attC, strand, evalue, model):
         """ Function which adds attC site to the Integron object. """
         tmp_df = pd.DataFrame()
@@ -72,11 +73,12 @@ class Integron(object):
         tmp_df["annotation"] = "attC"
         tmp_df["model"] = [model]
         self.attC = self.attC.append(tmp_df, ignore_index=True)
-        if len(self.attC) < 2:
+        attC_len = len(self.attC)
+        if attC_len < 2:
             self.sizes_cassettes = [np.nan]
         else:
-            self.sizes_cassettes.append((self.attC.iloc[len(self.attC) - 1].pos_beg -
-                                         self.attC.iloc[len(self.attC) - 2].pos_end) % SIZE_REPLICON)
+            self.sizes_cassettes.append((self.attC.iloc[attC_len - 1].pos_beg -
+                                     self.attC.iloc[attC_len - 2].pos_end) % SIZE_REPLICON)
         self.attC["distance_2attC"] = self.sizes_cassettes
 
         #self.attC.sort(["pos_beg"], inplace = True)
@@ -85,17 +87,15 @@ class Integron(object):
     def type(self):
         """
         Tells you whether the integrons is :
-        - complet : Have one integrase and at least one attC
+        - complete : Have one integrase and at least one attC
         - attC0 : Have at least one attC
         - In0 : Just an integrase intI
         """
 
         if len(self.attC) >= 1 and len(self.integrase) == 1:
             return "complete"
-
         elif len(self.attC) == 0 and len(self.integrase) == 1:
             return "In0"
-
         elif len(self.attC) >= 1 and len(self.integrase) == 0:
             return "attC0"
 
@@ -312,10 +312,8 @@ class Integron(object):
         fin = self.attC.pos_end.values[-1]
 
         if self.has_integrase():
-
             if ((debut - self.integrase.pos_end.values[0]) % SIZE_REPLICON >
                 (self.integrase.pos_beg.values[0] - fin) % SIZE_REPLICON):
-
                 # integrase on the right of attC cluster.
                 fin = self.integrase.pos_beg.min()
                 debut -= 200
@@ -436,17 +434,11 @@ class Integron(object):
 
 
     def has_integrase(self):
-        if len(self.integrase) >= 1:
-            return True
-        else:
-            return False
+        return len(self.integrase) >= 1
 
 
     def has_attC(self):
-        if len(self.attC) >= 1:
-            return True
-        else:
-            return False
+        return len(self.attC) >= 1
 
 
 def search_attc(attc_df, keep_palindromes):
