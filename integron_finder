@@ -243,12 +243,12 @@ class Integron(object):
         attI1.name = "attI1"
 
         ## attI2
-        instances_attI2 =  [Seq.Seq('TTAATTAACGGTAAGCATCAGCGGGTGACAAAACGAGCATGCTTACTAATAAAATGTT')]
+        instances_attI2 = [Seq.Seq('TTAATTAACGGTAAGCATCAGCGGGTGACAAAACGAGCATGCTTACTAATAAAATGTT')]
         attI2 = motifs.create(instances_attI2)
         attI2.name = "attI2"
 
         ## attI3
-        instances_attI3 =  [Seq.Seq('CTTTGTTTAACGACCACGGTTGTGGGTATCCGGTGTTTGGTCAGATAAACCACAAGTT')]
+        instances_attI3 = [Seq.Seq('CTTTGTTTAACGACCACGGTTGTGGGTATCCGGTGTTTGGTCAGATAAACCACAAGTT')]
         attI3 = motifs.create(instances_attI3)
         attI3.name = "attI3"
 
@@ -648,7 +648,7 @@ def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
                                               a_tmp[7], model_attc_name)
 
     elif len(intI_ac.pos_end.values) >= 1 and len(attc_ac) == 0: # Si intI seulement
-        for i,id_int in enumerate(intI_ac.ID_prot.values):
+        for i, id_int in enumerate(intI_ac.ID_prot.values):
             integrons.append(Integron(replicon_name))
             integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                        intI_ac.pos_end.values[i],
@@ -1152,7 +1152,7 @@ def to_gbk(df, sequence):
                            "integron_type" : type_integron}
                )
             sequence.features.append(tmp)
-            if (df.loc[i].type_elt=="protein"):
+            if df.loc[i].type_elt == "protein":
 
                 tmp = SeqFeature.SeqFeature(location=
                                        SeqFeature.FeatureLocation(df.loc[i].pos_beg - 1,
@@ -1219,7 +1219,7 @@ def to_gbk(df, sequence):
                                )
             sequence.features.append(tmp)
             for r in df.loc[i].iterrows():
-                if (r[1].type_elt == "protein"):
+                if r[1].type_elt == "protein":
                     tmp = SeqFeature.SeqFeature(location=
                                            SeqFeature.FeatureLocation(r[1].pos_beg - 1,
                                                                       r[1].pos_end),
@@ -1372,7 +1372,7 @@ Python {1}
 
     parser.add_argument("-V", "--version",
                         action="version",
-                        version=get_version_message() )
+                        version=get_version_message())
 
     args = parser.parse_args()
 
@@ -1507,7 +1507,7 @@ Python {1}
         integrons_describe.index = range(len(integrons_describe))
 
         integrons_describe['evalue'] = integrons_describe['evalue'].map(lambda x: '%.3e' % x)
-        integrons_describe.sort(["ID_integron","pos_beg", "evalue"], inplace=True)
+        integrons_describe.sort(["ID_integron", "pos_beg", "evalue"], inplace=True)
 
         outfile = replicon_name + ".integrons"
         integrons_describe.to_csv(os.path.join(out_dir, outfile), sep="\t", index=0, fillna="NA")
