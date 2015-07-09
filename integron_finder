@@ -16,7 +16,6 @@ from Bio import motifs
 from Bio import Seq
 from Bio import SeqFeature
 from subprocess import call
-import psutil
 import os
 import argparse
 from matplotlib import use as m_use
