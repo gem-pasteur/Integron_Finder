@@ -680,7 +680,7 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
 
         while len(df_max) > 0 and 0 < (window_beg and window_end) < SIZE_REPLICON:
 
-            df_max = local_max(window_beg, window_end, searched_strand)
+            df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
             max_elt = pd.concat([max_elt, df_max])
 
             if circular:
@@ -707,7 +707,7 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
 
         while len(df_max) > 0 and 0 < (window_beg and window_end) < SIZE_REPLICON:
 
-            df_max = local_max(window_beg, window_end, searched_strand)
+            df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
             max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
 
             if circular:
@@ -770,7 +770,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
 
             strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
 
-            df_max = local_max(window_beg, window_end, strand)
+            df_max = local_max(replicon_name, window_beg, window_end, strand)
 
             max_elt = pd.concat([max_elt, df_max])
 
@@ -811,7 +811,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
 
                 strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
 
-                df_max = local_max(window_beg, window_end, strand)
+                df_max = local_max(replicon_name, window_beg, window_end, strand)
 
                 max_elt = pd.concat([max_elt, df_max])
 
@@ -839,7 +839,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
                     window_beg = max(0, window_beg - DISTANCE_THRESHOLD)
                     window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD)
 
-                df_max = local_max(window_beg, window_end)
+                df_max = local_max(replicon_name, window_beg, window_end)
 
                 max_elt = pd.concat([max_elt, df_max])
 
