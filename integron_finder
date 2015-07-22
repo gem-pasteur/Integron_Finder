@@ -1046,7 +1046,7 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
     else:
         _re_ID = re.compile("^>>\s([.\S]*)\s*#\s*(\d*)\s*#\s*(\d*)\s*#\s*([-\d]{1,2})")
         strand_f = lambda x: int(x)
-    _re_data = re.compile("^\s*[\d]*\s[!?]\s*[\d\.\e\-\+]*\s*[\d\.\e\-\+]*\s*[\d\.e\-\+]*\s*([\d\.e\-\+]*)\s*([\d]*)\s*([\d]*)\s..\s*([\d]*)\s*([\d]*)")
+    _re_data = re.compile("^\s*[\d]*\s[!?]\s*[\d\.\e\-\+]*\s*[\d\.\e\-\+]*\s*[\d\.e\-\+]*\s*([\d\.e\-\+]*)\s*([\d]*)\s*([\d]*)\s*[\.\[\]]{2}\s*([\d]*)\s*([\d]*)")
     _re_query = re.compile("^Query:\s*(\w*)\s*\[\w*\=(\d*)\]\n.*")
 
     idx = 0
