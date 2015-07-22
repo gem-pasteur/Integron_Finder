@@ -17,21 +17,24 @@ Find integrons in genomes
 # Usage
 
 ```
-usage: integron_finder [-h] [--max] [--func_annot] [--cpu CPU]
+usage: integron_finder [-h] [--eagle_eyes] [--func_annot] [--cpu CPU]
                        [-dt DISTANCE_THRESH] [--outdir .] [--linear]
                        [--union_integrases] [--cmsearch CMSEARCH]
                        [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
-                       [--gembase] [--attc_model file.cm] [--evalue_attc 1]
-                       [--keep_palindromes]
+                       [--dir_func_annot DIR_FUNC_ANNOT] [--gembase]
+                       [--attc_model file.cm] [--evalue_attc 1]
+                       [--keep_palindromes] [-V]
                        replicon
 
 positional arguments:
-  replicon              Path and/or fasta file to the replicon, eg :
+  replicon              path to the replicon file (in fasta format), eg :
                         path/to/file.fst or file.fst
 
 optional arguments:
   -h, --help            show this help message and exit
-  --max                 Allows exact local detection (slower)
+  --eagle_eyes          Allows thorough local detection (slower). Like a
+                        soaring eagle in the sky, catching rabbits by
+                        surprise.
   --func_annot          Functional annotation of CDS associated with integrons
                         HMM files are needed in Func_annot folder.
   --cpu CPU             Number of CPUs used by INFERNAL and HMMER
@@ -51,6 +54,8 @@ optional arguments:
                         /usr/local/bin/hmmsearch
   --prodigal PRODIGAL   Complete path to prodigal if not in PATH. eg:
                         /usr/local/bin/prodigal
+  --dir_func_annot DIR_FUNC_ANNOT
+                        Complete path to a directory containing HMM profiles
   --gembase             Use gembase formatted protein file instead of
                         Prodigal. Folder structure must be preserved
   --attc_model file.cm  path or file to the attc model (Covariance Matrix)
@@ -58,6 +63,7 @@ optional arguments:
                         (default: 1)
   --keep_palindromes    for a given hit, if the palindromic version is found,
                         don't remove the one with highest evalue
+  -V, --version         show program's version number and exit
 
 ```
 

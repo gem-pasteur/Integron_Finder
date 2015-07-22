@@ -725,7 +725,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
     """
     Look for attC site with cmsearch --max option wich remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
-    hit.
+    hit. We call it eagle_eyes.
 
     integrons is a list of Integron object, they may have or not attC or intI.
 
@@ -736,7 +736,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
     ______<--------______________________________________
              intI
                   ^-------------------------------------^
-                 Search-space with --max
+                 Search-space with --eagle_eyes
 
     Updated hit :
     =============
@@ -1281,8 +1281,8 @@ Python {1}
     parser.add_argument("replicon",
                         help="path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst")
 
-    parser.add_argument("--max",
-                        help="Allows exact local detection (slower)",
+    parser.add_argument("--eagle_eyes",
+                        help="Allows thorough local detection (slower). Like a soaring eagle in the sky, catching rabbits by surprise.",
                         action="store_true")
 
     parser.add_argument("--func_annot",
