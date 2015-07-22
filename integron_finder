@@ -374,7 +374,7 @@ class Integron(object):
         full["type"] = self.type()
         full["ID_replicon"] = self.ID_replicon
         full["ID_integron"] = id(self)  # uniq identifier of a given Integron
-        full["default"] = "Yes" if not args.max else "No"
+        full["default"] = "Yes" if not args.eagle_eyes else "No"
         full.drop_duplicates(subset=["element"], inplace=True)
         return full
 
@@ -529,7 +529,9 @@ def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
     phageI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
-    tmp.loc[:, "query_replicon_name"] = "intersection_tyr_intI"
+
+    if len(tmp) >= 1:
+        tmp.loc[:, "query_replicon_name"] = "intersection_tyr_intI"
 
     if args.union_integrases:
         intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0
@@ -1254,7 +1256,10 @@ if __name__ == "__main__":
         _prefix_data = os.path.join(os.environ['INTEGRON_HOME'], 'data')
 
     if not os.path.exists(_prefix_data):
-        raise Exception("cannot find integron_finder data check your installation")
+        raise Exception("""cannot find integron_finder data check your installation
+                           if within a python environment, just type:
+                               os.environ["INTEGRON_HOME"] = "."
+                        """)
 
 
     def get_version_message():
@@ -1375,7 +1380,7 @@ Python {1}
     replicon_name, extension = os.path.splitext(sequence_file)
     in_dir = os.path.abspath(in_dir)
 
-    mode_name = "max" if args.max else "default"
+    mode_name = "eagle_eyes" if args.eagle_eyes else "default"
 
     try:
         os.mkdir(args.outdir)
@@ -1436,20 +1441,24 @@ Python {1}
 
     ############### Default search ###############
 
+    print "\n>>> Starting Default search ... :"
+
     find_attc(replicon_path, replicon_name, out_dir)
     find_integrase(replicon_path, replicon_name, out_dir)
 
-    print "Default search done... : \n"
+    print ">>> Default search done... : \n"
     integrons = find_integron(replicon_name,
                               os.path.join(out_dir, replicon_name + "_attc_table.res"),
                               os.path.join(out_dir, replicon_name + "_intI.res"),
                               os.path.join(out_dir, replicon_name + "_phage_int.res"))
 
-    ############### Max search ###############
-    if args.max:
+    ############### Search with Eagle Eyes ###############
+    if args.eagle_eyes:
+
+        print "\n>>>>>> Starting Eagle eyes search...:"
         integron_max = find_attc_max(integrons)
 
-        print "Max search done... : \n"
+        print ">>>>>> Search with Eagle Eyes done... : \n"
 
         integrons = find_integron(replicon_name,
                                   integron_max,
