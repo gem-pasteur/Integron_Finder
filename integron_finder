@@ -929,13 +929,19 @@ def find_attc(replicon_path, replicon_name, out_dir):
     :returns: None, the results are written on the disk
 
     """
-    call([CMSEARCH,
-          "--cpu", N_CPU,
-          "-o", os.path.join(out_dir, replicon_name + "_attc.res"),
-          "--tblout", os.path.join(out_dir, replicon_name + "_attc_table.res"),
-          "-E" "10",
-          MODEL_attc,
-          replicon_path])
+    cmsearch_cmd = [CMSEARCH,
+                    "--cpu", N_CPU,
+                    "-o", os.path.join(out_dir, replicon_name + "_attc.res"),
+                    "--tblout", os.path.join(out_dir, replicon_name + "_attc_table.res"),
+                    "-E" "10",
+                    MODEL_attc,
+                    replicon_path]
+    try:
+        returncode = call(cmsearch_cmd)
+    except Exception as err:
+        raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd[0], err))
+    if returncode != 0:
+        raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd[0], returncode))
 
 
 def find_integrase(replicon_path, replicon_name, out_dir):
@@ -957,36 +963,52 @@ def find_integrase(replicon_path, replicon_name, out_dir):
             dev_null = 'NUL' if platform.system() == 'Windows' else '/dev/null'
 
             if SIZE_REPLICON > 200000:
-                call([PRODIGAL,
-                      "-i", replicon_path,
-                      "-a", prot_tr_path,
-                      "-o", dev_null])
+                prodigal_cmd = [PRODIGAL,
+                                "-i", replicon_path,
+                                "-a", prot_tr_path,
+                                "-o", dev_null]
 
             else: # if small genome, prodigal annotate it as contig.
-                call([PRODIGAL,
-                      "-p", "meta",
-                      "-i", replicon_path,
-                      "-a", prot_tr_path,
-                      "-o", dev_null])
+                prodigal_cmd = [PRODIGAL,
+                                "-p", "meta",
+                                "-i", replicon_path,
+                                "-a", prot_tr_path,
+                                "-o", dev_null]
+            try:
+                returncode = call(prodigal_cmd)
+            except Exception as err:
+                raise RuntimeError("{0} failed : {1}".format(prodigal_cmd[0], err))
+            if returncode != 0:
+                raise RuntimeError("{0} failed returncode = {1}".format(prodigal_cmd[0], returncode))
+
 
     intI_hmm_out = os.path.join(out_dir, replicon_name + "_intI.res")
+    hmm_cmd = []
     if not os.path.isfile(intI_hmm_out):
-        call([HMMSEARCH,
-              "--cpu", N_CPU,
-              "--tblout", os.path.join(out_dir, replicon_name + "_intI_table.res"),
-              "-o", intI_hmm_out,
-              MODEL_integrase,
-              PROT_file])
+        hmm_cmd.append([HMMSEARCH,
+                        "--cpu", N_CPU,
+                        "--tblout", os.path.join(out_dir, replicon_name + "_intI_table.res"),
+                        "-o", intI_hmm_out,
+                        MODEL_integrase,
+                        PROT_file])
 
     phage_hmm_out = os.path.join(out_dir, replicon_name + "_phage_int.res")
     if not os.path.isfile(phage_hmm_out):
-        call([HMMSEARCH,
-              "--cpu", N_CPU,
-              "--tblout",
-              os.path.join(out_dir, replicon_name + "_phage_int_table.res"),
-              "-o", phage_hmm_out,
-              MODEL_phage_int,
-              PROT_file])
+        hmm_cmd.append([HMMSEARCH,
+                        "--cpu", N_CPU,
+                        "--tblout", os.path.join(out_dir, replicon_name + "_phage_int_table.res"),
+                        "-o", phage_hmm_out,
+                        MODEL_phage_int,
+                        PROT_file])
+
+    for cmd in hmm_cmd:
+        try:
+            returncode = call(cmd)
+        except Exception as err:
+            raise RuntimeError("{0} failed : {1}".format(cmd[0], err))
+        if returncode != 0:
+            raise RuntimeError("{0} failed returncode = {1}".format(cmd[0], returncode))
+
 
 def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
     """
@@ -1011,13 +1033,21 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
 
             for hmm in hmm_files:
                 hmm_out = os.path.join(out_dir, replicon_name + "_fa.res")
-                call([HMMSEARCH,
-                      "-Z", str(n_prot),
-                      "--cpu", N_CPU,
-                      "--tblout", os.path.join(out_dir, replicon_name + "_fa_table.res"),
-                      "-o", hmm_out,
-                      os.path.join(FA_DIR, hmm),
-                      prot_tmp])
+                hmm_cmd = [HMMSEARCH,
+                            "-Z", str(n_prot),
+                            "--cpu", N_CPU,
+                            "--tblout", os.path.join(out_dir, replicon_name + "_fa_table.res"),
+                            "-o", hmm_out,
+                            os.path.join(FA_DIR, hmm),
+                            prot_tmp]
+
+                try:
+                    returncode = call(hmm_cmd)
+                except Exception as err:
+                    raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
+                if returncode != 0:
+                    raise RuntimeError("{0} failed returncode = {1}".format(hmm_cmd[0], returncode))
+
                 hmm_in = read_hmm(read_hmm, hmm_out).sort("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
 
@@ -1410,8 +1440,17 @@ Python {1}
     MODEL_phage_int = os.path.join(MODEL_DIR, "phage-int.hmm")
 
     CMSEARCH = args.cmsearch
+    if CMSEARCH is None:
+        raise RuntimeError("""cannot find 'cmsearch' in your PATH.
+Please install infernal package or setup 'cmsearch' binary path with --cmsearch option""")
     HMMSEARCH = args.hmmsearch
+    if HMMSEARCH is None:
+        raise RuntimeError("""cannot find 'hmmsearch' in your PATH.
+Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option""")
     PRODIGAL = args.prodigal
+    if PRODIGAL is None:
+        raise RuntimeError("""cannot find 'prodigal' in your PATH.
+Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
     if args.func_annot or args.dir_func_annot != "Functional_annotation":
 
