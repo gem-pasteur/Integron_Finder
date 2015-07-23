@@ -876,39 +876,45 @@ def local_max(replicon_name, window_beg, window_end, strand_search="both"):
     tblout_path = os.path.join(out_dir, replicon_name + "_subseq_attc_table.res")
     infile_path = os.path.join(out_dir, replicon_name + "_subseq.fst")
     if strand_search == "both":
-        call([CMSEARCH,
-              "-Z", str(SIZE_REPLICON / 1000000.),
-              "--max",
-              "--cpu", N_CPU,
-              "-o", output_path,
-              "--tblout", tblout_path,
-              "-E" "10",
-              MODEL_attc,
-              infile_path])
+        cmsearch_cmd = [CMSEARCH,
+                        "-Z", str(SIZE_REPLICON / 1000000.),
+                        "--max",
+                        "--cpu", N_CPU,
+                        "-o", output_path,
+                        "--tblout", tblout_path,
+                        "-E", "10",
+                        MODEL_attc,
+                        infile_path]
 
     elif strand_search == "top":
-        call([CMSEARCH,
-              "-Z", str(SIZE_REPLICON / 1000000.),
-              "--toponly",
-              "--max",
-              "--cpu", N_CPU,
-              "-o", output_path,
-              "--tblout", tblout_path,
-              "-E" "10",
-              MODEL_attc,
-              infile_path])
+        cmsearch_cmd = [CMSEARCH,
+                        "-Z", str(SIZE_REPLICON / 1000000.),
+                        "--toponly",
+                        "--max",
+                        "--cpu", N_CPU,
+                        "-o", output_path,
+                        "--tblout", tblout_path,
+                        "-E", "10",
+                        MODEL_attc,
+                        infile_path]
 
     elif strand_search == "bottom":
-        call([CMSEARCH,
-              "-Z", str(SIZE_REPLICON / 1000000.),
-              "--bottomonly",
-              "--max",
-              "--cpu", N_CPU,
-              "-o", output_path,
-              "--tblout", tblout_path,
-              "-E" "10",
-              MODEL_attc,
-              infile_path])
+        cmsearch_cmd = [CMSEARCH,
+                        "-Z", str(SIZE_REPLICON / 1000000.),
+                        "--bottomonly",
+                        "--max",
+                        "--cpu", N_CPU,
+                        "-o", output_path,
+                        "--tblout", tblout_path,
+                        "-E", "10",
+                        MODEL_attc,
+                        infile_path]
+    try:
+        returncode = call(cmsearch_cmd)
+    except Exception as err:
+        raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd[0], err))
+    if returncode != 0:
+        raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd[0], returncode))
 
     df_max = read_infernal(tblout_path, evalue=evalue_attc)
     df_max.pos_beg = (df_max.pos_beg + window_beg) % SIZE_REPLICON
@@ -935,7 +941,7 @@ def find_attc(replicon_path, replicon_name, out_dir):
                     "--cpu", N_CPU,
                     "-o", os.path.join(out_dir, replicon_name + "_attc.res"),
                     "--tblout", os.path.join(out_dir, replicon_name + "_attc_table.res"),
-                    "-E" "10",
+                    "-E", "10",
                     MODEL_attc,
                     replicon_path]
     try:
@@ -983,7 +989,6 @@ def find_integrase(replicon_path, replicon_name, out_dir):
             if returncode != 0:
                 raise RuntimeError("{0} failed returncode = {1}".format(prodigal_cmd[0], returncode))
 
-
     intI_hmm_out = os.path.join(out_dir, replicon_name + "_intI.res")
     hmm_cmd = []
     if not os.path.isfile(intI_hmm_out):
@@ -1009,7 +1014,7 @@ def find_integrase(replicon_path, replicon_name, out_dir):
         except Exception as err:
             raise RuntimeError("{0} failed : {1}".format(cmd[0], err))
         if returncode != 0:
-            raise RuntimeError("{0} failed returncode = {1}".format(cmd[0], returncode))
+            raise RuntimeError("{0} failed return code = {1}".format(cmd[0], returncode))
 
 
 def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
@@ -1048,7 +1053,7 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
                 except Exception as err:
                     raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
                 if returncode != 0:
-                    raise RuntimeError("{0} failed returncode = {1}".format(hmm_cmd[0], returncode))
+                    raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
 
                 hmm_in = read_hmm(read_hmm, hmm_out).sort("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
