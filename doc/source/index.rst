@@ -1,4 +1,5 @@
-.. IntegronFinder documentation master file, created by
+.. IntegronFinder - Detection of Integron in DNA sequences
+   documentation master file, created by
    sphinx-quickstart on Mon Jul 27 15:07:43 2015.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
