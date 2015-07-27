@@ -6,17 +6,64 @@
 Welcome to IntegronFinder's documentation!
 ==========================================
 
-Contents:
+IntegronFinder is a program that detects integrons in DNA sequences.
+The program is available on a webserver (link), or by command line
+(`IntegronFinder on github`_)
 
+First, IntegronFinder annotate the DNA sequence's CDS with Prodigal.
+
+Second, IntegronFinder detects independantly integron integrase and *attC*
+recombination site. The Integron integrase is detected by using the intersection
+of two HMM profiles:
+
+- one specific of tyrosine-recombinase
+- one specific of the patch III domain of the integron integrase.
+
+The *attC* recombination site is detected with a covariance model (CM) which,
+models the secondary structure in addition to the few conserved sequence
+positions.
+
+Third, the results are intergrated, and IntegronFinder distinguishes 3 types of
+elements:
+
+- complete integron
+    Integron with integron integrase nearby *attC* site(s)
+- In0 element
+    Integron integrase only, without any *attC* site nearby
+- attC0 element
+    *attC* sites only, without integron integrase nearby.
+    A rule of thumbs to avoid false positive is to filter out singleton of
+    *attC* sites.
+
+IntegronFinder can also annotate gene cassettes (CDS nearby *attC* sites) using
+Resfams, a database of HMM profiles aiming at annotating antibiotic resistance
+genes. This database is provided but the user can add any other HMM profiles
+database of its own interest.
+
+.. image:: _static/pipeline.*
+     :height: 500px
+     :align: center
+     :alt: IntegronFinder Pipeline
+
+
+
+.. _`IntegronFinder on github`: https://github.com/gem-pasteur/Integron_Finder
+
+
+Running IntegronFinder
+======================
 .. toctree::
    :maxdepth: 2
 
+   installation
+   quickstart
+   inputs
+   outputs
 
+..
+  Indices and tables
+  ==================
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+  * :ref:`genindex`
+  * :ref:`modindex`
+  * :ref:`search`
