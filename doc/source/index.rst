@@ -42,7 +42,7 @@ genes. This database is provided but the user can add any other HMM profiles
 database of its own interest.
 
 .. image:: _static/pipeline.*
-     :height: 500px
+     :width: 400px
      :align: center
      :alt: IntegronFinder Pipeline
 
