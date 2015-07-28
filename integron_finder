@@ -522,24 +522,31 @@ def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
     attc_file :
         Accession_number    attC    cm_debut    cm_fin    pos_beg    pos_end    sens    evalue
     """
-    intI = read_hmm(replicon_name, intI_file)
-    intI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-    phageI = read_hmm(replicon_name, phage_int_file)
-    phageI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
+    if args.no_proteins == False:
+        intI = read_hmm(replicon_name, intI_file)
+        intI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-    tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
+        phageI = read_hmm(replicon_name, phage_int_file)
+        phageI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-    if len(tmp) >= 1:
-        tmp.loc[:, "query_replicon_name"] = "intersection_tyr_intI"
+        tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
 
-    if args.union_integrases:
-        intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0
-                      ].merge(phageI[phageI.ID_prot.isin(tmp.ID_prot) == 0],
-                              how="outer"
-                             ).merge(tmp, how="outer")
+        if len(tmp) >= 1:
+            tmp.loc[:, "query_replicon_name"] = "intersection_tyr_intI"
+
+        if args.union_integrases:
+            intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0
+                          ].merge(phageI[phageI.ID_prot.isin(tmp.ID_prot) == 0],
+                                  how="outer"
+                                 ).merge(tmp, how="outer")
+        else:
+            intI_ac = tmp
     else:
-        intI_ac = tmp
+        intI_ac = pd.DataFrame(columns=["Accession_number", "query_name", "ID_query",
+                                        "ID_prot", "strand", "pos_beg", "pos_end",
+                                        "evalue", "hmmfrom", "hmmto", "alifrom",
+                                        "alito", "len_profile"])
 
     if isinstance(attc_file, pd.DataFrame):
         attc = attc_file
@@ -1402,6 +1409,10 @@ Python {1}
                         help="for a given hit, if the palindromic version is found, don't remove the one with highest evalue ",
                         action="store_true")
 
+    parser.add_argument("--no_proteins",
+                        help="Don't annotate CDS and don't find integrase, just look for attC sites.",
+                        action="store_true")
+
     parser.add_argument("-V", "--version",
                         action="version",
                         version=get_version_message())
@@ -1462,7 +1473,9 @@ Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch o
         raise RuntimeError("""cannot find 'prodigal' in your PATH.
 Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
-    if args.func_annot or args.dir_func_annot != "Functional_annotation/":
+    if (args.func_annot or
+        args.dir_func_annot != "Functional_annotation/" and
+        args.no_proteins == False):
 
         FA_DIR = os.path.join(_prefix_data, args.dir_func_annot)
         FA_HMM = [f for f in os.listdir(FA_DIR) if f.lower().endswith("hmm")]
@@ -1485,10 +1498,12 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
 
     ############### Default search ###############
 
+    if args.no_proteins == False:
+        find_integrase(replicon_path, replicon_name, out_dir)
+
     print "\n>>> Starting Default search ... :"
 
     find_attc(replicon_path, replicon_name, out_dir)
-    find_integrase(replicon_path, replicon_name, out_dir)
 
     print ">>> Default search done... : \n"
     integrons = find_integron(replicon_name,
@@ -1518,7 +1533,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         j = 1
         for i in integrons:
             if i.type() != "In0": # complete & attC0
-                i.add_proteins()
+                if args.no_proteins == False:
+                    i.add_proteins()
 
             if i.type() == "complete":
                 i.add_promoter()
