@@ -1462,7 +1462,7 @@ Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch o
         raise RuntimeError("""cannot find 'prodigal' in your PATH.
 Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
-    if args.func_annot or args.dir_func_annot != "Functional_annotation":
+    if args.func_annot or args.dir_func_annot != "Functional_annotation/":
 
         FA_DIR = os.path.join(_prefix_data, args.dir_func_annot)
         FA_HMM = [f for f in os.listdir(FA_DIR) if f.lower().endswith("hmm")]
