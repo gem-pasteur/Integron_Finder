@@ -19,7 +19,7 @@ IntegronFinder is built with Python 2.7, and a few libraries are needed:
    - Biopython 1.63
    - Matplotlib 1.4.3
 
-In addition, IntegronFinder have external dependencies which have to be
+In addition, IntegronFinder has external dependencies which have to be
 installed prior the use of the program.
 
 - `HMMER 3.1b1`_
@@ -39,7 +39,7 @@ Installation procedure
 
 1. Download the `latest release`_
 2. Uncompress it
-3. In a shell (*e.g.* terminal), go to the directory::
+3. In a shell (*e.g.* a terminal), go to the directory::
 
      cd Integron_Finder-x.x/
 
@@ -59,7 +59,8 @@ Installation procedure
   Canopy, see `Canopy CLI`_
 
 .. warning::
-  When installing a new version of IntegronFinder, do not forget to uninstall the previous version installed !
+  When installing a new version of IntegronFinder, do not forget to uninstall
+  the previous version installed !
 
 Uninstallation procedure
 =========================

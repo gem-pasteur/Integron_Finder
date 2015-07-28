@@ -9,11 +9,11 @@ Welcome to IntegronFinder's documentation!
 
 IntegronFinder is a program that detects integrons in DNA sequences.
 The program is available on a webserver (link), or by command line
-(`IntegronFinder on github`_)
+(`IntegronFinder on github`_).
 
-First, IntegronFinder annotate the DNA sequence's CDS with Prodigal.
+First, IntegronFinder annotates the DNA sequence's CDS with Prodigal.
 
-Second, IntegronFinder detects independantly integron integrase and *attC*
+Second, IntegronFinder detects independently integron integrase and *attC*
 recombination site. The Integron integrase is detected by using the intersection
 of two HMM profiles:
 
@@ -33,26 +33,28 @@ elements:
     Integron integrase only, without any *attC* site nearby
 - attC0 element
     *attC* sites only, without integron integrase nearby.
-    A rule of thumbs to avoid false positive is to filter out singleton of
-    *attC* sites.
+    A rule of thumb to avoid false positive is to filter out singleton of
+    *attC* site.
 
 IntegronFinder can also annotate gene cassettes (CDS nearby *attC* sites) using
 Resfams, a database of HMM profiles aiming at annotating antibiotic resistance
 genes. This database is provided but the user can add any other HMM profiles
 database of its own interest.
 
+When available, IntegronFinder annotates the promoters and attI sites by pattern
+matching.
+
 .. image:: _static/pipeline.*
      :width: 400px
      :align: center
      :alt: IntegronFinder Pipeline
-
-
 
 .. _`IntegronFinder on github`: https://github.com/gem-pasteur/Integron_Finder
 
 
 Running IntegronFinder
 ======================
+
 .. toctree::
    :maxdepth: 2
 
