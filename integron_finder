@@ -1029,14 +1029,20 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
     Call hmmmer to annotate CDS associated with the integron. Use Resfams per default (Gibson et al, ISME J.,  2014)
     """
     print "# Start Functional annotation... : "
+
+    prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
+
     for integron in integrons:
-        if integron.type() != "In0":
+
+        if os.path.isfile(prot_tmp):
+            os.remove(prot_tmp)
+
+        if integron.type() != "In0" and len(integron.proteins) > 0:
             func_annotate_res = pd.DataFrame(columns=["Accession_number",
                                                       "query_name", "ID_query",
                                                       "ID_prot", "strand",
                                                       "pos_beg", "pos_end", "evalue"])
             prot_to_annotate = []
-            prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
             prot = SeqIO.parse(PROT_file, "fasta")
             n_prot = 0
             for p in prot:
@@ -1514,10 +1520,10 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     ############### Search with Eagle Eyes ###############
     if args.eagle_eyes:
 
-        print "\n>>>>>> Starting Eagle eyes search...:"
+        print "\n>>>>>> Starting search with Eagle's eyes...:"
         integron_max = find_attc_max(integrons)
 
-        print ">>>>>> Search with Eagle Eyes done... : \n"
+        print ">>>>>> Search with Eagle's eyes done... : \n"
 
         integrons = find_integron(replicon_name,
                                   integron_max,
@@ -1549,6 +1555,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         if is_func_annot and len(FA_HMM) > 0:
             if not os.path.isfile(os.path.join(out_dir, replicon_name + "_fa.res")):
                 func_annot(replicon_name, out_dir, FA_HMM)
+
         j = 1
         for i in integrons:
             if i.type() == "complete":
