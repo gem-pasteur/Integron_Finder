@@ -328,7 +328,6 @@ require_python = ['python (>=2.7, <3.0)']
 require_packages = ['numpy (>=1.7.0)',
                     'pandas (>=0.15.1)',
                     'Bio (>=1.63)',
-                    'psutil (>=2.1.3)',
                     'matplotlib (>=1.4.2)']
 
 setup(name='integron_finder',
