@@ -533,7 +533,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
         tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
 
         if len(tmp) >= 1:
-            tmp.loc[:, "query_replicon_name"] = "intersection_tyr_intI"
+            tmp.loc[:, "query_name"] = "intersection_tyr_intI"
 
         if args.union_integrases:
             intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0
@@ -574,7 +574,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                                        id_int,
                                        int(intI_ac.strand.values[i]),
                                        intI_ac.evalue.values[i],
-                                       intI_ac.query_replicon_name.values[i])
+                                       intI_ac.query_name.values[i])
 
             else: # we still have attC and int :
                 attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
@@ -610,7 +610,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                                                 id_int,
                                                 int(intI_ac.strand.values[i]),
                                                 intI_ac.evalue.values[i],
-                                                intI_ac.query_replicon_name.values[i])
+                                                intI_ac.query_name.values[i])
 
                     attc_tmp = attc_ac.pop(idx_attc)
 
@@ -627,7 +627,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                                                 intI_ac.pos_end.values[i],
                                                 id_int,
                                                 int(intI_ac.strand.values[i]),
-                                                intI_ac.evalue.values[i], intI_ac.query_replicon_name.values[i])
+                                                intI_ac.evalue.values[i], intI_ac.query_name.values[i])
 
         if n_attc_array > 0: # after the integrase loop (<=> no more integrases)
             for attc_array in attc_ac:
@@ -656,7 +656,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                                        id_int,
                                        int(intI_ac.strand.values[i]),
                                        intI_ac.evalue.values[i],
-                                       intI_ac.query_replicon_name.values[i])
+                                       intI_ac.query_name.values[i])
 
     print "In replicon {}, there are:".format(replicon_name)
     print "- {} complete integron(s) found with {} attC site(s)".format(sum(
