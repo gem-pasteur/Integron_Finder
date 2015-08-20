@@ -509,7 +509,7 @@ def search_attc(attc_df, keep_palindromes):
         return attc_array
 
 
-def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
+def find_integron(replicon_name, attc_file, intI_file, phageI_file):
     """ Function that looks for integrons given rules :
     - presence of intI
     - presence of attC
@@ -527,13 +527,13 @@ def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
         intI = read_hmm(replicon_name, intI_file)
         intI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-        phageI = read_hmm(replicon_name, phage_int_file)
+        phageI = read_hmm(replicon_name, phageI_file)
         phageI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
         tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
 
         if len(tmp) >= 1:
-            tmp.loc[:, "query_replicon_name"] = "intersection_tyr_intI"
+            tmp.loc[:, "query_name"] = "intersection_tyr_intI"
 
         if args.union_integrases:
             intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0
@@ -574,7 +574,7 @@ def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
                                        id_int,
                                        int(intI_ac.strand.values[i]),
                                        intI_ac.evalue.values[i],
-                                       intI_ac.query_replicon_name.values[i])
+                                       intI_ac.query_name.values[i])
 
             else: # we still have attC and int :
                 attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
@@ -610,7 +610,7 @@ def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
                                                 id_int,
                                                 int(intI_ac.strand.values[i]),
                                                 intI_ac.evalue.values[i],
-                                                intI_ac.query_replicon_name.values[i])
+                                                intI_ac.query_name.values[i])
 
                     attc_tmp = attc_ac.pop(idx_attc)
 
@@ -656,7 +656,7 @@ def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
                                        id_int,
                                        int(intI_ac.strand.values[i]),
                                        intI_ac.evalue.values[i],
-                                       intI_ac.query_replicon_name.values[i])
+                                       intI_ac.query_name.values[i])
 
     print "In replicon {}, there are:".format(replicon_name)
     print "- {} complete integron(s) found with {} attC site(s)".format(sum(
@@ -670,65 +670,6 @@ def find_integron(replicon_name, attc_file, intI_file, phage_int_file):
                                                 sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons]))
 
     return integrons
-
-def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_right=False):
-    # for a given element, we can search on the left hand side (if integrase is on the right for instance)
-    # or right hand side (opposite situation) or both side (only integrase or only attC sites)
-    wb = window_beg
-    we = window_end
-    if search_right:
-
-        if circular:
-            window_beg = (window_end - 200) % SIZE_REPLICON # 200 to allow the detection of sites that would overlap 2 consecutive windows
-            window_end = (window_end + DISTANCE_THRESHOLD) % SIZE_REPLICON
-        else:
-            window_beg = max(0, window_end - 200) # 200 to allow the detection of sites that would overlap 2 consecutive windows
-            window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD)
-
-        searched_strand = "both" if search_left else "top" # search on both strands if search in both directions
-
-        while len(df_max) > 0 and 0 < (window_beg and window_end) < SIZE_REPLICON:
-
-            df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
-            max_elt = pd.concat([max_elt, df_max])
-
-            if circular:
-                window_beg = (window_end - 200) % SIZE_REPLICON
-                window_end = (window_end + DISTANCE_THRESHOLD) % SIZE_REPLICON
-            else:
-                window_beg = max(0, window_end - 200)
-                window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD)
-
-        # re-initialize in case we enter search left too.
-        df_max = max_elt.copy()
-        window_beg = wb
-        window_end = we
-
-    if search_left:
-        if circular:
-            window_beg = (window_beg - DISTANCE_THRESHOLD) % SIZE_REPLICON
-            window_end = (window_beg + 200) % SIZE_REPLICON
-        else:
-            window_beg = max(0, window_beg - DISTANCE_THRESHOLD)
-            window_end = min(SIZE_REPLICON, window_beg + 200)
-
-        searched_strand = "both" if search_right else "bottom"
-
-        while len(df_max) > 0 and 0 < (window_beg and window_end) < SIZE_REPLICON:
-
-            df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
-            max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
-
-            if circular:
-                window_beg = (window_beg - DISTANCE_THRESHOLD) % SIZE_REPLICON
-                window_end = (window_beg + 200) % SIZE_REPLICON
-            else:
-                window_beg = max(0, window_beg - DISTANCE_THRESHOLD)
-                window_end = min(SIZE_REPLICON, window_beg + 200)
-
-    max_elt.drop_duplicates(inplace=True)
-    max_elt.index = range(len(max_elt))
-    return max_elt
 
 def find_attc_max(integrons, outfile="attC_max_1.res"):
     """
@@ -863,6 +804,69 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
         max_final.index = range(len(max_final))
 
     return max_final
+
+def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_right=False):
+    # for a given element, we can search on the left hand side (if integrase is on the right for instance)
+    # or right hand side (opposite situation) or both side (only integrase or only attC sites)
+    wb = window_beg
+    we = window_end
+
+    if search_right:
+
+        if circular:
+            window_beg = (window_end - 200) % SIZE_REPLICON # 200 to allow the detection of sites that would overlap 2 consecutive windows
+            window_end = (window_end + DISTANCE_THRESHOLD) % SIZE_REPLICON
+        else:
+            window_beg = max(0, window_end - 200) # 200 to allow the detection of sites that would overlap 2 consecutive windows
+            window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD)
+
+        searched_strand = "both" if search_left else "top" # search on both strands if search in both directions
+
+        while len(df_max) > 0 and 0 < (window_beg and window_end) < SIZE_REPLICON:
+
+            df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
+            max_elt = pd.concat([max_elt, df_max])
+
+            if circular:
+                window_beg = (window_end - 200) % SIZE_REPLICON
+                window_end = (window_end + DISTANCE_THRESHOLD) % SIZE_REPLICON
+            else:
+                window_beg = max(0, window_end - 200)
+                window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD)
+
+        # re-initialize in case we enter search left too.
+        df_max = max_elt.copy()
+        window_beg = wb
+        window_end = we
+
+    if search_left:
+
+        if circular:
+            window_end = (window_beg + 200) % SIZE_REPLICON
+            window_beg = (window_beg - DISTANCE_THRESHOLD) % SIZE_REPLICON
+
+        else:
+            window_beg = max(0, window_beg - DISTANCE_THRESHOLD)
+            window_end = min(SIZE_REPLICON, window_beg + 200)
+
+        searched_strand = "both" if search_right else "bottom"
+
+        while len(df_max) > 0 and 0 < (window_beg and window_end) < SIZE_REPLICON:
+
+            df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
+            max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
+
+            if circular:
+                window_end = (window_beg + 200) % SIZE_REPLICON
+                window_beg = (window_beg - DISTANCE_THRESHOLD) % SIZE_REPLICON
+
+            else:
+                window_end = min(SIZE_REPLICON, window_beg + 200)
+                window_beg = max(0, window_beg - DISTANCE_THRESHOLD)
+
+    max_elt.drop_duplicates(inplace=True)
+    max_elt.index = range(len(max_elt))
+    return max_elt
 
 
 def local_max(replicon_name, window_beg, window_end, strand_search="both"):
@@ -1029,14 +1033,20 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
     Call hmmmer to annotate CDS associated with the integron. Use Resfams per default (Gibson et al, ISME J.,  2014)
     """
     print "# Start Functional annotation... : "
+
+    prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
+
     for integron in integrons:
-        if integron.type() != "In0":
+
+        if os.path.isfile(prot_tmp):
+            os.remove(prot_tmp)
+
+        if integron.type() != "In0" and len(integron.proteins) > 0:
             func_annotate_res = pd.DataFrame(columns=["Accession_number",
                                                       "query_name", "ID_query",
                                                       "ID_prot", "strand",
                                                       "pos_beg", "pos_end", "evalue"])
             prot_to_annotate = []
-            prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
             prot = SeqIO.parse(PROT_file, "fasta")
             n_prot = 0
             for p in prot:
@@ -1498,31 +1508,47 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
 
     ############### Default search ###############
 
+    intI_file = os.path.join(out_dir, replicon_name + "_intI.res")
+    phageI_file = os.path.join(out_dir, replicon_name + "_phage_int.res")
+    attC_default_file = os.path.join(out_dir, replicon_name + "_attc_table.res")
+
     if args.no_proteins == False:
-        find_integrase(replicon_path, replicon_name, out_dir)
+        if (os.path.isfile(intI_file) == 0 or
+            os.path.isfile(phageI_file) == 0):
+
+            find_integrase(replicon_path, replicon_name, out_dir)
+
 
     print "\n>>> Starting Default search ... :"
-
-    find_attc(replicon_path, replicon_name, out_dir)
+    if os.path.isfile(attC_default_file) == 0:
+        find_attc(replicon_path, replicon_name, out_dir)
 
     print ">>> Default search done... : \n"
     integrons = find_integron(replicon_name,
-                              os.path.join(out_dir, replicon_name + "_attc_table.res"),
-                              os.path.join(out_dir, replicon_name + "_intI.res"),
-                              os.path.join(out_dir, replicon_name + "_phage_int.res"))
+                              attC_default_file,
+                              intI_file,
+                              phageI_file)
 
     ############### Search with Eagle Eyes ###############
     if args.eagle_eyes:
 
-        print "\n>>>>>> Starting Eagle eyes search...:"
-        integron_max = find_attc_max(integrons)
+        print "\n>>>>>> Starting search with Eagle's eyes...:"
+        if os.path.isfile(os.path.join(out_dir, "integron_max.pickle")) == 0:
 
-        print ">>>>>> Search with Eagle Eyes done... : \n"
+
+            integron_max = find_attc_max(integrons)
+            integron_max.to_pickle(os.path.join(out_dir, "integron_max.pickle"))
+            print ">>>>>> Search with Eagle's eyes done... : \n"
+
+        else:
+            integron_max = pd.read_pickle(os.path.join(out_dir,
+                                                       "integron_max.pickle"))
+            print ">>>>>> Search with Eagle's eyes was already done, continue... : \n"
 
         integrons = find_integron(replicon_name,
                                   integron_max,
-                                  os.path.join(out_dir, replicon_name + "_intI.res"),
-                                  os.path.join(out_dir, replicon_name + "_phage_int.res"))
+                                  intI_file,
+                                  phageI_file)
 
 
     ############### Add promoters and attI ###############
@@ -1549,6 +1575,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         if is_func_annot and len(FA_HMM) > 0:
             if not os.path.isfile(os.path.join(out_dir, replicon_name + "_fa.res")):
                 func_annot(replicon_name, out_dir, FA_HMM)
+
         j = 1
         for i in integrons:
             if i.type() == "complete":
