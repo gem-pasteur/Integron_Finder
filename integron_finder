@@ -374,7 +374,7 @@ class Integron(object):
         full["type"] = self.type()
         full["ID_replicon"] = self.ID_replicon
         full["ID_integron"] = id(self)  # uniq identifier of a given Integron
-        full["default"] = "Yes" if not args.eagle_eyes else "No"
+        full["default"] = "Yes" if not (args.eagle_eyes or args.local_max) else "No"
         full.drop_duplicates(subset=["element"], inplace=True)
         return full
 
@@ -675,7 +675,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
     """
     Look for attC site with cmsearch --max option wich remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
-    hit. We call it eagle_eyes.
+    hit. We call it local_max or eagle_eyes.
 
     integrons is a list of Integron object, they may have or not attC or intI.
 
@@ -686,7 +686,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
     ______<--------______________________________________
              intI
                   ^-------------------------------------^
-                 Search-space with --eagle_eyes
+                 Search-space with --local_max
 
     Updated hit :
     =============
@@ -1338,8 +1338,8 @@ Python {1}
     parser.add_argument("replicon",
                         help="path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst")
 
-    parser.add_argument("--eagle_eyes",
-                        help="Allows thorough local detection (slower). Like a soaring eagle in the sky, catching rabbits by surprise.",
+    parser.add_argument("--local_max",
+                        help="Allows thorough local detection (slower but more sensitive and do not increase false positive rate).",
                         action="store_true")
 
     parser.add_argument("--func_annot",
@@ -1423,6 +1423,10 @@ Python {1}
                         help="Don't annotate CDS and don't find integrase, just look for attC sites.",
                         action="store_true")
 
+    parser.add_argument("--eagle_eyes",
+                        help="Synonym of --local_max. Like a soaring eagle in the sky, catching rabbits(or attC sites) by surprise.",
+                        action="store_true")
+
     parser.add_argument("-V", "--version",
                         action="version",
                         version=get_version_message())
@@ -1436,7 +1440,7 @@ Python {1}
     replicon_name, extension = os.path.splitext(sequence_file)
     in_dir = os.path.abspath(in_dir)
 
-    mode_name = "eagle_eyes" if args.eagle_eyes else "default"
+    mode_name = "local_max" if (args.eagle_eyes or args.local_max) else "default"
 
     try:
         os.mkdir(args.outdir)
@@ -1530,20 +1534,20 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                               phageI_file)
 
     ############### Search with Eagle Eyes ###############
-    if args.eagle_eyes:
+    if (args.eagle_eyes or args.local_max):
 
-        print "\n>>>>>> Starting search with Eagle's eyes...:"
+        print "\n>>>>>> Starting search with local_max...:"
         if os.path.isfile(os.path.join(out_dir, "integron_max.pickle")) == 0:
 
 
             integron_max = find_attc_max(integrons)
             integron_max.to_pickle(os.path.join(out_dir, "integron_max.pickle"))
-            print ">>>>>> Search with Eagle's eyes done... : \n"
+            print ">>>>>> Search with local_max done... : \n"
 
         else:
             integron_max = pd.read_pickle(os.path.join(out_dir,
                                                        "integron_max.pickle"))
-            print ">>>>>> Search with Eagle's eyes was already done, continue... : \n"
+            print ">>>>>> Search with local_max was already done, continue... : \n"
 
         integrons = find_integron(replicon_name,
                                   integron_max,
