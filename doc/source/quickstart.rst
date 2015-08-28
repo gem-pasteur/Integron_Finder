@@ -2,9 +2,9 @@
 
 .. _quickstart:
 
-**********
-Quickstart
-**********
+********
+Tutorial
+********
 
 We assume here that the program is :ref:`installed <install>`.
 
@@ -38,7 +38,7 @@ It will perform a search, and outputs the results in a directory called
 - mysequence_X.pdf
    For each complete integron, a simple graphic of the region is depicted
 
-.. _eagle_eyes:
+.. _local_max:
 
 Thorough local detection
 ------------------------
@@ -46,7 +46,7 @@ Thorough local detection
 This option allows a more sensitive search. It will be slower if integrons are
 found, but will be as fast if nothing is detected::
 
-    integron_finder mysequence.fst --eagle_eyes
+    integron_finder mysequence.fst --local_max
 
 .. _func_annot:
 
@@ -74,8 +74,8 @@ where ``path/to/DB/HMM/`` contains one or many ``.hmm`` (or ``.HMM``) files.
 Parallelization
 ---------------
 
-The time limiting part are HMMER and INFERNAL. So IntegronFinder has parallel
-implementation, but the user can set the number of CPU used by HMMER and
+The time limiting part are HMMER and INFERNAL. So IntegronFinder does not have
+parallel implementation, but the user can set the number of CPU used by HMMER and
 INFERNAL::
 
   integron_finder mysequence.fst --cpu 4
@@ -125,7 +125,7 @@ Circularity
 -----------
 
 By default, IntegronFinder assumes replicon to be circular. However, if they
-aren't, or if it's PCR fragments of contigs, you can specify that it's a linear
+aren't, or if it's PCR fragments or contigs, you can specify that it's a linear
 fragment::
 
     integron_finder mylinearsequence.fst --linear

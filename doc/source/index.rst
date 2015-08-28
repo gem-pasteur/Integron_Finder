@@ -14,10 +14,10 @@ The program is available on a webserver (link), or by command line
 First, IntegronFinder annotates the DNA sequence's CDS with Prodigal.
 
 Second, IntegronFinder detects independently integron integrase and *attC*
-recombination site. The Integron integrase is detected by using the intersection
+recombination sites. The Integron integrase is detected by using the intersection
 of two HMM profiles:
 
-- one specific of tyrosine-recombinase
+- one specific of tyrosine-recombinase (PF00589)
 - one specific of the patch III domain of the integron integrase.
 
 The *attC* recombination site is detected with a covariance model (CM) which,
