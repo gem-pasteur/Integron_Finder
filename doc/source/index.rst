@@ -59,7 +59,7 @@ Running IntegronFinder
    :maxdepth: 2
 
    installation
-   quickstart
+   tutorial
    inputs
    outputs
 

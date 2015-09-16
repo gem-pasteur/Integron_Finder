@@ -1,6 +1,6 @@
 .. IntegronFinder - Detection of Integron in DNA sequences
 
-.. _quickstart:
+.. _tutorial:
 
 ********
 Tutorial
