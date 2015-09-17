@@ -52,16 +52,12 @@ matching.
 .. _`IntegronFinder on github`: https://github.com/gem-pasteur/Integron_Finder
 
 
-Running IntegronFinder
-======================
-
 .. toctree::
    :maxdepth: 2
 
    installation
    tutorial
-   inputs
-   outputs
+   mobyle
 
 ..
   Indices and tables
