@@ -11,8 +11,8 @@ IntegronFinder is a program that detects integrons in DNA sequences.
 The program is available on a webserver (link), or by command line
 (`IntegronFinder on github`_).
 
-Outline of the Program
-----------------------
+**Outline of the Program**
+
 
 - First, IntegronFinder annotates the DNA sequence's CDS with Prodigal.
 
