@@ -17,13 +17,14 @@ Find integrons in genomes
 # Usage
 
 ```
-usage: integron_finder [-h] [--eagle_eyes] [--func_annot] [--cpu CPU]
+usage: integron_finder [-h] [--local_max] [--func_annot] [--cpu CPU]
                        [-dt DISTANCE_THRESH] [--outdir .] [--linear]
                        [--union_integrases] [--cmsearch CMSEARCH]
                        [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
                        [--dir_func_annot DIR_FUNC_ANNOT] [--gembase]
                        [--attc_model file.cm] [--evalue_attc 1]
-                       [--keep_palindromes] [-V]
+                       [--keep_palindromes] [--no_proteins] [--eagle_eyes]
+                       [-V]
                        replicon
 
 positional arguments:
@@ -32,9 +33,8 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --eagle_eyes          Allows thorough local detection (slower). Like a
-                        soaring eagle in the sky, catching rabbits by
-                        surprise.
+  --local_max           Allows thorough local detection (slower but more
+                        sensitive and do not increase false positive rate).
   --func_annot          Functional annotation of CDS associated with integrons
                         HMM files are needed in Func_annot folder.
   --cpu CPU             Number of CPUs used by INFERNAL and HMMER
@@ -63,6 +63,10 @@ optional arguments:
                         (default: 1)
   --keep_palindromes    for a given hit, if the palindromic version is found,
                         don't remove the one with highest evalue
+  --no_proteins         Don't annotate CDS and don't find integrase, just look
+                        for attC sites.
+  --eagle_eyes          Synonym of --local_max. Like a soaring eagle in the
+                        sky, catching rabbits(or attC sites) by surprise.
   -V, --version         show program's version number and exit
 
 ```
@@ -70,7 +74,7 @@ optional arguments:
 
 ### Example
 
-    python Integron_Finder.py myfastafile.fst --resfams --max
+    integron_finder myfastafile.fst --local_max --func_annot
 
 ## Output :
 

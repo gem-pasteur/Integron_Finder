@@ -14,10 +14,11 @@ IntegronFinder dependencies
 IntegronFinder is built with Python 2.7, and a few libraries are needed:
 
 - Python 2.7
-   - Pandas 0.15.1
-   - Numpy 1.9.1
-   - Biopython 1.63
-   - Matplotlib 1.4.3
+   - Pandas (>=0.15.1)
+   - Numpy (>=1.9.1)
+   - Biopython (>=1.63)
+   - Matplotlib (>=1.4.3)
+   - psutil (>=2.1.3)
 
 In addition, IntegronFinder has external dependencies which have to be
 installed prior the use of the program.
