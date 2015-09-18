@@ -37,6 +37,9 @@ It will perform a search, and outputs the results in a directory called
    the previous file.
 - mysequence_X.pdf
    For each complete integron, a simple graphic of the region is depicted
+- other
+   A folder containing outputs of the different step in the program. It includes
+   notably the protein file in fasta (mysequence.prt).
 
 .. _local_max:
 

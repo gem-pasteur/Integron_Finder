@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 
 """
 integron_finder is a program that looks for integron in DNA sequences.
@@ -1327,7 +1329,7 @@ if __name__ == "__main__":
 Python {1}
 ######### TODO ############
  - licence,
- - authors,
+ - Cury Jean, Jové Thomas, Néron Bertrand, Rocha PC Eduardo,
  - citation
 ####### END TODO ##########
  """.format(version, sys.version)
@@ -1452,7 +1454,15 @@ Python {1}
     except OSError:
         pass
 
-    out_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name)
+    try:
+        os.mkdir(os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name,
+                              "other"))
+    except OSError:
+        pass
+
+    out_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name,
+                           "other")
+    out_dir_ok = os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name)
 
     SEQUENCE = SeqIO.read(replicon_path,
                           "fasta",
@@ -1583,7 +1593,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         j = 1
         for i in integrons:
             if i.type() == "complete":
-                i.draw_integron(file=os.path.join(out_dir, replicon_name + "_" + str(j) + ".pdf"))
+                i.draw_integron(file=os.path.join(out_dir_ok,
+                                                  replicon_name + "_" + str(j) + ".pdf"))
                 j += 1
 
         ############### Writing out results ###############
@@ -1601,12 +1612,11 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         integrons_describe['evalue'] = integrons_describe['evalue'].map(lambda x: '%.3e' % x)
         integrons_describe.sort(["ID_integron", "pos_beg", "evalue"], inplace=True)
 
-        outfile = replicon_name + ".integrons"
-        integrons_describe.to_csv(os.path.join(out_dir, outfile), sep="\t", index=0, fillna="NA")
+        integrons_describe.to_csv(os.path.join(out_dir_ok, outfile), sep="\t", index=0, fillna="NA")
 
         to_gbk(integrons_describe, SEQUENCE)
-        SeqIO.write(SEQUENCE, os.path.join(out_dir, replicon_name + ".gbk"), "genbank")
+        SeqIO.write(SEQUENCE, os.path.join(out_dir_ok, replicon_name + ".gbk"), "genbank")
     else:
-        out_f = open(os.path.join(out_dir, outfile), "w")
+        out_f = open(os.path.join(out_dir_ok, outfile), "w")
         out_f.write("# No Integron found\n")
         out_f.close()
