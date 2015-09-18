@@ -50,7 +50,7 @@ Once the job is finished, you have a results page. It contains:
 
 Finally, you have the sequence of the replicon you input and the command line used.
 
-For each of the aforementionned file, you can save them by clicking on the save
+For each of the aforementionned files, you can save them by clicking on the save
 button |savebutton|.
 
 
