@@ -419,7 +419,7 @@ class Integron(object):
         for c, l in zip(["#749FCD", "#DD654B", "#6BC865", "#D06CC0", "#C3B639", "#e8950e", "#d3d3d3"],
                         ["attC", "integrase", "Promoter/attI class 1",
                          "Promoter/attI class 2", "Promoter/attI class 3",
-                         "ATB resistance", "Hypothetical Protein"]):
+                         "Functional Annotation", "Hypothetical Protein"]):
             ax.bar(0, 0, color=c, label=l)
         plt.legend(loc=[1.01, 0.4])
         ax.set_xlim(xlims)
@@ -1037,45 +1037,49 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
     print "# Start Functional annotation... : "
 
     prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
-
+    hmm_out = os.path.join(out_dir, replicon_name + "_fa.res")
     for integron in integrons:
 
         if os.path.isfile(prot_tmp):
             os.remove(prot_tmp)
 
         if integron.type() != "In0" and len(integron.proteins) > 0:
+
             func_annotate_res = pd.DataFrame(columns=["Accession_number",
                                                       "query_name", "ID_query",
                                                       "ID_prot", "strand",
                                                       "pos_beg", "pos_end", "evalue"])
-            prot_to_annotate = []
-            prot = SeqIO.parse(PROT_file, "fasta")
-            n_prot = 0
-            for p in prot:
-                n_prot += 1
-                if p.id in integron.proteins.index:
-                    prot_to_annotate.append(p)
-            SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
 
-            for hmm in hmm_files:
-                hmm_out = os.path.join(out_dir, replicon_name + "_fa.res")
-                hmm_cmd = [HMMSEARCH,
-                            "-Z", str(n_prot),
-                            "--cpu", N_CPU,
-                            "--tblout", os.path.join(out_dir, replicon_name + "_fa_table.res"),
-                            "-o", hmm_out,
-                            os.path.join(FA_DIR, hmm),
-                            prot_tmp]
+            if not os.path.isfile(hmm_out):
 
-                try:
-                    returncode = call(hmm_cmd)
-                except Exception as err:
-                    raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
-                if returncode != 0:
-                    raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
+                prot_to_annotate = []
+                prot = SeqIO.parse(PROT_file, "fasta")
+                n_prot = 0
+                for p in prot:
+                    n_prot += 1
+                    if p.id in integron.proteins.index:
+                        prot_to_annotate.append(p)
+                SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
 
-                hmm_in = read_hmm(read_hmm, hmm_out).sort("evalue").drop_duplicates(subset="ID_prot")
-                func_annotate_res = pd.concat([func_annotate_res, hmm_in])
+                for hmm in hmm_files:
+
+                    hmm_cmd = [HMMSEARCH,
+                                "-Z", str(n_prot),
+                                "--cpu", N_CPU,
+                                "--tblout", os.path.join(out_dir, replicon_name + "_fa_table.res"),
+                                "-o", hmm_out,
+                                os.path.join(FA_DIR, hmm),
+                                prot_tmp]
+
+                    try:
+                        returncode = call(hmm_cmd)
+                    except Exception as err:
+                        raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
+                    if returncode != 0:
+                        raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
+
+            hmm_in = read_hmm(read_hmm, hmm_out).sort("evalue").drop_duplicates(subset="ID_prot")
+            func_annotate_res = pd.concat([func_annotate_res, hmm_in])
 
             func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
             integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
@@ -1587,8 +1591,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         ############### Functional annotation ###############
 
         if is_func_annot and len(FA_HMM) > 0:
-            if not os.path.isfile(os.path.join(out_dir, replicon_name + "_fa.res")):
-                func_annot(replicon_name, out_dir, FA_HMM)
+            func_annot(replicon_name, out_dir, FA_HMM)
 
         j = 1
         for i in integrons:

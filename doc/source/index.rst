@@ -8,10 +8,10 @@ Welcome to IntegronFinder's documentation!
 ==========================================
 
 IntegronFinder is a program that detects integrons in DNA sequences.
-The program is available on a webserver (link), or by command line
+The program is available on a webserver :ref:`(Mobyle) <mobyle>`, or by command line
 (`IntegronFinder on github`_).
 
-**Outline of the Program**
+**How does it work ?**
 
 
 - First, IntegronFinder annotates the DNA sequence's CDS with Prodigal.
