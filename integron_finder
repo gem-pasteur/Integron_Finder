@@ -1618,6 +1618,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         integrons_describe.to_csv(os.path.join(out_dir_ok, outfile), sep="\t", index=0, fillna="NA")
 
         to_gbk(integrons_describe, SEQUENCE)
+        if not SEQUENCE.description.endswith('.'):
+            SEQUENCE.description += '.'
         SeqIO.write(SEQUENCE, os.path.join(out_dir_ok, replicon_name + ".gbk"), "genbank")
     else:
         out_f = open(os.path.join(out_dir_ok, outfile), "w")
