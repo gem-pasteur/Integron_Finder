@@ -8,6 +8,7 @@ integron_finder is a program that looks for integron in DNA sequences.
 
 __version__ = '$VERSION'
 
+import glob
 import numpy as np
 import pandas as pd
 import re
@@ -1339,6 +1340,30 @@ Python {1}
  """.format(version, sys.version)
         return version_text
 
+
+    def scan_hmm_bank(path):
+        """
+        :param path: - if the path is a dir:
+                       return all files ending with .hmm in the dir
+                     - if the path is a file:
+                       parse the file, each line must be an expression (glob)
+                       pointing to hmm files
+        :return: lists of hmm files to consider for annotation
+        """
+        real_path = os.path.realpath(path)
+        files = []
+        if os.path.exists(real_path):
+            if os.path.isdir(real_path):
+                files = glob.glob(os.path.join(real_path,'*.hmm'))
+            elif os.path.isfile(real_path):
+                with open(real_path) as hmm_bank:
+                    for bank_path in hmm_bank:
+                        bank_files = glob.glob(bank_path.strip())
+                        files.extend(bank_files)
+            return files
+        else:
+            raise IOError("{} no such file or directory".format(path))
+
     ############### Arguments and declarations ###############
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("replicon",
@@ -1402,6 +1427,12 @@ Python {1}
                         action='store',
                         type=str,
                         help='Complete path to a directory containing HMM profiles')
+
+    parser.add_argument('--path_func_annot',
+                        default="hmm_bank",
+                        action='store',
+                        type=str,
+                        help='the path of file containing all hmm bank paths')
 
     parser.add_argument("--gembase",
                         help="Use gembase formatted protein file instead of Prodigal. Folder structure must be preserved",
@@ -1501,15 +1532,31 @@ Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch o
         raise RuntimeError("""cannot find 'prodigal' in your PATH.
 Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
-    if (args.func_annot or
-        args.dir_func_annot != "Functional_annotation/" and
-        args.no_proteins == False):
-
-        FA_DIR = os.path.join(_prefix_data, args.dir_func_annot)
-        FA_HMM = [f for f in os.listdir(FA_DIR) if f.lower().endswith("hmm")]
+    if args.func_annot and args.no_proteins is False:
+        fa_path = os.path.join(_prefix_data, "Functional_annotation")
+        if os.path.exists(fa_path):
+            FA_HMM = scan_hmm_bank(fa_path)
+        elif os.path.exists('bank_hmm'):
+            FA_HMM = scan_hmm_bank('bank_hmm')
+        else:
+            raise
+        is_func_annot = True
+    elif args.path_func_annot and args.no_proteins is False:
+        FA_HMM = scan_hmm_bank(args.path_func_annot)
         is_func_annot = True
     else:
         is_func_annot = False
+
+
+    #
+    #     args.dir_func_annot != "Functional_annotation/" and
+    #     args.no_proteins == False):
+    #
+    #     FA_DIR = os.path.join(_prefix_data, args.dir_func_annot)
+    #     FA_HMM = [f for f in os.listdir(FA_DIR) if f.lower().endswith("hmm")]
+    #     is_func_annot = True
+    # else:
+    #     is_func_annot = False
 
     if len(args.attc_model.split("/")) > 1: #contain path
         MODEL_attc = args.attc_model
