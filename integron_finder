@@ -1553,6 +1553,9 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     else:
         is_func_annot = False
 
+    if is_func_annot and not FA_HMM:
+        print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, \
+        skip functional annotation step."
 
     #
     #     args.dir_func_annot != "Functional_annotation/" and
