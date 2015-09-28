@@ -1321,9 +1321,7 @@ if __name__ == "__main__":
 
     if not os.path.exists(_prefix_data):
         raise Exception("""cannot find integron_finder data check your installation
-                           if within a python environment, just type:
-                               os.environ["INTEGRON_HOME"] = "."
-                        """)
+or define INTEGRON_HOME environment variable.""")
 
 
     def get_version_message():
