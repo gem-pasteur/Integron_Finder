@@ -26,6 +26,11 @@ m_use("Agg")
 import matplotlib.pyplot as plt
 import distutils.spawn
 
+
+class IntegronError(Exception):
+    pass
+
+
 class Integron(object):
     """Integron object represents an object composed of an integrase, attC sites and gene cassettes.
     Each element is characterized by their coordinates in the replicon, the strand (+ or -),
@@ -1539,7 +1544,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         elif os.path.exists('bank_hmm'):
             FA_HMM = scan_hmm_bank('bank_hmm')
         else:
-            raise
+            raise IntegronError("the dir '{}' neither '{}' exists, specify the location of hmm \
+            profile with --path_func_annot option".format(fa_path, 'bank_hmm'))
         is_func_annot = True
     elif args.path_func_annot and args.no_proteins is False:
         FA_HMM = scan_hmm_bank(args.path_func_annot)
