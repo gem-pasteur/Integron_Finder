@@ -1074,7 +1074,7 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
                                 "--cpu", N_CPU,
                                 "--tblout", os.path.join(out_dir, replicon_name + "_fa_table.res"),
                                 "-o", hmm_out,
-                                os.path.join(FA_DIR, hmm),
+                                hmm,
                                 prot_tmp]
 
                     try:
