@@ -20,6 +20,7 @@ from Bio import Seq
 from Bio import SeqFeature
 from subprocess import call
 import os
+import sys
 import argparse
 from matplotlib import use as m_use
 m_use("Agg")
@@ -1041,7 +1042,6 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
     Call hmmmer to annotate CDS associated with the integron. Use Resfams per default (Gibson et al, ISME J.,  2014)
     """
     print "# Start Functional annotation... : "
-
     prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
     hmm_out = os.path.join(out_dir, replicon_name + "_fa.res")
     for integron in integrons:
@@ -1362,6 +1362,8 @@ Python {1}
                 with open(real_path) as hmm_bank:
                     for bank_path in hmm_bank:
                         bank_files = glob.glob(bank_path.strip())
+                        if not bank_files:
+                            print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
                         files.extend(bank_files)
             return files
         else:
