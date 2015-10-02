@@ -1361,10 +1361,15 @@ Python {1}
             elif os.path.isfile(real_path):
                 with open(real_path) as hmm_bank:
                     for bank_path in hmm_bank:
+                        if bank_path.startswith('#'):
+                            continue
                         bank_files = glob.glob(bank_path.strip())
                         if not bank_files:
                             print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
-                        files.extend(bank_files)
+                        else:
+                            for path in bank_files:
+                                print >> sys.stderr, "the hmm {} will be used for functional annotation".format(path)
+                            files.extend(bank_files)
             return files
         else:
             raise IOError("{} no such file or directory".format(path))
@@ -1537,7 +1542,6 @@ Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch o
         raise RuntimeError("""cannot find 'prodigal' in your PATH.
 Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
-    print "@@ DEBUG @@ args.path_func_annot", args.path_func_annot, type(args.path_func_annot)
     if args.func_annot and args.no_proteins is False:
         fa_path = os.path.join(_prefix_data, "Functional_annotation")
         if os.path.exists('bank_hmm'):
