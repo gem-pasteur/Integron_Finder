@@ -1380,6 +1380,7 @@ Python {1}
 
     parser.add_argument("--func_annot",
                         help="Functional annotation of CDS associated with integrons HMM files are needed in Func_annot folder.",
+                        default= False,
                         action="store_true")
 
     parser.add_argument('--cpu',
@@ -1434,7 +1435,6 @@ Python {1}
                         help='Complete path to a directory containing HMM profiles')
 
     parser.add_argument('--path_func_annot',
-                        default="hmm_bank",
                         action='store',
                         type=str,
                         help='the path of file containing all hmm bank paths')
@@ -1537,12 +1537,13 @@ Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch o
         raise RuntimeError("""cannot find 'prodigal' in your PATH.
 Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
+    print "@@ DEBUG @@ args.path_func_annot", args.path_func_annot, type(args.path_func_annot)
     if args.func_annot and args.no_proteins is False:
         fa_path = os.path.join(_prefix_data, "Functional_annotation")
-        if os.path.exists(fa_path):
-            FA_HMM = scan_hmm_bank(fa_path)
-        elif os.path.exists('bank_hmm'):
+        if os.path.exists('bank_hmm'):
             FA_HMM = scan_hmm_bank('bank_hmm')
+        elif os.path.exists(fa_path):
+            FA_HMM = scan_hmm_bank(fa_path)
         else:
             raise IntegronError("the dir '{}' neither '{}' exists, specify the location of hmm \
             profile with --path_func_annot option".format(fa_path, 'bank_hmm'))
@@ -1557,15 +1558,6 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, \
         skip functional annotation step."
 
-    #
-    #     args.dir_func_annot != "Functional_annotation/" and
-    #     args.no_proteins == False):
-    #
-    #     FA_DIR = os.path.join(_prefix_data, args.dir_func_annot)
-    #     FA_HMM = [f for f in os.listdir(FA_DIR) if f.lower().endswith("hmm")]
-    #     is_func_annot = True
-    # else:
-    #     is_func_annot = False
 
     if len(args.attc_model.split("/")) > 1: #contain path
         MODEL_attc = args.attc_model
