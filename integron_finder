@@ -1104,52 +1104,83 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
                                "evalue", "hmmfrom", "hmmto", "alifrom",
                                "alito", "len_profile"])
 
-    hmm_file = open(infile, "r") # no split
 
-    if args.gembase:
-        _re_ID = re.compile("^>>\s([\w\_\.]*)\s*([DC])\s*\w*\s*\w*\s*(\d*)\s*(\d*)")
-        strand_f = lambda x: 1 if x == "D" else -1
-    else:
-        _re_ID = re.compile("^>>\s([.\S]*)\s*#\s*(\d*)\s*#\s*(\d*)\s*#\s*([-\d]{1,2})")
-        strand_f = lambda x: int(x)
-    _re_data = re.compile("^\s*[\d]*\s[!?]\s*[\d\.\e\-\+]*\s*[\d\.\e\-\+]*\s*[\d\.e\-\+]*\s*([\d\.e\-\+]*)\s*([\d]*)\s*([\d]*)\s*[\.\[\]]{2}\s*([\d]*)\s*([\d]*)")
-    _re_query = re.compile("^Query:\s+(\S+)\s+\[\w+=(\d+)\]\n.*$")
+    from Bio import SearchIO
+    # hmm_file = open(infile, "r") # no split
 
-    idx = 0
-    for line in hmm_file:
-        try:
-            if args.gembase:
-                id_prot, strand, pos_beg, pos_end = re.search(_re_ID, line).groups()
-            else:
-                id_prot, pos_beg, pos_end, strand = re.search(_re_ID, line).groups()
-        except AttributeError:
-            pass
-        try:
-            query, len_profile = re.search(_re_query, line).groups()
-        except AttributeError:
-            pass
-
-        try:
-            evalue, hmmfrom, hmmto, alifrom, alito = re.search(_re_data, line).groups()
+    gen = SearchIO.parse(infile, 'hmmer3-text')
+    for idx, query_result in enumerate(gen):
+        len_profile = query_result.seq_len
+        query = query_result.id
+        for hit in query_result.hits:
+            id_prot = hit.id
+            for hsp in hit.hsps:
+                pos_beg, pos_end, strand = [x.strip() for x in hit.description_all[0].split('#') if x][:-1]
+                #strand = hsp.query_strand
+                evalue = hsp.evalue
+                hmmfrom = hsp.query_start + 1
+                hmmto = hsp.query_end
+                alifrom = hsp.hit_start + 1
+                alito = hsp.hit_end
 
             df.loc[idx, "ID_prot"] = id_prot
-            df.loc[idx, "ID_query"] = "-" # remnant of ancient parsing function to keep data structure
-            df.loc[idx, "pos_beg"] = int(pos_beg)
-            df.loc[idx, "pos_end"] = int(pos_end)
-            df.loc[idx, "strand"] = strand_f(strand)
-
-            df.loc[idx, "evalue"] = float(evalue)   # i-evalue
-            df.loc[idx, "hmmfrom"] = int(hmmfrom)  # hmmfrom
-            df.loc[idx, "hmmto"] = int(hmmto)    # hmm to
-            df.loc[idx, "alifrom"] = int(alifrom)  # alifrom
-            df.loc[idx, "alito"] = int(alito)    # ali to
+            df.loc[idx, "ID_query"] = "-"  # remnant of ancient parsing function to keep data structure
+            df.loc[idx, "pos_beg"] = pos_beg
+            df.loc[idx, "pos_end"] = pos_end
+            df.loc[idx, "strand"] = strand
+            df.loc[idx, "evalue"] = evalue   # i-evalue
+            df.loc[idx, "hmmfrom"] = hmmfrom  # hmmfrom
+            df.loc[idx, "hmmto"] = hmmto    # hmm to
+            df.loc[idx, "alifrom"] = alifrom  # alifrom
+            df.loc[idx, "alito"] = alito  # ali to
             df.loc[idx, "len_profile"] = float(len_profile)
             df.loc[idx, "Accession_number"] = replicon_name
             df.loc[idx, "query_name"] = query
 
-            idx += 1
-        except AttributeError:
-            pass
+    # if args.gembase:
+    #     _re_ID = re.compile("^>>\s([\w\_\.]*)\s*([DC])\s*\w*\s*\w*\s*(\d*)\s*(\d*)")
+    #     strand_f = lambda x: 1 if x == "D" else -1
+    # else:
+    #     _re_ID = re.compile("^>>\s([.\S]*)\s*#\s*(\d*)\s*#\s*(\d*)\s*#\s*([-\d]{1,2})")
+    #     strand_f = lambda x: int(x)
+    # _re_data = re.compile("^\s*[\d]*\s[!?]\s*[\d\.\e\-\+]*\s*[\d\.\e\-\+]*\s*[\d\.e\-\+]*\s*([\d\.e\-\+]*)\s*([\d]*)\s*([\d]*)\s*[\.\[\]]{2}\s*([\d]*)\s*([\d]*)")
+    # _re_query = re.compile("^Query:\s+(\S+)\s+\[\w+=(\d+)\]\n.*$")
+    #
+    # idx = 0
+    # for line in hmm_file:
+    #     try:
+    #         if args.gembase:
+    #             id_prot, strand, pos_beg, pos_end = re.search(_re_ID, line).groups()
+    #         else:
+    #             id_prot, pos_beg, pos_end, strand = re.search(_re_ID, line).groups()
+    #     except AttributeError:
+    #         pass
+    #     try:
+    #         query, len_profile = re.search(_re_query, line).groups()
+    #     except AttributeError:
+    #         pass
+    #
+    #     try:
+    #         evalue, hmmfrom, hmmto, alifrom, alito = re.search(_re_data, line).groups()
+    #
+    #         df.loc[idx, "ID_prot"] = id_prot
+    #         df.loc[idx, "ID_query"] = "-" # remnant of ancient parsing function to keep data structure
+    #         df.loc[idx, "pos_beg"] = int(pos_beg)
+    #         df.loc[idx, "pos_end"] = int(pos_end)
+    #         df.loc[idx, "strand"] = strand_f(strand)
+    #
+    #         df.loc[idx, "evalue"] = float(evalue)   # i-evalue
+    #         df.loc[idx, "hmmfrom"] = int(hmmfrom)  # hmmfrom
+    #         df.loc[idx, "hmmto"] = int(hmmto)    # hmm to
+    #         df.loc[idx, "alifrom"] = int(alifrom)  # alifrom
+    #         df.loc[idx, "alito"] = int(alito)    # ali to
+    #         df.loc[idx, "len_profile"] = float(len_profile)
+    #         df.loc[idx, "Accession_number"] = replicon_name
+    #         df.loc[idx, "query_name"] = query
+    #
+    #         idx += 1
+    #     except AttributeError:
+    #         pass
 
     df = df[((df.hmmto - df.hmmfrom) / df.len_profile > coverage) & (df.evalue < evalue)]
     df.index = range(len(df))
@@ -1157,7 +1188,7 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
     df_out = df[["Accession_number", "query_name", "ID_query", "ID_prot",
                  "strand", "pos_beg", "pos_end", "evalue"]]
 
-    hmm_file.close()
+    # hmm_file.close()
     return df_out
 
 
