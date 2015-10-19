@@ -28,9 +28,12 @@ m_use("Agg")
 import matplotlib.pyplot as plt
 import distutils.spawn
 
-import warnings
-warnings.simplefilter('ignore', FutureWarning)
-warnings.simplefilter('ignore', BiopythonExperimentalWarning)
+
+if not __version__.endswith('VERSION'):
+    # display warning only for non installed integron_finder
+    import warnings
+    warnings.simplefilter('ignore', FutureWarning)
+    warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 class IntegronError(Exception):
     pass
