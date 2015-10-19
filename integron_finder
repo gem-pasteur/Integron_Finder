@@ -11,10 +11,10 @@ __version__ = '$VERSION'
 import glob
 import numpy as np
 import pandas as pd
-import re
 import platform
 
 from Bio import SeqIO
+from Bio import SearchIO
 from Bio import motifs
 from Bio import Seq
 from Bio import SeqFeature
@@ -1091,13 +1091,13 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
                     if returncode != 0:
                         raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
 
-            hmm_in = read_hmm(read_hmm, hmm_out).sort("evalue").drop_duplicates(subset="ID_prot")
-            func_annotate_res = pd.concat([func_annotate_res, hmm_in])
+                    hmm_in = read_hmm(replicon_name, hmm_out).sort("evalue").drop_duplicates(subset="ID_prot")
+                    func_annotate_res = pd.concat([func_annotate_res, hmm_in])
 
-            func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
-            integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
-            integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
-            integron.proteins.loc[func_annotate_res.ID_prot, "model"] = func_annotate_res.ID_query.values
+        func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
+        integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
+        integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
+        integron.proteins.loc[func_annotate_res.ID_prot, "model"] = func_annotate_res.ID_query.values
 
 
 def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
@@ -1110,10 +1110,6 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
                                "ID_prot", "strand", "pos_beg", "pos_end",
                                "evalue", "hmmfrom", "hmmto", "alifrom",
                                "alito", "len_profile"])
-
-
-    from Bio import SearchIO
-    # hmm_file = open(infile, "r") # no split
 
     gen = SearchIO.parse(infile, 'hmmer3-text')
     for idx, query_result in enumerate(gen):
@@ -1144,58 +1140,12 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
             df.loc[idx, "Accession_number"] = replicon_name
             df.loc[idx, "query_name"] = query
 
-    # if args.gembase:
-    #     _re_ID = re.compile("^>>\s([\w\_\.]*)\s*([DC])\s*\w*\s*\w*\s*(\d*)\s*(\d*)")
-    #     strand_f = lambda x: 1 if x == "D" else -1
-    # else:
-    #     _re_ID = re.compile("^>>\s([.\S]*)\s*#\s*(\d*)\s*#\s*(\d*)\s*#\s*([-\d]{1,2})")
-    #     strand_f = lambda x: int(x)
-    # _re_data = re.compile("^\s*[\d]*\s[!?]\s*[\d\.\e\-\+]*\s*[\d\.\e\-\+]*\s*[\d\.e\-\+]*\s*([\d\.e\-\+]*)\s*([\d]*)\s*([\d]*)\s*[\.\[\]]{2}\s*([\d]*)\s*([\d]*)")
-    # _re_query = re.compile("^Query:\s+(\S+)\s+\[\w+=(\d+)\]\n.*$")
-    #
-    # idx = 0
-    # for line in hmm_file:
-    #     try:
-    #         if args.gembase:
-    #             id_prot, strand, pos_beg, pos_end = re.search(_re_ID, line).groups()
-    #         else:
-    #             id_prot, pos_beg, pos_end, strand = re.search(_re_ID, line).groups()
-    #     except AttributeError:
-    #         pass
-    #     try:
-    #         query, len_profile = re.search(_re_query, line).groups()
-    #     except AttributeError:
-    #         pass
-    #
-    #     try:
-    #         evalue, hmmfrom, hmmto, alifrom, alito = re.search(_re_data, line).groups()
-    #
-    #         df.loc[idx, "ID_prot"] = id_prot
-    #         df.loc[idx, "ID_query"] = "-" # remnant of ancient parsing function to keep data structure
-    #         df.loc[idx, "pos_beg"] = int(pos_beg)
-    #         df.loc[idx, "pos_end"] = int(pos_end)
-    #         df.loc[idx, "strand"] = strand_f(strand)
-    #
-    #         df.loc[idx, "evalue"] = float(evalue)   # i-evalue
-    #         df.loc[idx, "hmmfrom"] = int(hmmfrom)  # hmmfrom
-    #         df.loc[idx, "hmmto"] = int(hmmto)    # hmm to
-    #         df.loc[idx, "alifrom"] = int(alifrom)  # alifrom
-    #         df.loc[idx, "alito"] = int(alito)    # ali to
-    #         df.loc[idx, "len_profile"] = float(len_profile)
-    #         df.loc[idx, "Accession_number"] = replicon_name
-    #         df.loc[idx, "query_name"] = query
-    #
-    #         idx += 1
-    #     except AttributeError:
-    #         pass
-
     df = df[((df.hmmto - df.hmmfrom) / df.len_profile > coverage) & (df.evalue < evalue)]
     df.index = range(len(df))
 
     df_out = df[["Accession_number", "query_name", "ID_query", "ID_prot",
                  "strand", "pos_beg", "pos_end", "evalue"]]
 
-    # hmm_file.close()
     return df_out
 
 
