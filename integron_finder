@@ -1116,30 +1116,34 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
     for idx, query_result in enumerate(gen):
         len_profile = query_result.seq_len
         query = query_result.id
-        for hit in query_result.hits:
+        try:
+            id_query = query_result.accession
+        except AttributeError:
+            id_query = "-"
+        for idx2, hit in enumerate(query_result.hits):
             id_prot = hit.id
             for hsp in hit.hsps:
                 pos_beg, pos_end, strand = [x.strip() for x in hit.description_all[0].split('#') if x][:-1]
                 #strand = hsp.query_strand
-                evalue = hsp.evalue
+                evalue_tmp = hsp.evalue
                 hmmfrom = hsp.query_start + 1
                 hmmto = hsp.query_end
                 alifrom = hsp.hit_start + 1
                 alito = hsp.hit_end
 
-            df.loc[idx, "ID_prot"] = id_prot
-            df.loc[idx, "ID_query"] = "-"  # remnant of ancient parsing function to keep data structure
-            df.loc[idx, "pos_beg"] = pos_beg
-            df.loc[idx, "pos_end"] = pos_end
-            df.loc[idx, "strand"] = strand
-            df.loc[idx, "evalue"] = evalue   # i-evalue
-            df.loc[idx, "hmmfrom"] = hmmfrom  # hmmfrom
-            df.loc[idx, "hmmto"] = hmmto    # hmm to
-            df.loc[idx, "alifrom"] = alifrom  # alifrom
-            df.loc[idx, "alito"] = alito  # ali to
-            df.loc[idx, "len_profile"] = float(len_profile)
-            df.loc[idx, "Accession_number"] = replicon_name
-            df.loc[idx, "query_name"] = query
+            df.loc[idx+idx2, "ID_prot"] = id_prot
+            df.loc[idx+idx2, "ID_query"] = id_query # "-"  # remnant of ancient parsing function to keep data structure
+            df.loc[idx+idx2, "pos_beg"] = int(pos_beg)
+            df.loc[idx+idx2, "pos_end"] = int(pos_end)
+            df.loc[idx+idx2, "strand"] = int(strand)
+            df.loc[idx+idx2, "evalue"] = evalue_tmp   # i-evalue
+            df.loc[idx+idx2, "hmmfrom"] = hmmfrom  # hmmfrom
+            df.loc[idx+idx2, "hmmto"] = hmmto    # hmm to
+            df.loc[idx+idx2, "alifrom"] = alifrom  # alifrom
+            df.loc[idx+idx2, "alito"] = alito  # ali to
+            df.loc[idx+idx2, "len_profile"] = float(len_profile)
+            df.loc[idx+idx2, "Accession_number"] = replicon_name
+            df.loc[idx+idx2, "query_name"] = query
 
     df = df[((df.hmmto - df.hmmfrom) / df.len_profile > coverage) & (df.evalue < evalue)]
     df.index = range(len(df))
@@ -1352,7 +1356,7 @@ Python {1}
                     for bank_path in hmm_bank:
                         if bank_path.startswith('#'):
                             continue
-                        bank_files = glob.glob(bank_path.strip())
+                        bank_files = glob.glob(os.path.expanduser(bank_path.strip("\n").strip()))
                         if not bank_files:
                             print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
                         else:
