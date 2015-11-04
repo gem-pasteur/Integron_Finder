@@ -50,8 +50,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'IntegronFinder'
-copyright = u'2015, Jean Cury, Thomas Jové, Bertrand Néron, Eduardo PC Rocha'
-author = u'Jean Cury, Thomas Jové, Bertrand Néron, Eduardo PC Rocha'
+copyright = u'2015, Jean Cury, Bertrand Néron, Eduardo PC Rocha'
+author = u'Jean Cury, Bertrand Néron, Eduardo PC Rocha'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -212,11 +212,15 @@ htmlhelp_basename = 'IntegronFinderdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
+
+'classoptions': ',openany,oneside',
+'babel' : '\\usepackage[english]{babel}',
+
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
 
 # The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+'pointsize': '12pt',
 
 # Additional stuff for the LaTeX preamble.
 #'preamble': '',
@@ -230,7 +234,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   (master_doc, 'IntegronFinder.tex', u'IntegronFinder Documentation',
-   u'Jean Cury, Thomas Jové, Bertrand Néron, Eduardo PC Rocha', 'manual'),
+   u'Jean Cury, Bertrand Néron, Eduardo PC Rocha', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

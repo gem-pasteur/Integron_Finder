@@ -11,8 +11,9 @@ IntegronFinder is a program that detects integrons in DNA sequences.
 The program is available on a webserver :ref:`(Mobyle) <mobyle>`, or by command line
 (`IntegronFinder on github`_).
 
-**How does it work ?**
+You already read the paper and want to install it ? Click :ref:`here <install>`
 
+**How does it work ?**
 
 - First, IntegronFinder annotates the DNA sequence's CDS with Prodigal.
 
@@ -22,7 +23,6 @@ The program is available on a webserver :ref:`(Mobyle) <mobyle>`, or by command 
 
   - one specific of tyrosine-recombinase (PF00589)
   - one specific of the patch III domain of the integron integrase.
-
 
   The *attC* recombination site is detected with a covariance model (CM), which
   models the secondary structure in addition to the few conserved sequence
