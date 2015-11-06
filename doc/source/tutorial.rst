@@ -68,9 +68,17 @@ add any other HMM file here. Alternatively, if one wants to use a database which
 is present elsewhere on the user's computer without copying it into that
 directory, one can specify the following option::
 
-    integron_finder mysequence.fst --dir_func_annot path/to/DB/HMM/
+    integron_finder mysequence.fst --path_func_annot bank_hmm
 
-where ``path/to/DB/HMM/`` contains one or many ``.hmm`` (or ``.HMM``) files.
+where ``bank_hmm`` is a file containing one absolute path to a hmm file per
+line, and you can comment out a line::
+
+  ~/Downloads/Integron_Finder-x.x/data/Functional_annotation/Resfams.hmm
+  ~/Documents/Data/Pfam-A.hmm
+  # ~/Documents/Data/Pfam-B.hmm
+
+Here, annotation will be made using Pfam-A et Resfams, but not Pfam-B. If a
+protein is hit by 2 different profiles, the one with the best e-value will be kept.
 
 .. _parallel:
 
