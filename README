@@ -87,3 +87,9 @@ A folder name Results\_id\_genome, inside there are different files :
 - *.pdf : representation of complete integrons detected (with integrase (redish) and at least one attc (blueish)). If a protein has a hit with an antibiotic resistance gene, it's yellow, otherwise grey.
 
  and one folder, `other`, containing the different outputs of the different steps of the program.
+
+ # Mobyle
+
+ You can use this program whithout installing it, through a webserver:
+
+ http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder

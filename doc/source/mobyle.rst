@@ -55,7 +55,7 @@ button |savebutton|.
 
 
 
-.. _`Mobyle server of the Pasteur institute`: http://mobyle-dev.pasteur.fr/cgi-bin/portal.py#forms::integron_finder
+.. _`Mobyle server of the Pasteur institute`: http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder
 .. |red question mark| image:: _static/questionmark.png
    :height: 13
    :width: 13
