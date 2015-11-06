@@ -327,7 +327,7 @@ require_python = ['python (>=2.7, <3.0)']
 
 require_packages = ['numpy (>=1.7.0)',
                     'pandas (>=0.15.1)',
-                    'Bio (>=1.63)',
+                    'Bio (>=1.65)',
                     'matplotlib (>=1.4.2)']
 
 setup(name='integron_finder',
@@ -337,7 +337,7 @@ setup(name='integron_finder',
        the attC sites, the integrase
        and when possible attI site and promoters.""",
       author="Jean Cury",
-      author_email="jcury@pasteur.fr",
+      author_email="jean.cury@normalesup.org",
       classifiers=[
                      'Operating System :: POSIX',
                      'Programming Language :: Python',
@@ -361,4 +361,3 @@ setup(name='integron_finder',
               },
       distclass=UsageDistribution
       )
-

@@ -8,7 +8,7 @@ Find integrons in genomes
 - Python 2.7
    - Pandas 0.15.1
    - Numpy 1.9.1
-   - Biopython 1.63
+   - Biopython 1.65
    - Matplotlib 1.4.3
    - psutils 2.1.3
 - HMMER 3.1b1
@@ -22,18 +22,18 @@ usage: integron_finder [-h] [--local_max] [--func_annot] [--cpu CPU]
                        [-dt DISTANCE_THRESH] [--outdir .] [--linear]
                        [--union_integrases] [--cmsearch CMSEARCH]
                        [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
-                       [--dir_func_annot DIR_FUNC_ANNOT] [--gembase]
+                       [--path_func_annot bank_hmm] [--gembase]
                        [--attc_model file.cm] [--evalue_attc 1]
                        [--keep_palindromes] [--no_proteins] [--eagle_eyes]
                        [-V]
                        replicon
 
 positional arguments:
-  replicon              path to the replicon file (in fasta format), eg :
+  replicon              Path to the replicon file (in fasta format), eg :
                         path/to/file.fst or file.fst
 
 optional arguments:
-  -h, --help            Shows this help message and exit
+  -h, --help            show this help message and exit
   --local_max           Allows thorough local detection (slower but more
                         sensitive and do not increase false positive rate).
   --func_annot          Functional annotation of CDS associated with integrons
@@ -42,8 +42,8 @@ optional arguments:
   -dt DISTANCE_THRESH, --distance_thresh DISTANCE_THRESH
                         Two elements are aggregated if they are distant of
                         DISTANCE_THRESH [4kb] or less
-  --outdir .            set the output directory (default: current)
-  --linear              consider replicon as linear. If replicon smaller than
+  --outdir .            Set the output directory (default: current)
+  --linear              Consider replicon as linear. If replicon smaller than
                         20kb, it will be considered as linear
   --union_integrases    Instead of taking intersection of hits from Phage_int
                         profile (Tyr recombinases) and integron_integrase
@@ -56,8 +56,8 @@ optional arguments:
   --prodigal PRODIGAL   Complete path to prodigal if not in PATH. eg:
                         /usr/local/bin/prodigal
   --path_func_annot bank_hmm
-                        Path to file containing all hmm bank paths
-                        (one per line)
+                        Path to file containing all hmm bank paths (one per
+                        line)
   --gembase             Use gembase formatted protein file instead of
                         Prodigal. Folder structure must be preserved
   --attc_model file.cm  path or file to the attc model (Covariance Matrix)
