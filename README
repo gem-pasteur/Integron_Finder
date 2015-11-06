@@ -33,14 +33,14 @@ positional arguments:
                         path/to/file.fst or file.fst
 
 optional arguments:
-  -h, --help            show this help message and exit
+  -h, --help            Shows this help message and exit
   --local_max           Allows thorough local detection (slower but more
                         sensitive and do not increase false positive rate).
   --func_annot          Functional annotation of CDS associated with integrons
                         HMM files are needed in Func_annot folder.
   --cpu CPU             Number of CPUs used by INFERNAL and HMMER
   -dt DISTANCE_THRESH, --distance_thresh DISTANCE_THRESH
-                        Two element are aggregated if they are distant of
+                        Two elements are aggregated if they are distant of
                         DISTANCE_THRESH [4kb] or less
   --outdir .            set the output directory (default: current)
   --linear              consider replicon as linear. If replicon smaller than
@@ -55,8 +55,9 @@ optional arguments:
                         /usr/local/bin/hmmsearch
   --prodigal PRODIGAL   Complete path to prodigal if not in PATH. eg:
                         /usr/local/bin/prodigal
-  --dir_func_annot DIR_FUNC_ANNOT
-                        Complete path to a directory containing HMM profiles
+  --path_func_annot bank_hmm
+                        Path to file containing all hmm bank paths
+                        (one per line)
   --gembase             Use gembase formatted protein file instead of
                         Prodigal. Folder structure must be preserved
   --attc_model file.cm  path or file to the attc model (Covariance Matrix)
@@ -85,4 +86,4 @@ A folder name Results\_id\_genome, inside there are different files :
 - *.integrons : contain list of all element detected (attc, protein near attC, integrase, Pc, attI, Pint) with position, strand, evalue, etc...
 - *.pdf : representation of complete integrons detected (with integrase (redish) and at least one attc (blueish)). If a protein has a hit with an antibiotic resistance gene, it's yellow, otherwise grey.
 
- and one folder, `other`, containing the different outputs of the different steps of the program.   
+ and one folder, `other`, containing the different outputs of the different steps of the program.

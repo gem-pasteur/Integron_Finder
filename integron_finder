@@ -1370,7 +1370,7 @@ Python {1}
     ############### Arguments and declarations ###############
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("replicon",
-                        help="path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst")
+                        help="Path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst")
 
     parser.add_argument("--local_max",
                         help="Allows thorough local detection (slower but more sensitive and do not increase false positive rate).",
@@ -1391,17 +1391,17 @@ Python {1}
                         default=4000,
                         action='store',
                         type=int,
-                        help='Two element are aggregated if they are distant of DISTANCE_THRESH [4kb] or less')
+                        help='Two elements are aggregated if they are distant of DISTANCE_THRESH [4kb] or less')
 
     parser.add_argument('--outdir',
                         default=".",
                         action='store',
                         type=str,
                         metavar='.',
-                        help='set the output directory (default: current)')
+                        help='Set the output directory (default: current)')
 
     parser.add_argument("--linear",
-                        help="consider replicon as linear. If replicon smaller than 20kb, it will be considered as linear",
+                        help="Consider replicon as linear. If replicon smaller than 20kb, it will be considered as linear",
                         action="store_true")
 
     parser.add_argument("--union_integrases",
@@ -1428,8 +1428,9 @@ Python {1}
 
     parser.add_argument('--path_func_annot',
                         action='store',
+                        metavar='bank_hmm',
                         type=str,
-                        help='the path of file containing all hmm bank paths')
+                        help='Path to file containing all hmm bank paths (one per line)')
 
     parser.add_argument("--gembase",
                         help="Use gembase formatted protein file instead of Prodigal. Folder structure must be preserved",
