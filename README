@@ -3,6 +3,8 @@ Integron_Finder
 
 Find integrons in genomes
 
+See Documentation for mor details: http://integronfinder.readthedocs.org/en/latest/
+
 # Dependencies :
 
 - Python 2.7
