@@ -412,11 +412,12 @@ class Integron(object):
 
         colors = ["#749FCD" if i == "attC" else
                   "#DD654B" if i == "intI" else
-                  "#6BC865" if i[-2:] == "_1" else
-                  "#D06CC0" if i[-2:] == "_2" else
-                  "#C3B639" if i[-2:] == "_3" else
+                  "#6BC865" if (i[-2:] == "_1" and j == "Promoter") else
+                  "#D06CC0" if (i[-2:] == "_2" and j == "Promoter") else
+                  "#C3B639" if (i[-2:] == "_3" and j == "Promoter") else
                   "#e8950e" if i != "protein" else
-                  "#d3d3d3" for i in full.annotation]
+                  "#d3d3d3" for (i, j) in zip(full.annotation,
+                                             full.type_elt)]
 
         colors_alpha = [j+[i] for j, i in zip([[ord(c)/255. for c in i[1:].decode("hex")] for i in colors],
                                               alpha)]
@@ -1051,7 +1052,7 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
     """
     print "# Start Functional annotation... : "
     prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
-    hmm_out = os.path.join(out_dir, replicon_name + "_fa.res")
+
     for integron in integrons:
 
         if os.path.isfile(prot_tmp):
@@ -1075,11 +1076,16 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
             SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
 
             for hmm in hmm_files:
-
+                hmm_out = os.path.join(out_dir, "_".join([replicon_name,
+                                                         hmm.split("/")[-1].split(".")[0],
+                                                         "fa.res"]))
+                hmm_tableout = os.path.join(out_dir, "_".join([replicon_name,
+                                                         hmm.split("/")[-1].split(".")[0],
+                                                         "fa_table.res"]))
                 hmm_cmd = [HMMSEARCH,
                             "-Z", str(n_prot),
                             "--cpu", N_CPU,
-                            "--tblout", os.path.join(out_dir, replicon_name + "_fa_table.res"),
+                            "--tblout", hmm_tableout,
                             "-o", hmm_out,
                             hmm,
                             prot_tmp]
