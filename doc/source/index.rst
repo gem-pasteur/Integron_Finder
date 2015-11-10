@@ -11,7 +11,11 @@ IntegronFinder is a program that detects integrons in DNA sequences.
 The program is available on a webserver :ref:`(Mobyle) <mobyle>`, or by command line
 (`IntegronFinder on github`_).
 
-You already read the paper and want to install it ? Click :ref:`here <install>`
+You already read the :ref:`paper <references>` and want to install it ? Click :ref:`here <install>`
+
+Integrons are major genetic element, notorious for their major implication in the spread of antibiotic resistance genes. More generally,  integrons are gene-capturing device, whose broader evolutionary role remains poorly understood. IntegronFinder is able to detect with high accuracy integron in DNA sequences. It is accurate because it combines the use of HMM profiles for the detection of the essential protein, the site-specific integron integrase, and the use of Covariance Models for the detection of the recombination site, the *attC* site.
+
+|integron schema|
 
 **How does it work ?**
 
@@ -22,11 +26,12 @@ You already read the paper and want to install it ? Click :ref:`here <install>`
   of two HMM profiles:
 
   - one specific of tyrosine-recombinase (PF00589)
-  - one specific of the patch III domain of the integron integrase.
+  - one specific of the integron integrase, near the patch III domain of tyrosine recombinases.
 
-  The *attC* recombination site is detected with a covariance model (CM), which
-  models the secondary structure in addition to the few conserved sequence
-  positions.
+The *attC* recombination site is detected with a covariance model (CM), which
+models the secondary structure in addition to the few conserved sequence
+positions.
+
 
 - Third, the results are integrated, and IntegronFinder distinguishes 3 types of
   elements:
@@ -50,8 +55,14 @@ matching.
 
 .. image:: _static/pipeline.*
      :width: 400px
-     :align: center
+     :align: middle
      :alt: IntegronFinder Pipeline
+
+.. |integron schema| image:: _static/schema.*
+      :align: middle
+      :width: 300px
+      :alt: Integron Schema
+
 
 .. _`IntegronFinder on github`: https://github.com/gem-pasteur/Integron_Finder
 
@@ -62,6 +73,7 @@ matching.
    installation
    tutorial
    mobyle
+   references
 
 ..
   Indices and tables
