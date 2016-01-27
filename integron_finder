@@ -571,7 +571,10 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
         attc.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     else:
-        attc = read_infernal(attc_file, evalue=evalue_attc)
+        attc = read_infernal(attc_file,
+                             evalue=evalue_attc,
+                             size_max_attc=max_attc_size,
+                             size_min_attc=min_attc_size)
         attc.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     attc_ac = search_attc(attc, args.keep_palindromes)  # list of Dataframe, each have an array of attC
@@ -945,13 +948,16 @@ def local_max(replicon_name, window_beg, window_end, strand_search="both"):
     if returncode != 0:
         raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd[0], returncode))
 
-    df_max = read_infernal(tblout_path, evalue=evalue_attc)
+    df_max = read_infernal(tblout_path,
+                           evalue=evalue_attc,
+                           size_max_attc=max_attc_size,
+                           size_min_attc=min_attc_size)
     df_max.pos_beg = (df_max.pos_beg + window_beg) % SIZE_REPLICON
     df_max.pos_end = (df_max.pos_end + window_beg) % SIZE_REPLICON
     df_max.to_csv(os.path.join(out_dir, replicon_name + "_subseq_attc_table_end.res"),
                   sep="\t", index=0, mode="a", header=0)
     # filter on size
-    df_max = df_max[(abs(df_max.pos_end - df_max.pos_beg) > 40) & (abs(df_max.pos_end - df_max.pos_beg) < 200)]
+    df_max = df_max[(abs(df_max.pos_end - df_max.pos_beg) > min_attc_size) & (abs(df_max.pos_end - df_max.pos_beg) < max_attc_size)]
     return df_max
 
 
@@ -1464,6 +1470,20 @@ Python {1}
                         help="Don't annotate CDS and don't find integrase, just look for attC sites.",
                         action="store_true")
 
+    parser.add_argument('--max_attc_size',
+                        default=200,
+                        action='store',
+                        type=int,
+                        metavar='200',
+                        help='set maximum value fot the attC size (default: 200bp)')
+
+    parser.add_argument('--min_attc_size',
+                        default=40,
+                        action='store',
+                        type=int,
+                        metavar='40',
+                        help='set minimum value fot the attC size (default: 40bp)')
+
     parser.add_argument("--eagle_eyes",
                         help="Synonym of --local_max. Like a soaring eagle in the sky, catching rabbits(or attC sites) by surprise.",
                         action="store_true")
@@ -1563,6 +1583,9 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         MODEL_attc = os.path.join(MODEL_DIR, args.attc_model)
 
     model_attc_name = MODEL_attc.split("/")[-1].split(".cm")[0]
+
+    max_attc_size = args.max_attc_size
+    min_attc_size = args.min_attc_size
 
     if args.gembase:
         PROT_dir = os.path.join(in_dir, "..", "Proteins")
