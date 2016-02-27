@@ -105,7 +105,7 @@ class Integron(object):
         """
         Tells you whether the integrons is :
         - complete : Have one integrase and at least one attC
-        - attC0 : Have at least one attC
+        - CALIN : Have at least one attC
         - In0 : Just an integrase intI
         """
 
@@ -114,7 +114,7 @@ class Integron(object):
         elif len(self.attC) == 0 and len(self.integrase) == 1:
             return "In0"
         elif len(self.attC) >= 1 and len(self.integrase) == 0:
-            return "attC0"
+            return "CALIN"
 
     def add_promoter(self):
         """
@@ -214,7 +214,7 @@ class Integron(object):
             right = int(self.integrase.pos_end.values[-1])
             strand_array = "both"
 
-        elif self.type() == "attC0":
+        elif self.type() == "CALIN":
             left = int(self.attC.pos_beg.values[0])
             right = int(self.attC.pos_end.values[-1])
             strand_array = self.attC.strand.unique()[0]
@@ -288,7 +288,7 @@ class Integron(object):
             right = int(self.integrase.pos_end)
             strand_array = "both"
 
-        elif self.type() == "attC0":
+        elif self.type() == "CALIN":
             left = int(self.attC.pos_beg.values[0])
             right = int(self.attC.pos_end.values[-1])
             strand_array = self.attC.strand.unique()[0]
@@ -680,13 +680,13 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                                        intI_ac.query_name.values[i])
 
     print "In replicon {}, there are:".format(replicon_name)
-    print "- {} complete integron(s) found with {} attC site(s)".format(sum(
+    print "- {} complete integron(s) found with a total {} attC site(s)".format(sum(
                                                 [1 if i.type() == "complete" else 0 for i in integrons]),
                                                 sum([len(i.attC) if i.type() == "complete" else 0 for i in integrons]))
-    print "- {} attC0 integron(s) found with {} attC site(s)".format(sum(
-                                                [1 if i.type() == "attC0" else 0 for i in integrons]),
-                                                sum([len(i.attC) if i.type() == "attC0" else 0 for i in integrons]))
-    print "- {} In0 integron(s) found with {} attC site".format(sum(
+    print "- {} CALIN element(s) found with a total of {} attC site(s)".format(sum(
+                                                [1 if i.type() == "CALIN" else 0 for i in integrons]),
+                                                sum([len(i.attC) if i.type() == "CALIN" else 0 for i in integrons]))
+    print "- {} In0 element(s) found with a total of {} attC site".format(sum(
                                                 [1 if i.type() == "In0" else 0 for i in integrons]),
                                                 sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons]))
 
@@ -776,7 +776,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
             max_elt = expand(window_beg, window_end, max_elt, df_max,
                              search_left=go_left, search_right=go_right)
 
-        elif all(full_element.type == "attC0"):
+        elif all(full_element.type == "CALIN"):
 
             if len(full_element[full_element.pos_beg.isin(max_final.pos_beg)]) == 0:
                 # if cluster don't overlap already max-searched region
@@ -1670,7 +1670,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     if len(integrons):
         j = 1
         for i in integrons:
-            if i.type() != "In0": # complete & attC0
+            if i.type() != "In0": # complete & CALIN
                 if args.no_proteins == False:
                     i.add_proteins()
 
