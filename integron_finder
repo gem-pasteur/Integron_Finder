@@ -1152,32 +1152,40 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
             id_query = "-"
         for idx2, hit in enumerate(query_result.hits):
             id_prot = hit.id
-            for hsp in hit.hsps:
-                if args.gembase == False:
-                    pos_beg, pos_end, strand = [x.strip() for x in hit.description_all[0].split('#') if x][:-1]
-                else:
-                    desc = [j for j in hit.description_all[0].split(" ")]
-                    strand = 1 if desc[0] == "D" else -1
-                    pos_beg = int(desc[3])
-                    pos_end = int(desc[4])
+            if args.gembase == False:
+                pos_beg, pos_end, strand = [x.strip() for x in hit.description_all[0].split('#') if x][:-1]
+            else:
+                desc = [j for j in hit.description_all[0].split(" ")]
+                strand = 1 if desc[0] == "D" else -1
+                pos_beg = int(desc[3])
+                pos_end = int(desc[4])
 
+            evalue_tmp = []
+            hmmfrom = []
+            hmmto = []
+            alifrom = []
+            alito = []
+
+            for hsp in hit.hsps:
                 #strand = hsp.query_strand
-                evalue_tmp = hsp.evalue
-                hmmfrom = hsp.query_start + 1
-                hmmto = hsp.query_end
-                alifrom = hsp.hit_start + 1
-                alito = hsp.hit_end
+                evalue_tmp.append(hsp.evalue)
+                hmmfrom.append(hsp.query_start + 1)
+                hmmto.append(hsp.query_end)
+                alifrom.append(hsp.hit_start + 1)
+                alito.append(hsp.hit_end)
+
+            best_evalue = np.argmin(evalue_tmp)
 
             df.loc[idx+idx2, "ID_prot"] = id_prot
             df.loc[idx+idx2, "ID_query"] = id_query # "-"  # remnant of ancient parsing function to keep data structure
             df.loc[idx+idx2, "pos_beg"] = int(pos_beg)
             df.loc[idx+idx2, "pos_end"] = int(pos_end)
             df.loc[idx+idx2, "strand"] = int(strand)
-            df.loc[idx+idx2, "evalue"] = evalue_tmp   # i-evalue
-            df.loc[idx+idx2, "hmmfrom"] = hmmfrom  # hmmfrom
-            df.loc[idx+idx2, "hmmto"] = hmmto    # hmm to
-            df.loc[idx+idx2, "alifrom"] = alifrom  # alifrom
-            df.loc[idx+idx2, "alito"] = alito  # ali to
+            df.loc[idx+idx2, "evalue"] = evalue_tmp[best_evalue]   # i-evalue
+            df.loc[idx+idx2, "hmmfrom"] = hmmfrom[best_evalue]   # hmmfrom
+            df.loc[idx+idx2, "hmmto"] = hmmto[best_evalue]     # hmm to
+            df.loc[idx+idx2, "alifrom"] = alifrom[best_evalue]   # alifrom
+            df.loc[idx+idx2, "alito"] = alito [best_evalue]  # ali to
             df.loc[idx+idx2, "len_profile"] = float(len_profile)
             df.loc[idx+idx2, "Accession_number"] = replicon_name
             df.loc[idx+idx2, "query_name"] = query

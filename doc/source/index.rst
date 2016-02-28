@@ -8,8 +8,7 @@ Welcome to IntegronFinder's documentation!
 ==========================================
 
 IntegronFinder is a program that detects integrons in DNA sequences.
-The program is available on a webserver :ref:`(Mobyle) <mobyle>`, or by command line
-(`IntegronFinder on github`_).
+The program is available on a webserver :ref:`(Mobyle) <mobyle>`, or by command line (`IntegronFinder on github`_).
 
 You already read the :ref:`paper <references>` and want to install it ? Click :ref:`here <install>`
 
@@ -40,7 +39,7 @@ positions.
       Integron with integron integrase nearby *attC* site(s)
   - In0 element
       Integron integrase only, without any *attC* site nearby
-  - attC0 element
+  - CALIN element
       *attC* sites only, without integron integrase nearby.
       A rule of thumb to avoid false positive is to filter out singleton of
       *attC* site.
