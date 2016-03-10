@@ -1,3 +1,4 @@
 include integron_finder
 include data/Functional_annotation/*
 include data/Models/*
+include README.md
