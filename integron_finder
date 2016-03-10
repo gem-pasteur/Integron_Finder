@@ -1221,11 +1221,19 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
     df.sort([8, 15], inplace=True)
     df.index = range(0, len(df))
     df.columns = ["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                  "pos_beg", "pos_end",
+                  "pos_beg_tmp", "pos_end_tmp",
                   "sens", "evalue"]
-    idx = (df.pos_beg > df.pos_end)
-    df.loc[idx, ['pos_beg', 'pos_end']] = df.loc[idx, ['pos_end', 'pos_beg']].values
-    return df
+    idx = (df.pos_beg_tmp > df.pos_end_tmp)
+
+    df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: x["pos_end_tmp"] - (length_cm - x["cm_fin"]), axis=1)
+    df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: x["pos_beg_tmp"] + (x["cm_debut"] - 1), axis=1)
+
+    df.loc[~idx, "pos_end"] = df.loc[~idx].apply(lambda x: x["pos_end_tmp"] + (length_cm - x["cm_fin"]), axis=1)
+    df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: x["pos_beg_tmp"] - (x["cm_debut"] - 1), axis=1)
+
+    return df[["Accession_number", "cm_attC", "cm_debut", "cm_fin",
+                  "pos_beg", "pos_end",
+                  "sens", "evalue"]]
 
 
 def to_gbk(df, sequence):
@@ -1620,6 +1628,13 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     max_attc_size = args.max_attc_size
     min_attc_size = args.min_attc_size
 
+    with open(MODEL_attc) as f:
+        for i,line in enumerate(f):
+            if "CLEN" in line:
+                length_cm = int(line.split()[1])
+                break
+
+
     if args.gembase:
         PROT_dir = os.path.join(in_dir, "..", "Proteins")
         PROT_file = os.path.join(PROT_dir, replicon_name + ".prt")
@@ -1649,7 +1664,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                               intI_file,
                               phageI_file)
 
-    ############### Search with Eagle Eyes ###############
+    ############### Search with local_max ###############
     if (args.eagle_eyes or args.local_max):
 
         print "\n>>>>>> Starting search with local_max...:"
