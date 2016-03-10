@@ -3,7 +3,10 @@ Integron_Finder
 
 Find integrons in DNA sequences
 
-See Documentation for more details: http://integronfinder.readthedocs.org/en/latest/
+See the [latest release](https://github.com/gem-pasteur/Integron_Finder/releases/latest) to download the program. Or, use it online on the [Mobyle Webserver](http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder)
+
+See Documentation for how to install it and how to use it: [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](http://integronfinder.readthedocs.org/en/latest/)
+
 
 # Dependencies :
 
@@ -26,8 +29,9 @@ usage: integron_finder [-h] [--local_max] [--func_annot] [--cpu CPU]
                        [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
                        [--path_func_annot bank_hmm] [--gembase]
                        [--attc_model file.cm] [--evalue_attc 1]
-                       [--keep_palindromes] [--no_proteins] [--eagle_eyes]
-                       [-V]
+                       [--keep_palindromes] [--no_proteins]
+                       [--max_attc_size 200] [--min_attc_size 40]
+                       [--eagle_eyes] [-V]
                        replicon
 
 positional arguments:
@@ -69,6 +73,8 @@ optional arguments:
                         don't remove the one with highest evalue
   --no_proteins         Don't annotate CDS and don't find integrase, just look
                         for attC sites.
+  --max_attc_size 200   set maximum value fot the attC size (default: 200bp)
+  --min_attc_size 40    set minimum value fot the attC size (default: 40bp)
   --eagle_eyes          Synonym of --local_max. Like a soaring eagle in the
                         sky, catching rabbits(or attC sites) by surprise.
   -V, --version         show program's version number and exit
@@ -95,24 +101,24 @@ A folder name Results\_id\_genome, inside there are different files :
  You can use this program whithout installing it, through a webserver:
 
  http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder
- 
+
  # Citation
- 
+
  The paper is submitted.
- 
- See here for pre-print: 
- 
+
+ See here for pre-print:
+
 Automatic and accurate identification of integrons and cassette arrays in bacterial genomes reveals unexpected patterns
 Jean Cury, Thomas Jové, Marie Touchon, Bertrand Néron, Eduardo PC Rocha
 bioRxiv doi: http://dx.doi.org/10.1101/030866
 
- 
+
  Please cite also the following articles:
- 
+
  - Nawrocki, E.P. and Eddy, S.R. (2013) Infernal 1.1: 100-fold faster RNA homology searches. Bioinformatics, 29, 2933-2935.
  - Eddy, S.R. (2011) Accelerated Profile HMM Searches. PLoS Comput Biol, 7, e1002195.
  - Hyatt, D., Chen, G.L., Locascio, P.F., Land, M.L., Larimer, F.W. and Hauser, L.J. (2010) Prodigal: prokaryotic gene recognition and translation initiation site identification. BMC Bioinformatics, 11, 119.
- 
+
  and if you use the function `--func_annot` which uses Resfams:
- 
+
  - Gibson, M.K., Forsberg, K.J. and Dantas, G. (2015) Improved annotation of antibiotic resistance determinants reveals microbial resistomes cluster by ecology. ISME J, 9, 207-216.
