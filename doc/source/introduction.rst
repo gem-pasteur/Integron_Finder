@@ -50,7 +50,7 @@ matching.
 
 **Does it work ?**
 
-Yes! The estimated sensitivity is 61% on average with the default option and goes up to 88% with the `--local_max` option. The missing *attC* sites are usually at the end of the array.  The False positive rate with the `--local_max` option is estimated between 0.03 False Positive per Megabases (FP/Mb) to 0.72 FP/Mb. This leads to a probability of finding 2 consecutive *attC* sites within 4kb between 4.10^-6 and 7.10^-9. Finally, this parameters do not depend on the G+C percent of the given replicon.
+Yes! The estimated sensitivity is 61% on average with the default option and goes up to 88% with the ``--local_max`` option. The missing *attC* sites are usually at the end of the array.  The False positive rate with the ``--local_max`` option is estimated between 0.03 False Positive per Megabases (FP/Mb) to 0.72 FP/Mb. This leads to a probability of finding 2 consecutive *attC* sites within 4kb between 4.10^-6 and 7.10^-9. Finally, this parameters do not depend on the G+C percent of the given replicon.
 
 |benchmark|
 

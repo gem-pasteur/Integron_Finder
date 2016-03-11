@@ -1386,7 +1386,7 @@ Python {1}
  - citation:
      Automatic and accurate identification of integrons
      and cassette arrays in bacterial genomes reveals unexpected patterns
-     Jean Cury, Thomas Jové, Marie Touchon, Bertrand Néron, Eduardo PC Rocha 
+     Jean Cury, Thomas Jové, Marie Touchon, Bertrand Néron, Eduardo PC Rocha
      bioRxiv doi: http://dx.doi.org/10.1101/030866
  """.format(version, sys.version)
         return version_text

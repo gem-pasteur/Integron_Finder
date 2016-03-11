@@ -93,9 +93,21 @@ INFERNAL::
 
 Default is 1.
 
+Circularity
+-----------
+
+By default, IntegronFinder assumes your replicon to be circular. However, if they aren't, or if it's PCR fragments or contigs, you can specify that it's a linear fragment::
+
+    integron_finder mylinearsequence.fst --linear
+
+However, if ``--linear`` is not used and the replicon is smaller than ``4 x dt``
+(where ``dt`` is the distance threshold, so 4kb by default), the replicon is
+considered linear to avoid clustering problem
+
+
 .. _advance:
 
-Advanced use
+Advanced options
 ============
 
 .. _distance_threshold:
@@ -118,6 +130,10 @@ or, equivalently::
 
 This sets the threshold for clustering to 10 kb.
 
+.. note::
+    The option ``--outdir`` allows you to chose the location of the Results folder (``Results_Integron_Finder_mysequence``). If this folder already exists, IntegronFinder will not re-run analyses already done, except functional annotation. It allows you to re-run rapidly IntegronFinder with a different ``--distance_threshold`` value. Functional annotation needs to re-run each time because depending on the aggregation parameters, the proteins associated with an integron might change. 
+
+
 *attC* evalue
 -------------
 
@@ -128,19 +144,6 @@ to the cost of a much higher false positive rate.
 ::
 
     integron_finder mysequence.fst --evalue_attc 5
-
-Circularity
------------
-
-By default, IntegronFinder assumes replicon to be circular. However, if they
-aren't, or if it's PCR fragments or contigs, you can specify that it's a linear
-fragment::
-
-    integron_finder mylinearsequence.fst --linear
-
-However, if ``--linear`` is not used and the replicon is smaller than ``4 x dt``
-(where ``dt`` is the distance threshold, so 4kb by default), the replicon is
-considered linear to avoid clustering problem
 
 Palindromes
 -----------
