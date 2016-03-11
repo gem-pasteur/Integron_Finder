@@ -1381,11 +1381,13 @@ or define INTEGRON_HOME environment variable.""")
             version = __version__
         version_text = """integron_finder {0}
 Python {1}
-######### TODO ############
- - licence,
- - Cury Jean, Jové Thomas, Néron Bertrand, Rocha PC Eduardo,
- - citation
-####### END TODO ##########
+ - open-source GPLv3,
+ - Jean Cury, Betrand Néron, Eduardo Rocha,
+ - citation:
+     Automatic and accurate identification of integrons
+     and cassette arrays in bacterial genomes reveals unexpected patterns
+     Jean Cury, Thomas Jové, Marie Touchon, Bertrand Néron, Eduardo PC Rocha 
+     bioRxiv doi: http://dx.doi.org/10.1101/030866
  """.format(version, sys.version)
         return version_text
 
