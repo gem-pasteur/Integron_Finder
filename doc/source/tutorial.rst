@@ -86,15 +86,12 @@ Parallelization
 ---------------
 
 The time limiting part are HMMER and INFERNAL. So IntegronFinder does not have
-parallel implementation, but the user can set the number of CPU used by HMMER and
+parallel implementation (yet?), but the user can set the number of CPU used by HMMER and
 INFERNAL::
 
   integron_finder mysequence.fst --cpu 4
 
 Default is 1.
-
-To start IntegronFinder on many nucleotide sequences, one can use "manual"
-parallelization by calling multiple times IntegronFinder in ``bash``.
 
 .. _advance:
 
