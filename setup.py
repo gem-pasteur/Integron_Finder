@@ -331,7 +331,7 @@ require_packages = ['numpy (>=1.7.0)',
                     'matplotlib (>=1.4.2)']
 
 setup(name='integron_finder',
-      version="Version 1.4",
+      version="1.4",
       description="""Integron Finder aims at detecting integrons in DNA sequences
        by finding particular features of the integron:
        the attC sites, the integrase
