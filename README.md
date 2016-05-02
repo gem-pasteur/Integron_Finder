@@ -102,7 +102,7 @@ You can use this program whithout installing it, through a webserver:
 
 http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder
 
- # Citation
+# Citation
 
  The paper is published in Nucleic Acid Research.
 
