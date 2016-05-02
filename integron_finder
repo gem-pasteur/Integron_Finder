@@ -98,7 +98,7 @@ class Integron(object):
                                      self.attC.iloc[attC_len - 2].pos_end) % SIZE_REPLICON)
         self.attC["distance_2attC"] = self.sizes_cassettes
 
-        #self.attC.sort(["pos_beg"], inplace = True)
+        #self.attC.sort_values(["pos_beg"], inplace = True)
         self.attC.index = ["attc_%03i" % int(j + 1) for j in self.attC.index]
 
     def type(self):
@@ -474,7 +474,7 @@ def search_attc(attc_df, keep_palindromes):
     attc_minus = attc_df[attc_df.sens == "-"].copy()
 
     if keep_palindromes == False:
-        attc_df = attc_df.sort(["pos_beg", "evalue"]).drop_duplicates(subset=["pos_beg"]).copy()
+        attc_df = attc_df.sort_values(["pos_beg", "evalue"]).drop_duplicates(subset=["pos_beg"]).copy()
         attc_plus = attc_df[attc_df.sens == "+"].copy()
         attc_minus = attc_df[attc_df.sens == "-"].copy()
 
@@ -543,10 +543,10 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
 
     if args.no_proteins == False:
         intI = read_hmm(replicon_name, intI_file)
-        intI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
+        intI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
         phageI = read_hmm(replicon_name, phageI_file)
-        phageI.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
+        phageI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
         tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
 
@@ -568,14 +568,14 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
 
     if isinstance(attc_file, pd.DataFrame):
         attc = attc_file
-        attc.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
+        attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     else:
         attc = read_infernal(attc_file,
                              evalue=evalue_attc,
                              size_max_attc=max_attc_size,
                              size_min_attc=min_attc_size)
-        attc.sort(["Accession_number", "pos_beg", "evalue"], inplace=True)
+        attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     attc_ac = search_attc(attc, args.keep_palindromes)  # list of Dataframe, each have an array of attC
     integrons = []
@@ -1121,10 +1121,10 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
                 if returncode != 0:
                     raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
 
-                hmm_in = read_hmm(replicon_name, hmm_out).sort("evalue").drop_duplicates(subset="ID_prot")
+                hmm_in = read_hmm(replicon_name, hmm_out).sort_values("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
 
-            func_annotate_res = func_annotate_res.sort("evalue").drop_duplicates(subset="ID_prot")
+            func_annotate_res = func_annotate_res.sort_values("evalue").drop_duplicates(subset="ID_prot")
 
             integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
             integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
@@ -1215,25 +1215,30 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
     df = df[[2, 5, 6, 7, 8, 9, 15]]
     df = df[(df[15] < evalue)]
     df = df[(abs(df[8]-df[7]) < size_max_attc) & (size_min_attc < abs(df[8]-df[7]))]  # filter on evalue
-    df["Accession_number"] = replicon_name
-    c = df.columns.tolist()
-    df = df[c[-1:] + c[:-1]]
-    df.sort([8, 15], inplace=True)
-    df.index = range(0, len(df))
-    df.columns = ["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                  "pos_beg_tmp", "pos_end_tmp",
-                  "sens", "evalue"]
-    idx = (df.pos_beg_tmp > df.pos_end_tmp)
+    if len(df) > 0:
+        df["Accession_number"] = replicon_name
+        c = df.columns.tolist()
+        df = df[c[-1:] + c[:-1]]
+        df.sort_values([8, 15], inplace=True)
+        df.index = range(0, len(df))
+        df.columns = ["Accession_number", "cm_attC", "cm_debut", "cm_fin",
+                      "pos_beg_tmp", "pos_end_tmp",
+                      "sens", "evalue"]
+        idx = (df.pos_beg_tmp > df.pos_end_tmp)
 
-    df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: x["pos_end_tmp"] - (length_cm - x["cm_fin"]), axis=1)
-    df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: x["pos_beg_tmp"] + (x["cm_debut"] - 1), axis=1)
+        df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: x["pos_end_tmp"] - (length_cm - x["cm_fin"]), axis=1)
+        df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: x["pos_beg_tmp"] + (x["cm_debut"] - 1), axis=1)
 
-    df.loc[~idx, "pos_end"] = df.loc[~idx].apply(lambda x: x["pos_end_tmp"] + (length_cm - x["cm_fin"]), axis=1)
-    df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: x["pos_beg_tmp"] - (x["cm_debut"] - 1), axis=1)
+        df.loc[~idx, "pos_end"] = df.loc[~idx].apply(lambda x: x["pos_end_tmp"] + (length_cm - x["cm_fin"]), axis=1)
+        df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: x["pos_beg_tmp"] - (x["cm_debut"] - 1), axis=1)
 
-    return df[["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                  "pos_beg", "pos_end",
-                  "sens", "evalue"]]
+        return df[["Accession_number", "cm_attC", "cm_debut", "cm_fin",
+                      "pos_beg", "pos_end",
+                      "sens", "evalue"]]
+    else:
+        return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
+                                     "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
+
 
 
 def to_gbk(df, sequence):
@@ -1379,7 +1384,7 @@ or define INTEGRON_HOME environment variable.""")
             version = "NOT packaged, it should be development version"
         else:
             version = __version__
-        version_text = """integron_finder {0}
+        version_text = """integron_finder version {0}
 Python {1}
  - open-source GPLv3,
  - Jean Cury, Betrand Néron, Eduardo Rocha,
@@ -1557,14 +1562,17 @@ Python {1}
         pass
 
     try:
-        os.mkdir(os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name,
+        os.mkdir(os.path.join(args.outdir,
+                              "Results_Integron_Finder_" + replicon_name,
                               "other"))
     except OSError:
         pass
 
-    out_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name,
+    out_dir = os.path.join(args.outdir,
+                           "Results_Integron_Finder_" + replicon_name,
                            "other")
-    out_dir_ok = os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name)
+    out_dir_ok = os.path.join(args.outdir,
+                              "Results_Integron_Finder_" + replicon_name)
 
     SEQUENCE = SeqIO.read(replicon_path,
                           "fasta",
@@ -1722,7 +1730,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         ############### Writing out results ###############
 
         integrons_describe = pd.concat([i.describe() for i in integrons])
-        dic_id = {i: "%02i" % (j + 1) for j, i in enumerate(integrons_describe.sort("pos_beg").ID_integron.unique())}
+        dic_id = {i: "%02i" % (j + 1) for j, i in enumerate(integrons_describe.sort_values("pos_beg").ID_integron.unique())}
         integrons_describe.ID_integron = ["integron_" + dic_id[i] for i in integrons_describe.ID_integron]
         integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
                                                  "pos_beg", "pos_end", "strand", "evalue",
@@ -1732,7 +1740,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         integrons_describe.index = range(len(integrons_describe))
 
         integrons_describe['evalue'] = integrons_describe['evalue'].map(lambda x: '%.3e' % x)
-        integrons_describe.sort(["ID_integron", "pos_beg", "evalue"], inplace=True)
+        integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
 
         integrons_describe.to_csv(os.path.join(out_dir_ok, outfile), sep="\t", index=0, fillna="NA")
 

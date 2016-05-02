@@ -27,14 +27,14 @@ from distutils.util import subst_vars as distutils_subst_vars
 from distutils.util import get_platform, change_root, convert_path
 
 class check_and_build( build ):
-    
+
     def run(self):
         chk = True
         for req in require_python:
             chk &= self.check_python(req)
         for req in require_packages:
             chk &= self.check_package(req)
-        if not chk: 
+        if not chk:
             sys.exit(1)
         build.run(self)
 
@@ -70,7 +70,7 @@ class check_and_build( build ):
 class install_integron_finder(install):
 
     #I use record to store all installed files and reuse this record file for uninstall
-    #so this option is not available anymore for the users 
+    #so this option is not available anymore for the users
     for i, opt in enumerate(install.user_options):
         if opt[0] == 'record=':
             install.user_options.pop(i)
@@ -139,7 +139,7 @@ class install_data(_install_data):
                                    ('force', 'force'),
                                   )
         self.prefix_data = self.install_dir
-        self.files_2_install = self.distribution.data_files 
+        self.files_2_install = self.distribution.data_files
         with open(self.distribution.uninstall_prefix, "a") as _f:
             _f.write('install_data = {}\n'.format(self.install_dir))
 
@@ -326,12 +326,12 @@ def subst_vars(src, dst, vars):
 require_python = ['python (>=2.7, <3.0)']
 
 require_packages = ['numpy (>=1.7.0)',
-                    'pandas (>=0.15.1)',
+                    'pandas (>=0.18.0)',
                     'Bio (>=1.65)',
                     'matplotlib (>=1.4.2)']
 
 setup(name='integron_finder',
-      version=time.strftime("%Y%m%d"),
+      version="1.4",
       description="""Integron Finder aims at detecting integrons in DNA sequences
        by finding particular features of the integron:
        the attC sites, the integrase

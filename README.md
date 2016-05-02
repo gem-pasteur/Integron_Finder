@@ -5,13 +5,13 @@ Find integrons in DNA sequences
 
 See the [latest release](https://github.com/gem-pasteur/Integron_Finder/releases/latest) to download the program. Or, use it online on the [Mobyle Webserver](http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder)
 
-See Documentation for how to install it and how to use it: [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](http://integronfinder.readthedocs.org/en/latest/)
+See Documentation for how to install it and how to use it: [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](http://integronfinder.readthedocs.io/en/v1.4/)
 
 
 # Dependencies :
 
 - Python 2.7
-   - Pandas 0.15.1
+   - Pandas 0.18.0
    - Numpy 1.9.1
    - Biopython 1.65
    - Matplotlib 1.4.3
@@ -104,14 +104,11 @@ A folder name Results\_id\_genome, inside there are different files :
 
  # Citation
 
- The paper is submitted.
+ The paper is published in Nucleic Acid Research.
 
- See here for pre-print:
-
-Automatic and accurate identification of integrons and cassette arrays in bacterial genomes reveals unexpected patterns
-Jean Cury, Thomas Jové, Marie Touchon, Bertrand Néron, Eduardo PC Rocha
-bioRxiv doi: http://dx.doi.org/10.1101/030866
-
+Identification and analysis of integrons and cassette arrays in bacterial genomes
+Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
+Nucleic Acids Research 2016; [doi: 10.1093/nar/gkw319](http://nar.oxfordjournals.org/cgi/content/full/gkw319)
 
  Please cite also the following articles:
 
