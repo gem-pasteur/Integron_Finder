@@ -98,9 +98,9 @@ A folder name Results\_id\_genome, inside there are different files :
 
  # Mobyle
 
- You can use this program whithout installing it, through a webserver:
+You can use this program whithout installing it, through a webserver:
 
- http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder
+http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder
 
  # Citation
 
