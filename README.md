@@ -104,14 +104,11 @@ A folder name Results\_id\_genome, inside there are different files :
 
  # Citation
 
- The paper is submitted.
+ The paper is published in Nucleic Acid Research.
 
- See here for pre-print:
-
-Automatic and accurate identification of integrons and cassette arrays in bacterial genomes reveals unexpected patterns
-Jean Cury, Thomas Jové, Marie Touchon, Bertrand Néron, Eduardo PC Rocha
-bioRxiv doi: http://dx.doi.org/10.1101/030866
-
+Identification and analysis of integrons and cassette arrays in bacterial genomes
+Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
+Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
 
  Please cite also the following articles:
 
