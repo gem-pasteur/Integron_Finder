@@ -108,7 +108,7 @@ A folder name Results\_id\_genome, inside there are different files :
 
 Identification and analysis of integrons and cassette arrays in bacterial genomes
 Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
-Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
+Nucleic Acids Research 2016; [doi: 10.1093/nar/gkw319](http://nar.oxfordjournals.org/cgi/content/full/gkw319)
 
  Please cite also the following articles:
 
