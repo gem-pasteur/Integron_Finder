@@ -1386,13 +1386,14 @@ or define INTEGRON_HOME environment variable.""")
             version = __version__
         version_text = """integron_finder version {0}
 Python {1}
+
  - open-source GPLv3,
  - Jean Cury, Betrand Néron, Eduardo Rocha,
  - citation:
-     Automatic and accurate identification of integrons
-     and cassette arrays in bacterial genomes reveals unexpected patterns
-     Jean Cury, Thomas Jové, Marie Touchon, Bertrand Néron, Eduardo PC Rocha
-     bioRxiv doi: http://dx.doi.org/10.1101/030866
+
+ Identification and analysis of integrons and cassette arrays in bacterial genomes
+ Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
+ Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
  """.format(version, sys.version)
         return version_text
 
