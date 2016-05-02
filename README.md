@@ -5,7 +5,7 @@ Find integrons in DNA sequences
 
 See the [latest release](https://github.com/gem-pasteur/Integron_Finder/releases/latest) to download the program. Or, use it online on the [Mobyle Webserver](http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder)
 
-See Documentation for how to install it and how to use it: [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](http://integronfinder.readthedocs.io/en/latest/)
+See Documentation for how to install it and how to use it: [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](http://integronfinder.readthedocs.io/en/v1.5/)
 
 
 # Dependencies :
