@@ -326,7 +326,7 @@ def subst_vars(src, dst, vars):
 require_python = ['python (>=2.7, <3.0)']
 
 require_packages = ['numpy (>=1.7.0)',
-                    'pandas (>=0.15.1)',
+                    'pandas (>=0.18.0)',
                     'Bio (>=1.65)',
                     'matplotlib (>=1.4.2)']
 
