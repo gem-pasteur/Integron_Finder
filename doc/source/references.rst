@@ -8,8 +8,8 @@ References
 If you use this software, please cite:
 
 - Identification and analysis of integrons and cassette arrays in bacterial genomes
-Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
-Nucleic Acids Research 2016; `doi: 10.1093/nar/gkw319`_
+Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha.
+**Nucleic Acids Research**, 2016; `doi: 10.1093/nar/gkw319`_
 
 Please cite also the following articles:
 
