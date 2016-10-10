@@ -1,3 +1,5 @@
+![install](https://img.shields.io/github/downloads/gem-pasteur/Integron_finder/total.svg) ![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)
+
 Integron_Finder
 ===============
 
