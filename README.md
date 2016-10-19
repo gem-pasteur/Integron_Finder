@@ -1,6 +1,6 @@
-![install](https://img.shields.io/github/downloads/gem-pasteur/Integron_finder/total.svg) ![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)
+[![install](https://img.shields.io/github/downloads/gem-pasteur/Integron_finder/total.svg)](https://github.com/gem-pasteur/Integron_Finder/releases/latest) [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](http://integronfinder.readthedocs.io/en/v1.5/) [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0)
 
-Integron_Finder
+Integron Finder
 ===============
 
 Find integrons in DNA sequences
@@ -9,6 +9,9 @@ See the [latest release](https://github.com/gem-pasteur/Integron_Finder/releases
 
 See Documentation for how to install it and how to use it: [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](http://integronfinder.readthedocs.io/en/v1.5/)
 
+# Licence:
+
+Integron Finder is under [open source licence GPLv3](https://opensource.org/licenses/GPL-3.0)
 
 # Dependencies :
 
