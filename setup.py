@@ -326,12 +326,12 @@ def subst_vars(src, dst, vars):
 require_python = ['python (>=2.7, <3.0)']
 
 require_packages = ['numpy (>=1.7.0)',
-                    'pandas (>=0.15.1)',
+                    'pandas (>=0.18.0)',
                     'Bio (>=1.65)',
                     'matplotlib (>=1.4.2)']
 
 setup(name='integron_finder',
-      version="Version 1.4",
+      version="1.4",
       description="""Integron Finder aims at detecting integrons in DNA sequences
        by finding particular features of the integron:
        the attC sites, the integrase
