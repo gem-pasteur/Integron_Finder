@@ -1740,7 +1740,6 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
         integrons_describe.index = range(len(integrons_describe))
 
-        integrons_describe['evalue'] = integrons_describe['evalue'].map(lambda x: '%.3e' % x)
         integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
 
         integrons_describe.to_csv(os.path.join(out_dir_ok, outfile), sep="\t", index=0, na_rep="NA")
