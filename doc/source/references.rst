@@ -7,7 +7,9 @@ References
 
 If you use this software, please cite:
 
-- Cury J, Jové T, Touchon M, Néron B, Rocha E.P.C. (2015) Automatic and accurate identification of integrons and cassette arrays in bacterial genomes reveals unexpected patterns, **bioRxiv** doi: http://dx.doi.org/10.1101/030866
+- Identification and analysis of integrons and cassette arrays in bacterial genomes
+Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha.
+**Nucleic Acids Research**, 2016; `doi: 10.1093/nar/gkw319`_
 
 Please cite also the following articles:
 
@@ -20,3 +22,5 @@ Please cite also the following articles:
 and if you use functional annotation, cite the corresponding articles:
 
 - Gibson, M.K., Forsberg, K.J. and Dantas, G. (2015) Improved annotation of antibiotic resistance determinants reveals microbial resistomes cluster by ecology. **ISME J**, 9, 207-216.
+
+.. _`doi: 10.1093/nar/gkw319`: http://nar.oxfordjournals.org/cgi/content/full/gkw319
