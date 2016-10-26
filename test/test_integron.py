@@ -136,7 +136,7 @@ class Test(pd.util.testing.TestCase):
                                1,
                                1e-2,
                                "intersection_tyr_intI")
-        self.assertEqual(just_one_attC.type(), "attC0")
+        self.assertEqual(just_one_attC.type(), "CALIN")
 
         one_integrase_one_attC = Integron("one_integrase_one_attC")
         one_integrase_one_attC.add_integrase(10,
