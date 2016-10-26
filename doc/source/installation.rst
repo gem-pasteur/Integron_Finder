@@ -18,7 +18,6 @@ IntegronFinder is built with Python 2.7, and a few libraries are needed:
    - Numpy (>=1.9.1)
    - Biopython (>=1.65)
    - Matplotlib (>=1.4.3)
-   - psutil (>=2.1.3)
 
 If you're not at ease with Python, see :ref:`here on how to install Python and
 its libraries <python_install>`
@@ -42,11 +41,23 @@ IntegronFinder.
 Installation procedure
 ======================
 
+Using pip (recommended)
+-----------------------
+
+1. Download the `latest release`_
+2. In a shell (*e.g.* a terminal), start installation with::
+
+    (sudo) python pip install integron_finder-x.x.tar.gz
+
+
+Using setuptools
+----------------
+
 1. Download the `latest release`_
 2. Uncompress it
 3. In a shell (*e.g.* a terminal), go to the directory::
 
-     cd Integron_Finder-x.x/
+     cd integron_finder-x.x/
 
 4. Start installation with::
 
@@ -70,12 +81,23 @@ Installation procedure
 Uninstallation procedure
 =========================
 
-To uninstall IntegronFinder, run in the ``Integron_Finder-x.x/`` directory::
+If you install integron_finder with pip
+---------------------------------------
 
-    (sudo) python setup.py uninstall
+To uninstall integron_finder, run in the following command::
+
+    (sudo) pip uninstall integron_finder
+
+It will uninstall integron_finder executable
+but You have to remove $PREFIX/share/integron_finder by hands.
+
+If you install integron_finder with setup.py
+--------------------------------------------
+
+.. warning::
+    There is no deinstallation procedure with setup.py
 
 .. _python_install:
-
 
 How to install Python
 =====================
