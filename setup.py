@@ -12,15 +12,11 @@ try:
 except ImportError:
     warnings = None
 
-from distutils import log
-from distutils.command.install_data import install_data as _install_data
 from distutils.errors import DistutilsFileError
 from distutils.util import subst_vars as distutils_subst_vars
-from distutils.util import change_root, convert_path
 
 from setuptools import setup
 from setuptools.dist import Distribution
-from setuptools.command.install import install as _install
 from setuptools.command.install_scripts import install_scripts as _install_scripts
 
 
@@ -71,121 +67,12 @@ class install_scripts(_install_scripts):
             _install_scripts.run(self)
 
 
-class install_data(_install_data):
-
-    user_options = [
-        ('install-dir=', 'd',
-         "base directory for installing data files "
-         "(default: installation base dir)"),
-        ('root=', None,
-         "install everything relative to this alternate root directory"),
-        ('force', 'f', "force installation (overwrite existing files)"),
-        ]
-
-    boolean_options = ['force']
-
-    def finalize_options(self):
-        inst = self.distribution.command_options.get('install')
-        inst = {} if inst is None else inst
-        self.install_dir = get_install_data_dir(inst)
-        self.set_undefined_options('install',
-                                   ('root', 'root'),
-                                   ('force', 'force'),
-                                  )
-        self.prefix_data = self.install_dir
-        self.files_2_install = self.distribution.data_files
-
-
-    def run(self):
-        self.mkpath(self.install_dir)
-        for f in self.files_2_install:
-            if isinstance(f, str):
-                if not os.path.exists(f):
-                    log.warn("WARNING the document {} cannot be found, installation skipped".format(f))
-                # it's a simple file, so copy it
-                f = convert_path(f)
-                if self.warn_dir:
-                    self.warn("setup script did not provide a directory for "
-                              "'{0}' -- installing right in '{1}'".format(f, self.install_dir))
-                (out, _) = self.copy_file(f, self.install_dir)
-                self.outfiles.append(out)
-            else:
-                # it's a tuple with path to install to and a list of path
-                dir_ = convert_path(f[0])
-                if not os.path.isabs(dir_):
-                    dir_ = os.path.join(self.install_dir, dir_)
-                elif self.root:
-                    dir_ = change_root(self.root, dir_)
-                self.mkpath(dir_)
-                if f[1] == []:
-                    # If there are no files listed, the user must be
-                    # trying to create an empty directory, so add the
-                    # directory to the list of output files.
-                    self.outfiles.append(dir_)
-                else:
-                    # Copy files, adding them to the list of output files.
-                    for data in f[1]:
-                        data = convert_path(data)  # return name that will work on the native filesystem
-                        if not os.path.exists(data):
-                            log.warn("WARNING the document {} cannot be found, installation skipped".format(data))
-                            continue
-                        if os.path.isdir(data):
-                            out = self.copy_tree(data, dir_)
-                            self.outfiles.extend(out)
-                        else:
-                            (out, _) = self.copy_file(data, dir_)
-                            self.outfiles.append(out)
-
-
-class install_doc(install_data):
-
-    _install.sub_commands += [('install_doc', lambda self: not self.no_doc)]
-
-    description = "installation directory for documentation files"
-
-    setattr(_install, 'install_doc', None)
-    setattr(_install, 'no_doc', None)
-
-    _install.user_options.append(('install-doc=', None, description))
-    _install.user_options.append(('no-doc', None, 'do not install documentation'))
-
-    user_options = [
-        ('install-doc=', 'd', "base directory for installing documentation files "
-                              "(default: installation base dir share/doc)"),
-        ('root=', None, "install everything relative to this alternate root directory"),
-        ('force', 'f', "force installation (overwrite existing files)"),
-        ('no-doc', None, 'do not install documentation')
-        ]
-
-    boolean_options = ['force']
-
-    def initialize_options(self):
-        install_data.initialize_options(self)
-        self.install_doc = None
-        self.no_doc = None
-        self.files_2_install = self.distribution.doc_files
-
-    def finalize_options(self):
-        inst = self.distribution.command_options.get('install')
-        inst = {} if inst is None else inst
-        self.install_dir = get_install_doc_dir(inst)
-        self.set_undefined_options('install',
-                                   ('root', 'root'),
-                                   ('force', 'force'),
-                                  )
-        self.prefix_data = self.install_dir
-        self.no_doc = inst.get('no_doc', ('command line', False))[1]
-
-    def run(self):
-        install_data.run(self)
-
-
 class UsageDistribution(Distribution):
 
     def __init__(self, attrs=None):
         #It's important to define potions before to call __init__
         #otherwise AttributeError: UsageDistribution instance has no attribute 'conf_files'
-        self.doc_files = None
+        #self.doc_files = None
         self.fix_prefix = None
         self.fix_scripts = None
         Distribution.__init__(self, attrs=attrs)
@@ -210,19 +97,6 @@ def get_install_data_dir(inst):
     return install_dir
 
 
-def get_install_doc_dir(inst):
-    if 'VIRTUAL_ENV' in os.environ:
-        inst['prefix'] = ('environment', os.environ['VIRTUAL_ENV'])
-
-    if 'install_doc' in inst:
-        install_dir = inst['install_doc'][1]
-    elif 'prefix' in inst:
-        install_dir = os.path.join(inst['prefix'][1], 'share', 'integron_finder', 'doc')
-    else:
-        install_dir = os.path.join('/', 'usr', 'share', 'integron_finder', 'doc')
-    return install_dir
-
-
 def subst_vars(src, dst, vars):
     try:
         src_file = open(src, "r")
@@ -239,6 +113,30 @@ def subst_vars(src, dst, vars):
                 dest_file.write(new_line)
 
 
+def expand_data(data_to_expand):
+    def remove_prefix(prefix, path):
+        prefix = os.path.normpath(prefix)
+        path = os.path.normpath(path)
+        to_keep = os.path.split(prefix)[1]
+        truncated = path[len(to_keep):]
+        if truncated.startswith(os.path.sep):
+            truncated = truncated[1:]
+        return truncated
+
+    data_struct = []
+    for base_dest_dir, src in data_to_expand:
+        base_dest_dir = os.path.normpath(base_dest_dir)
+        for one_src in src:
+            if os.path.isdir(one_src):
+                for path, _, files in os.walk(one_src):
+                    if not files:
+                        continue
+                    path_2_create = remove_prefix(one_src, path)
+                    data_struct.append((os.path.join(base_dest_dir, path_2_create), [os.path.join(path, f) for f in files]))
+            if os.path.isfile(one_src):
+                data_struct.append((base_dest_dir, [one_src]))
+    return data_struct
+
 
 ###################################################
 #                                                 #
@@ -247,7 +145,7 @@ def subst_vars(src, dst, vars):
 ###################################################
 
 setup(name='integron_finder',
-      version="1.5",
+      version="inject",
       description="Integron Finder aims at detecting integrons in DNA sequences",
       long_description="""Integron Finder aims at detecting integrons in DNA sequences
 by finding particular features of the integron:
@@ -265,27 +163,21 @@ by finding particular features of the integron:
           'Intended Audience :: Science/Research',
           'Scientific/Engineering :: Bio-Informatics'
           ],
-      install_requires=['numpy>=1.7.0',
-                        'matplotlib>=1.4.2',
-                        'pandas>=0.18.0',
-                        'biopython>=1.65',
-                        ],
+      #install_requires=['numpy>=1.7.0',
+      #                  'matplotlib>=1.4.2',
+      #                  'pandas>=0.18.0',
+      #                  'biopython>=1.65',
+      #                  ],
 
       scripts=['integron_finder'],
       #file where some variable must be fix by install
       fix_scripts=['integron_finder'],
-
       #(dataprefix +'where to put the data in the install, [where to find the data in the tar ball]
-      data_files=[('integron_finder/data/Functional_annotation', ['data/Functional_annotation/']),
-                  ('integron_finder/data/Models', ['data/Models/']),
-                  ],
-      doc_files=[('html', ['doc/build/html/']),
-                 ('pdf', ['doc/build/latex/IntegronFinder.pdf'])],
-      cmdclass={
-                'install_scripts': install_scripts,
-                'install_data': install_data,
-                'install_doc': install_doc,
-              },
+      data_files=expand_data([('share/integron_finder/data/', ['data']),
+                              ('share/integron_finder/doc/html', ['doc/build/html']),
+                              ('share/integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
+                             ]),
+      cmdclass={'install_scripts': install_scripts},
       distclass=UsageDistribution
       )
 
