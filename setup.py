@@ -84,6 +84,12 @@ Common commands: (see '--help-commands' for more)
 
 
 def get_install_data_dir(inst):
+    """
+    :param inst: iinstallation option
+    :type inst: dict
+    :return: the prefix where to install data
+    :rtype: string
+    """
     if 'VIRTUAL_ENV' in os.environ:
         inst['prefix'] = ('environment', os.environ['VIRTUAL_ENV'])
 
@@ -92,11 +98,20 @@ def get_install_data_dir(inst):
     elif 'prefix' in inst:
         install_dir = os.path.join(inst['prefix'][1], 'share')
     else:
-        install_dir = os.path.join('/', 'usr', 'share')
+        install_dir = os.path.join(sysconfig.get_path('data'), 'share')
     return install_dir
 
 
 def subst_vars(src, dst, vars):
+    """
+    substitute variables (string starting with $) in file
+    :param src: the file containing variable to substitute
+    :type src: string
+    :param dst: the destination file
+    :type dst: string
+    :param vars: the variables to substitute in dict key are variable name
+    :type vars: dict
+    """
     try:
         src_file = open(src, "r")
     except os.error as err:
