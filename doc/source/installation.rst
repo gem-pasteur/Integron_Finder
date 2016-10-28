@@ -95,7 +95,7 @@ Otherwise, you will have to install Biopython manually. ``pip`` is recommended a
 
     (sudo) pip install Biopython==1.65
 
-To install version 1.65 of Biopython (recommended fro IntegronFinder).
+To install version 1.65 of Biopython (recommended for IntegronFinder).
 
 .. note::
     If you don't manage to install all the packages, try googling the error, or don't hesisate to ask a question on `stackoverflow`_.

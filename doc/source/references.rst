@@ -19,7 +19,7 @@ Please cite also the following articles:
 
 - Hyatt, D., Chen, G.L., Locascio, P.F., Land, M.L., Larimer, F.W. and Hauser, L.J. (2010) Prodigal: prokaryotic gene recognition and translation initiation site identification. **BMC Bioinformatics**, 11, 119.
 
-and if you use functional annotation, cite the corresponding articles:
+and if you use ResFams, cite the corresponding articles:
 
 - Gibson, M.K., Forsberg, K.J. and Dantas, G. (2015) Improved annotation of antibiotic resistance determinants reveals microbial resistomes cluster by ecology. **ISME J**, 9, 207-216.
 
