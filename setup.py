@@ -6,6 +6,7 @@ if sys.version_info[0] == 3:
     sys.exit("Sorry, Python 3 is not supported yet")
 
 import os
+import sysconfig
 
 try:
     import warnings
