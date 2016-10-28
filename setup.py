@@ -24,8 +24,7 @@ from setuptools.command.install_scripts import install_scripts as _install_scrip
 class install_scripts(_install_scripts):
 
     def finalize_options(self):
-        inst = self.distribution.command_options.get('install')
-        inst = {} if inst is None else inst
+        inst = self.distribution.command_options.get('install', {})
         _install_scripts.finalize_options(self)
 
     def run(self):
@@ -54,8 +53,7 @@ class install_scripts(_install_scripts):
         if installer == 'fucking_setuptools':
             _install_scripts.run(self)
 
-        inst = self.distribution.command_options.get('install')
-        inst = {} if inst is None else inst
+        inst = self.distribution.command_options.get('install', {})
         if self.distribution.fix_scripts is not None:
             vars_2_subst = {'PREFIX': inst['prefix'][1] if 'prefix' in inst else '',
                             'PREFIXDATA': os.path.join(get_install_data_dir(inst), 'integron_finder'),
