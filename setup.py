@@ -172,7 +172,7 @@ def expand_data(data_to_expand):
 ###################################################
 
 setup(name='integron_finder',
-      version="inject",
+      version="1.5.1",
       description="Integron Finder aims at detecting integrons in DNA sequences",
       long_description="""Integron Finder aims at detecting integrons in DNA sequences
 by finding particular features of the integron:
