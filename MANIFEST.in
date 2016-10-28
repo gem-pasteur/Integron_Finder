@@ -6,4 +6,6 @@ recursive-include doc/build/html *
 include doc/build/latex/IntegronFinder.pdf
 
 include README.md
+include COPYING
+include COPYRIGHT
 include requirements.txt
