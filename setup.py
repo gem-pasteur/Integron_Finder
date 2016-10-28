@@ -190,11 +190,11 @@ by finding particular features of the integron:
           'Intended Audience :: Science/Research',
           'Scientific/Engineering :: Bio-Informatics'
           ],
-      #install_requires=['numpy>=1.7.0',
-      #                  'matplotlib>=1.4.2',
-      #                  'pandas>=0.18.0',
-      #                  'biopython>=1.65',
-      #                  ],
+      install_requires=['numpy>=1.7.0',
+                        'matplotlib>=1.4.2',
+                        'pandas>=0.18.0',
+                        'biopython>=1.65',
+                        ],
 
       scripts=['integron_finder'],
       #file where some variable must be fix by install
