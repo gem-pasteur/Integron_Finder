@@ -41,28 +41,10 @@ IntegronFinder.
 Installation procedure
 ======================
 
-Using pip (recommended)
------------------------
-
 1. Download the `latest release`_
 2. In a shell (*e.g.* a terminal), start installation with::
 
     (sudo) python pip install integron_finder-x.x.tar.gz
-
-
-Using setuptools
-----------------
-
-1. Download the `latest release`_
-2. Uncompress it
-3. In a shell (*e.g.* a terminal), go to the directory::
-
-     cd integron_finder-x.x/
-
-4. Start installation with::
-
-      (sudo) python setup.py install
-
 
 .. note::
   Super-user privileges (*i.e.*, ``sudo``) are necesserary if you want to
@@ -78,24 +60,18 @@ Using setuptools
   When installing a new version of IntegronFinder, do not forget to uninstall
   the previous version installed !
 
+.. warning::
+    The installer does not work with pure setuptools procedure.
+
+
 Uninstallation procedure
 =========================
-
-If you install integron_finder with pip
----------------------------------------
 
 To uninstall integron_finder, run in the following command::
 
     (sudo) pip uninstall integron_finder
 
 It will uninstall integron_finder executable
-but You have to remove $PREFIX/share/integron_finder by hands.
-
-If you install integron_finder with setup.py
---------------------------------------------
-
-.. warning::
-    There is no deinstallation procedure with setup.py
 
 .. _python_install:
 
