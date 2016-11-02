@@ -1,6 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+####################################################################################
+# Integron_Finder - Integron Finder aims at detecting integrons in DNA sequences   #
+# by finding particular features of the integron:                                  #
+#   - the attC sites                                                               #
+#   - the integrase                                                                #
+#   - and when possible attI site and promoters.                                   #
+#                                                                                  #
+# Authors: Jean Cury, Bertrand Néron, Eduardo PC Rocha                             #
+# Copyright © 2015 - 2016  Institut Pasteur, Paris.                                #
+# See the COPYRIGHT file for details                                               #
+#                                                                                  #
+# Integron_Finder is distributed under the terms of the GNU General Public License #
+# (GPLv3). See the COPYING file for details.                                       #
+####################################################################################
+
 
 """
 integron_finder is a program that looks for integron in DNA sequences.

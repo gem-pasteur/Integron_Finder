@@ -1,0 +1,31 @@
+Integron_Finder - Integron Finder aims at detecting integrons in DNA sequences
+by finding particular features of the integron:
+  - the attC sites
+  - the integrase
+  - and when possible attI site and promoters.
+Copyright © 2016 Institut Pasteur (Paris) and CNRS.
+------------------------------------------------------------------
+
+Citation: 
+
+Identification and analysis of integrons and cassette arrays in bacterial genomes
+Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
+Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
+
+-----------------------------------------------------------------
+The source code of Integron_Finder is distributed
+under the terms of the GNU GeneralPublic License. 
+See the file COPYING for details.
+
+This program are free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation version 3 of the License.
+
+These programs are distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License is in the file COPYING.  You
+may also obtain a copy from <http://www.gnu.org/licenses/>.
+
