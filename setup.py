@@ -187,6 +187,7 @@ by finding particular features of the integron:
           'Environment :: Console',
           'Operating System :: POSIX',
           'Programming Language :: Python :: 2',
+          'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
           'Intended Audience :: Science/Research',
           'Scientific/Engineering :: Bio-Informatics'
           ],
