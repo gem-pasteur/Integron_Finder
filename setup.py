@@ -178,10 +178,18 @@ setup(name='integron_finder',
 by finding particular features of the integron:
   - the attC sites
   - the integrase
-  - and when possible attI site and promoters.""",
+  - and when possible attI site and promoters.
+
+integron_finder has been describe in a paper published in Nucleic Acid Research.
+
+Identification and analysis of integrons and cassette arrays in bacterial genomes.
+Jean Cury; Thomas Jove; Marie Touchon; Bertrand Néron; Eduardo PC Rocha
+Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
+""",
       author="Jean Cury",
       author_email="jean.cury@normalesup.org",
       url="https://github.com/gem-pasteur/Integron_Finder/",
+      download_url = 'https://github.com/gem-pasteur/Integron_Finder/archive/v1.5.1.tar.gz',
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
