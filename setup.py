@@ -189,7 +189,7 @@ by finding particular features of the integron:
           'Programming Language :: Python :: 2',
           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
           'Intended Audience :: Science/Research',
-          'Scientific/Engineering :: Bio-Informatics'
+          'Topic :: Scientific/Engineering :: Bio-Informatics'
           ],
       install_requires=['numpy>=1.7.0',
                         'matplotlib>=1.4.2',
