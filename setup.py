@@ -182,6 +182,7 @@ by finding particular features of the integron:
       author="Jean Cury",
       author_email="jean.cury@normalesup.org",
       url="https://github.com/gem-pasteur/Integron_Finder/",
+      license="GPLv3",
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
