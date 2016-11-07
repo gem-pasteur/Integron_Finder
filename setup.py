@@ -56,7 +56,7 @@ class install_scripts(_install_scripts):
         inst = self.distribution.command_options.get('install', {})
         if self.distribution.fix_scripts is not None:
             vars_2_subst = {'PREFIX': inst['prefix'][1] if 'prefix' in inst else '',
-                            'PREFIXDATA': os.path.join(get_install_data_dir(inst), 'integron_finder'),
+                            'PREFIXSHARE': os.path.join(get_install_data_dir(inst), 'integron_finder'),
                             'VERSION': self.distribution.get_version(),
                             }
             for _file in self.distribution.fix_scripts:

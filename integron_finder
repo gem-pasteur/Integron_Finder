@@ -1389,12 +1389,14 @@ if __name__ == "__main__":
 
     ############### setup ###############
 
-    _prefix_data = '$PREFIXDATA'
+    _prefix_share = '$PREFIXSHARE'
 
     # integron was not installed using the setup.py
     # it's a developement version using environment variable
     if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
-        _prefix_data = os.path.join(os.environ['INTEGRON_HOME'], 'data')
+        _prefix_share = os.environ['INTEGRON_HOME']
+
+    _prefix_data = os.path.join(_prefix_share, 'data')
 
     if not os.path.exists(_prefix_data):
         raise Exception("""cannot find integron_finder data check your installation
