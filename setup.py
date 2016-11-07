@@ -184,12 +184,12 @@ integron_finder has been describe in a paper published in Nucleic Acid Research.
 
 Identification and analysis of integrons and cassette arrays in bacterial genomes.
 Jean Cury; Thomas Jove; Marie Touchon; Bertrand Néron; Eduardo PC Rocha
-Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
+Nucleic Acids Research 2016; doi:10.1093/nar/gkw319
 """,
       author="Jean Cury",
       author_email="jean.cury@normalesup.org",
       url="https://github.com/gem-pasteur/Integron_Finder/",
-      download_url = 'https://github.com/gem-pasteur/Integron_Finder/archive/v1.5.1.tar.gz',
+      download_url='https://github.com/gem-pasteur/Integron_Finder/archive/v1.5.1.tar.gz',
       license="GPLv3",
       classifiers=[
           'Development Status :: 5 - Production/Stable',
