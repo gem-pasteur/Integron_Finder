@@ -85,13 +85,17 @@ Common commands: (see '--help-commands' for more)
 
 def get_install_data_dir(inst):
     """
-    :param inst: iinstallation option
+    :param inst: installation option
     :type inst: dict
     :return: the prefix where to install data
     :rtype: string
     """
+
     if 'VIRTUAL_ENV' in os.environ:
         inst['prefix'] = ('environment', os.environ['VIRTUAL_ENV'])
+    elif 'user' in inst:
+        import site
+        inst['prefix'] = ('command line', site.USER_BASE)
 
     if 'install_data' in inst:
         install_dir = inst['install_data'][1]
