@@ -96,6 +96,12 @@ def get_install_data_dir(inst):
     elif 'user' in inst:
         import site
         inst['prefix'] = ('command line', site.USER_BASE)
+    elif 'root' in inst:
+        inst['prefix'] = ('command line',
+                          os.path.join(inst['root'][1],
+                                       sysconfig.get_path('data').strip(os.path.sep)
+                                       )
+                          )
 
     if 'install_data' in inst:
         install_dir = inst['install_data'][1]
@@ -176,7 +182,7 @@ def expand_data(data_to_expand):
 ###################################################
 
 setup(name='integron_finder',
-      version="1.5.1.RC1",
+      version="1.5.1rc3",
       description="Integron Finder aims at detecting integrons in DNA sequences",
       long_description="""Integron Finder aims at detecting integrons in DNA sequences
 by finding particular features of the integron:
