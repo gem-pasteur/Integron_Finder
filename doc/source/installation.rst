@@ -61,7 +61,9 @@ Installation procedure
   the previous version installed !
 
 .. warning::
-    The installer does not work with pure setuptools procedure.
+    The installer does not work with pure setuptools procedure, it does not work in egg. 
+    Unless you disable egg by using the ``--root`` option.
+    ``python setup.py install --root /prefix/where/to/install/integron_finder``
 
 
 Uninstallation procedure
