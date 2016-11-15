@@ -41,7 +41,7 @@ Installation procedure
 ======================
 
 .. warning::
-    When installing a new version of IntegronFinder, do not forget to :ref:`uninstall <uninstallation>` the previous version installed !
+    When installing a new version (up to 1.5.1 included) of IntegronFinder, do not forget to :ref:`uninstall <uninstallation>` the previous version installed !
 
 From Version 1.5.1 and after
 ----------------------------
@@ -50,8 +50,12 @@ From Version 1.5.1 and after
 
     (sudo) pip install integron_finder
 
+2. To get a updated version (no need to uninstall)::
+
+    (sudo) pip install -U integron_finder
+
 For Version 1.5 and before
--------------------------------
+--------------------------
 
 1. Download the `latest release`_
 2. Uncompress it
