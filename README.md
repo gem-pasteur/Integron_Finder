@@ -1,4 +1,4 @@
-[![install](https://img.shields.io/github/downloads/gem-pasteur/Integron_finder/total.svg)](https://github.com/gem-pasteur/Integron_Finder/releases/latest) [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](http://integronfinder.readthedocs.io/en/v1.5/) [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0)
+[![install](https://img.shields.io/github/downloads/gem-pasteur/Integron_finder/total.svg)](https://github.com/gem-pasteur/Integron_Finder/releases/latest) [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest) [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0)
 
 Integron Finder
 ===============
@@ -7,7 +7,7 @@ Find integrons in DNA sequences
 
 See the [latest release](https://github.com/gem-pasteur/Integron_Finder/releases/latest) to download the program. Or, use it online on the [Mobyle Webserver](http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder)
 
-See Documentation for how to install it and how to use it: [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](http://integronfinder.readthedocs.io/en/v1.5/)
+See Documentation for how to install it and how to use it: [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest)
 
 # Licence:
 
