@@ -50,14 +50,14 @@ From Version 1.5.1 and after
 
     (sudo) pip install integron_finder
 
-2. To get a updated version (no need to uninstall)::
+2. To get an updated version (no need to uninstall)::
 
     (sudo) pip install -U integron_finder
 
 For Version 1.5 and before
 --------------------------
 
-1. Download the `latest release`_
+1. Download the `latest release`_ that can be installed like this (v1.5)
 2. Uncompress it
 3. In a shell (*e.g.* a terminal), go to the directory and run::
 
@@ -135,6 +135,6 @@ To install version 1.65 of Biopython (recommended for IntegronFinder).
 .. _`HMMER 3.1b1`: http://hmmer.janelia.org/
 .. _`INFERNAL 1.1`: http://infernal.janelia.org/
 .. _`Prodigal V2.6.2`: https://github.com/hyattpd/Prodigal/releases
-.. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/latest
+.. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/tag/v1.5.0
 .. _`virtualenv`: http://www.virtualenv.org/
 .. _`Canopy CLI`: http://docs.enthought.com/canopy/configure/canopy-cli.html#canopy-cli-venv
