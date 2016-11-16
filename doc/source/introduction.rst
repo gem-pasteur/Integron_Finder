@@ -34,7 +34,7 @@ positions.
   - In0 element (panel C  above)
       Integron integrase only, without any *attC* site nearby
   - CALIN element (panel D above)
-      *attC* sites only, without integron integrase nearby.
+      **C**luster of ***a****ttC* sites **l**acking **in**tegrase nearby.
       A rule of thumb to avoid false positive is to filter out singleton of
       *attC* site.
 
@@ -50,7 +50,7 @@ matching.
 
 **Does it work ?**
 
-Yes! The estimated sensitivity is 61% on average with the default option and goes up to 88% with the ``--local_max`` option. The missing *attC* sites are usually at the end of the array.  The False positive rate with the ``--local_max`` option is estimated between 0.03 False Positive per Megabases (FP/Mb) to 0.72 FP/Mb. This leads to a probability of finding 2 consecutive *attC* sites within 4kb between 4.10^-6 and 7.10^-9. Finally, this parameters do not depend on the G+C percent of the given replicon.
+Yes! The estimated sensitivity is 61% on average with the default option and goes up to 88% with the ``--local_max`` option. The missing *attC* sites are usually at the end of the array.  The False positive rate with the ``--local_max`` option is estimated between 0.03 False Positive per Megabases (FP/Mb) to 0.72 FP/Mb. This leads to a probability of finding 2 consecutive false *attC* sites within 4kb between 4.10^-6 and 7.10^-9. Overall, the probability of finding an integron in a chromosome (including finding a part of it) is more than 95%.  Finally, these parameters do not depend on the G+C percent of the given replicon. See the `paper`_ for more information (freely accessible).
 
 |benchmark|
 
@@ -58,6 +58,9 @@ The time in the table correspond to the average time per run with a pseudogenome
 
 .. Note::
     The time does not vary depending of the mode (default or local_max), and is about a couple of second, if the replicon does not contain any *attC* site.
+
+
+.. _`paper`: http://nar.oxfordjournals.org/cgi/content/full/gkw319
 
 
 .. |benchmark| image:: _static/benchmark.*
