@@ -34,7 +34,7 @@ positions.
   - In0 element (panel C  above)
       Integron integrase only, without any *attC* site nearby
   - CALIN element (panel D above)
-      **C**luster of ***a****ttC* sites **l**acking **in**tegrase nearby.
+      Cluster of *attC* sites Lacking INtegrase nearby.
       A rule of thumb to avoid false positive is to filter out singleton of
       *attC* site.
 
