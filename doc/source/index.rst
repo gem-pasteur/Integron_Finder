@@ -20,6 +20,7 @@ The program is available on a webserver :ref:`(Mobyle) <mobyle>`, or by command 
    installation
    tutorial
    mobyle
+   galaxy
    references
 
 ..
