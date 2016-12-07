@@ -5,7 +5,7 @@ Integron Finder
 
 Finds integrons in DNA sequences
 
-You can use it in command line, see installation below, or, you can use it online on the [Mobyle Webserver](http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder)(closing end of 2016) and [Galaxy Pasteur](https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F1.5.1).
+You can use it in command line, see installation below, or, you can use it online on the [Mobyle Webserver](http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder) (closing end of 2016) and [Galaxy Pasteur](https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F1.5.1).
 
 See Documentation for how to use it: [![Doc] (https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest)
 
@@ -109,7 +109,7 @@ A folder name Results\_id\_genome, inside there are different files :
 
 You can use this program without installing it, through two webservers:
 
-* [Mobyle](http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder)(closing end of 2016)
+* [Mobyle](http://mobyle.pasteur.fr/cgi-bin/portal.py#forms::integron_finder) (closing end of 2016)
 * [Galaxy Pasteur](https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F1.5.1)
 
 # Citation
