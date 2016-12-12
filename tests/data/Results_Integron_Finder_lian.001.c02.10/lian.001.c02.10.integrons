@@ -1,0 +1,169 @@
+ID_integron	ID_replicon	element	pos_beg	pos_end	strand	evalue	type_elt	annotation	model	type	default	distance_2attC
+integron_01	lian.001.c02.10	LIAN.001.C02_10_1	556	771	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_2	768	1085	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_043	1228	1353	1	3.200e-03	attC	attC	attc_4	complete	Yes	8008.0
+integron_01	lian.001.c02.10	attc_044	1780	1906	1	2.300e-01	attC	attC	attc_4	complete	Yes	427.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_3	1933	2058	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_045	2913	3038	1	1.700e-02	attC	attC	attc_4	complete	Yes	1007.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_4	3759	4157	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_5	4539	6080	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_6	6140	6493	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_7	6490	6807	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_046	6902	7027	1	3.100e-03	attC	attC	attc_4	complete	Yes	3864.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_8	7102	7308	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_9	7428	7658	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_047	7738	7865	1	4.900e-04	attC	attC	attc_4	complete	Yes	711.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_10	7952	8188	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_048	8289	8416	1	3.700e-02	attC	attC	attc_4	complete	Yes	424.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_11	8473	8961	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_049	8971	9096	1	1.300e-02	attC	attC	attc_4	complete	Yes	555.0
+integron_01	lian.001.c02.10	attc_050	9524	9650	1	5.200e-04	attC	attC	attc_4	complete	Yes	428.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_12	9671	10168	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_13	10165	10437	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_051	10527	10652	1	3.100e-02	attC	attC	attc_4	complete	Yes	877.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_14	11188	11967	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_15	11964	12884	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_16	12983	13276	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_052	13271	13398	1	6.400e-04	attC	attC	attc_4	complete	Yes	2619.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_17	13525	13938	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_825	934165	934689	-1	1.100e-26	protein	intI	intersection_tyr_intI	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_826	934701	936242	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_827	936251	936655	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_828	936652	936969	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_001	937239	937364	1	8.900e-04	attC	attC	attc_4	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_829	937435	938100	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_002	938558	938684	1	1.000e-03	attC	attC	attc_4	complete	Yes	1194.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_830	938704	938979	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_003	938974	939099	1	3.500e-01	attC	attC	attc_4	complete	Yes	290.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_831	939338	940426	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_832	941513	941611	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_833	941692	942195	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_834	942775	943260	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_004	943270	943395	1	2.600e-01	attC	attC	attc_4	complete	Yes	4171.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_835	943474	943725	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_836	943715	944002	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_005	944008	944133	1	9.800e-02	attC	attC	attc_4	complete	Yes	613.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_837	944152	944313	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_006	944472	944598	1	9.500e-06	attC	attC	attc_4	complete	Yes	339.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_838	944666	944842	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_839	945737	946393	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_840	946546	946890	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_841	947041	947589	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_842	948276	948557	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_843	949243	949776	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_844	949773	950042	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_845	950423	950539	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_846	950723	951238	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_847	951597	952031	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_848	952066	952299	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_007	952855	952980	1	9.500e-03	attC	attC	attc_4	complete	Yes	8257.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_849	953176	953418	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_850	953405	953854	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_851	954271	954780	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_008	954775	954901	1	3.500e-03	attC	attC	attc_4	complete	Yes	1795.0
+integron_01	lian.001.c02.10	attc_009	955328	955454	1	1.200e-02	attC	attC	attc_4	complete	Yes	427.0
+integron_01	lian.001.c02.10	attc_010	955790	955916	1	9.600e-04	attC	attC	attc_4	complete	Yes	336.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_852	955931	956704	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_011	956699	956824	1	9.400e-03	attC	attC	attc_4	complete	Yes	783.0
+integron_01	lian.001.c02.10	attc_012	957173	957292	1	3.500e-01	attC	attC	attc_4	complete	Yes	349.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_853	957313	957870	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_854	958034	958195	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_013	958351	958477	1	9.500e-06	attC	attC	attc_4	complete	Yes	1059.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_855	958540	958656	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_014	958812	958938	1	8.100e-05	attC	attC	attc_4	complete	Yes	335.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_856	958955	959692	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_015	959687	959813	1	4.000e-01	attC	attC	attc_4	complete	Yes	749.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_857	959876	959992	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_016	960148	960274	1	6.700e-03	attC	attC	attc_4	complete	Yes	335.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_858	960387	960635	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_017	960727	960852	1	1.000e-01	attC	attC	attc_4	complete	Yes	453.0
+integron_01	lian.001.c02.10	attc_018	961280	961406	1	2.000e-02	attC	attC	attc_4	complete	Yes	428.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_859	961422	961967	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_860	962100	962615	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_019	962618	962744	1	1.400e-04	attC	attC	attc_4	complete	Yes	1212.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_861	962807	962923	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_020	963081	963207	1	8.100e-05	attC	attC	attc_4	complete	Yes	337.0
+integron_01	lian.001.c02.10	attc_021	963546	963671	1	6.900e-03	attC	attC	attc_4	complete	Yes	339.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_862	963734	963850	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_022	964008	964134	1	6.700e-03	attC	attC	attc_4	complete	Yes	337.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_863	964167	964448	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_023	964500	964626	1	5.800e-04	attC	attC	attc_4	complete	Yes	366.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_864	964701	964907	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_865	965027	965257	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_024	965337	965464	1	4.100e-02	attC	attC	attc_4	complete	Yes	711.0
+integron_01	lian.001.c02.10	attc_025	965801	965927	1	3.200e-02	attC	attC	attc_4	complete	Yes	337.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_866	965941	966477	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_867	967159	967500	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_868	967655	968014	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_026	968009	968135	1	2.700e-03	attC	attC	attc_4	complete	Yes	2082.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_869	968161	968328	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_027	968978	969103	1	1.400e-01	attC	attC	attc_4	complete	Yes	843.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_870	969191	970114	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_871	970111	970509	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_028	970517	970644	1	6.300e-02	attC	attC	attc_4	complete	Yes	1414.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_872	971487	971621	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_873	971690	972169	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_029	972347	972472	1	1.200e-03	attC	attC	attc_4	complete	Yes	1703.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_874	972529	972651	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_030	972808	972934	1	8.100e-05	attC	attC	attc_4	complete	Yes	336.0
+integron_01	lian.001.c02.10	attc_031	973330	973456	1	3.300e-05	attC	attC	attc_4	complete	Yes	396.0
+integron_01	lian.001.c02.10	attc_032	973852	973978	1	7.400e-02	attC	attC	attc_4	complete	Yes	396.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_875	973992	974435	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_033	974437	974563	1	2.100e-03	attC	attC	attc_4	complete	Yes	459.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_876	974628	975314	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_877	975453	975614	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_034	975770	975896	1	3.300e-03	attC	attC	attc_4	complete	Yes	1207.0
+integron_01	lian.001.c02.10	attc_035	976324	976451	1	1.500e-02	attC	attC	attc_4	complete	Yes	428.0
+integron_01	lian.001.c02.10	attc_036	976787	976913	1	8.100e-05	attC	attC	attc_4	complete	Yes	336.0
+integron_01	lian.001.c02.10	attc_037	977309	977435	1	2.800e-03	attC	attC	attc_4	complete	Yes	396.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_878	977498	977614	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_038	977771	977897	1	3.200e-02	attC	attC	attc_4	complete	Yes	336.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_879	977865	978446	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_039	978441	978567	1	1.900e-01	attC	attC	attc_4	complete	Yes	544.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_880	978582	979172	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_881	979461	979670	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_882	979889	980005	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_040	980161	980286	1	7.900e-05	attC	attC	attc_4	complete	Yes	1594.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_883	980323	980763	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_041	980764	980890	1	1.700e-02	attC	attC	attc_4	complete	Yes	478.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_884	980874	981071	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	attc_042	981228	981354	1	5.200e-04	attC	attC	attc_4	complete	Yes	338.0
+integron_01	lian.001.c02.10	LIAN.001.C02_10_885	981368	981547	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_886	981540	982400	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_887	982321	982920	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_888	983787	983903	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_889	984087	984554	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_890	984921	985220	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_891	985842	986201	-1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_892	987401	987685	1	nan	protein	protein	NA	complete	Yes	
+integron_01	lian.001.c02.10	LIAN.001.C02_10_893	987682	987960	1	nan	protein	protein	NA	complete	Yes	
+integron_02	lian.001.c02.10	attc_001	945053	945179	-1	2.000e-02	attC	attC	attc_4	attC0	Yes	
+integron_02	lian.001.c02.10	LIAN.001.C02_10_839	945737	946393	-1	nan	protein	protein	NA	attC0	Yes	
+integron_02	lian.001.c02.10	LIAN.001.C02_10_840	946546	946890	-1	nan	protein	protein	NA	attC0	Yes	
+integron_02	lian.001.c02.10	attc_002	946915	947041	-1	3.600e-02	attC	attC	attc_4	attC0	Yes	1736.0
+integron_02	lian.001.c02.10	LIAN.001.C02_10_841	947041	947589	-1	nan	protein	protein	NA	attC0	Yes	
+integron_02	lian.001.c02.10	attc_003	948097	948224	-1	1.000e-01	attC	attC	attc_4	attC0	Yes	1056.0
+integron_02	lian.001.c02.10	LIAN.001.C02_10_842	948276	948557	-1	nan	protein	protein	NA	attC0	Yes	
+integron_02	lian.001.c02.10	attc_004	948590	948716	-1	2.800e-03	attC	attC	attc_4	attC0	Yes	366.0
+integron_02	lian.001.c02.10	attc_005	949110	949235	-1	7.500e-03	attC	attC	attc_4	attC0	Yes	394.0
+integron_02	lian.001.c02.10	LIAN.001.C02_10_843	949243	949776	-1	nan	protein	protein	NA	attC0	Yes	
+integron_02	lian.001.c02.10	LIAN.001.C02_10_844	949773	950042	-1	nan	protein	protein	NA	attC0	Yes	
+integron_02	lian.001.c02.10	attc_006	950142	950268	-1	6.700e-03	attC	attC	attc_4	attC0	Yes	907.0
+integron_02	lian.001.c02.10	LIAN.001.C02_10_845	950423	950539	1	nan	protein	protein	NA	attC0	Yes	
+integron_02	lian.001.c02.10	attc_007	950605	950725	-1	4.600e-01	attC	attC	attc_4	attC0	Yes	337.0
+integron_02	lian.001.c02.10	LIAN.001.C02_10_846	950723	951238	-1	nan	protein	protein	NA	attC0	Yes	
+integron_03	lian.001.c02.10	attc_001	983504	983630	-1	2.800e-02	attC	attC	attc_4	attC0	Yes	
+integron_03	lian.001.c02.10	LIAN.001.C02_10_888	983787	983903	1	nan	protein	protein	NA	attC0	Yes	
+integron_03	lian.001.c02.10	attc_002	983965	984092	-1	3.100e-05	attC	attC	attc_4	attC0	Yes	335.0
+integron_03	lian.001.c02.10	LIAN.001.C02_10_889	984087	984554	-1	nan	protein	protein	NA	attC0	Yes	
+integron_03	lian.001.c02.10	attc_003	984584	984710	-1	1.700e-02	attC	attC	attc_4	attC0	Yes	492.0
+integron_03	lian.001.c02.10	LIAN.001.C02_10_890	984921	985220	-1	nan	protein	protein	NA	attC0	Yes	
+integron_03	lian.001.c02.10	attc_004	985188	985314	-1	1.100e-01	attC	attC	attc_4	attC0	Yes	478.0
+integron_03	lian.001.c02.10	attc_005	985720	985847	-1	2.600e-01	attC	attC	attc_4	attC0	Yes	406.0
+integron_03	lian.001.c02.10	LIAN.001.C02_10_891	985842	986201	-1	nan	protein	protein	NA	attC0	Yes	
+integron_03	lian.001.c02.10	attc_006	986232	986358	-1	3.300e-05	attC	attC	attc_4	attC0	Yes	385.0
+integron_03	lian.001.c02.10	attc_007	986755	986881	-1	8.100e-05	attC	attC	attc_4	attC0	Yes	397.0
+integron_03	lian.001.c02.10	attc_008	987217	987343	-1	2.300e-03	attC	attC	attc_4	attC0	Yes	336.0
+integron_03	lian.001.c02.10	LIAN.001.C02_10_892	987401	987685	1	nan	protein	protein	NA	attC0	Yes	
+integron_03	lian.001.c02.10	LIAN.001.C02_10_893	987682	987960	1	nan	protein	protein	NA	attC0	Yes	
+integron_03	lian.001.c02.10	attc_009	987976	988101	-1	9.500e-04	attC	attC	attc_4	attC0	Yes	633.0
