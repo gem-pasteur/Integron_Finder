@@ -1,0 +1,21 @@
+language: python
+python:
+  - "2.7"
+# Apply only on main branches
+branches:
+  except:
+       - /^feature.*$/
+
+# command to install Ubuntu dependencies
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get -y --no-install-recommends prodigal infernal hmmer
+  - sudo apt-get -y install python-pip python-numpy python-matplotlib python-biopython
+  - cd -
+
+# command to run tests
+script:
+- python setup.py sdist
+- pip install sdist/integron_finder*.tar.gz
+- python tests/run_tests.py -vv
+
