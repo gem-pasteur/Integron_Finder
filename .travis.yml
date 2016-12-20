@@ -12,7 +12,7 @@ before_install:
   - sudo apt-get -y install python-pip python-numpy python-matplotlib python-biopython
   
   - wget https://github.com/hyattpd/Prodigal/archive/v2.6.1.tar.gz
-  - tar -xf Prodigal-2.6.2.tar.gz
+  - tar -xf v2.6.2.tar.gz
   - cd Prodigal-2.6.2 && make && sudo make install
   
   - wget  http://eddylab.org/software/infernal/infernal-1.1.2.tar.gz
