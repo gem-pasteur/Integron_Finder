@@ -9,8 +9,11 @@ branches:
 # command to install Ubuntu dependencies
 before_install:
   - sudo apt-get update
-  - sudo apt-get -y --no-install-recommends prodigal infernal hmmer
+  - sudo apt-get -y --no-install-recommends infernal hmmer
   - sudo apt-get -y install python-pip python-numpy python-matplotlib python-biopython
+  - wget https://github.com/hyattpd/Prodigal/archive/v2.6.1.tar.gz
+  - tar -xf Prodigal-2.6.2.tar.gz
+  - cd Prodigal-2.6.2 && make && sudo make install
   - cd -
 
 # command to run tests
