@@ -29,6 +29,6 @@ before_install:
 # command to run tests
 script:
 - python setup.py sdist
-- pip install sdist/integron_finder*.tar.gz
+- pip install dist/integron_finder*.tar.gz
 - python tests/run_tests.py -vv
 
