@@ -1,5 +1,6 @@
 #! /usr/bin/env python2
 # -*- coding: utf-8 -*-
+
 from __future__ import print_function
 
 import unittest
@@ -104,6 +105,11 @@ if __name__ == '__main__':
             INTEGRON_HOME = os.environ['INTEGRON_HOME']
             if INTEGRON_HOME not in sys.path:
                 sys.path.insert(0, INTEGRON_HOME)
+        else:
+            # We test an installed version of integronfinder
+            # integron library are in syspath
+            # but we need the tests module
+            sys.path.append(os.abspath(os.path.dirname(__file__)))
         test_runner = run_unittests(args.tests, verbosity=args.verbosity)
         unit_results = test_runner.wasSuccessful()
         result_all_tests.append(unit_results)
