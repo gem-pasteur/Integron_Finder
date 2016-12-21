@@ -7,6 +7,7 @@ import unittest
 import sys
 import os
 
+
 def _run(test_files, test_root_path, verbosity=0):
     if not test_files:
         suite = unittest.TestLoader().discover(test_root_path, pattern="test_*.py")
@@ -96,36 +97,42 @@ if __name__ == '__main__':
     result_all_tests = []
 
     old_path = sys.path
-    INTEGRON_HOME = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
         INTEGRON_HOME = os.environ['INTEGRON_HOME']
         if INTEGRON_HOME not in sys.path:
             sys.path.insert(0, INTEGRON_HOME)
     else:
-
-        # we are in the case where we tests an installed integron_finder
-        # so the libraries are already in PYTHONPATH
-        # but test are not
-        # we must had tests parent dir in PYTHONPATH
-        # but after the standard libraries containing integron_finder
-        # as we want to run integron_finder using installed libraries
-        if INTEGRON_HOME not in sys.path:
-            sys.path.append(INTEGRON_HOME)
-
-    ############## WORKAROUND ##################
-    integron_finder_script = os.path.join(INTEGRON_HOME, 'integron.finder')
-    integron_finder_lib = os.path.join(INTEGRON_HOME, 'integron.finder.py')
-    remove_link = False
-    if not os.path.exists(integron_finder_lib):
-        os.symlink(integron_finder_script, integron_finder_lib)
-        remove_link = True
-    ############ END WORKAROUND ################
-
+        # the test directory is automatically added by python
+        # in sys.path as first element
+        pass
 
     if args.unit:
         print("\n", "#" * 70, sep='')
         print("Test Runner: Unit tests")
         print("#" * 70)
+
+        ############## WORKAROUND ##################
+        # integron_finder is a script not a lib
+        # to test each function in integron_finder,
+        # we need to import integron_finder
+        # so we need to transform the script in lib
+        # and ad it to the path somewhere a user can write
+        # the fisrt element of path is integron_finder.tests
+
+        if not 'INTEGRON_HOME' in os.environ:
+            INTEGRON_HOME = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            sys.path.append(INTEGRON_HOME)
+        from tests import which
+
+        integron_finder_script = which('integron_finder')
+        fake_lib = os.path.join(INTEGRON_HOME, 'tests', 'fake_lib')
+        integron_finder_lib = os.path.join(fake_lib, 'integron_finder.py')
+        if not os.path.exists(fake_lib):
+            os.mkdir(fake_lib)
+        if not os.path.exists(integron_finder_lib):
+            os.symlink(integron_finder_script, integron_finder_lib)
+        sys.path.insert(0, fake_lib)
+        ############ END WORKAROUND ################
 
         test_runner = run_unittests(args.tests, verbosity=args.verbosity)
         unit_results = test_runner.wasSuccessful()
@@ -141,10 +148,6 @@ if __name__ == '__main__':
         result_all_tests.append(functional_results)
 
     sys.path = old_path
-    ############## WORKAROUND ##################
-    if remove_link:
-        os.unlink(integron_finder_lib)
-    ############ END WORKAROUND ################
     if all(result_all_tests):
         sys.exit(0)
     else:

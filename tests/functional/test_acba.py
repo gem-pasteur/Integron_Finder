@@ -7,7 +7,6 @@ import os
 import sys
 from subprocess import Popen, PIPE
 
-
 from tests import IntegronTest, which
 
 
@@ -46,10 +45,13 @@ class Test(IntegronTest):
                                                                   python_exe=sys.executable,
                                                                   bin=self.bin,
                                                                   out_dir=self.out_dir,
-                                                                  replicon=os.path.join(os.path.dirname(__file__),
-                                                                                        '..', 'data',
-                                                                                        'acba.007.p01.13.fst')
+                                                                  replicon=os.path.normpath(
+                                                                      os.path.join(os.path.dirname(__file__),
+                                                                                   '..',
+                                                                                   'data',
+                                                                                   'acba.007.p01.13.fst')
                                                                   )
+        )
         print("\n", command)
         if not self.bin:
             raise RuntimeError('coverage not found, INTEGRON_HOME must be either in your path or INTEGRON_HOME'
