@@ -95,51 +95,42 @@ if __name__ == '__main__':
 
     result_all_tests = []
 
+    old_path = sys.path
+    home_tests = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
+        INTEGRON_HOME = os.environ['INTEGRON_HOME']
+        if INTEGRON_HOME not in sys.path:
+            sys.path.insert(0, INTEGRON_HOME)
+    else:
+
+        # we are in the case where we tests an installed integron_finder
+        # so the libraries are already in PYTHONPATH
+        # but test are not
+        # we must had tests parent dir in PYTHONPATH
+        # but after the standard libraries containing integron_finder
+        # as we want to run integron_finder using installed libraries
+        if home_tests not in sys.path:
+            sys.path.append(home_tests)
+
     if args.unit:
         print("\n", "#" * 70, sep='')
         print("Test Runner: Unit tests")
         print("#" * 70)
 
-        old_path = sys.path
-        if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
-            INTEGRON_HOME = os.environ['INTEGRON_HOME']
-            if INTEGRON_HOME not in sys.path:
-                sys.path.insert(0, INTEGRON_HOME)
-        else:
-            # We test an installed version of integronfinder
-            # integron library are in syspath
-            # but we need the tests module
-            sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-        print("DEBUG", "sys.path =", sys.path)
         test_runner = run_unittests(args.tests, verbosity=args.verbosity)
         unit_results = test_runner.wasSuccessful()
         result_all_tests.append(unit_results)
-        sys.path = old_path
 
     if args.functional:
         print("\n", "#" * 70, sep='')
         print("Test Runner: Functional tests")
         print("#" * 70)
 
-        old_path = sys.path
-        if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
-            INTEGRON_HOME = os.environ['INTEGRON_HOME']
-            if INTEGRON_HOME not in sys.path:
-                sys.path.insert(0, INTEGRON_HOME)
-        else:
-            home_tests = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-            # we are in the case where we tests an installed CRAW
-            # so the libraries are already in PYTHONPATH
-            # but test are not
-            # we must had tests parent dir in pythonpath
-            # but after the standard libraries containing gensoft2docker
-            # as we want to run CRAW using installed libraries
-            sys.path.append(home_tests)
-        print("DEBUG",""sys.path =",sys.path)
         test_runner = run_functional_tests(args.tests, verbosity=args.verbosity)
         functional_results = test_runner.wasSuccessful()
         result_all_tests.append(functional_results)
-        sys.path = old_path
+
+    sys.path = old_path
 
     if all(result_all_tests):
         sys.exit(0)
