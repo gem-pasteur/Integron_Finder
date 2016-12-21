@@ -122,15 +122,19 @@ if __name__ == '__main__':
         if not 'INTEGRON_HOME' in os.environ:
             INTEGRON_HOME = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
             sys.path.append(INTEGRON_HOME)
-        from tests import which
+            from tests import which
+            integron_finder_script = which('integron_finder')
+        else:
+            integron_finder_script = os.path.join(INTEGRON_HOME, 'integron_finder')
 
-        integron_finder_script = which('integron_finder')
         fake_lib = os.path.join(INTEGRON_HOME, 'tests', 'fake_lib')
         integron_finder_lib = os.path.join(fake_lib, 'integron_finder.py')
         if not os.path.exists(fake_lib):
             os.mkdir(fake_lib)
-        if not os.path.exists(integron_finder_lib):
-            os.symlink(integron_finder_script, integron_finder_lib)
+        if os.path.exists(integron_finder_lib):
+            os.unlink(integron_finder_lib)
+        os.symlink(integron_finder_script, integron_finder_lib)
+
         sys.path.insert(0, fake_lib)
         ############ END WORKAROUND ################
 
