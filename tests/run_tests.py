@@ -109,7 +109,7 @@ if __name__ == '__main__':
             # We test an installed version of integronfinder
             # integron library are in syspath
             # but we need the tests module
-            sys.path.append(os.abspath(os.path.dirname(__file__)))
+            sys.path.append(os.path.abspath(os.path.dirname(__file__)))
         test_runner = run_unittests(args.tests, verbosity=args.verbosity)
         unit_results = test_runner.wasSuccessful()
         result_all_tests.append(unit_results)
