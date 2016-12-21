@@ -110,7 +110,7 @@ if __name__ == '__main__':
             # integron library are in syspath
             # but we need the tests module
             sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-        print "sys.path =", sys.path
+        print("DEBUG", "sys.path =", sys.path)
         test_runner = run_unittests(args.tests, verbosity=args.verbosity)
         unit_results = test_runner.wasSuccessful()
         result_all_tests.append(unit_results)
@@ -135,7 +135,7 @@ if __name__ == '__main__':
             # but after the standard libraries containing gensoft2docker
             # as we want to run CRAW using installed libraries
             sys.path.append(home_tests)
-        print "sys.path =",sys.path
+        print("DEBUG",""sys.path =",sys.path)
         test_runner = run_functional_tests(args.tests, verbosity=args.verbosity)
         functional_results = test_runner.wasSuccessful()
         result_all_tests.append(functional_results)
