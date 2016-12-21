@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import shutil
 import tempfile
 import os
@@ -45,9 +46,11 @@ class Test(IntegronTest):
                                                                   python_exe=sys.executable,
                                                                   bin=self.bin,
                                                                   out_dir=self.out_dir,
-                                                                  replicon=os.path.join(os.path.dirname(__file__),'..', 'data', 'acba.007.p01.13.fst')
+                                                                  replicon=os.path.join(os.path.dirname(__file__),
+                                                                                        '..', 'data',
+                                                                                        'acba.007.p01.13.fst')
                                                                   )
-        print "\n", command
+        print("\n", command)
         if not self.bin:
             raise RuntimeError('coverage not found, INTEGRON_HOME must be either in your path or INTEGRON_HOME'
                                ' must be defined command launch: \n{}'.format(command))
