@@ -96,7 +96,7 @@ if __name__ == '__main__':
     result_all_tests = []
 
     old_path = sys.path
-    home_tests = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    INTEGRON_HOME = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
         INTEGRON_HOME = os.environ['INTEGRON_HOME']
         if INTEGRON_HOME not in sys.path:
@@ -109,8 +109,18 @@ if __name__ == '__main__':
         # we must had tests parent dir in PYTHONPATH
         # but after the standard libraries containing integron_finder
         # as we want to run integron_finder using installed libraries
-        if home_tests not in sys.path:
-            sys.path.append(home_tests)
+        if INTEGRON_HOME not in sys.path:
+            sys.path.append(INTEGRON_HOME)
+
+    ############## WORKAROUND ##################
+    integron_finder_script = os.path.join(INTEGRON_HOME, 'integron.finder')
+    integron_finder_lib = os.path.join(INTEGRON_HOME, 'integron.finder.py')
+    remove_link = False
+    if not os.path.exists(integron_finder_lib):
+        os.symlink(integron_finder_script, integron_finder_lib)
+        remove_link = True
+    ############ END WORKAROUND ################
+
 
     if args.unit:
         print("\n", "#" * 70, sep='')
@@ -131,7 +141,10 @@ if __name__ == '__main__':
         result_all_tests.append(functional_results)
 
     sys.path = old_path
-
+    ############## WORKAROUND ##################
+    if remove_link:
+        os.unlink(integron_finder_lib)
+    ############ END WORKAROUND ################
     if all(result_all_tests):
         sys.exit(0)
     else:
