@@ -6,16 +6,32 @@ branches:
   except:
        - /^feature.*$/
 
-# command to install Ubuntu dependencies
+# command to install dependencies
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get -y --no-install-recommends prodigal infernal hmmer
+  - sudo apt-get update
   - sudo apt-get -y install python-pip python-numpy python-matplotlib python-biopython
+  
+  - wget https://github.com/hyattpd/Prodigal/archive/v2.6.2.tar.gz
+  - tar -xf v2.6.2.tar.gz
+  - cd Prodigal-2.6.2 && make && sudo make install
+  - cd -
+  
+  - wget  http://eddylab.org/software/infernal/infernal-1.1.2.tar.gz
+  - tar -xf infernal-1.1.2.tar.gz
+  - cd infernal-1.1.2 && ./configure && make && sudo make install
+  - cd -
+  
+  - wget  http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2.tar.gz
+  - tar -xf hmmer-3.1b2.tar.gz
+  - cd hmmer-3.1b2 && ./configure && make && sudo make install
   - cd -
 
-# command to run tests
+# command to install integroon_finder
+install:
+  - python setup.py sdist
+  - pip install dist/integron_finder*.tar.gz
+
+# test integron_finder
 script:
-- python setup.py sdist
-- pip install sdist/integron_finder*.tar.gz
-- python tests/run_tests.py -vv
+  - python tests/run_tests.py -vv
 
