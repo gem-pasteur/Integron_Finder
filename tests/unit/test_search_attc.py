@@ -3,7 +3,7 @@
 
 
 """
-Unit tests for functions in integron_finder.py
+Unit tests search_attc function of integron_finder
 """
 
 import integron_finder
