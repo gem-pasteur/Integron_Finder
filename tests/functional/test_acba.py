@@ -6,6 +6,7 @@ import tempfile
 import os
 import sys
 from subprocess import Popen, PIPE
+from itertools import izip
 
 from tests import IntegronTest, which
 
@@ -82,14 +83,9 @@ class Test(IntegronTest):
         for output_filename in results_file_to_test:
             expected_result_path = os.path.join(self._data_dir, 'Results_Integron_Finder_acba.007.p01.13', output_filename)
             test_result_path = os.path.join(test_result_dir, output_filename)
-            with open(expected_result_path) as expected_result_file:
-                expected_result = expected_result_file.readlines()
-
-            with open(test_result_path) as test_result_file:
-                test_result = test_result_file.readlines()
-
-            # test equality line by line
-            for expected, result in zip(expected_result, test_result):
-                self.assertEqual(expected, result)
+            with open(expected_result_path) as expected_result_file, open(test_result_path) as test_result_file:
+                for expected_line, result_line in izip(expected_result_file, test_result_file):
+                    # test equality line by line
+                    self.assertEqual(expected_line, result_line)
 
 
