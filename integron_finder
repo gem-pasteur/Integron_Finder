@@ -549,7 +549,11 @@ def search_attc(attc_df, keep_palindromes):
 
         attc_array = [pd.DataFrame(i, columns=["Accession_number", "cm_attC", "cm_debut",
                                                "cm_fin", "pos_beg", "pos_end", "sens", "evalue"]) for i in tmp]
-
+        # convert positions to int, and evalue to float
+        intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
+        for a in attc_array:
+            a[intcols] = a[intcols].astype(int)
+            a["evalue"] = a["evalue"].astype(float)
         return attc_array
 
 
