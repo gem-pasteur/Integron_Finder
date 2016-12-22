@@ -324,3 +324,110 @@ class TestFunctions(unittest.TestCase):
         attc_df = attc_df.reindex([2, 3, 0, 1])
         attc_df.reset_index(inplace=True, drop=True)
         pdt.assert_frame_equal(attc_df, attc_array[0])
+
+
+    def test_search_attc_drop_pal(self):
+        """
+        If there is 1 palindrome attC, check that it keeps the one with the highest evalue,
+        and that clusters are then found according to it.
+        """
+        attc_df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
+        attc_df = attc_df.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 1000,
+                                    "pos_end": 2000, "sens": "+", "evalue": 1e-9},
+                                    ignore_index=True)
+        attc_df = attc_df.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 3000,
+                                    "pos_end": 4000, "sens": "-", "evalue": 1e-4},
+                                    ignore_index=True)
+        attc_df = attc_df.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 3000,
+                                    "pos_end": 4000, "sens": "+", "evalue": 1e-9},
+                                    ignore_index=True)
+        attc_df = attc_df.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 5500,
+                                    "pos_end": 7000, "sens": "+", "evalue": 1.1e-7},
+                                    ignore_index=True)
+        intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
+        attc_df[intcols] = attc_df[intcols].astype(int)
+
+        attc_array = integron_finder.search_attc(attc_df, False)
+        self.assertEqual(len(attc_array), 1)
+
+        # Construct expected outputs:
+        attc_res = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
+                                         "pos_beg", "pos_end", "sens", "evalue"])
+        attc_res = attc_res.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 1000,
+                                    "pos_end": 2000, "sens": "+", "evalue": 1e-9},
+                                    ignore_index=True)
+        attc_res = attc_res.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 3000,
+                                    "pos_end": 4000, "sens": "+", "evalue": 1e-9},
+                                    ignore_index=True)
+        attc_res = attc_res.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 5500,
+                                    "pos_end": 7000, "sens": "+", "evalue": 1.1e-7},
+                                    ignore_index=True)
+
+        attc_res[intcols] = attc_res[intcols].astype(int)
+        attc_array[0].reset_index(inplace=True, drop=True)
+        pdt.assert_frame_equal(attc_res, attc_array[0])
+
+
+    def test_search_attc_drop_pal_break(self):
+        """
+        If there is 1 palindrome attC, check that it keeps the one with the highest evalue,
+        and that clusters are then found according to it.
+        """
+        attc_df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
+        attc_df = attc_df.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 1000,
+                                    "pos_end": 2000, "sens": "-", "evalue": 1e-9},
+                                    ignore_index=True)
+        attc_df = attc_df.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 3000,
+                                    "pos_end": 4000, "sens": "-", "evalue": 1e-4},
+                                    ignore_index=True)
+        attc_df = attc_df.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 3000,
+                                    "pos_end": 4000, "sens": "+", "evalue": 1e-9},
+                                    ignore_index=True)
+        attc_df = attc_df.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 5500,
+                                    "pos_end": 7000, "sens": "-", "evalue": 1.1e-7},
+                                    ignore_index=True)
+        intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
+        attc_df[intcols] = attc_df[intcols].astype(int)
+
+        attc_array = integron_finder.search_attc(attc_df, False)
+        self.assertEqual(len(attc_array), 3)
+
+        # Construct expected outputs:
+        columns = ["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg",
+                   "pos_end", "sens", "evalue"]
+        attc_res = pd.DataFrame(data={"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 1000,
+                                    "pos_end": 2000, "sens": "-", "evalue": 1e-9},
+                                index=[0])
+        attc_res = attc_res[columns]
+
+        attc_res2 = pd.DataFrame(data={"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 3000,
+                                    "pos_end": 4000, "sens": "+", "evalue": 1e-9},
+                                index=[0])
+        attc_res2 = attc_res2[columns]
+
+        attc_res3 = pd.DataFrame(data={"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 5500,
+                                    "pos_end": 7000, "sens": "-", "evalue": 1.1e-7},
+                                index=[0])
+        attc_res3 = attc_res3[columns]
+
+        attc_res[intcols] = attc_res[intcols].astype(int)
+        attc_res2[intcols] = attc_res2[intcols].astype(int)
+        attc_res3[intcols] = attc_res3[intcols].astype(int)
+        pdt.assert_frame_equal(attc_res2, attc_array[0])
+        pdt.assert_frame_equal(attc_res, attc_array[1])
+        pdt.assert_frame_equal(attc_res3, attc_array[2])
+
