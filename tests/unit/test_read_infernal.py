@@ -87,3 +87,65 @@ class TestFunctions(unittest.TestCase):
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
         pdt.assert_frame_equal(df, expect)
+
+    def test_attcsize_minthres(self):
+        """
+        Test that the filter by a minimum attc size works.
+        """
+        filename = os.path.join("tests", "data", "Results_Integron_Finder_" + self.rep_name,
+                                 "other", self.rep_name + "_attc_table.res")
+        df = integron_finder.read_infernal(filename, size_min_attc=60)
+        expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
+                                       "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
+        expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
+                                    "pos_end": 19149, "sens": "-", "evalue": 1e-4},
+                                    ignore_index=True)
+        expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
+                                    "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
+                                    ignore_index=True)
+        # convert positions to int
+        intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
+        expect[intcols] = expect[intcols].astype(int)
+        pdt.assert_frame_equal(df, expect)
+
+    def test_attcsize_maxthres(self):
+        """
+        Test that the filter by a maximum attc size works.
+        """
+        filename = os.path.join("tests", "data", "Results_Integron_Finder_" + self.rep_name,
+                                 "other", self.rep_name + "_attc_table.res")
+        df = integron_finder.read_infernal(filename, size_max_attc=100)
+        expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
+                                       "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
+        expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
+                                    "pos_end": 17884, "sens": "-", "evalue": 1e-9},
+                                    ignore_index=True)
+        expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
+                                    "pos_end": 19149, "sens": "-", "evalue": 1e-4},
+                                    ignore_index=True)
+        # convert positions to int
+        intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
+        expect[intcols] = expect[intcols].astype(int)
+        pdt.assert_frame_equal(df, expect)
+
+    def test_filter_evalue_thres(self):
+        """
+        Test that the filter by a maximum attc size works.
+        """
+        filename = os.path.join("tests", "data", "Results_Integron_Finder_" + self.rep_name,
+                                 "other", self.rep_name + "_attc_table.res")
+        df = integron_finder.read_infernal(filename, evalue=1e-8)
+        expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
+                                       "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
+        expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
+                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
+                                    "pos_end": 17884, "sens": "-", "evalue": 1e-9},
+                                    ignore_index=True)
+        # convert positions to int
+        intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
+        expect[intcols] = expect[intcols].astype(int)
+        pdt.assert_frame_equal(df, expect)
