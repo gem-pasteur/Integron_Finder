@@ -72,17 +72,17 @@ class TestFunctions(unittest.TestCase):
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
-                                    "pos_end": 17884, "sens": "-", "evalue": 1e-9},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
+                                "pos_end": 17884, "sens": "-", "evalue": 1e-9},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
-                                    "pos_end": 19149, "sens": "-", "evalue": 1e-4},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
+                                "pos_end": 19149, "sens": "-", "evalue": 1e-4},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
-                                    "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
+                                "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
+                               ignore_index=True)
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
@@ -98,13 +98,13 @@ class TestFunctions(unittest.TestCase):
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
-                                    "pos_end": 19149, "sens": "-", "evalue": 1e-4},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
+                                "pos_end": 19149, "sens": "-", "evalue": 1e-4},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
-                                    "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
+                                "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
+                               ignore_index=True)
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
@@ -120,13 +120,13 @@ class TestFunctions(unittest.TestCase):
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
-                                    "pos_end": 17884, "sens": "-", "evalue": 1e-9},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
+                                "pos_end": 17884, "sens": "-", "evalue": 1e-9},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
-                                    "pos_end": 19149, "sens": "-", "evalue": 1e-4},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
+                                "pos_end": 19149, "sens": "-", "evalue": 1e-4},
+                               ignore_index=True)
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
@@ -142,9 +142,9 @@ class TestFunctions(unittest.TestCase):
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
-                                    "pos_end": 17884, "sens": "-", "evalue": 1e-9},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
+                                "pos_end": 17884, "sens": "-", "evalue": 1e-9},
+                               ignore_index=True)
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
@@ -161,17 +161,17 @@ class TestFunctions(unittest.TestCase):
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 40, "pos_beg": 17825,
-                                    "pos_end": 17891, "sens": "+", "evalue": 1e-9},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 40, "pos_beg": 17825,
+                                "pos_end": 17891, "sens": "+", "evalue": 1e-9},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
-                                    "pos_end": 19149, "sens": "+", "evalue": 1e-4},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
+                                "pos_end": 19149, "sens": "+", "evalue": 1e-4},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 10, "cm_fin": 47, "pos_beg": 19609,
-                                    "pos_end": 19726, "sens": "+", "evalue": 1.1e-7},
-                                    ignore_index=True)
+                                "cm_debut": 10, "cm_fin": 47, "pos_beg": 19609,
+                                "pos_end": 19726, "sens": "+", "evalue": 1.1e-7},
+                               ignore_index=True)
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
@@ -188,17 +188,17 @@ class TestFunctions(unittest.TestCase):
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 40, "pos_beg": 17818,
-                                    "pos_end": 17884, "sens": "-", "evalue": 1e-9},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 40, "pos_beg": 17818,
+                                "pos_end": 17884, "sens": "-", "evalue": 1e-9},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
-                                    "pos_end": 19149, "sens": "-", "evalue": 1e-4},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
+                                "pos_end": 19149, "sens": "-", "evalue": 1e-4},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 10, "cm_fin": 47, "pos_beg": 19618,
-                                    "pos_end": 19735, "sens": "-", "evalue": 1.1e-7},
-                                    ignore_index=True)
+                                "cm_debut": 10, "cm_fin": 47, "pos_beg": 19618,
+                                "pos_end": 19735, "sens": "-", "evalue": 1.1e-7},
+                               ignore_index=True)
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
@@ -214,13 +214,13 @@ class TestFunctions(unittest.TestCase):
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
-                                    "pos_end": 19149, "sens": "-", "evalue": 1e-4},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
+                                "pos_end": 19149, "sens": "-", "evalue": 1e-4},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
-                                    "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
+                                "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
+                               ignore_index=True)
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
@@ -236,13 +236,13 @@ class TestFunctions(unittest.TestCase):
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
-                                    "pos_end": 17884, "sens": "-", "evalue": 1e-9},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
+                                "pos_end": 17884, "sens": "-", "evalue": 1e-9},
+                               ignore_index=True)
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
-                                    "pos_end": 19149, "sens": "-", "evalue": 1e-4},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
+                                "pos_end": 19149, "sens": "-", "evalue": 1e-4},
+                               ignore_index=True)
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
@@ -258,9 +258,9 @@ class TestFunctions(unittest.TestCase):
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
-                                    "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
-                                    "pos_end": 17884, "sens": "-", "evalue": 1e-9},
-                                    ignore_index=True)
+                                "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
+                                "pos_end": 17884, "sens": "-", "evalue": 1e-9},
+                               ignore_index=True)
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
