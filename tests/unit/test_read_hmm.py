@@ -26,6 +26,23 @@ class TestFunctions(unittest.TestCase):
         args = parser.parse_args([])
         integron_finder.args = args
 
+    def test_read_empty(self):
+        """
+        Test that when there are no hits in the hmm result file, it returns an empty
+        dataframe, without error.
+        """
+        infile = os.path.join("tests", "data", "fictive_results",
+                              self.rep_name + "_intI-empty.res")
+        df = integron_finder.read_hmm(self.rep_name, infile)
+        exp = pd.DataFrame(columns=["Accession_number", "query_name", "ID_query", "ID_prot",
+                                    "strand", "pos_beg", "pos_end", "evalue"])
+
+        intcols = ["pos_beg", "pos_end", "strand"]
+        floatcol = ["evalue"]
+        exp[intcols] = exp[intcols].astype(int)
+        exp[floatcol] = exp[floatcol].astype(float)
+        pdt.assert_frame_equal(df, exp)
+
     def test_read_hmm(self):
         """
         Test that when there are no attC sites detected, the attc array is empty.
@@ -40,4 +57,10 @@ class TestFunctions(unittest.TestCase):
         exp = exp[["Accession_number", "query_name", "ID_query", "ID_prot",
                    "strand", "pos_beg", "pos_end", "evalue"]]
         pdt.assert_frame_equal(df, exp)
+
+    # test with gembase format of .prt
+    # test filtering evalue
+    # test filtering coverage
+    # test various hits for same protein: keep best evalue
+
 
