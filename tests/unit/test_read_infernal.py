@@ -265,3 +265,4 @@ class TestFunctions(unittest.TestCase):
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         expect[intcols] = expect[intcols].astype(int)
         pdt.assert_frame_equal(df, expect)
+
