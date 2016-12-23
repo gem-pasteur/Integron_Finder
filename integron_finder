@@ -1242,9 +1242,11 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
 
     df = pd.read_table(infile, sep="\s*", engine="python",
                        header=None, skipfooter=10, skiprows=2)
+    # Keep only columns: query_name(2), mdl from(5), mdl to(6), seq from(7),
+    # seq to(8), strand(9), E-value(15)
     df = df[[2, 5, 6, 7, 8, 9, 15]]
-    df = df[(df[15] < evalue)]
-    df = df[(abs(df[8]-df[7]) < size_max_attc) & (size_min_attc < abs(df[8]-df[7]))]  # filter on evalue
+    df = df[(df[15] < evalue)]  # filter on evalue
+    df = df[(abs(df[8]-df[7]) < size_max_attc) & (size_min_attc < abs(df[8]-df[7]))]
     if len(df) > 0:
         df["Accession_number"] = replicon_name
         c = df.columns.tolist()
@@ -1255,7 +1257,6 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
                       "pos_beg_tmp", "pos_end_tmp",
                       "sens", "evalue"]
         idx = (df.pos_beg_tmp > df.pos_end_tmp)
-
         df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: x["pos_end_tmp"] - (length_cm - x["cm_fin"]), axis=1)
         df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: x["pos_beg_tmp"] + (x["cm_debut"] - 1), axis=1)
 
