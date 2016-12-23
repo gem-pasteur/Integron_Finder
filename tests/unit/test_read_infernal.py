@@ -185,7 +185,6 @@ class TestFunctions(unittest.TestCase):
         filename = os.path.join("tests", "data", "Results_Integron_Finder_" + self.rep_name,
                                  "other", self.rep_name + "_attc_table-partialm.res")
         df = integron_finder.read_infernal(filename)
-        print df
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.append({"Accession_number": self.rep_name, "cm_attC": "attC_4",
