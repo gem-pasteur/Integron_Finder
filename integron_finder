@@ -1171,11 +1171,11 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
                                "ID_prot", "strand", "pos_beg", "pos_end",
                                "evalue", "hmmfrom", "hmmto", "alifrom",
                                "alito", "len_profile"])
-
     gen = SearchIO.parse(infile, 'hmmer3-text')
     for idx, query_result in enumerate(gen):
         len_profile = query_result.seq_len
         query = query_result.id
+
         try:
             id_query = query_result.accession
         except AttributeError:
@@ -1219,6 +1219,11 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
             df.loc[idx+idx2, "len_profile"] = float(len_profile)
             df.loc[idx+idx2, "Accession_number"] = replicon_name
             df.loc[idx+idx2, "query_name"] = query
+
+    intcols = ["pos_beg", "pos_end", "strand"]
+    floatcol = ["evalue", "len_profile"]
+    df[intcols] = df[intcols].astype(int)
+    df[floatcol] = df[floatcol].astype(float)
 
     df = df[((df.hmmto - df.hmmfrom) / df.len_profile > coverage) & (df.evalue < evalue)]
     df.index = range(len(df))
