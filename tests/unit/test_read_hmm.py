@@ -103,6 +103,26 @@ class TestFunctions(unittest.TestCase):
         exp2[floatcol] = exp2[floatcol].astype(float)
         pdt.assert_frame_equal(df2, exp2)
 
+    def test_read_hmm_evalue2(self):
+        """
+        Test that the hmm hits are well read, it returns only the hits with evalue < given
+        threshold
+        """
+        infile = os.path.join("tests", "data", "fictive_results",
+                              self.rep_name + "_intI.res")
+        df1 = integron_finder.read_hmm(self.rep_name, infile, evalue=1e-3)
+        exp1 = pd.DataFrame(data={"Accession_number": [self.rep_name] * 2,
+                                  "query_name": ["intI_Cterm"] * 2,
+                                  "ID_query": ["-", "-"],
+                                  "ID_prot": ["ACBA.007.P01_13_1", "ACBA.007.P01_13_3"],
+                                  "strand": [1, 1],
+                                  "pos_beg": [55, 3000], "pos_end": [1014, 3500],
+                                  "evalue": [1.9e-25, 2e-25]},
+                            index=[0, 1])
+        exp1 = exp1[["Accession_number", "query_name", "ID_query", "ID_prot",
+                     "strand", "pos_beg", "pos_end", "evalue"]]
+        pdt.assert_frame_equal(df1, exp1)
+
     def test_read_hmm_cov(self):
         """
         Test that the hmm hits are well read, and returned only if coverage is > to the
@@ -127,8 +147,25 @@ class TestFunctions(unittest.TestCase):
         exp2[floatcol] = exp2[floatcol].astype(float)
         pdt.assert_frame_equal(df2, exp2)
 
-    # test various hits for same protein: keep best evalue
-
+    def test_read_hmm_cov2(self):
+        """
+        Test that the hmm hits are well read, it returns only the hits with coverage >
+        given threshold
+        """
+        infile = os.path.join("tests", "data", "fictive_results",
+                              self.rep_name + "_intI.res")
+        df1 = integron_finder.read_hmm(self.rep_name, infile, coverage=0.7)
+        exp1 = pd.DataFrame(data={"Accession_number": [self.rep_name] * 2,
+                                  "query_name": ["intI_Cterm"] * 2,
+                                  "ID_query": ["-", "-"],
+                                  "ID_prot": ["ACBA.007.P01_13_1", "ACBA.007.P01_13_2"],
+                                  "strand": [1, 1],
+                                  "pos_beg": [55, 2000], "pos_end": [1014, 2500],
+                                  "evalue": [1.9e-25, 1e-3]},
+                            index=[0, 1])
+        exp1 = exp1[["Accession_number", "query_name", "ID_query", "ID_prot",
+                     "strand", "pos_beg", "pos_end", "evalue"]]
+        pdt.assert_frame_equal(df1, exp1)
 
     def test_read_multi(self):
         """
