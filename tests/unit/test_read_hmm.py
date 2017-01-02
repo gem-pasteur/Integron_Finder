@@ -78,6 +78,22 @@ class TestFunctions(unittest.TestCase):
                    "strand", "pos_beg", "pos_end", "evalue"]]
         pdt.assert_frame_equal(df, exp)
 
+    def test_read_hmm_evalue(self):
+        """
+        Test that the hmm hits are well read, and returned only if evalue is < to the
+        given threshold.
+        """
+        infile = os.path.join("tests", "data", "Results_Integron_Finder_" + self.rep_name,
+                                 "other", self.rep_name + "_intI.res")
+        df = integron_finder.read_hmm(self.rep_name, infile, evalue=1.8e-25)
+        exp = pd.DataFrame(columns=["Accession_number", "query_name", "ID_query", "ID_prot",
+                                    "strand", "pos_beg", "pos_end", "evalue"])
+
+        intcols = ["pos_beg", "pos_end", "strand"]
+        floatcol = ["evalue"]
+        exp[intcols] = exp[intcols].astype(int)
+        exp[floatcol] = exp[floatcol].astype(float)
+        pdt.assert_frame_equal(df, exp)
 
     # test filtering evalue
     # test filtering coverage
