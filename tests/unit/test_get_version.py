@@ -29,7 +29,6 @@ class TestFunctions(unittest.TestCase):
         """
         pathname = os.path.dirname(sys.argv[0])
         os.environ['INTEGRON_HOME'] = os.path.join(os.path.abspath(pathname), "..")
-        print os.environ['INTEGRON_HOME']
         p = subprocess.Popen(["./integron_finder", "-V"], stderr=subprocess.PIPE)
         version = p.communicate()[1]
 
