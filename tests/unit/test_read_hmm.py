@@ -130,3 +130,25 @@ class TestFunctions(unittest.TestCase):
     # test various hits for same protein: keep best evalue
 
 
+    def test_read_multi(self):
+        """
+        Test reading hmm results when there are multiple hits: 2 hits on the same protein: keep
+        only the one with the best evalue. 2 hits on 2 different proteins: keep the 2 proteins.
+        """
+        parser = argparse.ArgumentParser(description='Process some integers.')
+        parser.add_argument("--gembase", help="gembase format", action="store_true")
+        args = parser.parse_args(["--gembase"])
+        integron_finder.args = args
+        infile = os.path.join("tests", "data", "fictive_results", self.rep_name +
+                              "_intI-multi.res")
+        df = integron_finder.read_hmm(self.rep_name, infile)
+        exp = pd.DataFrame(data={"Accession_number": [self.rep_name] * 2,
+                                 "query_name": ["intI_Cterm"] * 2, "ID_query": ["-"] * 2,
+                                 "ID_prot": ["ACBA007p01a_000009", "ACBA007p01a_000008"],
+                                 "strand": [1, -1],
+                                 "pos_beg": [55, 1], "pos_end": [1014, 50],
+                                 "evalue": [4.5e-25, 2.3e-25]},
+                           index=[0, 1])
+        exp = exp[["Accession_number", "query_name", "ID_query", "ID_prot",
+                   "strand", "pos_beg", "pos_end", "evalue"]]
+        pdt.assert_frame_equal(df, exp)
