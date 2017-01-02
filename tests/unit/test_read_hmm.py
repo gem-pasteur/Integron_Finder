@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-
 """
 Unit tests read_hmm function of integron_finder
 """
