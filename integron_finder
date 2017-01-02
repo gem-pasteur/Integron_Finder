@@ -1395,6 +1395,36 @@ def to_gbk(df, sequence):
     if len(SEQUENCE.name) > 16:
         SEQUENCE.name = SEQUENCE.name[-16:]
 
+def scan_hmm_bank(path):
+    """
+    :param path: - if the path is a dir:
+                   return all files ending with .hmm in the dir
+                 - if the path is a file:
+                   parse the file, each line must be an expression (glob)
+                   pointing to hmm files
+    :return: lists of hmm files to consider for annotation
+    """
+    real_path = os.path.realpath(path)
+    files = []
+    if os.path.exists(real_path):
+        if os.path.isdir(real_path):
+            files = glob.glob(os.path.join(real_path,'*.hmm'))
+        elif os.path.isfile(real_path):
+            with open(real_path) as hmm_bank:
+                for bank_path in hmm_bank:
+                    if bank_path.startswith('#'):
+                        continue
+                    bank_files = glob.glob(os.path.expanduser(bank_path.strip("\n").strip()))
+                    if not bank_files:
+                        print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
+                    else:
+                        for path in bank_files:
+                            print >> sys.stderr, "the hmm {} will be used for functional annotation".format(path)
+                        files.extend(bank_files)
+        return files
+    else:
+        raise IOError("{} no such file or directory".format(path))
+
 if __name__ == "__main__":
 
     ############### setup ###############
@@ -1434,37 +1464,6 @@ Python {1}
  Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
  """.format(version, sys.version)
         return version_text
-
-
-    def scan_hmm_bank(path):
-        """
-        :param path: - if the path is a dir:
-                       return all files ending with .hmm in the dir
-                     - if the path is a file:
-                       parse the file, each line must be an expression (glob)
-                       pointing to hmm files
-        :return: lists of hmm files to consider for annotation
-        """
-        real_path = os.path.realpath(path)
-        files = []
-        if os.path.exists(real_path):
-            if os.path.isdir(real_path):
-                files = glob.glob(os.path.join(real_path,'*.hmm'))
-            elif os.path.isfile(real_path):
-                with open(real_path) as hmm_bank:
-                    for bank_path in hmm_bank:
-                        if bank_path.startswith('#'):
-                            continue
-                        bank_files = glob.glob(os.path.expanduser(bank_path.strip("\n").strip()))
-                        if not bank_files:
-                            print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
-                        else:
-                            for path in bank_files:
-                                print >> sys.stderr, "the hmm {} will be used for functional annotation".format(path)
-                            files.extend(bank_files)
-            return files
-        else:
-            raise IOError("{} no such file or directory".format(path))
 
     ############### Arguments and declarations ###############
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
