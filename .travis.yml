@@ -33,6 +33,7 @@ install:
 
 # test integron_finder
 script:
+  - export INTEGRON_HOME = `pwd`
   - integron_finder -V
   - ./integron_finder -V
   - python tests/run_tests.py -vv
