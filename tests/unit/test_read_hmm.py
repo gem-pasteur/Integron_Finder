@@ -85,18 +85,48 @@ class TestFunctions(unittest.TestCase):
         """
         infile = os.path.join("tests", "data", "Results_Integron_Finder_" + self.rep_name,
                                  "other", self.rep_name + "_intI.res")
-        df = integron_finder.read_hmm(self.rep_name, infile, evalue=1.8e-25)
-        exp = pd.DataFrame(columns=["Accession_number", "query_name", "ID_query", "ID_prot",
-                                    "strand", "pos_beg", "pos_end", "evalue"])
+        df1 = integron_finder.read_hmm(self.rep_name, infile, evalue=1.95e-25)
+        exp1 = pd.DataFrame(data={"Accession_number": self.rep_name, "query_name": "intI_Cterm",
+                                  "ID_query": "-", "ID_prot": "ACBA.007.P01_13_1", "strand": 1,
+                                  "pos_beg": 55, "pos_end": 1014, "evalue": 1.9e-25},
+                            index=[0])
+        exp1 = exp1[["Accession_number", "query_name", "ID_query", "ID_prot",
+                     "strand", "pos_beg", "pos_end", "evalue"]]
+        pdt.assert_frame_equal(df1, exp1)
+        df2 = integron_finder.read_hmm(self.rep_name, infile, evalue=1.9e-25)
+        exp2 = pd.DataFrame(columns=["Accession_number", "query_name", "ID_query", "ID_prot",
+                                     "strand", "pos_beg", "pos_end", "evalue"])
 
         intcols = ["pos_beg", "pos_end", "strand"]
         floatcol = ["evalue"]
-        exp[intcols] = exp[intcols].astype(int)
-        exp[floatcol] = exp[floatcol].astype(float)
-        pdt.assert_frame_equal(df, exp)
+        exp2[intcols] = exp2[intcols].astype(int)
+        exp2[floatcol] = exp2[floatcol].astype(float)
+        pdt.assert_frame_equal(df2, exp2)
 
-    # test filtering evalue
-    # test filtering coverage
+    def test_read_hmm_cov(self):
+        """
+        Test that the hmm hits are well read, and returned only if coverage is > to the
+        given threshold.
+        """
+        infile = os.path.join("tests", "data", "Results_Integron_Finder_" + self.rep_name,
+                                 "other", self.rep_name + "_intI.res")
+        df1 = integron_finder.read_hmm(self.rep_name, infile, coverage=0.945)
+        exp1 = pd.DataFrame(data={"Accession_number": self.rep_name, "query_name": "intI_Cterm",
+                                  "ID_query": "-", "ID_prot": "ACBA.007.P01_13_1", "strand": 1,
+                                  "pos_beg": 55, "pos_end": 1014, "evalue": 1.9e-25},
+                            index=[0])
+        exp1 = exp1[["Accession_number", "query_name", "ID_query", "ID_prot",
+                     "strand", "pos_beg", "pos_end", "evalue"]]
+        pdt.assert_frame_equal(df1, exp1)
+        df2 = integron_finder.read_hmm(self.rep_name, infile, coverage=0.95)
+        exp2 = pd.DataFrame(columns=["Accession_number", "query_name", "ID_query", "ID_prot",
+                                     "strand", "pos_beg", "pos_end", "evalue"])
+        intcols = ["pos_beg", "pos_end", "strand"]
+        floatcol = ["evalue"]
+        exp2[intcols] = exp2[intcols].astype(int)
+        exp2[floatcol] = exp2[floatcol].astype(float)
+        pdt.assert_frame_equal(df2, exp2)
+
     # test various hits for same protein: keep best evalue
 
 
