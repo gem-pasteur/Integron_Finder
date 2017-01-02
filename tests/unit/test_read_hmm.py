@@ -45,7 +45,7 @@ class TestFunctions(unittest.TestCase):
 
     def test_read_hmm(self):
         """
-        Test that when there are no attC sites detected, the attc array is empty.
+        Test that the hmm hits are well read
         """
         infile = os.path.join("tests", "data", "Results_Integron_Finder_" + self.rep_name,
                                  "other", self.rep_name + "_intI.res")
@@ -58,7 +58,27 @@ class TestFunctions(unittest.TestCase):
                    "strand", "pos_beg", "pos_end", "evalue"]]
         pdt.assert_frame_equal(df, exp)
 
-    # test with gembase format of .prt
+    def test_read_hmm_gembase(self):
+        """
+        Test that the hmm hits are well read, when the gembase format is used (.prt file is
+        provided, prodigal is not used to find the proteins).
+        """
+        parser = argparse.ArgumentParser(description='Process some integers.')
+        parser.add_argument("--gembase", help="gembase format", action="store_true")
+        args = parser.parse_args(["--gembase"])
+        integron_finder.args = args
+        infile = os.path.join("tests", "data", "fictive_results", self.rep_name +
+                                 "_intI-gembase.res")
+        df = integron_finder.read_hmm(self.rep_name, infile)
+        exp = pd.DataFrame(data={"Accession_number": self.rep_name, "query_name": "intI_Cterm",
+                                 "ID_query": "-", "ID_prot": "ACBA007p01a_000009", "strand": 1,
+                                 "pos_beg": 55, "pos_end": 1014, "evalue": 1.9e-25},
+                           index=[0])
+        exp = exp[["Accession_number", "query_name", "ID_query", "ID_prot",
+                   "strand", "pos_beg", "pos_end", "evalue"]]
+        pdt.assert_frame_equal(df, exp)
+
+
     # test filtering evalue
     # test filtering coverage
     # test various hits for same protein: keep best evalue
