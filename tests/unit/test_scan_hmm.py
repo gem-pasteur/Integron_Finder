@@ -17,6 +17,10 @@ class TestFunctions(unittest.TestCase):
 
     @contextmanager
     def catch_output(self):
+        """
+        Catch stderr and stdout of the code running with this function.
+        They can, then, be compared to expected outputs.
+        """
         new_out, new_err = StringIO(), StringIO()
         old_out, old_err = sys.stdout, sys.stderr
         try:
