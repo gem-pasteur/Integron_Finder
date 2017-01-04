@@ -1104,7 +1104,7 @@ def find_integrase(replicon_path, replicon_name, out_dir):
             raise RuntimeError("{0} failed return code = {1}".format(cmd[0], returncode))
 
 
-def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
+def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage=0.5):
     """
     Call hmmmer to annotate CDS associated with the integron. Use Resfams per default (Gibson et al, ISME J.,  2014)
     """
@@ -1112,7 +1112,6 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
     prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
 
     for integron in integrons:
-
         if os.path.isfile(prot_tmp):
             os.remove(prot_tmp)
 
@@ -1132,7 +1131,6 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
                 if p.id in integron.proteins.index:
                     prot_to_annotate.append(p)
             SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
-
             for hmm in hmm_files:
                 hmm_out = os.path.join(out_dir, "_".join([replicon_name,
                                                          hmm.split("/")[-1].split(".")[0],
@@ -1154,10 +1152,8 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
                     raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
                 if returncode != 0:
                     raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
-
-                hmm_in = read_hmm(replicon_name, hmm_out).sort_values("evalue").drop_duplicates(subset="ID_prot")
+                hmm_in = read_hmm(replicon_name, hmm_out, evalue=evalue, coverage=coverage).sort_values("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
-
             func_annotate_res = func_annotate_res.sort_values("evalue").drop_duplicates(subset="ID_prot")
 
             integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
