@@ -29,9 +29,13 @@ before_install:
 # command to install integroon_finder
 install:
   - python setup.py sdist
+  - pip install python-coveralls coverage
   - pip install dist/integron_finder*.tar.gz
 
 # test integron_finder
 script:
-  - python tests/run_tests.py -vv
+  - coverage run tests/run_tests.py -vv --unit
+
+after_success:
+  - coveralls
 
