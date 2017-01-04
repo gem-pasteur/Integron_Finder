@@ -285,5 +285,46 @@ class TestFunctions(unittest.TestCase):
         for inte, prots in zip(integron_finder.integrons, int_proteins):
             pdt.assert_frame_equal(inte.proteins, prots)
 
-    # TODO:
-    # error with hmmsearch
+    def test_annot_wrong_hmm(self):
+        """
+        Test that when the given hmm file does not exist, it returns an error specifying that
+        the hmm command ended with a non-zero return code.
+        """
+        hmm_files = ["myhmm.hmm"]
+        # Create integron
+        integron1 = integron_finder.Integron(self.replicon_name)
+        integron_finder.integrons = [integron1]
+        # Add only attc sites (no integrase)
+        integron1.add_attC(17825, 17884, -1, 7e-9, "attc_4")
+        integron1.add_attC(19080, 19149, -1, 7e-4, "attc_4")
+        integron1.add_attC(19618, 19726, -1, 7e-7, "attc_4")
+        # Add proteins between attC sites
+        integron1.add_proteins()
+        # Annotate proteins
+        with self.assertRaises(RuntimeError) as exp:
+            integron_finder.func_annot(self.replicon_name, self.out_dir, hmm_files)
+
+        raised = exp.exception
+        self.assertEqual(raised.message, integron_finder.HMMSEARCH + " failed return code = 1")
+
+    def test_annot_wrong_hmmsearch(self):
+        """
+        Test that when the given HMMSEARCH command does not exist, it raises an exception
+        specifying that the given command could not run.
+        """
+        integron_finder.HMMSEARCH = "hmmsearchh"
+        # Create integron
+        integron1 = integron_finder.Integron(self.replicon_name)
+        integron_finder.integrons = [integron1]
+        # Add only attc sites (no integrase)
+        integron1.add_attC(17825, 17884, -1, 7e-9, "attc_4")
+        integron1.add_attC(19080, 19149, -1, 7e-4, "attc_4")
+        integron1.add_attC(19618, 19726, -1, 7e-7, "attc_4")
+        # Add proteins between attC sites
+        integron1.add_proteins()
+        # Annotate proteins
+        with self.assertRaises(RuntimeError) as exp:
+            integron_finder.func_annot(self.replicon_name, self.out_dir, self.hmm_files)
+        raised = exp.exception
+        self.assertEqual(raised.message, integron_finder.HMMSEARCH +\
+                         " failed : [Errno 2] No such file or directory")
