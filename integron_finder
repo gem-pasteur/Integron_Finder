@@ -402,6 +402,10 @@ class Integron(object):
                 else:
                     self.proteins.loc[desc[0]] = desc[1:] + [prot_evalue, "protein",
                                                              prot_model, np.nan, prot_annot]
+            intcols = ["pos_beg", "pos_end", "strand"]
+            floatcols = ["evalue", "distance_2attC"]
+            self.proteins[intcols] = self.proteins[intcols].astype(int)
+            self.proteins[floatcols] = self.proteins[floatcols].astype(float)
 
 
     def describe(self):
