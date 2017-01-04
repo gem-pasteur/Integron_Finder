@@ -5,7 +5,7 @@
 *~
 \#*\#
 
-################# 
+#################
 # pycharm files #
 #################
 \.idea
@@ -16,6 +16,13 @@
 *\.pyc
 *\.pyo
 *\__pycache__/
+
+##################
+# Coverage files #
+##################
+.coverage
+.coveralls.yml
+coverage_html/
 
 #########################
 # distribution packages #
