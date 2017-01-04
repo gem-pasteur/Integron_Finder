@@ -47,6 +47,8 @@ class TestFunctions(unittest.TestCase):
                           "acba.007.p01.13_Resfams_fa.res", "acba.007.p01.13_intI.res",
                           "acba.007.p01.13_phage_int.res", "acba.007.p01.13_subseqprot.tmp"]
         self.exp_files = [os.path.join(self.out_dir, file) for file in self.exp_files]
+        # Run prodigal to find CDS on replicon (and run hmmsearch on integrase (2 profiles))
+        integron_finder.find_integrase(self.replicon_path, self.replicon_name, self.out_dir)
 
     def tearDown(self):
         """
@@ -60,8 +62,6 @@ class TestFunctions(unittest.TestCase):
         Test func_annot when the integron is a CALIN (attC but no integrase), with 4 proteins:
         for 3 of them resfam annotations are found, and not for the last 1.
         """
-        # Run prodigal to find CDS on replicon (and run hmmsearch on integrase (2 profiles))
-        integron_finder.find_integrase(self.replicon_path, self.replicon_name, self.out_dir)
         # Create integron
         integron1 = integron_finder.Integron(self.replicon_name)
         integron_finder.integrons = [integron1]
@@ -102,8 +102,78 @@ class TestFunctions(unittest.TestCase):
                                               "RF0003", np.nan, "AAC3-I"]
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
+    def test_annot_calin_empty(self):
+        """
+        Test func_annot when the integron is a CALIN (attC but no integrase), without any protein:
+        nothing to annotate
+        """
+        # Create integron
+        integron1 = integron_finder.Integron(self.replicon_name)
+        integron_finder.integrons = [integron1]
+        # Add only attc sites (no integrase)
+        integron1.add_attC(17825, 17884, -1, 7e-9, "attc_4")
+        integron1.add_attC(19080, 19149, -1, 7e-4, "attc_4")
+        integron1.add_attC(19618, 19726, -1, 7e-7, "attc_4")
+
+        # check proteins before annotation
+        proteins = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
+                                         "evalue", "type_elt", "model",
+                                         "distance_2attC", "annotation"])
+        pdt.assert_frame_equal(proteins, integron1.proteins)
+
+        # Annotate proteins
+        integron_finder.func_annot(self.replicon_name, self.out_dir, self.hmm_files)
+
+        # Check that all files generated are as expected
+        files_created = glob.glob(os.path.join(self.out_dir, "*"))
+        exp_files = ["acba.007.p01.13.prt", "acba.007.p01.13_intI_table.res",
+                     "acba.007.p01.13_phage_int_table.res", "acba.007.p01.13_intI.res",
+                     "acba.007.p01.13_phage_int.res"]
+        exp_files = [os.path.join(self.out_dir, file) for file in exp_files]
+        self.assertEqual(set(exp_files), set(files_created))
+
+        # Check proteins after annotation
+        pdt.assert_frame_equal(proteins, integron1.proteins)
+
+    def test_annot_in0(self):
+        """
+        Test func_annot when the integron is a in0: only an integrase. There are no proteins
+        to annotate
+        """
+        # Create integron
+        integron1 = integron_finder.Integron(self.replicon_name)
+        integron_finder.integrons = [integron1]
+        # Add integrase
+        integron1.add_integrase(55, 1014, "ACBA.007.P01_13_1", 1, 1.9e-25,
+                                      "intersection_tyr_intI")
+        # check proteins before annotation
+        proteins = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
+                                         "evalue", "type_elt", "model",
+                                         "distance_2attC", "annotation"])
+        pdt.assert_frame_equal(proteins, integron1.proteins)
+
+        # Annotate proteins
+        integron_finder.func_annot(self.replicon_name, self.out_dir, self.hmm_files)
+        # Check that all files generated are as expected
+        files_created = glob.glob(os.path.join(self.out_dir, "*"))
+        exp_files = ["acba.007.p01.13.prt", "acba.007.p01.13_intI_table.res",
+                     "acba.007.p01.13_phage_int_table.res", "acba.007.p01.13_intI.res",
+                     "acba.007.p01.13_phage_int.res"]
+        exp_files = [os.path.join(self.out_dir, file) for file in exp_files]
+        self.assertEqual(set(exp_files), set(files_created))
+        # check proteins after annotation
+        pdt.assert_frame_equal(proteins, integron1.proteins)
+
+    def test_annot_multi(self):
+        """
+        Test func_annot when there are 3 integrons:
+        - 1 calin
+        - 1 in0
+        - 1 complete with 4 proteins, 3 having a resfam annotation
+        """
+        # resfam pour: 16, 13, 3, 12
+        pass
     # TODO:
-    # annotate in0
     # annotate complete
     # create a _subseqprot.tmp file before running the function
     # several integrons
