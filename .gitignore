@@ -42,7 +42,7 @@ doc/build/
 ###########################
 # integron_finder results #
 ###########################
-Results_Integron_Finder*\
+Results_Integron_Finder*/
 
 ############################################
 # workaround for integron_finder as module #
