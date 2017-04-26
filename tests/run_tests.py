@@ -125,6 +125,7 @@ if __name__ == '__main__':
             from tests import which
             integron_finder_script = which('integron_finder')
         else:
+            INTEGRON_HOME = os.environ['INTEGRON_HOME']
             integron_finder_script = os.path.join(INTEGRON_HOME, 'integron_finder')
 
         fake_lib = os.path.join(INTEGRON_HOME, 'tests', 'fake_lib')
