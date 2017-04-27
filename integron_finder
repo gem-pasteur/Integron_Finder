@@ -1033,15 +1033,15 @@ def find_integrase(replicon_path, replicon_name, out_dir):
     :type replicon_path: string
     :param replicon_name: the name of the replicon to analyse
     :type replicon_name: string
+    :param out_dir: the relative path to the directory where prodigal outputs will be stored
+    :type out_dir: str
     :returns: None, the results are written on the disk
     """
-
     if not args.gembase:
         # Test whether the protein file exist to avoid new annotation for each run on the same replicon
         prot_tr_path = os.path.join(out_dir, replicon_name + ".prt")
         if not os.path.isfile(prot_tr_path):
             dev_null = 'NUL' if platform.system() == 'Windows' else '/dev/null'
-
             if SIZE_REPLICON > 200000:
                 prodigal_cmd = [PRODIGAL,
                                 "-i", replicon_path,
