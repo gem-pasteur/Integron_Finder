@@ -856,11 +856,13 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
 
 def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_right=False):
     """
+    for a given element, we can search on the left hand side (if integrase is on the right for instance)
+    or right hand side (opposite situation) or both side (only integrase or only attC sites)
     
     :param window_beg: 
-    :type window_beg:
+    :type window_beg: int
     :param window_end:
-    :type window_end:
+    :type window_end: int
     :param max_elt: 
     :type max_elt: int
     :param df_max:
@@ -869,10 +871,12 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
     :type search_left: bool
     :param search_right: need to search on right of ???
     :type search_right: bool
-    :return: 
+    :return: a copy of max_elt with attC hits
+    :rtype: :class:`pandas.DataFrame` object
     """
     # for a given element, we can search on the left hand side (if integrase is on the right for instance)
     # or right hand side (opposite situation) or both side (only integrase or only attC sites)
+
     wb = window_beg
     we = window_end
 
