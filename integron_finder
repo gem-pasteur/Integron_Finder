@@ -941,7 +941,19 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
 
 
 def local_max(replicon_name, window_beg, window_end, strand_search="both"):
-
+    """
+    
+    :param replicon_name: the name of replicon (without suffix)
+    :type replicon_name: str
+    :param window_beg: 
+    :type window_beg: int
+    :param window_end: 
+    :type window_end: int
+    :param strand_search:
+    :type strand_search: str
+    :return: 
+    :rtype: :class:`pd.DataFrame` object
+    """
     if window_beg < window_end:
         subseq = SEQUENCE[window_beg : window_end]
     else:
