@@ -577,8 +577,8 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
         
     :param replicon_name: the name of the replicon
     :type replicon_name: str
-    :param attc_file: the output of hmmsearch with the attc model
-    :type attc_file: file object
+    :param attc_file: the output of cmsearch or the parsing of this file by read_infernal
+    :type attc_file: file object or :class:`pd.Dataframe`
     :param intI_file: the output of hmmsearch with the integrase model
     :type intI_file: file object
     :param phageI_file: the output of hmmsearch with the phage model
@@ -766,7 +766,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
     :param outfile: the name of cmsearch result file
     :type outfile: string
     :return:
-    :rtype:
+    :rtype: :class:`pd.DataFrame`
     """
 
     max_final = pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin',
