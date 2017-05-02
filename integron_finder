@@ -886,7 +886,6 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
     """
     # for a given element, we can search on the left hand side (if integrase is on the right for instance)
     # or right hand side (opposite situation) or both side (only integrase or only attC sites)
-
     wb = window_beg
     we = window_end
 

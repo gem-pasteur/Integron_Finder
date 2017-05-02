@@ -1,0 +1,4 @@
+Accession_number,cm_attC,cm_debut,cm_fin,pos_beg,pos_end,sens,evalue
+lian.001.c02.10,attC_4,1,47,943270,943395,+,0.13
+lian.001.c02.10,attC_4,1,47,944008,944133,+,0.049
+lian.001.c02.10,attC_4,1,47,944472,944598,+,4.7e-06
