@@ -1435,14 +1435,18 @@ def scan_hmm_bank(path):
     files = []
     if os.path.exists(real_path):
         if os.path.isdir(real_path):
-            files = glob.glob(os.path.join(real_path,'*.hmm'))
+            files = glob.glob(os.path.join(real_path, '*.hmm'))
         elif os.path.isfile(real_path):
             with open(real_path) as hmm_bank:
                 for bank_path in hmm_bank:
                     if bank_path.startswith('#'):
                         continue
                     elif not os.path.isabs(bank_path):
-                        bank_path = os.path.normpath(os.path.join(_prefix_share, bank_path))
+                        if "_prefix_share" in globals():
+                            prefix = _prefix_share
+                        else:
+                            prefix = os.environ['INTEGRON_HOME']
+                        bank_path = os.path.normpath(os.path.join(prefix, bank_path))
                     bank_files = glob.glob(os.path.expanduser(bank_path.strip("\n").strip()))
                     if not bank_files:
                         print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
