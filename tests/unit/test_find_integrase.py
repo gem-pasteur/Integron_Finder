@@ -24,7 +24,7 @@ def call_wrapper():
     So I replace the `call` function in module integron_finder
     by a wrapper which call the original function but add redirect stderr and stdout
     in dev_null
-    :return: warpper around integron_finder.call
+    :return: wrapper around integron_finder.call
     :rtype: function
     """
     def wrapper(*args, **kwargs):
