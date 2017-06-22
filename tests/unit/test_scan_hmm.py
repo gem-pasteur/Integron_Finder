@@ -58,7 +58,7 @@ class TestFunctions(unittest.TestCase):
         with self.catch_output() as (out, err):
             files = integron_finder.scan_hmm_bank(mypath)
         self.assertEqual(out.getvalue().strip(), "")
-        self.assertEqual(err.getvalue().strip(), "WARNING func_annot 'my_hmms' does not " +
+        self.assertEqual(err.getvalue().strip(), "WARNING func_annot '/my_hmms' does not " +
                                                   "match any files.")
         self.assertEqual(files, [])
 
