@@ -1441,6 +1441,8 @@ def scan_hmm_bank(path):
                 for bank_path in hmm_bank:
                     if bank_path.startswith('#'):
                         continue
+                    elif not os.path.isabs(bank_path):
+                        bank_path = os.path.normpath(os.path.join(_prefix_share, bank_path))
                     bank_files = glob.glob(os.path.expanduser(bank_path.strip("\n").strip()))
                     if not bank_files:
                         print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
@@ -1448,6 +1450,7 @@ def scan_hmm_bank(path):
                         for path in bank_files:
                             print >> sys.stderr, "the hmm {} will be used for functional annotation".format(path)
                         files.extend(bank_files)
+
         return files
     else:
         raise IOError("{} no such file or directory".format(path))
