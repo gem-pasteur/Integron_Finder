@@ -14,29 +14,7 @@ warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 import integron_finder
-_call_ori = integron_finder.call
 _local_max_ori = integron_finder.local_max
-
-from tests import which
-
-
-def call_wrapper():
-    """
-    hmmsearch or prodigal write lot of things on stderr or stdout 
-    which noise the unit test output
-    So I replace the `call` function in module integron_finder
-    by a wrapper which call the original function but add redirect stderr and stdout
-    in dev_null
-    :return: wrapper around integron_finder.call
-    :rtype: function
-    """
-    def wrapper(*args, **kwargs):
-        with open(os.devnull, 'w') as f:
-            kwargs['stderr'] = f
-            kwargs['stdout'] = f
-            res = _call_ori(*args, **kwargs)
-        return res
-    return wrapper
 
 
 def local_max_mock():
