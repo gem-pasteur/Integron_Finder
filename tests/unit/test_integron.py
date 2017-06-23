@@ -1,7 +1,9 @@
 __author__ = 'bneron'
 
 import os
+import unittest
 import pandas as pd
+import pandas.util.testing as pdt
 import numpy as np
 from integron_finder import Integron
 
@@ -12,7 +14,7 @@ from integron_finder import Integron
 import integron_finder
 ##########
 
-class Test(pd.util.testing.TestCase):
+class Test(unittest.TestCase):
 
     _data_dir = os.path.join(os.path.dirname(__file__), "data")
 
@@ -54,7 +56,7 @@ class Test(pd.util.testing.TestCase):
                                data_integrase["evalue"],
                                data_integrase["model"]
                                )
-        self.assert_frame_equal(df, integron.integrase, check_dtype=False)
+        pdt.assert_frame_equal(df, integron.integrase, check_dtype=False)
 
     def test_add_attc(self):
         id_replicon = "acba.007.p01.13"
@@ -89,7 +91,7 @@ class Test(pd.util.testing.TestCase):
                           data_attc["evalue"],
                           data_attc["model"])
 
-        self.assert_frame_equal(df, integron.attC, check_dtype=False)
+        pdt.assert_frame_equal(df, integron.attC, check_dtype=False)
         self.assertListEqual(sizes_cassettes, integron.sizes_cassettes)
 
         integron_finder.SIZE_REPLICON = 3
@@ -116,7 +118,7 @@ class Test(pd.util.testing.TestCase):
                           data_attc["evalue"],
                           data_attc["model"])
 
-        self.assert_frame_equal(df, integron.attC, check_dtype=False)
+        pdt.assert_frame_equal(df, integron.attC, check_dtype=False)
         self.assertListEqual(sizes_cassettes, integron.sizes_cassettes)
 
     def test_type(self):
