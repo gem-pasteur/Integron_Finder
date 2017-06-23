@@ -1,0 +1,119 @@
+import os
+import tempfile
+import shutil
+import unittest
+
+import pandas as pd
+import pandas.util.testing as pdt
+
+# display warning only for non installed integron_finder
+from Bio import BiopythonExperimentalWarning
+from Bio import Seq, SeqIO
+import warnings
+warnings.simplefilter('ignore', FutureWarning)
+warnings.simplefilter('ignore', BiopythonExperimentalWarning)
+
+import integron_finder
+_call_ori = integron_finder.call
+
+from tests import which
+
+
+def call_wrapper():
+    """
+    hmmsearch or prodigal write lot of things on stderr or stdout 
+    which noise the unit test output
+    So I replace the `call` function in module integron_finder
+    by a wrapper which call the original function but add redirect stderr and stdout
+    in dev_null
+    :return: wrapper around integron_finder.call
+    :rtype: function
+    """
+    def wrapper(*args, **kwargs):
+        with open(os.devnull, 'w') as f:
+            kwargs['stderr'] = f
+            kwargs['stdout'] = f
+            res = _call_ori(*args, **kwargs)
+        return res
+    return wrapper
+
+
+def read_infernal_mock():
+    """expand call several time local_max which run cmserach and need lot of global variable
+    to avoid to call cmsearch (we don't want to test local max), I have been ccahed the results
+    of local_max and replace the function by this mock
+    """
+    _cache = {('/tmp/tmp_test_integron_finder/lian.001.c02.10_942899_947099_subseq_attc_table.res', 1.0, 200, 40):
+               pd.DataFrame([
+                   ['lian.001.c02.10', 'attC_4', 1, 47, 371, 496, '+', 0.130000],
+                   ['lian.001.c02.10', 'attC_4', 1, 47, 1109, 1234, '+', 0.049000]
+                   ['lian.001.c02.10', 'attC_4', 1, 47, 1573, 1699, '+', 0.000005]],
+                   columns=['df_max', 'Accession_number', 'cm_attC', 'cm_debut',
+                            'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']),
+
+              }
+    def fake_local_max(*args):
+        return _cache[args]
+    return fake_local_max
+
+
+class TestLocalMax(unittest.TestCase):
+
+    _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', "data"))
+
+
+    def setUp(self):
+        if 'INTEGRON_HOME' in os.environ:
+            self.integron_home = os.environ['INTEGRON_HOME']
+            self.local_install = True
+        else:
+            self.local_install = False
+            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..' '..')))
+
+        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        os.makedirs(self.tmp_dir)
+
+        integron_finder.PRODIGAL = which('prodigal')
+        integron_finder.HMMSEARCH = which('hmmsearch')
+        integron_finder.CMSEARCH = which('cmsearch')
+        integron_finder.N_CPU = '1'
+        integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
+        integron_finder.MODEL_integrase = os.path.join(integron_finder.MODEL_DIR, "integron_integrase.hmm")
+        integron_finder.MODEL_phage_int = os.path.join(integron_finder.MODEL_DIR, "phage-int.hmm")
+        integron_finder.MODEL_attc = os.path.join(self.integron_home, 'data', 'Models', 'attc_4.cm')
+        integron_finder.out_dir = self.tmp_dir
+        integron_finder.call = call_wrapper()
+
+    def tearDown(self):
+        integron_finder.call = _call_ori
+        try:
+            shutil.rmtree(self.tmp_dir)
+            pass
+        except:
+            pass
+
+
+    def test_local_max(self):
+        integron_finder.replicon_name = 'lian.001.c02.10'
+        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name + '.fst')
+
+        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
+        integron_finder.evalue_attc = 1.
+        integron_finder.max_attc_size = 200
+        integron_finder.min_attc_size = 40
+
+        integron_finder.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
+
+        win_beg = 942899
+        win_end = 947099
+        strand_search = 'top'
+        local_max_recieved = integron_finder.local_max(integron_finder.replicon_name,
+                                                       win_beg, win_end,
+                                                       strand_search=strand_search)
+        local_max_expected = pd.DataFrame([['lian.001.c02.10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
+                                           ['lian.001.c02.10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
+                                           ['lian.001.c02.10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
+                                          columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg',
+                                                   'pos_end', 'sens', 'evalue'])
+        pdt.assert_frame_equal(local_max_expected, local_max_recieved)
