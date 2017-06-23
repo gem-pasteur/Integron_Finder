@@ -1,0 +1,4 @@
+annotation,distance_2attC,evalue,model,pos_beg,pos_end,strand,type_elt
+attc_001,attC,,1e-09,attc_4,17825.0,17884.0,-1.0,attC
+attc_002,attC,1196.0,0.0001,attc_4,19080.0,19149.0,-1.0,attC
+attc_003,attC,469.0,1.1e-07,attc_4,19618.0,19726.0,-1.0,attC
