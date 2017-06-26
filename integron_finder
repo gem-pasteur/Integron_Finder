@@ -77,18 +77,37 @@ class Integron(object):
         self.integrase = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                                "evalue", "type_elt", "model",
                                                "distance_2attC", "annotation"])
+        self.integrase = self.integrase.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
+                                                      "evalue": "float", "type_elt": "str", "model": "str",
+                                                      "distance_2attC": "float", "annotation": "str"})
+
         self.attC = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                                "evalue", "type_elt", "model",
                                                "distance_2attC", "annotation"])
+        self.attC = self.attC.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
+                                                      "evalue": "float", "type_elt": "str", "model": "str",
+                                                      "distance_2attC": "float", "annotation": "str"})
+
         self.promoter = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                                "evalue", "type_elt", "model",
                                                "distance_2attC", "annotation"])
+        self.promoter = self.promoter.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
+                                                      "evalue": "float", "type_elt": "str", "model": "str",
+                                                      "distance_2attC": "float", "annotation": "str"})
+
         self.attI = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                                "evalue", "type_elt", "model",
                                                "distance_2attC", "annotation"])
+        self.attI = self.attI.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
+                                                      "evalue": "float", "type_elt": "str", "model": "str",
+                                                      "distance_2attC": "float", "annotation": "str"})
+
         self.proteins = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                                "evalue", "type_elt", "model",
                                                "distance_2attC", "annotation"])
+        self.proteins = self.proteins.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
+                                                      "evalue": "float", "type_elt": "str", "model": "str",
+                                                      "distance_2attC": "float", "annotation": "str"})
 
     def add_integrase(self, pos_beg_int, pos_end_int, id_int, strand_int, evalue, model):
         """Function which adds integrases to the integron. Should be called once"""
