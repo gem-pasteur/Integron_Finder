@@ -85,13 +85,45 @@ class TestFindIntegons(unittest.TestCase):
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
         self.assertEqual(integron.ID_replicon, replicon_name)
-        pdt.assert_frame_equal(integron.integrase,
-                               pd.read_csv(os.path.join(self._data_dir,'{}_integrase.csv'.format(replicon_name))))
-        pdt.assert_frame_equal(integron.attC,
-                               pd.read_csv(os.path.join(self._data_dir,'{}_attC.csv'.format(replicon_name))))
-        pdt.assert_frame_equal(integron.promoter,
-                               pd.read_csv(os.path.join(self._data_dir,'{}_promoter.csv'.format(replicon_name))))
-        pdt.assert_frame_equal(integron.attI,
-                               pd.read_csv(os.path.join(self._data_dir,'{}_attI.csv'.format(replicon_name))))
-        pdt.assert_frame_equal(integron.proteins,
-                               pd.read_csv(os.path.join(self._data_dir,'{}_proteins.csv'.format(replicon_name))))
+        print "\n##############################################"
+        print pd.__version__
+        print "\n##############################################"
+        print "integron.integrase\n", integron.integrase
+        print integron.integrase.dtypes
+        print "---------------"
+        exp = pd.read_csv(os.path.join(self._data_dir,'{}_integrase.csv'.format(replicon_name)))
+        print "expected\n", exp
+        print exp.dtypes
+        pdt.assert_frame_equal(integron.integrase, exp)
+        print "================================================"
+        print "integron.attC\n", integron.attC
+        print integron.attC.dtypes
+        print "---------------"
+        exp = pd.read_csv(os.path.join(self._data_dir,'{}_attC.csv'.format(replicon_name)))
+        print "expected\n", exp
+        print exp.dtypes
+        pdt.assert_frame_equal(integron.attC, exp)
+        print "================================================"
+        print "integron.promoter\n", integron.promoter
+        print integron.promoter.dtypes
+        print "---------------"
+        exp = pd.read_csv(os.path.join(self._data_dir, '{}_promoter.csv'.format(replicon_name)))
+        print "expected\n", exp
+        print exp.dtypes
+        pdt.assert_frame_equal(integron.promoter, exp)
+        print "================================================"
+        print "integron.attI\n", integron.attI
+        print integron.attI.dtypes
+        print "---------------"
+        exp = pd.read_csv(os.path.join(self._data_dir, '{}_attI.csv'.format(replicon_name)))
+        print "expected\n",
+        print exp.dtypes
+        pdt.assert_frame_equal(integron.attI, exp)
+        print "================================================"
+        print "integron.proteins\n", integron.proteins
+        print integron.proteins.dtypes
+        print "---------------"
+        exp = pd.read_csv(os.path.join(self._data_dir, '{}_proteins.csv'.format(replicon_name)))
+        print "expected\n",
+        print exp.dtypes
+        pdt.assert_frame_equal(integron.proteins, exp)
