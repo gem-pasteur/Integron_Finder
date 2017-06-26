@@ -3,6 +3,9 @@ import tempfile
 import shutil
 import unittest
 import argparse
+import sys
+from StringIO import StringIO
+from contextlib import contextmanager
 
 import pandas as pd
 import pandas.util.testing as pdt
@@ -54,6 +57,21 @@ class TestFindIntegons(unittest.TestCase):
             pass
 
 
+    @contextmanager
+    def catch_output(self):
+        """
+        Catch stderr and stdout of the code running with this function.
+        They can, then, be compared to expected outputs.
+        """
+        new_out, new_err = StringIO(), StringIO()
+        old_out, old_err = sys.stdout, sys.stderr
+        try:
+            sys.stdout, sys.stderr = new_out, new_err
+            yield sys.stdout, sys.stderr
+        finally:
+            sys.stdout, sys.stderr = old_out, old_err
+
+
     def test_find_integron(self):
         replicon_name = 'acba.007.p01.13'
         replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
@@ -78,10 +96,18 @@ class TestFindIntegons(unittest.TestCase):
         integron_finder.DISTANCE_THRESHOLD = 4000  # (4kb at least between 2 different arrays)
         integron_finder.model_attc_name = integron_finder.MODEL_attc.split("/")[-1].split(".cm")[0]
 
-        integrons = integron_finder.find_integron(replicon_name,
-                                                  attc_file,
-                                                  intI_file,
-                                                  phageI_file)
+        with self.catch_output() as (out, err):
+            integrons = integron_finder.find_integron(replicon_name,
+                                                      attc_file,
+                                                      intI_file,
+                                                      phageI_file)
+
+        self.assertEqual(err.getvalue().strip(), "")
+        self.assertEqual(out.getvalue().strip(), """In replicon acba.007.p01.13, there are:
+- 0 complete integron(s) found with a total 0 attC site(s)
+- 1 CALIN element(s) found with a total of 3 attC site(s)
+- 0 In0 element(s) found with a total of 0 attC site""")
+
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
         self.assertEqual(integron.ID_replicon, replicon_name)
