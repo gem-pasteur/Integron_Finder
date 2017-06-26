@@ -120,6 +120,9 @@ class TestFunctions(unittest.TestCase):
         proteins = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                          "evalue", "type_elt", "model",
                                          "distance_2attC", "annotation"])
+        proteins = proteins.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
+                                          "evalue": "float", "type_elt": "str", "model": "str",
+                                          "distance_2attC": "float", "annotation": "str"})
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
         # Annotate proteins
@@ -154,6 +157,9 @@ class TestFunctions(unittest.TestCase):
         proteins = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                          "evalue", "type_elt", "model",
                                          "distance_2attC", "annotation"])
+        proteins = proteins.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
+                                          "evalue": "float", "type_elt": "str", "model": "str",
+                                          "distance_2attC": "float", "annotation": "str"})
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
         # Annotate proteins
@@ -210,6 +216,9 @@ class TestFunctions(unittest.TestCase):
         proteins1 = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                           "evalue", "type_elt", "model",
                                           "distance_2attC", "annotation"])
+        proteins1 = proteins1.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
+                                          "evalue": "float", "type_elt": "str", "model": "str",
+                                          "distance_2attC": "float", "annotation": "str"})
         proteins1 = proteins1[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
                                "model", "distance_2attC", "annotation"]]
         proteins2 = pd.DataFrame({"pos_beg": [7088, 7710, 8650, 10524],
