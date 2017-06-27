@@ -18,7 +18,7 @@ import integron_finder
 from tests import which
 
 
-class TestFindIntegons(unittest.TestCase):
+class TestFindFindAttCMax(unittest.TestCase):
 
     _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', "data"))
 
