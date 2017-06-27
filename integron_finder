@@ -111,6 +111,8 @@ class Integron(object):
 
     def add_integrase(self, pos_beg_int, pos_end_int, id_int, strand_int, evalue, model):
         """Function which adds integrases to the integron. Should be called once"""
+        if not self.integrase.empty:
+            raise RuntimeError("add_integrase should be called once.")
         tmp_df = pd.DataFrame()
         tmp_df["pos_beg"] = [pos_beg_int]
         tmp_df["pos_end"] = [pos_end_int]
