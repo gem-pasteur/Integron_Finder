@@ -786,12 +786,15 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
     :return:
     :rtype: :class:`pd.DataFrame`
     """
-
-    max_final = pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin',
-                                      'pos_beg', 'pos_end', 'sens', 'evalue'])
+    columns = ['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']
+    data_type = {'Accession_number': 'str', 'cm_attC': 'str',
+                 'cm_debut': 'int', 'cm_fin': 'int',
+                 'pos_beg': 'int', 'pos_end': 'int', }
+    max_final = pd.DataFrame(columns=columns)
+    max_final = max_final.astype(dtype=data_type)
     for i in integrons:
-        max_elt = pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin',
-                                        'pos_beg', 'pos_end', 'sens', 'evalue'])
+        max_elt = pd.DataFrame(columns=columns)
+        max_elt = max_elt.astype(dtype=data_type)
         full_element = i.describe()
         if all(full_element.type == "complete"):
 
