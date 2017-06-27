@@ -125,7 +125,6 @@ class TestFindIntegons(unittest.TestCase):
         integron_finder.args = args
 
         integron_finder.circular = False
-
         integrons = []
         for i in (0, 1):
             integron = integron_finder.Integron(replicon_name)
