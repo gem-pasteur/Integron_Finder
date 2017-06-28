@@ -19,8 +19,7 @@ import integron_finder
 
 class Test(unittest.TestCase):
 
-    _data_dir = os.path.join(os.path.dirname(__file__), "data")
-
+    _data_dir = os.path.join(os.path.join(os.path.dirname(__file__), '..', "data"))
 
     def test_add_integrase(self):
         #                       pos_beg, pos_end, strand,   evalue,   type_elt, annotation, model,           distance_2attC
@@ -159,9 +158,87 @@ class Test(unittest.TestCase):
     # def test_attI(self):
     #     pass
     #
-    # def add_proteins(self):
-    #     pass
-    #
+
+    def test_add_proteins(self):
+        replicon_name = 'pssu.001.c01.13'
+        integron_finder.SIZE_REPLICON = 3419049
+        integron_finder.PROT_file = os.path.join(self._data_dir,
+                                                 '{}.prt.short'.format(replicon_name))
+        args = argparse.Namespace()
+        args.gembase = False
+        integron_finder.args = args
+
+        integron = Integron(replicon_name)
+
+        dtype = {"pos_beg": 'int',
+                 "pos_end": 'int',
+                 "strand": 'int',
+                 "evalue": 'float',
+                 "type_elt": 'str',
+                 "annotation": 'str',
+                 "model": 'str',
+                 "distance_2attC": 'float'}
+        columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
+        # data_integrase = {"pos_beg": [],
+        #                   "pos_end": [],
+        #                   "strand": [],
+        #                   "evalue": [],
+        #                   "type_elt": [],
+        #                   "annotation": [],
+        #                   "model": [],
+        #                   "distance_2attC": [np.nan]}
+        #
+        # id_int = "PSSU.001.C01.13_1"
+        # integrase = pd.DataFrame(data_integrase, index=[id_int])
+        # integrase = integrase.astype(dtype=dtype)
+
+        data_attc = {"pos_beg": [3072863, 3073496, 3074121, 3075059, 3075593, 3076281, 3076659],
+                     "pos_end": [3072931, 3073555, 3074232, 3075118, 3075652, 3076340, 3076718],
+                     "strand": [-1] * 7,
+                     "evalue": [2.5e-06, 7e-08, 6.5e-08, 3.2e-06, 4.1e-07, 1.4e-08, 4e-08],
+                     "type_elt": ['attC'] * 7,
+                     "annotation": ['attC'] * 7,
+                     "model": ['attc_4'] * 7,
+                     "distance_2attC": [np.nan, 565.0, 566.0, 827.0, 475.0, 629.0, 319.0]}
+
+        attC = pd.DataFrame(data_attc, index=['attc_00{}'.format(i) for i in range(len(data_attc['pos_beg']))])
+        attC = attC.astype(dtype=dtype)
+        integron.attC = attC
+
+        integrase = pd.DataFrame(columns=columns)
+        integrase = integrase.astype(dtype=dtype)
+        integron.integrase = integrase
+
+        promoter = pd.DataFrame(columns=columns)
+        promoter = promoter.astype(dtype=dtype)
+        integron.promoter = promoter
+
+        attI = pd.DataFrame(columns=columns)
+        attI = attI.astype(dtype=dtype)
+        integron.attI = attI
+
+        proteins = pd.DataFrame(columns=columns)
+        proteins = proteins.astype(dtype=dtype)
+        integron.proteins = proteins
+
+        integron.add_proteins()
+
+        exp_proteins = pd.DataFrame({'pos_beg': [3071974, 3072950, 3074243, 3076720],
+                                     'pos_end': [3072855, 3073468, 3075055, 3077511],
+                                     'strand': [-1] * 4,
+                                     'evalue': [np.nan] * 4,
+                                     'type_elt': ['protein'] * 4,
+                                     'annotation': ['protein'] *4,
+                                     'model': ['NA'] * 4,
+                                     'distance_2attC': [np.nan] *4
+                                     },
+                                    index=['PSSU.001.C01_13_281{}'.format(i) for i in range(5, 9)],
+                                    columns=columns
+                                    )
+        exp_proteins = exp_proteins.astype(dtype=dtype)
+        pdt.assert_frame_equal(exp_proteins, integron.proteins)
+
+
     def test_describe(self):
         id_replicon = "acba.007.p01.13"
         integron = Integron(id_replicon)
