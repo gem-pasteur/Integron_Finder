@@ -47,10 +47,17 @@ class Test(IntegronTest):
             python_exe=sys.executable,
             bin=self.bin,
             out_dir=self.out_dir,
-            annot_bank=os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'data', 'Functional_annot')),
-            replicon=os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'data', self.replicon_name + '.fst'))
+            annot_bank=os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                                     '..',
+                                                     'data',
+                                                     'Functional_annot')),
+            replicon=os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                                   '..',
+                                                   'data',
+                                                   'Replicons',
+                                                   self.replicon_name + '.fst'))
         )
-        print("\n", command)
+        #print("\n", command)
         if not self.bin:
             raise RuntimeError('coverage not found, INTEGRON_HOME must be either in your path or INTEGRON_HOME'
                                ' must be defined command launch: \n{}'.format(command))

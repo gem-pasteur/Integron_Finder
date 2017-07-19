@@ -61,7 +61,7 @@ class TestFindFindAttCMax(unittest.TestCase):
 
     def test_find_attc_max_circular(self):
         replicon_name = 'pssu.001.c01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         args = argparse.Namespace
         args.eagle_eyes = False
@@ -113,7 +113,7 @@ class TestFindFindAttCMax(unittest.TestCase):
 
     def test_find_attc_max_linear(self):
         replicon_name = 'pssu.001.c01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         args = argparse.Namespace
         args.eagle_eyes = False

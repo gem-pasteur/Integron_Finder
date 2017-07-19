@@ -20,7 +20,7 @@ class TestFunctions(unittest.TestCase):
         """
         Define variables common to all tests
         """
-        self.replicon_path = os.path.join("tests", "data", "acba.007.p01.13.fst")
+        self.replicon_path = os.path.join("tests", "data", 'Replicons', "acba.007.p01.13.fst")
         self.seq = SeqIO.read(self.replicon_path, "fasta",
                               alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.PROT_file = os.path.join("tests", "data",

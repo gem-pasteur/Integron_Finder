@@ -40,7 +40,7 @@ class TestFindAttc(unittest.TestCase):
 
     def test_find_attc(self):
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         integron_finder.find_attc(replicon_path, replicon_name, self.tmp_dir)
         for suffix in ('_attc.res', '_attc_table.res'):
             res = os.path.join(self.tmp_dir, replicon_name + suffix)
@@ -49,7 +49,7 @@ class TestFindAttc(unittest.TestCase):
     def test_find_attc_no_infernal(self):
         integron_finder.CMSEARCH = 'foo'
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         with self.assertRaises(RuntimeError) as ctx:
             integron_finder.find_attc(replicon_path, replicon_name, self.tmp_dir)
         self.assertEqual(str(ctx.exception), 'foo failed : [Errno 2] No such file or directory')
@@ -57,7 +57,7 @@ class TestFindAttc(unittest.TestCase):
     def test_find_attc_no_model(self):
         integron_finder.MODEL_attc = 'foo'
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         with self.assertRaises(RuntimeError) as ctx:
             integron_finder.find_attc(replicon_path, replicon_name, self.tmp_dir)
         self.assertEqual(str(ctx.exception), '{} failed returncode = 1'.format(integron_finder.CMSEARCH))

@@ -76,14 +76,14 @@ class TestFindIntegrase(unittest.TestCase):
         integron_finder.args = FakeArgs(True)
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, replicon_name + ".prt"),
+        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
                         integron_finder.PROT_file)
 
         integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
-        for suffix in ('_intI.res', '_intI_table.res','_phage_int.res', '_phage_int_table.res'):
+        for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
             res = os.path.join(self.tmp_dir, replicon_name + suffix)
             self.assertTrue(os.path.exists(res))
 
@@ -94,10 +94,10 @@ class TestFindIntegrase(unittest.TestCase):
         integron_finder.SIZE_REPLICON = 200
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, replicon_name + ".prt"),
+        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
                         integron_finder.PROT_file)
 
         integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
@@ -112,7 +112,7 @@ class TestFindIntegrase(unittest.TestCase):
         integron_finder.SIZE_REPLICON = 200
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
 
@@ -128,7 +128,7 @@ class TestFindIntegrase(unittest.TestCase):
         integron_finder.SIZE_REPLICON = 500000
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
         integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
@@ -143,7 +143,7 @@ class TestFindIntegrase(unittest.TestCase):
         integron_finder.SIZE_REPLICON = 500000
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         integron_finder.PRODIGAL = 'foo'
         with self.assertRaises(RuntimeError) as ctx:
@@ -169,10 +169,10 @@ class TestFindIntegrase(unittest.TestCase):
         integron_finder.HMMSEARCH = 'foo'
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, replicon_name + ".prt"),
+        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
                         integron_finder.PROT_file)
         with self.assertRaises(RuntimeError) as ctx:
             integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
@@ -186,10 +186,10 @@ class TestFindIntegrase(unittest.TestCase):
         integron_finder.HMMSEARCH = 'foo'
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, replicon_name + ".prt"),
+        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
                         integron_finder.PROT_file)
         with self.assertRaises(RuntimeError) as ctx:
             integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
@@ -202,10 +202,10 @@ class TestFindIntegrase(unittest.TestCase):
         integron_finder.N_CPU = 'foo'
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, replicon_name + ".prt"),
+        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
                         integron_finder.PROT_file)
         with self.assertRaises(RuntimeError) as ctx:
             integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)

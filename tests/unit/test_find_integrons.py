@@ -76,7 +76,7 @@ class TestFindIntegons(unittest.TestCase):
 
     def test_find_integron(self):
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         attc_file = os.path.join(self._data_dir,
                                  'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc_table.res')
         intI_file = os.path.join(self._data_dir,
@@ -140,7 +140,7 @@ class TestFindIntegons(unittest.TestCase):
 
     def test_find_integron_attC_is_df(self):
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         attc_file = os.path.join(self._data_dir,
                                  'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc_table.res')
 
@@ -210,7 +210,7 @@ class TestFindIntegons(unittest.TestCase):
 
     def test_find_integron_proteins(self):
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         attc_file = os.path.join(self._data_dir,
                                  'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc_table.res')
         intI_file = os.path.join(self._data_dir,
@@ -293,7 +293,7 @@ class TestFindIntegons(unittest.TestCase):
 
     def test_find_integron_proteins_n_union_integrase(self):
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         attc_file = os.path.join(self._data_dir,
                                  'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc_table.res')
         intI_file = os.path.join(self._data_dir,

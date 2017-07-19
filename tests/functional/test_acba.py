@@ -50,6 +50,7 @@ class Test(IntegronTest):
                                                                       os.path.join(os.path.dirname(__file__),
                                                                                    '..',
                                                                                    'data',
+                                                                                   'Replicons',
                                                                                    'acba.007.p01.13.fst')
                                                                   )
         )

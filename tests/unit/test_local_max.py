@@ -105,7 +105,7 @@ class TestLocalMax(unittest.TestCase):
 
     def test_local_max_top(self):
         integron_finder.replicon_name = 'lian.001.c02.10'
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name + '.fst')
 
         integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
@@ -131,7 +131,7 @@ class TestLocalMax(unittest.TestCase):
 
     def test_no_local_max_top(self):
         integron_finder.replicon_name = 'lian.001.c02.10'
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name + '.fst')
 
         integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
@@ -154,7 +154,7 @@ class TestLocalMax(unittest.TestCase):
 
     def test_no_local_max_bottom(self):
         integron_finder.replicon_name = 'lian.001.c02.10'
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name + '.fst')
 
         integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
@@ -177,7 +177,7 @@ class TestLocalMax(unittest.TestCase):
 
     def test_local_max_both(self):
         integron_finder.replicon_name = 'lian.001.c02.10'
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name + '.fst')
 
         integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
@@ -203,7 +203,7 @@ class TestLocalMax(unittest.TestCase):
 
     def local_max_end_beg(self):
         integron_finder.replicon_name = 'lian.001.c02.10'
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name + '.fst')
 
         integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
@@ -228,7 +228,7 @@ class TestLocalMax(unittest.TestCase):
 
     def test_local_max_cmsearch_failed(self):
         integron_finder.replicon_name = 'lian.001.c02.10'
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name + '.fst')
 
         integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)

@@ -69,7 +69,7 @@ class TestExpand(unittest.TestCase):
         integron_finder.DISTANCE_THRESHOLD = 4000
         integron_finder.replicon_name = 'lian.001.c02.10'
 
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name +'.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name +'.fst')
         sequence = SeqIO.read(replicon_path, "fasta",
                                               alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(sequence)
@@ -87,7 +87,7 @@ class TestExpand(unittest.TestCase):
         integron_finder.DISTANCE_THRESHOLD = 4000
         integron_finder.replicon_name = 'lian.001.c02.10'
 
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name + '.fst')
         sequence = SeqIO.read(replicon_path, "fasta",
                               alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(sequence)
@@ -105,7 +105,7 @@ class TestExpand(unittest.TestCase):
         integron_finder.DISTANCE_THRESHOLD = 4000
         integron_finder.replicon_name = 'lian.001.c02.10'
 
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name +'.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name +'.fst')
         sequence = SeqIO.read(replicon_path, "fasta",
                                               alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(sequence)
@@ -123,7 +123,7 @@ class TestExpand(unittest.TestCase):
         integron_finder.DISTANCE_THRESHOLD = 4000
         integron_finder.replicon_name = 'lian.001.c02.10'
 
-        replicon_path = os.path.join(self._data_dir, integron_finder.replicon_name + '.fst')
+        replicon_path = os.path.join(self._data_dir, 'Replicons', integron_finder.replicon_name + '.fst')
         sequence = SeqIO.read(replicon_path, "fasta",
                               alphabet=Seq.IUPAC.unambiguous_dna)
         integron_finder.SIZE_REPLICON = len(sequence)
