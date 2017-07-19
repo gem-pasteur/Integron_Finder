@@ -125,7 +125,6 @@ class Integron(object):
         tmp_df["distance_2attC"] = [np.nan]
         self.integrase = self.integrase.append(tmp_df)
 
-
     def add_attC(self, pos_beg_attC, pos_end_attC, strand, evalue, model):
         """ Function which adds attC site to the Integron object. """
         tmp_df = pd.DataFrame()
@@ -168,7 +167,6 @@ class Integron(object):
         Function that looks for known promoters if they exists within your integrons element.
         It takes 1s for about 13kb.
         """
-
         dist_prom = 500  # pb distance from edge of the element for which we seek promoter
 
         ######## Promoter of integrase #########
@@ -223,9 +221,9 @@ class Integron(object):
         ## Pc-int1
         motifs_Pc = []
 
-        pc = SeqIO.parse(MODEL_DIR + "variants_Pc_intI1.fst", "fasta")
+        pc = SeqIO.parse(os.path.join(MODEL_DIR, "variants_Pc_intI1.fst"), "fasta")
         pseq = [i for i in pc]
-        d = {len(i):[] for i in pseq}
+        d = {len(i): [] for i in pseq}
         _ = [d[len(i)].append(i.seq.upper()) for i in pseq]
         for k, i in d.iteritems():
             motifs_Pc.append(motifs.create(i))
@@ -298,7 +296,6 @@ class Integron(object):
 
 
     def add_attI(self):
-
         dist_atti = 500
 
         ## attI1
@@ -370,8 +367,8 @@ class Integron(object):
                     tmp_df["distance_2attC"] = [np.nan]
                     self.attI = self.attI.append(tmp_df)
 
-    def add_proteins(self):
 
+    def add_proteins(self):
         debut = self.attC.pos_beg.values[0]
         fin = self.attC.pos_end.values[-1]
 
@@ -427,7 +424,6 @@ class Integron(object):
             floatcols = ["evalue", "distance_2attC"]
             self.proteins[intcols] = self.proteins[intcols].astype(int)
             self.proteins[floatcols] = self.proteins[floatcols].astype(float)
-
 
     def describe(self):
         """ Method describing the integron object """
