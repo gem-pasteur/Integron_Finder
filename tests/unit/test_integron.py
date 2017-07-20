@@ -30,14 +30,18 @@ class Test(unittest.TestCase):
             self.local_install = False
             self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..' '..')))
 
+        self.columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
+        self.dtype = {"pos_beg": 'int',
+                      "pos_end": 'int',
+                      "strand": 'int',
+                      "evalue": 'float',
+                      "type_elt": 'str',
+                      "annotation": 'str',
+                      "model": 'str',
+                      "distance_2attC": 'float'}
 
 
     def test_add_integrase(self):
-        #                       pos_beg, pos_end, strand,   evalue,   type_elt, annotation, model,           distance_2attC
-        # ACBA.007.P01_13_1,    55     ,    1014,    1,   1.900000e-25, protein, intI,    intersection_tyr_intI, NaN
-        # LIAN.001.C02_10_825,  934165 ,  934689,   -1,   1.900000e-26, protein, intI,    intersection_tyr_intI, NaN
-        # PSSU.001.C01_13_1919, 2131128, 2132135,    1,   5.100000e-27, protein, intI,    intersection_tyr_intI, NaN
-
         id_replicon = "acba.007.p01.13"
         data_integrase = {"pos_beg": 55,
                           "pos_end": 1014,
@@ -47,18 +51,12 @@ class Test(unittest.TestCase):
                           "annotation": "intI",
                           "model": "intersection_tyr_intI",
                           "distance_2attC": np.nan}
-        integrase_dtype = {"pos_beg": 'int',
-                           "pos_end": 'int',
-                           "strand": 'int',
-                           "evalue": 'float',
-                           "type_elt": 'str',
-                           "annotation": 'str',
-                           "model": 'str',
-                           "distance_2attC": 'float'}
         id_int = "ACBA.007.P01_13_1"
 
-        df = pd.DataFrame(data_integrase, index=[id_int])
-        df = df.astype(dtype=integrase_dtype)
+        df = pd.DataFrame(data_integrase,
+                          columns=self.columns,
+                          index=[id_int])
+        df = df.astype(dtype=self.dtype)
 
         integron = Integron(id_replicon)
         integron.add_integrase(data_integrase["pos_beg"],
@@ -69,6 +67,7 @@ class Test(unittest.TestCase):
                                data_integrase["model"]
                                )
         pdt.assert_frame_equal(df, integron.integrase)
+
         with self.assertRaises(RuntimeError) as ctx:
             integron.add_integrase(data_integrase["pos_beg"],
                                    data_integrase["pos_end"],
@@ -82,6 +81,7 @@ class Test(unittest.TestCase):
 
     def test_add_attc(self):
         id_replicon = "acba.007.p01.13"
+
         data_attc_1 = {"pos_beg": 10,
                        "pos_end": 100,
                        "strand": -1,
@@ -90,17 +90,12 @@ class Test(unittest.TestCase):
                        "annotation": "attC",
                        "model": "attc_4",
                        "distance_2attC": np.nan}
-        attc_dtype = {"pos_beg": 'int',
-                      "pos_end": 'int',
-                      "strand": 'int',
-                      "evalue": 'float',
-                      "type_elt": 'str',
-                      "annotation": 'str',
-                      "model": 'str',
-                      "distance_2attC": 'float'}
 
-        attc_1 = pd.DataFrame(data_attc_1, index=['attc_001'])
-        attc_1 = attc_1.astype(dtype=attc_dtype)
+        attc_1 = pd.DataFrame(data_attc_1,
+                              columns=self.columns,
+                              index=['attc_001'])
+        attc_1 = attc_1.astype(dtype=self.dtype)
+
         integron = Integron(id_replicon)
         integron.add_attC(attc_1.loc['attc_001', 'pos_beg'],
                           attc_1.loc['attc_001', 'pos_end'],
@@ -112,7 +107,10 @@ class Test(unittest.TestCase):
 
         integron_finder.SIZE_REPLICON = 3
 
-        attc_2 = pd.DataFrame(data_attc_1, index=['attc_002'])
+        attc_2 = pd.DataFrame(data_attc_1,
+                              columns=self.columns,
+                              index=['attc_002'])
+        attc_2 = attc_2.astype(dtype=self.dtype)
         attc_2['pos_beg'] = attc_2['pos_beg'] + 100
         attc_2['pos_end'] = attc_2['pos_end'] + 100
         attc_2["distance_2attC"] = (attc_2.loc['attc_002', 'pos_beg'] - attc_1.loc['attc_001', 'pos_end']) % \
@@ -172,21 +170,6 @@ class Test(unittest.TestCase):
                                                  '{}.prt'.format(replicon_name))
         integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
         integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        #args = argparse.Namespace()
-        #args.gembase = False
-        #integron_finder.args = args
-
-        integron = Integron(replicon_name)
-
-        dtype = {"pos_beg": 'int',
-                 "pos_end": 'int',
-                 "strand": 'int',
-                 "evalue": 'float',
-                 "type_elt": 'str',
-                 "annotation": 'str',
-                 "model": 'str',
-                 "distance_2attC": 'float'}
-        columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
 
         # to test promoter we need to ad attC and integrase first
         # as add_promoter use attc and integrase
@@ -200,13 +183,8 @@ class Test(unittest.TestCase):
                              'distance_2attC': [np.nan, 452.0, 797.0, 1480.0, 797.0, 261.0]
                              },
                             index=['attc_00{}'.format(i) for i in range(1, 7)],
-                            columns=columns)
-        attC = attC.astype(dtype=dtype)
-        integron.attC = attC
-
-        ##########################################
-        # test promoter with attC with integrase #
-        ##########################################
+                            columns=self.columns)
+        attC = attC.astype(dtype=self.dtype)
 
         integrase = pd.DataFrame({'pos_beg': 109469,
                                   'pos_end': 110482,
@@ -218,18 +196,17 @@ class Test(unittest.TestCase):
                                   'distance_2attC': np.nan
                                   },
                                  index=['SAEN.040.P01_10_135'],
-                                 columns=columns)
-        integrase = integrase.astype(dtype=dtype)
+                                 columns=self.columns)
+        integrase = integrase.astype(dtype=self.dtype)
+
+        ##########################################
+        # test promoter with attC with integrase #
+        ##########################################
+        integron = Integron(replicon_name)
+        integron.attC = attC
         integron.integrase = integrase
 
-        attI = pd.DataFrame(columns=columns)
-        attI = attI.astype(dtype=dtype)
-        integron.attI = attI
-
-        proteins = pd.DataFrame(columns=columns)
-        proteins = proteins.astype(dtype=dtype)
-        integron.proteins = proteins
-
+        integron.add_promoter()
 
         exp_promoters = pd.DataFrame({'pos_beg': [109413, 109439],
                                       'pos_end': [109447, 109465],
@@ -241,10 +218,9 @@ class Test(unittest.TestCase):
                                       'distance_2attC': [np.nan] * 2
                                       },
                                      index=['P_intI1', 'Pc_int1'],
+                                     columns=self.columns
                                      )
-        promoters = pd.DataFrame(exp_promoters, columns=columns)
-        promoters = promoters.astype(dtype=dtype)
-        integron.add_promoter()
+        exp_promoters = exp_promoters.astype(dtype=self.dtype)
 
         pdt.assert_frame_equal(exp_promoters, integron.promoter)
 
@@ -252,55 +228,117 @@ class Test(unittest.TestCase):
         # test promoter with attC without integrase #
         #############################################
         integron = Integron(replicon_name)
-
-        empty_integrase = pd.DataFrame(columns=columns)
-        empty_integrase = empty_integrase.astype(dtype=dtype)
-        integron.integrase = empty_integrase
-
         integron.attC = attC
-
-        attI = pd.DataFrame(columns=columns)
-        attI = attI.astype(dtype=dtype)
-        integron.attI = attI
-
-        proteins = pd.DataFrame(columns=columns)
-        proteins = proteins.astype(dtype=dtype)
-        integron.proteins = proteins
-
         integron.add_promoter()
-        empty_promoter = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        empty_promoter = empty_promoter.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                                      "evalue": "float", "type_elt": "str", "model": "str",
-                                                      "distance_2attC": "float", "annotation": "str"})
+
+        empty_promoter = pd.DataFrame(columns=self.columns)
+        empty_promoter = empty_promoter.astype(dtype=self.dtype)
+
         pdt.assert_frame_equal(empty_promoter, integron.promoter)
 
         #############################################
         # test promoter without attC with integrase #
         #############################################
         integron = Integron(replicon_name)
-
         integron.integrase = integrase
 
-        empty_attC = pd.DataFrame(columns=columns)
-        empty_attC = empty_attC.astype(dtype=dtype)
-        integron.attC = empty_attC
-
-        attI = pd.DataFrame(columns=columns)
-        attI = attI.astype(dtype=dtype)
-        integron.attI = attI
-
-        proteins = pd.DataFrame(columns=columns)
-        proteins = proteins.astype(dtype=dtype)
-        integron.proteins = proteins
-
         integron.add_promoter()
+
         pdt.assert_frame_equal(exp_promoters, integron.promoter)
 
-    # def test_attI(self):
-    #     pass
-    #
+
+    def test_attI(self):
+        replicon_name = 'saen.040.p01.10'
+        replicon_path = os.path.join(self._data_dir, "Replicons", replicon_name + '.fst')
+        integron_finder.SIZE_REPLICON = 148711
+        integron_finder.PROT_file = os.path.join(self._data_dir,
+                                                 'Proteins',
+                                                 '{}.prt'.format(replicon_name))
+        integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
+        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+
+        attC = pd.DataFrame({'pos_beg': [104651, 105162, 106018, 107567, 108423, 108743],
+                             'pos_end': [104710, 105221, 106087, 107626, 108482, 108832],
+                             'strand': [-1] * 6,
+                             'evalue': [3.400000e-06, 7.500000e-09, 6.800000e-06, 2.800000e-07, 6.600000e-06, 1.800000e-04],
+                             'type_elt': ['attC'] * 6,
+                             'annotation': ['attC'] * 6,
+                             'model': ['attc_4'] * 6,
+                             'distance_2attC': [np.nan, 452.0, 797.0, 1480.0, 797.0, 261.0]
+                             },
+                            index=['attc_00{}'.format(i) for i in range(1, 7)],
+                            columns=self.columns)
+        attC = attC.astype(dtype=self.dtype)
+
+
+        integrase = pd.DataFrame({'pos_beg': 109469,
+                                  'pos_end': 110482,
+                                  'strand': 1,
+                                  'evalue': 1.600000e-24,
+                                  'type_elt': 'protein',
+                                  'annotation': 'intI',
+                                  'model': 'intersection_tyr_intI',
+                                  'distance_2attC': np.nan
+                                  },
+                                 index=['SAEN.040.P01_10_135'],
+                                 columns=self.columns)
+        integrase = integrase.astype(dtype=self.dtype)
+
+        ##########################################
+        # test promoter with attC with integrase #
+        ##########################################
+        integron = Integron(replicon_name)
+        integron.attC = attC
+        integron.integrase = integrase
+
+        empty_proteins = pd.DataFrame(columns=self.columns)
+        empty_proteins = empty_proteins.astype(dtype=self.dtype)
+        integron.proteins = empty_proteins
+
+        empty_promoters = pd.DataFrame(columns=self.columns)
+        empty_promoters = empty_promoters.astype(dtype=self.dtype)
+        integron.promoter = empty_promoters
+
+        exp_attI = pd.DataFrame({'pos_beg': [109330],
+                                 'pos_end': [109388],
+                                 'strand': [-1],
+                                 'evalue': [np.nan],
+                                 'type_elt': 'attI',
+                                 'annotation': 'attI_1',
+                                 'model': 'NA',
+                                 'distance_2attC': [np.nan]
+                                 },
+                                index=['attI1'],
+                                columns=self.columns)
+        exp_attI = exp_attI.astype(dtype=self.dtype)
+
+        integron.add_attI()
+
+        pdt.assert_frame_equal(exp_attI, integron.attI)
+
+        #############################################
+        # test promoter with attC without integrase #
+        #############################################
+        integron = Integron(replicon_name)
+        integron.attC = attC
+
+        empty_attI = pd.DataFrame(columns=self.columns)
+        empty_attI = empty_attI.astype(dtype=self.dtype)
+
+        integron.add_attI()
+
+        pdt.assert_frame_equal(empty_attI, integron.attI)
+
+        #############################################
+        # test promoter without attC with integrase #
+        #############################################
+        integron = Integron(replicon_name)
+        integron.integrase = integrase
+
+        integron.add_attI()
+
+        pdt.assert_frame_equal(exp_attI, integron.attI)
+
 
     def test_add_proteins(self):
         replicon_name = 'pssu.001.c01.13'
@@ -313,28 +351,6 @@ class Test(unittest.TestCase):
 
         integron = Integron(replicon_name)
 
-        dtype = {"pos_beg": 'int',
-                 "pos_end": 'int',
-                 "strand": 'int',
-                 "evalue": 'float',
-                 "type_elt": 'str',
-                 "annotation": 'str',
-                 "model": 'str',
-                 "distance_2attC": 'float'}
-        columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
-        # data_integrase = {"pos_beg": [],
-        #                   "pos_end": [],
-        #                   "strand": [],
-        #                   "evalue": [],
-        #                   "type_elt": [],
-        #                   "annotation": [],
-        #                   "model": [],
-        #                   "distance_2attC": [np.nan]}
-        #
-        # id_int = "PSSU.001.C01.13_1"
-        # integrase = pd.DataFrame(data_integrase, index=[id_int])
-        # integrase = integrase.astype(dtype=dtype)
-
         data_attc = {"pos_beg": [3072863, 3073496, 3074121, 3075059, 3075593, 3076281, 3076659],
                      "pos_end": [3072931, 3073555, 3074232, 3075118, 3075652, 3076340, 3076718],
                      "strand": [-1] * 7,
@@ -344,25 +360,12 @@ class Test(unittest.TestCase):
                      "model": ['attc_4'] * 7,
                      "distance_2attC": [np.nan, 565.0, 566.0, 827.0, 475.0, 629.0, 319.0]}
 
-        attC = pd.DataFrame(data_attc, index=['attc_00{}'.format(i) for i in range(len(data_attc['pos_beg']))])
-        attC = attC.astype(dtype=dtype)
+        attC = pd.DataFrame(data_attc,
+                            columns=self.columns,
+                            index=['attc_00{}'.format(i) for i in range(len(data_attc['pos_beg']))])
+        attC = attC.astype(dtype=self.dtype)
+
         integron.attC = attC
-
-        integrase = pd.DataFrame(columns=columns)
-        integrase = integrase.astype(dtype=dtype)
-        integron.integrase = integrase
-
-        promoter = pd.DataFrame(columns=columns)
-        promoter = promoter.astype(dtype=dtype)
-        integron.promoter = promoter
-
-        attI = pd.DataFrame(columns=columns)
-        attI = attI.astype(dtype=dtype)
-        integron.attI = attI
-
-        proteins = pd.DataFrame(columns=columns)
-        proteins = proteins.astype(dtype=dtype)
-        integron.proteins = proteins
 
         integron.add_proteins()
 
@@ -371,29 +374,20 @@ class Test(unittest.TestCase):
                                      'strand': [-1] * 4,
                                      'evalue': [np.nan] * 4,
                                      'type_elt': ['protein'] * 4,
-                                     'annotation': ['protein'] *4,
+                                     'annotation': ['protein'] * 4,
                                      'model': ['NA'] * 4,
                                      'distance_2attC': [np.nan] *4
                                      },
                                     index=['PSSU.001.C01_13_281{}'.format(i) for i in range(5, 9)],
-                                    columns=columns
+                                    columns=self.columns
                                     )
-        exp_proteins = exp_proteins.astype(dtype=dtype)
+        exp_proteins = exp_proteins.astype(dtype=self.dtype)
         pdt.assert_frame_equal(exp_proteins, integron.proteins)
 
 
     def test_describe(self):
         id_replicon = "acba.007.p01.13"
         integron = Integron(id_replicon)
-
-        dtype = {"pos_beg": 'int',
-                 "pos_end": 'int',
-                 "strand": 'int',
-                 "evalue": 'float',
-                 "type_elt": 'str',
-                 "annotation": 'str',
-                 "model": 'str',
-                 "distance_2attC": 'float'}
 
         data_integrase = {"pos_beg": 55,
                           "pos_end": 1014,
@@ -405,8 +399,10 @@ class Test(unittest.TestCase):
                           "distance_2attC": np.nan}
 
         id_int = "ACBA.007.P01_13_1"
-        integrase = pd.DataFrame(data_integrase, index=[id_int])
-        integrase = integrase.astype(dtype=dtype)
+        integrase = pd.DataFrame(data_integrase,
+                                 columns=self.columns,
+                                 index=[id_int])
+        integrase = integrase.astype(dtype=self.dtype)
 
         data_attc = {"pos_beg": 10,
                      "pos_end": 100,
@@ -417,14 +413,22 @@ class Test(unittest.TestCase):
                      "model": "attc_4",
                      "distance_2attC": np.nan}
 
-        attC = pd.DataFrame(data_attc, index=['attc_001'])
-        attC = attC.astype(dtype=dtype)
-        promoter = pd.DataFrame(data_attc, index=['prom_001'])
-        promoter = promoter.astype(dtype=dtype)
-        attI = pd.DataFrame(data_attc, index=['attI_001'])
-        attI = attI.astype(dtype=dtype)
-        proteins = pd.DataFrame(data_attc, index=['prot_001'])
-        proteins = proteins.astype(dtype=dtype)
+        attC = pd.DataFrame(data_attc,
+                            columns=self.columns,
+                            index=['attc_001'])
+        attC = attC.astype(dtype=self.dtype)
+        promoter = pd.DataFrame(data_attc,
+                                columns=self.columns,
+                                index=['prom_001'])
+        promoter = promoter.astype(dtype=self.dtype)
+        attI = pd.DataFrame(data_attc,
+                            columns=self.columns,
+                            index=['attI_001'])
+        attI = attI.astype(dtype=self.dtype)
+        proteins = pd.DataFrame(data_attc,
+                                columns=self.columns,
+                                index=['prot_001'])
+        proteins = proteins.astype(dtype=self.dtype)
 
         excp_description = pd.concat([integrase, attC, promoter, attI, proteins], ignore_index=False)
         excp_description = excp_description.reset_index()
@@ -450,11 +454,9 @@ class Test(unittest.TestCase):
         pdt.assert_frame_equal(recieved_description, excp_description)
 
 
-
-
-
     # def test_draw_integron(self):
     #     pass
+
 
     def test_has_integrase(self):
         integron = Integron("foo")
