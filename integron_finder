@@ -74,46 +74,37 @@ class Integron(object):
 
     def __init__(self, ID_replicon):
         self.ID_replicon = ID_replicon
-        self.integrase = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        self.integrase = self.integrase.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                                      "evalue": "float", "type_elt": "str", "model": "str",
-                                                      "distance_2attC": "float", "annotation": "str"})
+        self._columns = ["pos_beg", "pos_end", "strand", "evalue", "type_elt", "model", "distance_2attC", "annotation"]
+        self._dtype = {"pos_beg": "int",
+                       "pos_end": "int",
+                       "strand": "int",
+                       "evalue": "float",
+                       "type_elt": "str",
+                       "model": "str",
+                       "distance_2attC": "float",
+                       "annotation": "str"}
+        self.integrase = pd.DataFrame(columns=self._columns)
+        self.integrase = self.integrase.astype(dtype=self._dtype)
 
-        self.attC = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        self.attC = self.attC.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                                      "evalue": "float", "type_elt": "str", "model": "str",
-                                                      "distance_2attC": "float", "annotation": "str"})
+        self.attC = pd.DataFrame(columns=self._columns)
+        self.attC = self.attC.astype(dtype=self._dtype)
 
-        self.promoter = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        self.promoter = self.promoter.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                                      "evalue": "float", "type_elt": "str", "model": "str",
-                                                      "distance_2attC": "float", "annotation": "str"})
+        self.promoter = pd.DataFrame(columns=self._columns)
+        self.promoter = self.promoter.astype(dtype=self._dtype)
 
-        self.attI = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        self.attI = self.attI.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                                      "evalue": "float", "type_elt": "str", "model": "str",
-                                                      "distance_2attC": "float", "annotation": "str"})
+        self.attI = pd.DataFrame(columns=self._columns)
+        self.attI = self.attI.astype(dtype=self._dtype)
 
-        self.proteins = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        self.proteins = self.proteins.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                                      "evalue": "float", "type_elt": "str", "model": "str",
-                                                      "distance_2attC": "float", "annotation": "str"})
+        self.proteins = pd.DataFrame(columns=self._columns)
+        self.proteins = self.proteins.astype(dtype=self._dtype)
+
 
     def add_integrase(self, pos_beg_int, pos_end_int, id_int, strand_int, evalue, model):
         """Function which adds integrases to the integron. Should be called once"""
         if not self.integrase.empty:
             raise RuntimeError("add_integrase should be called once.")
-        tmp_df = pd.DataFrame()
+        tmp_df = pd.DataFrame(columns=self._columns)
+        tmp_df = tmp_df.astype(dtype=self._dtype)
         tmp_df["pos_beg"] = [pos_beg_int]
         tmp_df["pos_end"] = [pos_end_int]
         tmp_df["strand"] = [strand_int]
@@ -127,7 +118,8 @@ class Integron(object):
 
     def add_attC(self, pos_beg_attC, pos_end_attC, strand, evalue, model):
         """ Function which adds attC site to the Integron object. """
-        tmp_df = pd.DataFrame()
+        tmp_df = pd.DataFrame(columns=self._columns)
+        tmp_df = tmp_df.astype(dtype=self._dtype)
         tmp_df["pos_beg"] = [pos_beg_attC]
         tmp_df["pos_end"] = [pos_end_attC]
         tmp_df["strand"] = [strand]
@@ -189,7 +181,8 @@ class Integron(object):
                 if self.integrase.strand.values[0] == 1:
                     generator_motifs = m.instances.search(seq_p_int[:dist_prom])
                     for pos, s in generator_motifs:
-                        tmp_df = pd.DataFrame()
+                        tmp_df = pd.DataFrame(columns=self._columns)
+                        tmp_df = tmp_df.astype(dtype=self._dtype)
                         tmp_df["pos_beg"] = [self.integrase.pos_beg.values[0] - dist_prom + pos]
                         tmp_df["pos_end"] = [self.integrase.pos_beg.values[0] - dist_prom + pos + len(s)]
                         tmp_df["strand"] = [self.integrase.strand.values[0]]
@@ -203,7 +196,8 @@ class Integron(object):
                 else:
                     generator_motifs = m.instances.reverse_complement().search(seq_p_int[-dist_prom:])
                     for pos, s in generator_motifs:
-                        tmp_df = pd.DataFrame()
+                        tmp_df = pd.DataFrame(columns=self._columns)
+                        tmp_df = tmp_df.astype(dtype=self._dtype)
                         tmp_df["pos_beg"] = [self.integrase.pos_end.max() + pos]
                         tmp_df["pos_end"] = [self.integrase.pos_end.max() + pos + len(s)]
                         tmp_df["strand"] = [self.integrase.strand.values[0]]
@@ -280,7 +274,8 @@ class Integron(object):
 
             for sa, mo in enumerate(mot):
                 for pos, s in mo.instances.search(seq_Pc):
-                    tmp_df = pd.DataFrame()
+                    tmp_df = pd.DataFrame(columns=self._columns)
+                    tmp_df = tmp_df.astype(dtype=self._dtype)
                     tmp_df["pos_beg"] = [(left - dist_prom + pos) % SIZE_REPLICON]
                     tmp_df["pos_end"] = [(left - dist_prom + pos + len(s)) % SIZE_REPLICON]
                     tmp_df["strand"] = [strand_array] if strand_array != "both" else [sa * 2 - 1]
@@ -353,7 +348,8 @@ class Integron(object):
 
             for sa, mo in enumerate(mot):
                 for pos, s in mo.instances.search(seq_attI):
-                    tmp_df = pd.DataFrame()
+                    tmp_df = pd.DataFrame(columns=self._columns)
+                    tmp_df = tmp_df.astype(dtype=self._dtype)
                     tmp_df["pos_beg"] = [(left - dist_atti + pos) % SIZE_REPLICON]
                     tmp_df["pos_end"] = [(left - dist_atti + pos + len(s)) % SIZE_REPLICON]
                     tmp_df["strand"] = [strand_array] if strand_array != "both" else [sa * 2 - 1]
@@ -422,6 +418,7 @@ class Integron(object):
             floatcols = ["evalue", "distance_2attC"]
             self.proteins[intcols] = self.proteins[intcols].astype(int)
             self.proteins[floatcols] = self.proteins[floatcols].astype(float)
+
 
     def describe(self):
         """ Method describing the integron object """
