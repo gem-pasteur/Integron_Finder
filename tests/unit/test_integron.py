@@ -291,14 +291,6 @@ class Test(unittest.TestCase):
         integron.attC = attC
         integron.integrase = integrase
 
-        empty_proteins = pd.DataFrame(columns=self.columns)
-        empty_proteins = empty_proteins.astype(dtype=self.dtype)
-        integron.proteins = empty_proteins
-
-        empty_promoters = pd.DataFrame(columns=self.columns)
-        empty_promoters = empty_promoters.astype(dtype=self.dtype)
-        integron.promoter = empty_promoters
-
         exp_attI = pd.DataFrame({'pos_beg': [109330],
                                  'pos_end': [109388],
                                  'strand': [-1],
