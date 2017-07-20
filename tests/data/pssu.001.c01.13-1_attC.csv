@@ -1,8 +1,0 @@
-,annotation,distance_2attC,evalue,model,pos_beg,pos_end,strand,type_elt
-attc_001,attC,,2.5e-06,attc_4,3072863,3072931,-1,attC
-attc_002,attC,565.0,7e-08,attc_4,3073496,3073555,-1,attC
-attc_003,attC,566.0,6.5e-08,attc_4,3074121,3074232,-1,attC
-attc_004,attC,827.0,3.2e-06,attc_4,3075059,3075118,-1,attC
-attc_005,attC,475.0,4.1e-07,attc_4,3075593,3075652,-1,attC
-attc_006,attC,629.0,1.4e-08,attc_4,3076281,3076340,-1,attC
-attc_007,attC,319.0,4e-08,attc_4,3076659,3076718,-1,attC
