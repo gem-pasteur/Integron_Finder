@@ -204,6 +204,10 @@ class Test(unittest.TestCase):
         attC = attC.astype(dtype=dtype)
         integron.attC = attC
 
+        ##########################################
+        # test promoter with attC with integrase #
+        ##########################################
+
         integrase = pd.DataFrame({'pos_beg': 109469,
                                   'pos_end': 110482,
                                   'strand': 1,
@@ -244,8 +248,55 @@ class Test(unittest.TestCase):
 
         pdt.assert_frame_equal(exp_promoters, integron.promoter)
 
+        #############################################
+        # test promoter with attC without integrase #
+        #############################################
+        integron = Integron(replicon_name)
 
+        empty_integrase = pd.DataFrame(columns=columns)
+        empty_integrase = empty_integrase.astype(dtype=dtype)
+        integron.integrase = empty_integrase
 
+        integron.attC = attC
+
+        attI = pd.DataFrame(columns=columns)
+        attI = attI.astype(dtype=dtype)
+        integron.attI = attI
+
+        proteins = pd.DataFrame(columns=columns)
+        proteins = proteins.astype(dtype=dtype)
+        integron.proteins = proteins
+
+        integron.add_promoter()
+        empty_promoter = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
+                                               "evalue", "type_elt", "model",
+                                               "distance_2attC", "annotation"])
+        empty_promoter = empty_promoter.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
+                                                      "evalue": "float", "type_elt": "str", "model": "str",
+                                                      "distance_2attC": "float", "annotation": "str"})
+        pdt.assert_frame_equal(empty_promoter, integron.promoter)
+
+        #############################################
+        # test promoter without attC with integrase #
+        #############################################
+        integron = Integron(replicon_name)
+
+        integron.integrase = integrase
+
+        empty_attC = pd.DataFrame(columns=columns)
+        empty_attC = empty_attC.astype(dtype=dtype)
+        integron.attC = empty_attC
+
+        attI = pd.DataFrame(columns=columns)
+        attI = attI.astype(dtype=dtype)
+        integron.attI = attI
+
+        proteins = pd.DataFrame(columns=columns)
+        proteins = proteins.astype(dtype=dtype)
+        integron.proteins = proteins
+
+        integron.add_promoter()
+        pdt.assert_frame_equal(exp_promoters, integron.promoter)
 
     # def test_attI(self):
     #     pass

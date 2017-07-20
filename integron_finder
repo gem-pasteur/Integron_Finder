@@ -154,7 +154,6 @@ class Integron(object):
         - CALIN : Have at least one attC
         - In0 : Just an integrase intI
         """
-
         if len(self.attC) >= 1 and len(self.integrase) == 1:
             return "complete"
         elif len(self.attC) == 0 and len(self.integrase) == 1:
@@ -272,7 +271,6 @@ class Integron(object):
             seq_Pc = seq_Pc1 + seq_Pc2
 
         for m in motifs_Pc:
-
             if strand_array == 1:
                 mot = [m]
             elif strand_array == "both":
