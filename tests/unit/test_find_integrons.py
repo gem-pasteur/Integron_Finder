@@ -50,6 +50,15 @@ class TestFindIntegons(unittest.TestCase):
         integron_finder.MODEL_phage_int = os.path.join(integron_finder.MODEL_DIR, "phage-int.hmm")
         integron_finder.MODEL_attc = os.path.join(self.integron_home, 'data', 'Models', 'attc_4.cm')
 
+        self.columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
+        self.dtype = {"pos_beg": 'int',
+                      "pos_end": 'int',
+                      "strand": 'int',
+                      "evalue": 'float',
+                      "type_elt": 'str',
+                      "annotation": 'str',
+                      "model": 'str',
+                      "distance_2attC": 'float'}
 
     def tearDown(self):
         try:
@@ -121,16 +130,14 @@ class TestFindIntegons(unittest.TestCase):
                             'pos_beg': [17825, 19080, 19618],
                             'pos_end': [17884, 19149, 19726],
                             'strand': [-1, -1, -1],
-                            'type_elt': 'attC'}, index=['attc_001', 'attc_002', 'attc_003'])
+                            'type_elt': 'attC'},
+                           columns=self.columns,
+                           index=['attc_001', 'attc_002', 'attc_003'])
         pdt.assert_frame_equal(integron.attC, exp)
 
-        exp = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                    "evalue", "type_elt", "model",
-                                    "distance_2attC", "annotation"])
+        exp = pd.DataFrame(columns=self.columns,)
 
-        exp = exp.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                "evalue": "float", "type_elt": "str", "model": "str",
-                                "distance_2attC": "float", "annotation": "str"})
+        exp = exp.astype(dtype=self.dtype)
 
         pdt.assert_frame_equal(integron.integrase, exp)
         pdt.assert_frame_equal(integron.promoter, exp)
@@ -191,16 +198,14 @@ class TestFindIntegons(unittest.TestCase):
                             'pos_beg': [17825, 19080, 19618],
                             'pos_end': [17884, 19149, 19726],
                             'strand': [-1, -1, -1],
-                            'type_elt': 'attC'}, index=['attc_001', 'attc_002', 'attc_003'])
+                            'type_elt': 'attC'},
+                           columns=self.columns,
+                           index=['attc_001', 'attc_002', 'attc_003'])
         pdt.assert_frame_equal(integron.attC, exp)
 
-        exp = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                    "evalue", "type_elt", "model",
-                                    "distance_2attC", "annotation"])
+        exp = pd.DataFrame(columns=self.columns)
 
-        exp = exp.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                "evalue": "float", "type_elt": "str", "model": "str",
-                                "distance_2attC": "float", "annotation": "str"})
+        exp = exp.astype(dtype=self.dtype)
 
         pdt.assert_frame_equal(integron.integrase, exp)
         pdt.assert_frame_equal(integron.promoter, exp)
@@ -258,10 +263,10 @@ class TestFindIntegons(unittest.TestCase):
                             'pos_beg': 55,
                             'pos_end': 1014,
                             'strand': 1,
-                            'type_elt': 'protein'}, index=['ACBA.007.P01_13_1'])
-        exp = exp.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                "evalue": "float", "type_elt": "str", "model": "str",
-                                "distance_2attC": "float", "annotation": "str"})
+                            'type_elt': 'protein'},
+                           columns=self.columns,
+                           index=['ACBA.007.P01_13_1'])
+        exp = exp.astype(dtype=self.dtype)
         pdt.assert_frame_equal(integron.integrase, exp)
 
         exp = pd.DataFrame({'annotation': ['attC'] * 3,
@@ -271,20 +276,16 @@ class TestFindIntegons(unittest.TestCase):
                             'pos_beg': [17825, 19080, 19618],
                             'pos_end': [17884, 19149, 19726],
                             'strand': [-1, -1, -1],
-                            'type_elt': 'attC'}, index=['attc_001', 'attc_002', 'attc_003'])
+                            'type_elt': 'attC'},
+                           columns=self.columns,
+                           index=['attc_001', 'attc_002', 'attc_003'])
 
-        exp = exp.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                "evalue": "float", "type_elt": "str", "model": "str",
-                                "distance_2attC": "float", "annotation": "str"})
+        exp = exp.astype(dtype=self.dtype)
         pdt.assert_frame_equal(integron.attC, exp)
 
-        exp = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                    "evalue", "type_elt", "model",
-                                    "distance_2attC", "annotation"])
+        exp = pd.DataFrame(columns=self.columns)
 
-        exp = exp.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                "evalue": "float", "type_elt": "str", "model": "str",
-                                "distance_2attC": "float", "annotation": "str"})
+        exp = exp.astype(dtype=self.dtype)
 
         pdt.assert_frame_equal(integron.promoter, exp)
         pdt.assert_frame_equal(integron.attI, exp)
@@ -342,10 +343,10 @@ class TestFindIntegons(unittest.TestCase):
                             'pos_beg': 55,
                             'pos_end': 1014,
                             'strand': 1,
-                            'type_elt': 'protein'}, index=['ACBA.007.P01_13_1'])
-        exp = exp.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                "evalue": "float", "type_elt": "str", "model": "str",
-                                "distance_2attC": "float", "annotation": "str"})
+                            'type_elt': 'protein'},
+                           columns=self.columns,
+                           index=['ACBA.007.P01_13_1'])
+        exp = exp.astype(dtype=self.dtype)
         pdt.assert_frame_equal(integron.integrase, exp)
 
         exp = pd.DataFrame({'annotation': ['attC'] * 3,
@@ -355,20 +356,16 @@ class TestFindIntegons(unittest.TestCase):
                             'pos_beg': [17825, 19080, 19618],
                             'pos_end': [17884, 19149, 19726],
                             'strand': [-1, -1, -1],
-                            'type_elt': 'attC'}, index=['attc_001', 'attc_002', 'attc_003'])
+                            'type_elt': 'attC'},
+                           columns=self.columns,
+                           index=['attc_001', 'attc_002', 'attc_003'])
 
-        exp = exp.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                "evalue": "float", "type_elt": "str", "model": "str",
-                                "distance_2attC": "float", "annotation": "str"})
+        exp = exp.astype(dtype=self.dtype)
         pdt.assert_frame_equal(integron.attC, exp)
 
-        exp = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                    "evalue", "type_elt", "model",
-                                    "distance_2attC", "annotation"])
+        exp = pd.DataFrame(columns=self.columns)
 
-        exp = exp.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                "evalue": "float", "type_elt": "str", "model": "str",
-                                "distance_2attC": "float", "annotation": "str"})
+        exp = exp.astype(dtype=self.dtype)
 
         pdt.assert_frame_equal(integron.promoter, exp)
         pdt.assert_frame_equal(integron.attI, exp)
