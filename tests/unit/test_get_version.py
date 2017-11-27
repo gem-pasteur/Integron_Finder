@@ -36,7 +36,7 @@ class TestFunctions(unittest.TestCase):
 Python {0}
 
  - open-source GPLv3,
- - Jean Cury, Betrand Néron, Eduardo Rocha,
+ - Jean Cury, Bertrand Neron, Eduardo Rocha,
  - citation:
 
  Identification and analysis of integrons and cassette arrays in bacterial genomes
@@ -64,7 +64,7 @@ Python {0}
 Python {0}
 
  - open-source GPLv3,
- - Jean Cury, Betrand Néron, Eduardo Rocha,
+ - Jean Cury, Bertrand Neron, Eduardo Rocha,
  - citation:
 
  Identification and analysis of integrons and cassette arrays in bacterial genomes

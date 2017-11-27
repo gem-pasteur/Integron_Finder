@@ -8,7 +8,7 @@
 #   - the integrase                                                                #
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
-# Authors: Jean Cury, Bertrand Néron, Eduardo PC Rocha                             #
+# Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
 # Copyright © 2015 - 2016  Institut Pasteur, Paris.                                #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
@@ -574,7 +574,7 @@ def search_attc(attc_df, keep_palindromes):
 
 
 def find_integron(replicon_name, attc_file, intI_file, phageI_file):
-    """ 
+    """
     Function that looks for integrons given rules :
     - presence of intI
     - presence of attC
@@ -586,7 +586,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
         Accession_number    ID_prot    strand    pos_beg    pos_end    evalue
     attc_file :
         Accession_number    attC    cm_debut    cm_fin    pos_beg    pos_end    sens    evalue
-        
+
     :param replicon_name: the name of the replicon
     :type replicon_name: str
     :param attc_file: the output of cmsearch or the parsing of this file by read_infernal
@@ -744,7 +744,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
     print "- {} In0 element(s) found with a total of {} attC site".format(sum(
                                                 [1 if i.type() == "In0" else 0 for i in integrons]),
                                                 sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons]))
-    
+
     return integrons
 
 
@@ -771,7 +771,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
     __________________-->____-->___-->___-->___-->_______
     ______<--------______________________________________
              intI
-             
+
     :param integrons: the integrons may contain or not attC or intI.
     :type integrons: list of :class:`Integron` objects.
     :param outfile: the name of cmsearch result file
@@ -883,12 +883,12 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
     """
     for a given element, we can search on the left hand side (if integrase is on the right for instance)
     or right hand side (opposite situation) or both side (only integrase or only attC sites)
-    
-    :param window_beg: 
+
+    :param window_beg:
     :type window_beg: int
     :param window_end:
     :type window_end: int
-    :param max_elt: 
+    :param max_elt:
     :type max_elt: int
     :param df_max:
     :type df_max: :class:`pandas.DataFrame` object
@@ -966,16 +966,16 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
 
 def local_max(replicon_name, window_beg, window_end, strand_search="both"):
     """
-    
+
     :param replicon_name: the name of replicon (without suffix)
     :type replicon_name: str
-    :param window_beg: 
+    :param window_beg:
     :type window_beg: int
-    :param window_end: 
+    :param window_end:
     :type window_end: int
     :param strand_search:
     :type strand_search: str
-    :return: 
+    :return:
     :rtype: :class:`pd.DataFrame` object
     """
     if window_beg < window_end:
