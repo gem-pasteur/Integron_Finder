@@ -227,5 +227,3 @@ Nucleic Acids Research 2016; doi:10.1093/nar/gkw319
       cmdclass={'install_scripts': install_scripts},
       distclass=UsageDistribution
       )
-
-
