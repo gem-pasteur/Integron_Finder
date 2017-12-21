@@ -7,6 +7,46 @@ Developer guide
 This part is for developers, who want to work on IntegronFinder scripts.
 
 
+Getting a local working copy of the repository
+==============================================
+
+If you are not part of the project, start by forking IntegronFinder repository. For that, sign in to your account on github, and go to https://github.com/gem-pasteur/Integron_Finder. Then, click on 'Fork' (under your account icone). This will create a copy of the repository, but with your username instead of 'gem-pasteur'.
+Then, clone it to your computer to have a local working copy, by opening a terminal window, and typing::
+
+    git clone https://github.com/<your_login>/Integron_Finder.git
+
+or, if you linked your ssh key::
+
+    git clone git@github.com:<your_login>/Integron_Finder.git
+
+Go to the ``Integron_Finder`` repository created: ``cd Integron_Finder`` (referred here after as 'the root directory of IntegronFinder'). Then, it is better if you work on your own branch. For that, type::
+
+    git checkout -b <your branch name>
+
+with ``<your branch name>`` a descriptive name (e.g. 'adding-xx-feature', 'fixing-typos', etc.), so that others understand what your are working on.
+
+You can then :ref:`install <install_dev>` IntegronFinder as explained above, and do your modifications, with their associated :ref:`tests <tests>`. Don't forget to commit your changes at each step.
+
+Send changes to upstream repository
+===================================
+
+Once you are done, you can push your changes to your forked repository::
+
+    git push --set-upstream origin <your branch name>
+
+Then, create a pull request, to add your changes to the official repository. For that:
+
+- go to your forked repository on github `https://github.com/<your_login>/Integron_Finder/pulls`
+- Click on 'New pull request'
+- Choose your repository and the branch on which you did your changes in 'head fork' (right-hand side), and choose 'gem-pasteur/Integron_Finder' with the branch on which you want to merge (probably master) in 'base fork' (left-hand side).
+- A green 'Able to merge' text should appear if git is able to automatically merge the 2 branches. In that case, click on 'Create pull request', write your comments on the changes you made, why etc., and save. We will receive the pull request.
+
+.. warning:: Before submitting your pull request, please be sure that you provide the unit tests corresponding to the new features you added.
+
+
+
+.. _install_dev:
+
 Developer installation
 ======================
 
@@ -24,6 +64,8 @@ In any case, you also need to define the ``INTEGRON_HOME`` environment variable,
 
     export INTEGRON_HOME=<path_to_integronfinder_directory>
 
+
+.. _tests:
 
 Tests
 =====
