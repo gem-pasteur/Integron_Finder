@@ -295,6 +295,11 @@ class TestFunctions(unittest.TestCase):
         proteins4.loc["ACBA.007.P01_13_23"] = [19721, 20254, -1, 6.2e-110, "protein",
                                               "RF0003", np.nan, "AAC3-I"]
         for inte, prots in zip(integron_finder.integrons, int_proteins):
+            print "##############################################"
+            print inte.proteins
+            print "========================"
+            print prots
+            print "##############################################"
             pdt.assert_frame_equal(inte.proteins, prots)
 
         # Annotate proteins with default evalue (1 more annotation)
