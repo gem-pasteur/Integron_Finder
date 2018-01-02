@@ -1205,6 +1205,7 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage=0.5):
             integron.proteins.loc[func_annotate_res.ID_prot, "model"] = func_annotate_res.ID_query.values
             integron.proteins = integron.proteins.astype(dtype=integron.dtype)
 
+
 def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
     """
     Function that parse hmmer --out output and returns a pandas DataFrame
