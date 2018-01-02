@@ -28,7 +28,7 @@ class Test(unittest.TestCase):
             self.local_install = True
         else:
             self.local_install = False
-            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..' '..')))
+            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
         self.columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
         self.dtype = {"pos_beg": 'int',
