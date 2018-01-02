@@ -1140,9 +1140,9 @@ def find_integrase(replicon_path, replicon_name, out_dir):
         try:
             returncode = call(cmd)
         except Exception as err:
-            raise RuntimeError("{0} failed : {1}".format(cmd[0], err))
+            raise RuntimeError("{0} failed : {1}".format(' '.join(cmd), err))
         if returncode != 0:
-            raise RuntimeError("{0} failed return code = {1}".format(cmd[0], returncode))
+            raise RuntimeError("{0} failed return code = {1}".format(' '.join(cmd), returncode))
 
 
 def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage=0.5):
