@@ -48,7 +48,7 @@ class TestFindIntegrase(unittest.TestCase):
             self.local_install = True
         else:
             self.local_install = False
-            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..' '..')))
+            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
@@ -194,7 +194,6 @@ class TestFindIntegrase(unittest.TestCase):
                         integron_finder.PROT_file)
         with self.assertRaises(RuntimeError) as ctx:
             integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
-        print str(ctx.exception)
         self.assertTrue(re.match('^foo .* failed : \[Errno 2\] No such file or directory$',
                                  str(ctx.exception)))
 
