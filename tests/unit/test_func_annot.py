@@ -296,9 +296,9 @@ class TestFunctions(unittest.TestCase):
                                               "RF0003", np.nan, "AAC3-I"]
         for inte, prots in zip(integron_finder.integrons, int_proteins):
             print "##############################################"
-            print inte.proteins
+            print inte.proteins.dtypes
             print "========================"
-            print prots
+            print prots.dtypes
             print "##############################################"
             pdt.assert_frame_equal(inte.proteins, prots)
 
