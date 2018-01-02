@@ -98,6 +98,9 @@ class Integron(object):
         self.proteins = pd.DataFrame(columns=self._columns)
         self.proteins = self.proteins.astype(dtype=self._dtype)
 
+    @property
+    def dtype(self):
+        return {k: v for k, v in self._dtype.items()}
 
     def add_integrase(self, pos_beg_int, pos_end_int, id_int, strand_int, evalue, model):
         """Function which adds integrases to the integron. Should be called once"""
@@ -1200,7 +1203,7 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage=0.5):
             integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
             integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
             integron.proteins.loc[func_annotate_res.ID_prot, "model"] = func_annotate_res.ID_query.values
-
+            integron.proteins = integron.proteins.astype(dtype=integron.dtype)
 
 def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
     """
