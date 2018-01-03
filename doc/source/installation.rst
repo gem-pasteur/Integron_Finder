@@ -19,10 +19,9 @@ IntegronFinder is built with Python 2.7, and a few libraries are needed:
    - Biopython (>=1.65)
    - Matplotlib (>=1.4.3)
 
-If you're not at ease with Python, see :ref:`here on how to install Python and
-its libraries <python_install>`
+From version 1.5.1, integron_finder will check and install theses libraries for you.
 
-In addition, IntegronFinder has external dependencies which have to be
+In addition, IntegronFinder has external dependencies, which have to be
 installed prior the use of the program (click to access the corresponding
 website).
 
@@ -33,7 +32,7 @@ website).
 After installation of these programs, they should be in your ``$PATH`` (*i.e.*
 you can type in a terminal ``hmmsearch``, ``cmsearch``, or ``prodigal`` and a
 ``command not found`` shall not be displayed). If you have them installed
-somewhere else, please refers to the parameters to give complete path to
+somewhere else, please refer to integron_finder's parameters to give complete path to
 IntegronFinder.
 
 .. _installation:
@@ -41,10 +40,29 @@ IntegronFinder.
 Installation procedure
 ======================
 
-1. Download the `latest release`_
-2. In a shell (*e.g.* a terminal), start installation with::
+.. warning::
+    When installing a new version (up to 1.5.1 included) of IntegronFinder, do not forget to :ref:`uninstall <uninstallation>` the previous version installed !
 
-    (sudo) python pip install integron_finder-x.x.tar.gz
+From Version 1.5.1 and after
+----------------------------
+
+1. Open a terminal and hit::
+
+    (sudo) pip install integron_finder
+
+2. To get an updated version (no need to uninstall)::
+
+    (sudo) pip install -U integron_finder
+
+For Version 1.5 and before
+--------------------------
+
+1. Download the `latest release`_ that can be installed like this (v1.5)
+2. Uncompress it
+3. In a shell (*e.g.* a terminal), go to the directory and run::
+
+    (sudo) python setup.py install
+
 
 .. note::
   Super-user privileges (*i.e.*, ``sudo``) are necesserary if you want to
@@ -57,23 +75,30 @@ Installation procedure
   Canopy, see `Canopy CLI`_
 
 .. warning::
-  When installing a new version of IntegronFinder, do not forget to uninstall
-  the previous version installed !
-
-.. warning::
-    The installer does not work with pure setuptools procedure, it does not work in egg. 
+    The installer does not work with pure setuptools procedure, it does not work in egg.
     Unless you disable egg by using the ``--root`` option.
     ``python setup.py install --root /prefix/where/to/install/integron_finder``
 
+.. _uninstallation:
 
 Uninstallation procedure
 =========================
 
-To uninstall integron_finder, run in the following command::
+From Version 1.5.1 and after
+----------------------------
+
+To uninstall IntegronFinder, run in the following command::
 
     (sudo) pip uninstall integron_finder
 
 It will uninstall integron_finder executable
+
+From Version 1.0 to Version 1.5
+-------------------------------
+
+Go to the directory from where you installed IntegronFinder (e.g. Integron_Finder-1.5), and run::
+
+    (sudo) python setup.py uninstall
 
 .. _python_install:
 
@@ -110,6 +135,6 @@ To install version 1.65 of Biopython (recommended for IntegronFinder).
 .. _`HMMER 3.1b1`: http://hmmer.janelia.org/
 .. _`INFERNAL 1.1`: http://infernal.janelia.org/
 .. _`Prodigal V2.6.2`: https://github.com/hyattpd/Prodigal/releases
-.. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/latest
+.. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/tag/v1.5.0
 .. _`virtualenv`: http://www.virtualenv.org/
 .. _`Canopy CLI`: http://docs.enthought.com/canopy/configure/canopy-cli.html#canopy-cli-venv

@@ -1,0 +1,42 @@
+language: python
+python:
+  - "2.7"
+# Apply only on main branches
+branches:
+  except:
+       - /^feature.*$/
+
+# command to install dependencies
+before_install:
+  - sudo apt-get update
+  - sudo apt-get -y install python-pip python-numpy python-matplotlib python-biopython
+
+  - wget https://github.com/hyattpd/Prodigal/archive/v2.6.2.tar.gz
+  - tar -xf v2.6.2.tar.gz
+  - cd Prodigal-2.6.2 && make && sudo make install
+  - cd -
+
+  - wget  http://eddylab.org/software/infernal/infernal-1.1.2.tar.gz
+  - tar -xf infernal-1.1.2.tar.gz
+  - cd infernal-1.1.2 && ./configure && make && sudo make install
+  - cd -
+
+  - wget  http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2.tar.gz
+  - tar -xf hmmer-3.1b2.tar.gz
+  - cd hmmer-3.1b2 && ./configure && make && sudo make install
+  - cd -
+
+# command to install integron_finder
+install:
+  - python setup.py sdist
+  - pip install python-coveralls coverage
+  - pip install dist/integron_finder*.tar.gz
+
+# test integron_finder
+script:
+  - coverage run tests/run_tests.py -vv --unit
+  - coverage report
+
+after_success:
+  - coveralls
+

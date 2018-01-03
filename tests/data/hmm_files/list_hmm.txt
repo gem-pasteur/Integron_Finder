@@ -1,0 +1,2 @@
+# one directory or file per line
+/my_hmms

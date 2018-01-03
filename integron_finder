@@ -8,7 +8,7 @@
 #   - the integrase                                                                #
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
-# Authors: Jean Cury, Bertrand Néron, Eduardo PC Rocha                             #
+# Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
 # Copyright © 2015 - 2016  Institut Pasteur, Paris.                                #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
@@ -74,25 +74,40 @@ class Integron(object):
 
     def __init__(self, ID_replicon):
         self.ID_replicon = ID_replicon
-        self.integrase = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        self.attC = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        self.promoter = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        self.attI = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
-        self.proteins = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
-                                               "evalue", "type_elt", "model",
-                                               "distance_2attC", "annotation"])
+        self._columns = ["pos_beg", "pos_end", "strand", "evalue", "type_elt", "model", "distance_2attC", "annotation"]
+        self._dtype = {"pos_beg": "int",
+                       "pos_end": "int",
+                       "strand": "int",
+                       "evalue": "float",
+                       "type_elt": "str",
+                       "model": "str",
+                       "distance_2attC": "float",
+                       "annotation": "str"}
+        self.integrase = pd.DataFrame(columns=self._columns)
+        self.integrase = self.integrase.astype(dtype=self._dtype)
+
+        self.attC = pd.DataFrame(columns=self._columns)
+        self.attC = self.attC.astype(dtype=self._dtype)
+
+        self.promoter = pd.DataFrame(columns=self._columns)
+        self.promoter = self.promoter.astype(dtype=self._dtype)
+
+        self.attI = pd.DataFrame(columns=self._columns)
+        self.attI = self.attI.astype(dtype=self._dtype)
+
+        self.proteins = pd.DataFrame(columns=self._columns)
+        self.proteins = self.proteins.astype(dtype=self._dtype)
+
+    @property
+    def dtype(self):
+        return {k: v for k, v in self._dtype.items()}
 
     def add_integrase(self, pos_beg_int, pos_end_int, id_int, strand_int, evalue, model):
         """Function which adds integrases to the integron. Should be called once"""
-        tmp_df = pd.DataFrame()
+        if not self.integrase.empty:
+            raise RuntimeError("add_integrase should be called once.")
+        tmp_df = pd.DataFrame(columns=self._columns)
+        tmp_df = tmp_df.astype(dtype=self._dtype)
         tmp_df["pos_beg"] = [pos_beg_int]
         tmp_df["pos_end"] = [pos_end_int]
         tmp_df["strand"] = [strand_int]
@@ -104,10 +119,10 @@ class Integron(object):
         tmp_df["distance_2attC"] = [np.nan]
         self.integrase = self.integrase.append(tmp_df)
 
-
     def add_attC(self, pos_beg_attC, pos_end_attC, strand, evalue, model):
         """ Function which adds attC site to the Integron object. """
-        tmp_df = pd.DataFrame()
+        tmp_df = pd.DataFrame(columns=self._columns)
+        tmp_df = tmp_df.astype(dtype=self._dtype)
         tmp_df["pos_beg"] = [pos_beg_attC]
         tmp_df["pos_end"] = [pos_end_attC]
         tmp_df["strand"] = [strand]
@@ -134,7 +149,6 @@ class Integron(object):
         - CALIN : Have at least one attC
         - In0 : Just an integrase intI
         """
-
         if len(self.attC) >= 1 and len(self.integrase) == 1:
             return "complete"
         elif len(self.attC) == 0 and len(self.integrase) == 1:
@@ -147,7 +161,6 @@ class Integron(object):
         Function that looks for known promoters if they exists within your integrons element.
         It takes 1s for about 13kb.
         """
-
         dist_prom = 500  # pb distance from edge of the element for which we seek promoter
 
         ######## Promoter of integrase #########
@@ -171,7 +184,8 @@ class Integron(object):
                 if self.integrase.strand.values[0] == 1:
                     generator_motifs = m.instances.search(seq_p_int[:dist_prom])
                     for pos, s in generator_motifs:
-                        tmp_df = pd.DataFrame()
+                        tmp_df = pd.DataFrame(columns=self._columns)
+                        tmp_df = tmp_df.astype(dtype=self._dtype)
                         tmp_df["pos_beg"] = [self.integrase.pos_beg.values[0] - dist_prom + pos]
                         tmp_df["pos_end"] = [self.integrase.pos_beg.values[0] - dist_prom + pos + len(s)]
                         tmp_df["strand"] = [self.integrase.strand.values[0]]
@@ -185,7 +199,8 @@ class Integron(object):
                 else:
                     generator_motifs = m.instances.reverse_complement().search(seq_p_int[-dist_prom:])
                     for pos, s in generator_motifs:
-                        tmp_df = pd.DataFrame()
+                        tmp_df = pd.DataFrame(columns=self._columns)
+                        tmp_df = tmp_df.astype(dtype=self._dtype)
                         tmp_df["pos_beg"] = [self.integrase.pos_end.max() + pos]
                         tmp_df["pos_end"] = [self.integrase.pos_end.max() + pos + len(s)]
                         tmp_df["strand"] = [self.integrase.strand.values[0]]
@@ -202,9 +217,9 @@ class Integron(object):
         ## Pc-int1
         motifs_Pc = []
 
-        pc = SeqIO.parse(MODEL_DIR + "variants_Pc_intI1.fst", "fasta")
+        pc = SeqIO.parse(os.path.join(MODEL_DIR, "variants_Pc_intI1.fst"), "fasta")
         pseq = [i for i in pc]
-        d = {len(i):[] for i in pseq}
+        d = {len(i): [] for i in pseq}
         _ = [d[len(i)].append(i.seq.upper()) for i in pseq]
         for k, i in d.iteritems():
             motifs_Pc.append(motifs.create(i))
@@ -253,7 +268,6 @@ class Integron(object):
             seq_Pc = seq_Pc1 + seq_Pc2
 
         for m in motifs_Pc:
-
             if strand_array == 1:
                 mot = [m]
             elif strand_array == "both":
@@ -263,7 +277,8 @@ class Integron(object):
 
             for sa, mo in enumerate(mot):
                 for pos, s in mo.instances.search(seq_Pc):
-                    tmp_df = pd.DataFrame()
+                    tmp_df = pd.DataFrame(columns=self._columns)
+                    tmp_df = tmp_df.astype(dtype=self._dtype)
                     tmp_df["pos_beg"] = [(left - dist_prom + pos) % SIZE_REPLICON]
                     tmp_df["pos_end"] = [(left - dist_prom + pos + len(s)) % SIZE_REPLICON]
                     tmp_df["strand"] = [strand_array] if strand_array != "both" else [sa * 2 - 1]
@@ -277,7 +292,6 @@ class Integron(object):
 
 
     def add_attI(self):
-
         dist_atti = 500
 
         ## attI1
@@ -337,7 +351,8 @@ class Integron(object):
 
             for sa, mo in enumerate(mot):
                 for pos, s in mo.instances.search(seq_attI):
-                    tmp_df = pd.DataFrame()
+                    tmp_df = pd.DataFrame(columns=self._columns)
+                    tmp_df = tmp_df.astype(dtype=self._dtype)
                     tmp_df["pos_beg"] = [(left - dist_atti + pos) % SIZE_REPLICON]
                     tmp_df["pos_end"] = [(left - dist_atti + pos + len(s)) % SIZE_REPLICON]
                     tmp_df["strand"] = [strand_array] if strand_array != "both" else [sa * 2 - 1]
@@ -349,8 +364,8 @@ class Integron(object):
                     tmp_df["distance_2attC"] = [np.nan]
                     self.attI = self.attI.append(tmp_df)
 
-    def add_proteins(self):
 
+    def add_proteins(self):
         debut = self.attC.pos_beg.values[0]
         fin = self.attC.pos_end.values[-1]
 
@@ -402,6 +417,10 @@ class Integron(object):
                 else:
                     self.proteins.loc[desc[0]] = desc[1:] + [prot_evalue, "protein",
                                                              prot_model, np.nan, prot_annot]
+            intcols = ["pos_beg", "pos_end", "strand"]
+            floatcols = ["evalue", "distance_2attC"]
+            self.proteins[intcols] = self.proteins[intcols].astype(int)
+            self.proteins[floatcols] = self.proteins[floatcols].astype(float)
 
 
     def describe(self):
@@ -549,12 +568,17 @@ def search_attc(attc_df, keep_palindromes):
 
         attc_array = [pd.DataFrame(i, columns=["Accession_number", "cm_attC", "cm_debut",
                                                "cm_fin", "pos_beg", "pos_end", "sens", "evalue"]) for i in tmp]
-
+        # convert positions to int, and evalue to float
+        intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
+        for a in attc_array:
+            a[intcols] = a[intcols].astype(int)
+            a["evalue"] = a["evalue"].astype(float)
         return attc_array
 
 
 def find_integron(replicon_name, attc_file, intI_file, phageI_file):
-    """ Function that looks for integrons given rules :
+    """
+    Function that looks for integrons given rules :
     - presence of intI
     - presence of attC
     - d(intI-attC) <= 4 kb
@@ -565,8 +589,16 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
         Accession_number    ID_prot    strand    pos_beg    pos_end    evalue
     attc_file :
         Accession_number    attC    cm_debut    cm_fin    pos_beg    pos_end    sens    evalue
-    """
 
+    :param replicon_name: the name of the replicon
+    :type replicon_name: str
+    :param attc_file: the output of cmsearch or the parsing of this file by read_infernal
+    :type attc_file: file object or :class:`pd.Dataframe`
+    :param intI_file: the output of hmmsearch with the integrase model
+    :type intI_file: file object
+    :param phageI_file: the output of hmmsearch with the phage model
+    :type phageI_file: file object
+    """
     if args.no_proteins == False:
         intI = read_hmm(replicon_name, intI_file)
         intI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
@@ -718,13 +750,13 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
 
     return integrons
 
+
 def find_attc_max(integrons, outfile="attC_max_1.res"):
     """
     Look for attC site with cmsearch --max option wich remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
     hit. We call it local_max or eagle_eyes.
 
-    integrons is a list of Integron object, they may have or not attC or intI.
 
     Default hit :
     =============
@@ -743,14 +775,22 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
     ______<--------______________________________________
              intI
 
+    :param integrons: the integrons may contain or not attC or intI.
+    :type integrons: list of :class:`Integron` objects.
+    :param outfile: the name of cmsearch result file
+    :type outfile: string
+    :return:
+    :rtype: :class:`pd.DataFrame`
     """
-
-    max_final = pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin',
-                                      'pos_beg', 'pos_end', 'sens', 'evalue'])
+    columns = ['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']
+    data_type = {'Accession_number': 'str', 'cm_attC': 'str',
+                 'cm_debut': 'int', 'cm_fin': 'int',
+                 'pos_beg': 'int', 'pos_end': 'int', }
+    max_final = pd.DataFrame(columns=columns)
+    max_final = max_final.astype(dtype=data_type)
     for i in integrons:
-
-        max_elt = pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin',
-                                        'pos_beg', 'pos_end', 'sens', 'evalue'])
+        max_elt = pd.DataFrame(columns=columns)
+        max_elt = max_elt.astype(dtype=data_type)
         full_element = i.describe()
 
         if all(full_element.type == "complete"):
@@ -763,14 +803,13 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
                                                ].pos_beg.values[0] -
                                   full_element[full_element.type_elt == "attC"].pos_end.values[-1]) % SIZE_REPLICON)
 
-
             if integrase_is_left:
                 window_beg = full_element[full_element.annotation == "intI"].pos_end.values[0]
                 DISTANCE_THRESHOLD_LEFT = 0
                 window_end = full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                 DISTANCE_THRESHOLD_RIGHT = DISTANCE_THRESHOLD
 
-            else: # is right
+            else:  # is right
                 window_beg = full_element[full_element.type_elt == "attC"].pos_beg.values[0]
                 DISTANCE_THRESHOLD_LEFT = DISTANCE_THRESHOLD
                 window_end = full_element[full_element.annotation == "intI"].pos_end.values[-1]
@@ -784,9 +823,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
                 window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD_RIGHT)
 
             strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
-
             df_max = local_max(replicon_name, window_beg, window_end, strand)
-
             max_elt = pd.concat([max_elt, df_max])
 
             # If we find new attC after the last found with default algo and if the integrase is on the left
@@ -795,75 +832,76 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
 
             go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - df_max.pos_end.values[0]
                        ) % SIZE_REPLICON < DISTANCE_THRESHOLD and not integrase_is_left
-
             go_right = (df_max.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                         ) % SIZE_REPLICON < DISTANCE_THRESHOLD and integrase_is_left
-
             max_elt = expand(window_beg, window_end, max_elt, df_max,
                              search_left=go_left, search_right=go_right)
 
         elif all(full_element.type == "CALIN"):
-
             if len(full_element[full_element.pos_beg.isin(max_final.pos_beg)]) == 0:
                 # if cluster don't overlap already max-searched region
-
                 window_beg = full_element[full_element.type_elt == "attC"].pos_beg.values[0]
                 window_end = full_element[full_element.type_elt == "attC"].pos_end.values[-1]
-
                 if circular:
                     window_beg = (window_beg - DISTANCE_THRESHOLD) % SIZE_REPLICON
                     window_end = (window_end + DISTANCE_THRESHOLD) % SIZE_REPLICON
                 else:
                     window_beg = max(0, window_beg - DISTANCE_THRESHOLD)
                     window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD)
-
                 strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
-
                 df_max = local_max(replicon_name, window_beg, window_end, strand)
-
                 max_elt = pd.concat([max_elt, df_max])
 
                 if len(df_max) > 0: # Max can sometimes find bigger attC than permitted
                     go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - df_max.pos_end.values[0]
                                ) % SIZE_REPLICON < DISTANCE_THRESHOLD
-
                     go_right = (df_max.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                                 ) % SIZE_REPLICON < DISTANCE_THRESHOLD
-
                     max_elt = expand(window_beg, window_end, max_elt, df_max,
                                      search_left=go_left, search_right=go_right)
 
         elif all(full_element.type == "In0"):
-
             if all(full_element.model != "Phage_integrase"):
-
                 window_beg = full_element[full_element.annotation == "intI"].pos_beg.values[0]
                 window_end = full_element[full_element.annotation == "intI"].pos_end.values[-1]
-
                 if circular:
                     window_beg = (window_beg - DISTANCE_THRESHOLD) % SIZE_REPLICON
                     window_end = (window_end + DISTANCE_THRESHOLD) % SIZE_REPLICON
                 else:
                     window_beg = max(0, window_beg - DISTANCE_THRESHOLD)
                     window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD)
-
                 df_max = local_max(replicon_name, window_beg, window_end)
-
                 max_elt = pd.concat([max_elt, df_max])
-
                 if len(max_elt) > 0:
-
                     max_elt = expand(window_beg, window_end, max_elt, df_max,
                                      search_left=True, search_right=True)
 
         max_final = pd.concat([max_final, max_elt])
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)
-
         max_final.index = range(len(max_final))
-
     return max_final
 
+
 def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_right=False):
+    """
+    for a given element, we can search on the left hand side (if integrase is on the right for instance)
+    or right hand side (opposite situation) or both side (only integrase or only attC sites)
+
+    :param window_beg:
+    :type window_beg: int
+    :param window_end:
+    :type window_end: int
+    :param max_elt:
+    :type max_elt: int
+    :param df_max:
+    :type df_max: :class:`pandas.DataFrame` object
+    :param search_left: need to search on right of ???
+    :type search_left: bool
+    :param search_right: need to search on right of ???
+    :type search_right: bool
+    :return: a copy of max_elt with attC hits
+    :rtype: :class:`pandas.DataFrame` object
+    """
     # for a given element, we can search on the left hand side (if integrase is on the right for instance)
     # or right hand side (opposite situation) or both side (only integrase or only attC sites)
     wb = window_beg
@@ -930,7 +968,19 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
 
 
 def local_max(replicon_name, window_beg, window_end, strand_search="both"):
+    """
 
+    :param replicon_name: the name of replicon (without suffix)
+    :type replicon_name: str
+    :param window_beg:
+    :type window_beg: int
+    :param window_end:
+    :type window_end: int
+    :param strand_search:
+    :type strand_search: str
+    :return:
+    :rtype: :class:`pd.DataFrame` object
+    """
     if window_beg < window_end:
         subseq = SEQUENCE[window_beg : window_end]
     else:
@@ -1013,8 +1063,10 @@ def find_attc(replicon_path, replicon_name, out_dir):
     :type replicon_path: string
     :param replicon_name: the name of the replicon to analyse
     :type replicon_name: string
+    :param out_dir: the relative path to the directory where cmsearch outputs will be stored
+    :type out_dir: str
     :returns: None, the results are written on the disk
-
+    :raises RuntimeError: when cmsearch run failed
     """
     cmsearch_cmd = [CMSEARCH,
                     "--cpu", N_CPU,
@@ -1040,15 +1092,15 @@ def find_integrase(replicon_path, replicon_name, out_dir):
     :type replicon_path: string
     :param replicon_name: the name of the replicon to analyse
     :type replicon_name: string
+    :param out_dir: the relative path to the directory where prodigal outputs will be stored
+    :type out_dir: str
     :returns: None, the results are written on the disk
     """
-
     if not args.gembase:
         # Test whether the protein file exist to avoid new annotation for each run on the same replicon
         prot_tr_path = os.path.join(out_dir, replicon_name + ".prt")
         if not os.path.isfile(prot_tr_path):
             dev_null = 'NUL' if platform.system() == 'Windows' else '/dev/null'
-
             if SIZE_REPLICON > 200000:
                 prodigal_cmd = [PRODIGAL,
                                 "-i", replicon_path,
@@ -1091,12 +1143,12 @@ def find_integrase(replicon_path, replicon_name, out_dir):
         try:
             returncode = call(cmd)
         except Exception as err:
-            raise RuntimeError("{0} failed : {1}".format(cmd[0], err))
+            raise RuntimeError("{0} failed : {1}".format(' '.join(cmd), err))
         if returncode != 0:
-            raise RuntimeError("{0} failed return code = {1}".format(cmd[0], returncode))
+            raise RuntimeError("{0} failed return code = {1}".format(' '.join(cmd), returncode))
 
 
-def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
+def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage=0.5):
     """
     Call hmmmer to annotate CDS associated with the integron. Use Resfams per default (Gibson et al, ISME J.,  2014)
     """
@@ -1104,7 +1156,6 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
     prot_tmp = os.path.join(out_dir, replicon_name + "_subseqprot.tmp")
 
     for integron in integrons:
-
         if os.path.isfile(prot_tmp):
             os.remove(prot_tmp)
 
@@ -1124,7 +1175,6 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
                 if p.id in integron.proteins.index:
                     prot_to_annotate.append(p)
             SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
-
             for hmm in hmm_files:
                 hmm_out = os.path.join(out_dir, "_".join([replicon_name,
                                                          hmm.split("/")[-1].split(".")[0],
@@ -1146,15 +1196,14 @@ def func_annot(replicon_name, out_dir, hmm_files, evalue=10, coverage="todo"):
                     raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
                 if returncode != 0:
                     raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
-
-                hmm_in = read_hmm(replicon_name, hmm_out).sort_values("evalue").drop_duplicates(subset="ID_prot")
+                hmm_in = read_hmm(replicon_name, hmm_out, evalue=evalue, coverage=coverage).sort_values("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
-
             func_annotate_res = func_annotate_res.sort_values("evalue").drop_duplicates(subset="ID_prot")
 
             integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values
             integron.proteins.loc[func_annotate_res.ID_prot, "annotation"] = func_annotate_res.query_name.values
             integron.proteins.loc[func_annotate_res.ID_prot, "model"] = func_annotate_res.ID_query.values
+            integron.proteins = integron.proteins.astype(dtype=integron.dtype)
 
 
 def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
@@ -1167,11 +1216,11 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
                                "ID_prot", "strand", "pos_beg", "pos_end",
                                "evalue", "hmmfrom", "hmmto", "alifrom",
                                "alito", "len_profile"])
-
     gen = SearchIO.parse(infile, 'hmmer3-text')
     for idx, query_result in enumerate(gen):
         len_profile = query_result.seq_len
         query = query_result.id
+
         try:
             id_query = query_result.accession
         except AttributeError:
@@ -1216,6 +1265,11 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
             df.loc[idx+idx2, "Accession_number"] = replicon_name
             df.loc[idx+idx2, "query_name"] = query
 
+    intcols = ["pos_beg", "pos_end", "strand"]
+    floatcol = ["evalue", "len_profile"]
+    df[intcols] = df[intcols].astype(int)
+    df[floatcol] = df[floatcol].astype(float)
+
     df = df[((df.hmmto - df.hmmfrom) / df.len_profile > coverage) & (df.evalue < evalue)]
     df.index = range(len(df))
 
@@ -1238,9 +1292,11 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
 
     df = pd.read_table(infile, sep="\s*", engine="python",
                        header=None, skipfooter=10, skiprows=2)
+    # Keep only columns: query_name(2), mdl from(5), mdl to(6), seq from(7),
+    # seq to(8), strand(9), E-value(15)
     df = df[[2, 5, 6, 7, 8, 9, 15]]
-    df = df[(df[15] < evalue)]
-    df = df[(abs(df[8]-df[7]) < size_max_attc) & (size_min_attc < abs(df[8]-df[7]))]  # filter on evalue
+    df = df[(df[15] < evalue)]  # filter on evalue
+    df = df[(abs(df[8]-df[7]) < size_max_attc) & (size_min_attc < abs(df[8]-df[7]))]
     if len(df) > 0:
         df["Accession_number"] = replicon_name
         c = df.columns.tolist()
@@ -1251,7 +1307,6 @@ def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
                       "pos_beg_tmp", "pos_end_tmp",
                       "sens", "evalue"]
         idx = (df.pos_beg_tmp > df.pos_end_tmp)
-
         df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: x["pos_end_tmp"] - (length_cm - x["cm_fin"]), axis=1)
         df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: x["pos_beg_tmp"] + (x["cm_debut"] - 1), axis=1)
 
@@ -1382,8 +1437,46 @@ def to_gbk(df, sequence):
 
     # We get a ValueError otherwise, eg:
     # ValueError: Locus identifier 'gi|00000000|gb|XX123456.2|' is too long
-    if len(SEQUENCE.name) > 16:
-        SEQUENCE.name = SEQUENCE.name[-16:]
+    if len(sequence.name) > 16:
+        sequence.name = sequence.name[-16:]
+
+
+def scan_hmm_bank(path):
+    """
+    :param path: - if the path is a dir:
+                   return all files ending with .hmm in the dir
+                 - if the path is a file:
+                   parse the file, each line must be an expression (glob)
+                   pointing to hmm files
+    :return: lists of hmm files to consider for annotation
+    """
+    real_path = os.path.realpath(path)
+    files = []
+    if os.path.exists(real_path):
+        if os.path.isdir(real_path):
+            files = glob.glob(os.path.join(real_path, '*.hmm'))
+        elif os.path.isfile(real_path):
+            with open(real_path) as hmm_bank:
+                for bank_path in hmm_bank:
+                    if bank_path.startswith('#'):
+                        continue
+                    elif not os.path.isabs(bank_path):
+                        if "_prefix_share" in globals():
+                            prefix = _prefix_share
+                        else:
+                            prefix = os.environ['INTEGRON_HOME']
+                        bank_path = os.path.normpath(os.path.join(prefix, bank_path))
+                    bank_files = glob.glob(os.path.expanduser(bank_path.strip("\n").strip()))
+                    if not bank_files:
+                        print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
+                    else:
+                        for path in bank_files:
+                            print >> sys.stderr, "the hmm {} will be used for functional annotation".format(path)
+                        files.extend(bank_files)
+
+        return files
+    else:
+        raise IOError("{} no such file or directory".format(path))
 
 if __name__ == "__main__":
 
@@ -1416,7 +1509,7 @@ or define INTEGRON_HOME environment variable.""")
 Python {1}
 
  - open-source GPLv3,
- - Jean Cury, Betrand Néron, Eduardo Rocha,
+ - Jean Cury, Bertrand Neron, Eduardo Rocha,
  - citation:
 
  Identification and analysis of integrons and cassette arrays in bacterial genomes
@@ -1424,37 +1517,6 @@ Python {1}
  Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
  """.format(version, sys.version)
         return version_text
-
-
-    def scan_hmm_bank(path):
-        """
-        :param path: - if the path is a dir:
-                       return all files ending with .hmm in the dir
-                     - if the path is a file:
-                       parse the file, each line must be an expression (glob)
-                       pointing to hmm files
-        :return: lists of hmm files to consider for annotation
-        """
-        real_path = os.path.realpath(path)
-        files = []
-        if os.path.exists(real_path):
-            if os.path.isdir(real_path):
-                files = glob.glob(os.path.join(real_path,'*.hmm'))
-            elif os.path.isfile(real_path):
-                with open(real_path) as hmm_bank:
-                    for bank_path in hmm_bank:
-                        if bank_path.startswith('#'):
-                            continue
-                        bank_files = glob.glob(os.path.expanduser(bank_path.strip("\n").strip()))
-                        if not bank_files:
-                            print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
-                        else:
-                            for path in bank_files:
-                                print >> sys.stderr, "the hmm {} will be used for functional annotation".format(path)
-                            files.extend(bank_files)
-            return files
-        else:
-            raise IOError("{} no such file or directory".format(path))
 
     ############### Arguments and declarations ###############
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -1771,7 +1833,6 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
 
         integrons_describe.to_csv(os.path.join(out_dir_ok, outfile), sep="\t", index=0, na_rep="NA")
-
         to_gbk(integrons_describe, SEQUENCE)
         if not SEQUENCE.description.endswith('.'):
             SEQUENCE.description += '.'
