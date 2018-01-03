@@ -168,8 +168,7 @@ def expand_data(data_to_expand):
                     if not files:
                         continue
                     path_2_create = remove_prefix(one_src, path)
-                    data_struct.append(
-                        (os.path.join(base_dest_dir, path_2_create), [os.path.join(path, f) for f in files]))
+                    data_struct.append((os.path.join(base_dest_dir, path_2_create), [os.path.join(path, f) for f in files]))
             if os.path.isfile(one_src):
                 data_struct.append((base_dest_dir, [one_src]))
     return data_struct
@@ -227,5 +226,3 @@ Nucleic Acids Research 2016; doi:10.1093/nar/gkw319
       cmdclass={'install_scripts': install_scripts},
       distclass=UsageDistribution
       )
-
-

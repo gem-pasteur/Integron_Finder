@@ -46,7 +46,7 @@ class TestExpand(unittest.TestCase):
             self.local_install = True
         else:
             self.local_install = False
-            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..' '..')))
+            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
         integron_finder.max_attc_size = 200
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')

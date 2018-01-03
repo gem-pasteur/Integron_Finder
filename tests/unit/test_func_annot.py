@@ -47,8 +47,19 @@ class TestFunctions(unittest.TestCase):
                           "acba.007.p01.13_Resfams_fa.res", "acba.007.p01.13_intI.res",
                           "acba.007.p01.13_phage_int.res", "acba.007.p01.13_subseqprot.tmp"]
         self.exp_files = [os.path.join(self.out_dir, file) for file in self.exp_files]
+
+        self.prot_dtype = {"pos_beg": 'int',
+                           "pos_end": 'int',
+                           "strand": 'int',
+                           "evalue": 'float',
+                           "type_elt": 'str',
+                           "annotation": 'str',
+                           "model": 'str',
+                           "distance_2attC": 'float'}
+
         # Run prodigal to find CDS on replicon (and run hmmsearch on integrase (2 profiles))
         integron_finder.find_integrase(self.replicon_path, self.replicon_name, self.out_dir)
+
 
     def tearDown(self):
         """
@@ -221,6 +232,8 @@ class TestFunctions(unittest.TestCase):
                                           "distance_2attC": "float", "annotation": "str"})
         proteins1 = proteins1[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
                                "model", "distance_2attC", "annotation"]]
+        proteins1 = proteins1.astype(dtype=self.prot_dtype)
+
         proteins2 = pd.DataFrame({"pos_beg": [7088, 7710, 8650, 10524],
                                  "pos_end": [7351, 8594, 10125, 11699],
                                  "strand": [1, -1, -1, -1],
@@ -233,6 +246,8 @@ class TestFunctions(unittest.TestCase):
                                        "ACBA.007.P01_13_13", "ACBA.007.P01_13_14"])
         proteins2 = proteins2[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
                                "model", "distance_2attC", "annotation"]]
+        proteins2 = proteins2.astype(dtype=self.prot_dtype)
+
         proteins3 = pd.DataFrame({"pos_beg": [3546, 4380],
                                  "pos_end": [4313, 4721],
                                  "strand": [1, 1],
@@ -244,6 +259,8 @@ class TestFunctions(unittest.TestCase):
                                 index=["ACBA.007.P01_13_6", "ACBA.007.P01_13_7"])
         proteins3 = proteins3[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
                                "model", "distance_2attC", "annotation"]]
+        proteins3 = proteins3.astype(dtype=self.prot_dtype)
+
         proteins4 = pd.DataFrame({"pos_beg": [17375, 17886, 19090, 19721],
                                  "pos_end": [17722, 18665, 19749, 20254],
                                  "strand": [-1] * 4,
@@ -256,6 +273,7 @@ class TestFunctions(unittest.TestCase):
                                        "ACBA.007.P01_13_22", "ACBA.007.P01_13_23"])
         proteins4 = proteins4[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
                                "model", "distance_2attC", "annotation"]]
+        proteins4 = proteins4.astype(dtype=self.prot_dtype)
 
         # Check proteins before annotation
         int_proteins = [proteins1, proteins2, proteins3, proteins4]

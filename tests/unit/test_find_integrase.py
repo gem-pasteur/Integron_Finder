@@ -2,7 +2,8 @@ import os
 import tempfile
 import shutil
 import unittest
-import platform
+import re
+
 from collections import namedtuple
 
 # display warning only for non installed integron_finder
@@ -47,7 +48,7 @@ class TestFindIntegrase(unittest.TestCase):
             self.local_install = True
         else:
             self.local_install = False
-            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..' '..')))
+            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
@@ -193,7 +194,8 @@ class TestFindIntegrase(unittest.TestCase):
                         integron_finder.PROT_file)
         with self.assertRaises(RuntimeError) as ctx:
             integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
-        self.assertEqual(str(ctx.exception), 'foo failed : [Errno 2] No such file or directory')
+        self.assertTrue(re.match('^foo .* failed : \[Errno 2\] No such file or directory$',
+                                 str(ctx.exception)))
 
 
     def test_find_integrase_gembase_hmmer_error(self):
@@ -209,6 +211,6 @@ class TestFindIntegrase(unittest.TestCase):
                         integron_finder.PROT_file)
         with self.assertRaises(RuntimeError) as ctx:
             integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
-        self.assertEqual(str(ctx.exception),  '{} failed return code = 1'.format(integron_finder.HMMSEARCH))
+        self.assertTrue(str(ctx.exception).endswith('failed return code = 1'))
 
 

@@ -37,7 +37,7 @@ class TestFindIntegons(unittest.TestCase):
             self.local_install = True
         else:
             self.local_install = False
-            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..' '..')))
+            self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
@@ -324,9 +324,7 @@ class TestFindIntegons(unittest.TestCase):
                                                       attc_file,
                                                       intI_file,
                                                       phageI_file)
-
-        self.assertTrue(err.getvalue().strip().endswith("""RuntimeWarning: divide by zero encountered in long_scalars
-  stride //= shape[i]"""))
+        
         self.assertEqual(out.getvalue().strip(), """In replicon acba.007.p01.13, there are:
 - 1 complete integron(s) found with a total 3 attC site(s)
 - 0 CALIN element(s) found with a total of 0 attC site(s)
