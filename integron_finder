@@ -61,6 +61,24 @@ import matplotlib.pyplot as plt
 import distutils.spawn
 
 
+def seq_counter(replicon_path):
+    """
+    compute the number of sequence in a fasta file
+
+    :param str replicon_path: the path to the replicon
+    :return: the number of sequence in replicon_path
+    :rtype: int
+    """
+    # ditch the boolean (x[0]) and just keep the header or sequence since
+    # we know they alternate.
+    with open(replicon_path) as fh:
+        faiter = (x[1] for x in groupby(fh, lambda line: line[0] == ">"))
+        seq_nb = 0
+        for header in faiter:
+            seq_nb += 1
+            faiter.next()  # discard sequence
+    return seq_nb
+
 
 class IntegronError(Exception):
     pass
