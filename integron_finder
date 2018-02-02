@@ -1646,6 +1646,16 @@ Python {1}
                         help="Synonym of --local_max. Like a soaring eagle in the sky, catching rabbits(or attC sites) by surprise.",
                         action="store_true")
 
+    topology_grp = parser.add_mutually_exclusive_group()
+    topology_grp.add_argument("--circ",
+                              help="Set the default topology for replicons to 'cirular'",
+                              action="store_true")
+    topology_grp.add_argument("--linear",
+                              help="Set the default topology for replicons to 'linear'",
+                              action="store_true")
+    parser.add_argument("--topology-file",
+                        help="The path to a file where the topology for each replicon is specified")
+
     parser.add_argument("-V", "--version",
                         action="version",
                         version=get_version_message())
