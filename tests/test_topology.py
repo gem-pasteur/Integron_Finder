@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 try:
     from tests import IntegronTest
 except ImportError as err:
