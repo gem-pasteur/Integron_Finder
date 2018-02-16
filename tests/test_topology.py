@@ -1,6 +1,10 @@
-import unittest
-from tests import IntegronTest
-from integron.topology import Topology
+try:
+    from tests import IntegronTest
+except ImportError as err:
+    msg = "Cannot import integron_finder: {0!s}".format(err)
+    raise ImportError(msg)
+
+from integron_finder.topology import Topology
 
 class TestFunctions(IntegronTest):
 
