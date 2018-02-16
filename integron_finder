@@ -1518,6 +1518,10 @@ Python {1}
  Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
  Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
  """.format(version, sys.version)
+        print
+        print "########################## DEBUG ####################################"
+        print version_text
+        print "###################### FIN DEBUG ####################################"
         return version_text
 
     ############### Arguments and declarations ###############
