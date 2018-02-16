@@ -11,15 +11,20 @@ class Config(object):
         _prefix_share = '$PREFIXSHARE'
         if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
             _prefix_share = os.environ['INTEGRON_HOME']
-
+        elif _prefix_share.endswith('PREFIXSHARE'):
+            _prefix_share = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         self._prefix_data = os.path.join(_prefix_share, 'data')
 
     def __getattr__(self, item):
-        return getattr(self.args, item)
+        try:
+            attr = getattr(self._args, item)
+            return attr
+        except AttributeError:
+            raise AttributeError("config object has no attribute '{}'".format(item))
 
     @property
     def replicon_path(self):
-        os.path.abspath(self._args.replicon)
+        return os.path.abspath(self._args.replicon)
 
     @property
     def replicon_name(self):
@@ -29,7 +34,7 @@ class Config(object):
 
     @property
     def input_dir(self):
-        in_dir, sequence_file = os.path.abspath(os.path.split(self.replicon_path))
+        in_dir, sequence_file = os.path.split(self.replicon_path)
         return in_dir
 
     @property
@@ -50,7 +55,7 @@ class Config(object):
 
     @property
     def model_dir(self):
-        return os.path.join(self._prefix_data, "Models/")
+        return os.path.join(self._prefix_data, "Models")
 
     @property
     def model_integrase(self):
@@ -70,4 +75,4 @@ class Config(object):
 
     @property
     def func_annot_path(self):
-        os.path.join(self._prefix_data, "Functional_annotation")
+        return os.path.join(self._prefix_data, "Functional_annotation")
