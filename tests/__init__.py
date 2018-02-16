@@ -12,7 +12,12 @@ class IntegronTest(unittest.TestCase):
         if os.path.exists(data_path):
             return data_path
         else:
-            raise RuntimeError("data '{}' does not exists".format(name))
+            raise IOError("data '{}' does not exists".format(name))
+
+
+    def compare_2_files(self, f1, f2):
+        with open(f1) as fh1, open(f2) as fh2:
+            return fh1.read() == fh2.read()
 
 
 def which(name, flags=os.X_OK):
