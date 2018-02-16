@@ -42,13 +42,6 @@ import pandas as pd
 
 import integron_finder
 
-print "#################################"
-print dir(integron_finder)
-print
-print sys.path
-print
-print integron_finder.__file__
-print "#################################"
 if not integron_finder.__version__.endswith('VERSION'):
     # display warning only for non installed integron_finder
     from Bio import BiopythonExperimentalWarning
@@ -58,12 +51,14 @@ if not integron_finder.__version__.endswith('VERSION'):
 
 from Bio import SeqIO
 from Bio import Seq
-
-from integron_finder.topology import Topology
 from integron_finder import IntegronError
 
+from integron_finder.topology import Topology
+from integron_finder.config import Config
 
-def main(args):
+
+def main(args=None):
+    args = sys.argv[1:] if args is None else args
 
     _prefix_share = '$PREFIXSHARE'
 
@@ -71,7 +66,8 @@ def main(args):
     # it's a development version using environment variable
     if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
         _prefix_share = os.environ['INTEGRON_HOME']
-
+    elif _prefix_share.endswith('PREFIXSHARE'):
+        _prefix_share = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     _prefix_data = os.path.join(_prefix_share, 'data')
 
     if not os.path.exists(_prefix_data):
@@ -207,7 +203,7 @@ def main(args):
 
     args = parser.parse_args(args)
 
-    config = integron_finder.config.Config(args)
+    config = Config(args)
 
     in_dir, sequence_file = os.path.split(config.replicon_path)
     replicon_name = config.replicon_name
@@ -420,4 +416,4 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
 
 if __name__ == "__main__":
 
-    main(sys.argv[1:])
+    main()
