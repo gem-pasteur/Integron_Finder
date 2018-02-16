@@ -2,9 +2,17 @@ import os.path
 import unittest
 import platform
 
+
 class IntegronTest(unittest.TestCase):
 
     _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "data"))
+
+    def find_data(self, name):
+        data_path = os.path.join(self._data_dir, name)
+        if os.path.exists(data_path):
+            return data_path
+        else:
+            raise RuntimeError("data '{}' does not exists".format(name))
 
 
 def which(name, flags=os.X_OK):

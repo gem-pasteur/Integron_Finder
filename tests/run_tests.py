@@ -132,6 +132,7 @@ if __name__ == '__main__':
 
         fake_lib = os.path.join(INTEGRON_HOME, 'tests', 'fake_lib')
         integron_finder_lib = os.path.join(fake_lib, 'integron_finder.py')
+
         if not os.path.exists(fake_lib):
             os.mkdir(fake_lib)
         if os.path.exists(integron_finder_lib):
@@ -143,6 +144,7 @@ if __name__ == '__main__':
             os.symlink(integron_finder_script, integron_finder_lib)
 
         sys.path.insert(0, fake_lib)
+        sys.path.insert(0, INTEGRON_HOME)
         ############ END WORKAROUND ################
 
         test_runner = run_unittests(args.tests, verbosity=args.verbosity)

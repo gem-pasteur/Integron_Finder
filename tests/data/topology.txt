@@ -1,0 +1,8 @@
+seq1 circ
+seq2 circular
+seq3 lin
+seq4 linear
+seq5    circ
+seq6    circular
+seq7    lin
+seq8    linear
