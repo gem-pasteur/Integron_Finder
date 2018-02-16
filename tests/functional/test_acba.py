@@ -81,12 +81,19 @@ class Test(IntegronTest):
                                                                                                                    )
                          )
         results_file_to_test = ('acba.007.p01.13.gbk', 'acba.007.p01.13.integrons')
+
         for output_filename in results_file_to_test:
             expected_result_path = os.path.join(self._data_dir, 'Results_Integron_Finder_acba.007.p01.13', output_filename)
             test_result_path = os.path.join(test_result_dir, output_filename)
             with open(expected_result_path) as expected_result_file, open(test_result_path) as test_result_file:
                 for expected_line, result_line in izip(expected_result_file, test_result_file):
                     # test equality line by line
-                    self.assertEqual(expected_line, result_line)
+                    self.assertEqual(expected_line, result_line, msg="{} differ from {} \n {}    !=   {}".format(
+                        expected_result_path,
+                        test_result_path,
+                        expected_line,
+                        result_line)
+                                     )
+
 
 
