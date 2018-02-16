@@ -19,6 +19,7 @@ from distutils.util import subst_vars as distutils_subst_vars
 from setuptools import setup
 from setuptools.dist import Distribution
 from setuptools.command.install_scripts import install_scripts as _install_scripts
+from setuptools.command.install_lib import install_lib as _install_lib
 
 
 class install_scripts(_install_scripts):
@@ -28,6 +29,11 @@ class install_scripts(_install_scripts):
         _install_scripts.finalize_options(self)
 
     def run(self):
+        print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+        print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+        print "@@@@@  install_scripts  @@@@@@"
+        print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+        print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         if os.path.exists(self.build_dir):
             installer = 'pip'
         else:
@@ -66,10 +72,27 @@ class install_scripts(_install_scripts):
             _install_scripts.run(self)
 
 
+def subst_file(_file, vars_2_subst):
+            input_file = os.path.join(script_tmp_dir, _file)
+            output_file = input_file + '.tmp'
+            subst_vars(input_file, output_file, vars_2_subst)
+            os.unlink(input_file)
+            self.move_file(output_file, input_file)
+
+class install_lib(_install_lib):
+
+    def run(self):
+        print "#########################################"
+        print "#########################################"
+        print "############ install_lib ################"
+        print "#########################################"
+        print "#########################################"
+        _install_lib.run()
+
 class UsageDistribution(Distribution):
 
     def __init__(self, attrs=None):
-        #It's important to define potions before to call __init__
+        #It's important to define options before to call __init__
         #otherwise AttributeError: UsageDistribution instance has no attribute 'conf_files'
         #self.doc_files = None
         self.fix_prefix = None
@@ -209,21 +232,25 @@ Nucleic Acids Research 2016; doi:10.1093/nar/gkw319
           'Intended Audience :: Science/Research',
           'Topic :: Scientific/Engineering :: Bio-Informatics'
           ],
-      install_requires=['numpy>=1.7.0',
-                        'matplotlib>=1.4.2',
-                        'pandas>=0.18.0',
-                        'biopython>=1.65',
-                        ],
+      install_requires=open("requirements.txt").read().split(),
 
-      scripts=['integron_finder'],
       #file where some variable must be fix by install
       fix_scripts=['integron_finder'],
-      packages=['integron'],
+
+      packages=['integron_finder'],
+
+      entry_points={
+          'console_scripts': [
+              'integron_finder=integron_finder.scripts.finder:main'
+          ]
+      },
       #(dataprefix +'where to put the data in the install, [where to find the data in the tar ball]
       data_files=expand_data([('share/integron_finder/data/', ['data']),
                               ('share/integron_finder/doc/html', ['doc/build/html']),
                               ('share/integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
                              ]),
-      cmdclass={'install_scripts': install_scripts},
+      cmdclass={'install_scripts': install_scripts,
+                'install_lib': install_lib
+                },
       distclass=UsageDistribution
       )

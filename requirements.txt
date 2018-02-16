@@ -1,4 +1,4 @@
-# integron_finder requirements
---index-url https://pypi.python.org/simple/
-
--e .
+numpy>=1.7.0
+matplotlib>=1.4.2
+pandas>=0.18.0
+biopython>=1.65
