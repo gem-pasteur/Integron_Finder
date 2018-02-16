@@ -81,9 +81,11 @@ class TestFunctions(unittest.TestCase):
             lhmm.write("# Directories containing hmm files:\n")
             lhmm.write(abs_hmm[0] + "\n")
             lhmm.write(abs_hmm[1] + "\n")
-            lhmm.write("# A hmm file:\n")
+            lhmm.write("# An absolute path hmm file:\n")
             lhmm.write(abs_hmm[2] + "\n")
             lhmm.write("# " + abs_hmm[2] + ".hmm\n")
+            lhmm.write("# A relative path to hmm file:\n")
+            lhmm.write("# " + hmm_paths[2] + ".hmm\n")
         # Read hmm_bank file and get list of all files found
         with self.catch_output() as (out, err):
             files = integron_finder.scan_hmm_bank("list_hmm2.txt")
@@ -92,7 +94,8 @@ class TestFunctions(unittest.TestCase):
         exp_files1 = [os.path.abspath(os.path.join(path1, myfile)) for myfile in exp_files1]
         exp_files2 = ["integron_integrase.hmm", "phage-int.hmm"]
         exp_files2 = [os.path.abspath(os.path.join(path2, myfile)) for myfile in exp_files2]
-        exp_files = exp_files1 + exp_files2 + [abs_hmm[2]]
+        exp_files = exp_files1 + exp_files2 + [abs_hmm[2]] + [os.path.normpath(os.path.join(os.environ['INTEGRON_HOME'],
+                                                                                           hmm_paths[2]))]
         # Compare expected and output
         self.assertEqual(set(exp_files), set(files))
         out_stderr = ["the hmm {} will be used for functional annotation".format(path)
