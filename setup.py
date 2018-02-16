@@ -218,6 +218,7 @@ Nucleic Acids Research 2016; doi:10.1093/nar/gkw319
       scripts=['integron_finder'],
       #file where some variable must be fix by install
       fix_scripts=['integron_finder'],
+      packages=['integron'],
       #(dataprefix +'where to put the data in the install, [where to find the data in the tar ball]
       data_files=expand_data([('share/integron_finder/data/', ['data']),
                               ('share/integron_finder/doc/html', ['doc/build/html']),
