@@ -61,24 +61,7 @@ m_use("Agg")
 import matplotlib.pyplot as plt
 import distutils.spawn
 
-
-def seq_counter(replicon_path):
-    """
-    compute the number of sequence in a fasta file
-
-    :param str replicon_path: the path to the replicon
-    :return: the number of sequence in replicon_path
-    :rtype: int
-    """
-    # ditch the boolean (x[0]) and just keep the header or sequence since
-    # we know they alternate.
-    with open(replicon_path) as fh:
-        faiter = (x[1] for x in groupby(fh, lambda line: line[0] == ">"))
-        seq_nb = 0
-        for header in faiter:
-            seq_nb += 1
-            faiter.next()  # discard sequence
-    return seq_nb
+from integron.topology import Topology
 
 
 class IntegronError(Exception):
@@ -770,7 +753,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
     return integrons
 
 
-def find_attc_max(integrons, outfile="attC_max_1.res"):
+def find_attc_max(integrons, circular=True, outfile="attC_max_1.res"):
     """
     Look for attC site with cmsearch --max option wich remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
@@ -796,6 +779,7 @@ def find_attc_max(integrons, outfile="attC_max_1.res"):
 
     :param integrons: the integrons may contain or not attC or intI.
     :type integrons: list of :class:`Integron` objects.
+    :param bool circular: True if replicon is circular, False otherwise.
     :param outfile: the name of cmsearch result file
     :type outfile: string
     :return:
@@ -1570,10 +1554,6 @@ Python {1}
                         metavar='.',
                         help='Set the output directory (default: current)')
 
-    parser.add_argument("--linear",
-                        help="Consider replicon as linear. If replicon smaller than 20kb, it will be considered as linear",
-                        action="store_true")
-
     parser.add_argument("--union_integrases",
                         help="Instead of taking intersection of hits from Phage_int profile (Tyr recombinases) and integron_integrase profile, use the union of the hits",
                         action="store_true")
@@ -1648,6 +1628,7 @@ Python {1}
 
     topology_grp = parser.add_mutually_exclusive_group()
     topology_grp.add_argument("--circ",
+                              dest='circular',
                               help="Set the default topology for replicons to 'cirular'",
                               action="store_true")
     topology_grp.add_argument("--linear",
@@ -1694,179 +1675,197 @@ Python {1}
     out_dir_ok = os.path.join(args.outdir,
                               "Results_Integron_Finder_" + replicon_name)
 
-    SEQUENCE = SeqIO.read(replicon_path,
-                          "fasta",
-                          alphabet=Seq.IUPAC.unambiguous_dna)
+    sequences_db = SeqIO.index(replicon_path,
+                               "fasta",
+                               alphabet=Seq.IUPAC.unambiguous_dna)
+
+    ################
+    # set topology #
+    ################
+    default_topology = None
+    if args.linear:
+        default_topology = 'lin'
+    elif args.circular:
+        default_topology = 'circ'
+
+    if default_topology is None:
+        if len(sequences_db) == 1:
+            default_topology = 'circ'
+        else:
+            default_topology = 'lin'
+
+    topologies = Topology(default_topology, topology_file=args.topology_file)
 
     ############### Definitions ###############
 
-    N_CPU = args.cpu
-    SIZE_REPLICON = len(SEQUENCE)
-    DISTANCE_THRESHOLD = args.distance_thresh
+    for seq_id in sequences_db:
+        SEQUENCE = sequences_db[seq_id]
+        N_CPU = args.cpu
+        SIZE_REPLICON = len(SEQUENCE)
+        DISTANCE_THRESHOLD = args.distance_thresh
 
-    # If sequence is too small, it can be problematic when using circularity
-    if len(SEQUENCE) > 4 * DISTANCE_THRESHOLD:
-        circular = not args.linear
-    else:
-        circular = False
-
-    MODEL_DIR = os.path.join(_prefix_data, "Models/")
-    MODEL_integrase = os.path.join(MODEL_DIR, "integron_integrase.hmm")
-    MODEL_phage_int = os.path.join(MODEL_DIR, "phage-int.hmm")
-
-    CMSEARCH = args.cmsearch
-    if CMSEARCH is None:
-        raise RuntimeError("""cannot find 'cmsearch' in your PATH.
-Please install infernal package or setup 'cmsearch' binary path with --cmsearch option""")
-    HMMSEARCH = args.hmmsearch
-    if HMMSEARCH is None:
-        raise RuntimeError("""cannot find 'hmmsearch' in your PATH.
-Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option""")
-    PRODIGAL = args.prodigal
-    if PRODIGAL is None:
-        raise RuntimeError("""cannot find 'prodigal' in your PATH.
-Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
-
-    if args.func_annot and args.no_proteins is False:
-        fa_path = os.path.join(_prefix_data, "Functional_annotation")
-        if os.path.exists('bank_hmm'):
-            FA_HMM = scan_hmm_bank('bank_hmm')
-        elif os.path.exists(fa_path):
-            FA_HMM = scan_hmm_bank(fa_path)
+        # If sequence is too small, it can be problematic when using circularity
+        topology = topologies[seq_id]
+        if topology == 'circ' and len(SEQUENCE) > 4 * DISTANCE_THRESHOLD:
+            circular = True
         else:
-            raise IntegronError("the dir '{}' neither '{}' exists, specify the location of hmm \
-            profile with --path_func_annot option".format(fa_path, 'bank_hmm'))
-        is_func_annot = True
-    elif args.path_func_annot and args.no_proteins is False:
-        FA_HMM = scan_hmm_bank(args.path_func_annot)
-        is_func_annot = True
-    else:
-        is_func_annot = False
+            circular = False
 
-    if is_func_annot and not FA_HMM:
-        print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, \
-        skip functional annotation step."
+        MODEL_DIR = os.path.join(_prefix_data, "Models/")
+        MODEL_integrase = os.path.join(MODEL_DIR, "integron_integrase.hmm")
+        MODEL_phage_int = os.path.join(MODEL_DIR, "phage-int.hmm")
 
+        CMSEARCH = args.cmsearch
+        if CMSEARCH is None:
+            raise RuntimeError("""cannot find 'cmsearch' in your PATH.
+    Please install infernal package or setup 'cmsearch' binary path with --cmsearch option""")
+        HMMSEARCH = args.hmmsearch
+        if HMMSEARCH is None:
+            raise RuntimeError("""cannot find 'hmmsearch' in your PATH.
+    Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option""")
+        PRODIGAL = args.prodigal
+        if PRODIGAL is None:
+            raise RuntimeError("""cannot find 'prodigal' in your PATH.
+    Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
-    if len(args.attc_model.split("/")) > 1: #contain path
-        MODEL_attc = args.attc_model
-    else:
-        MODEL_attc = os.path.join(MODEL_DIR, args.attc_model)
-
-    model_attc_name = MODEL_attc.split("/")[-1].split(".cm")[0]
-
-    max_attc_size = args.max_attc_size
-    min_attc_size = args.min_attc_size
-
-    with open(MODEL_attc) as f:
-        for i,line in enumerate(f):
-            if "CLEN" in line:
-                length_cm = int(line.split()[1])
-                break
-
-
-    if args.gembase:
-        PROT_dir = os.path.join(in_dir, "..", "Proteins")
-        PROT_file = os.path.join(PROT_dir, replicon_name + ".prt")
-    else:
-        PROT_file = os.path.join(out_dir, replicon_name + ".prt")
-
-    ############### Default search ###############
-
-    intI_file = os.path.join(out_dir, replicon_name + "_intI.res")
-    phageI_file = os.path.join(out_dir, replicon_name + "_phage_int.res")
-    attC_default_file = os.path.join(out_dir, replicon_name + "_attc_table.res")
-
-    if args.no_proteins == False:
-        if (os.path.isfile(intI_file) == 0 or
-            os.path.isfile(phageI_file) == 0):
-
-            find_integrase(replicon_path, replicon_name, out_dir)
-
-
-    print "\n>>> Starting Default search ... :"
-    if os.path.isfile(attC_default_file) == 0:
-        find_attc(replicon_path, replicon_name, out_dir)
-
-    print ">>> Default search done... : \n"
-    integrons = find_integron(replicon_name,
-                              attC_default_file,
-                              intI_file,
-                              phageI_file)
-
-    ############### Search with local_max ###############
-    if (args.eagle_eyes or args.local_max):
-
-        print "\n>>>>>> Starting search with local_max...:"
-        if os.path.isfile(os.path.join(out_dir, "integron_max.pickle")) == 0:
-
-
-            integron_max = find_attc_max(integrons)
-            integron_max.to_pickle(os.path.join(out_dir, "integron_max.pickle"))
-            print ">>>>>> Search with local_max done... : \n"
-
+        if args.func_annot and args.no_proteins is False:
+            fa_path = os.path.join(_prefix_data, "Functional_annotation")
+            if os.path.exists('bank_hmm'):
+                FA_HMM = scan_hmm_bank('bank_hmm')
+            elif os.path.exists(fa_path):
+                FA_HMM = scan_hmm_bank(fa_path)
+            else:
+                raise IntegronError("the dir '{}' neither '{}' exists, specify the location of hmm \
+                profile with --path_func_annot option".format(fa_path, 'bank_hmm'))
+            is_func_annot = True
+        elif args.path_func_annot and args.no_proteins is False:
+            FA_HMM = scan_hmm_bank(args.path_func_annot)
+            is_func_annot = True
         else:
-            integron_max = pd.read_pickle(os.path.join(out_dir,
-                                                       "integron_max.pickle"))
-            print ">>>>>> Search with local_max was already done, continue... : \n"
+            is_func_annot = False
 
+        if is_func_annot and not FA_HMM:
+            print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, \
+            skip functional annotation step."
+
+
+        if len(args.attc_model.split("/")) > 1: #contain path
+            MODEL_attc = args.attc_model
+        else:
+            MODEL_attc = os.path.join(MODEL_DIR, args.attc_model)
+
+        model_attc_name = MODEL_attc.split("/")[-1].split(".cm")[0]
+
+        max_attc_size = args.max_attc_size
+        min_attc_size = args.min_attc_size
+
+        with open(MODEL_attc) as f:
+            for i,line in enumerate(f):
+                if "CLEN" in line:
+                    length_cm = int(line.split()[1])
+                    break
+
+
+        if args.gembase:
+            PROT_dir = os.path.join(in_dir, "..", "Proteins")
+            PROT_file = os.path.join(PROT_dir, replicon_name + ".prt")
+        else:
+            PROT_file = os.path.join(out_dir, replicon_name + ".prt")
+
+        ############### Default search ###############
+
+        intI_file = os.path.join(out_dir, replicon_name + "_intI.res")
+        phageI_file = os.path.join(out_dir, replicon_name + "_phage_int.res")
+        attC_default_file = os.path.join(out_dir, replicon_name + "_attc_table.res")
+
+        if args.no_proteins == False:
+            if (os.path.isfile(intI_file) == 0 or
+                os.path.isfile(phageI_file) == 0):
+
+                find_integrase(replicon_path, replicon_name, out_dir)
+
+
+        print "\n>>> Starting Default search ... :"
+        if os.path.isfile(attC_default_file) == 0:
+            find_attc(replicon_path, replicon_name, out_dir)
+
+        print ">>> Default search done... : \n"
         integrons = find_integron(replicon_name,
-                                  integron_max,
+                                  attC_default_file,
                                   intI_file,
                                   phageI_file)
 
+        ############### Search with local_max ###############
+        if (args.eagle_eyes or args.local_max):
 
-    ############### Add promoters and attI ###############
+            print "\n>>>>>> Starting search with local_max...:"
+            if os.path.isfile(os.path.join(out_dir, "integron_max.pickle")) == 0:
 
-    outfile = replicon_name + ".integrons"
 
-    if len(integrons):
-        j = 1
-        for i in integrons:
-            if i.type() != "In0": # complete & CALIN
-                if args.no_proteins == False:
-                    i.add_proteins()
+                integron_max = find_attc_max(integrons, circular=circular)
+                integron_max.to_pickle(os.path.join(out_dir, "integron_max.pickle"))
+                print ">>>>>> Search with local_max done... : \n"
 
-            if i.type() == "complete":
-                i.add_promoter()
-                i.add_attI()
-                j += 1
-            if i.type() == "In0":
-                i.add_attI()
-                i.add_promoter()
+            else:
+                integron_max = pd.read_pickle(os.path.join(out_dir,
+                                                           "integron_max.pickle"))
+                print ">>>>>> Search with local_max was already done, continue... : \n"
 
-        ############### Functional annotation ###############
+            integrons = find_integron(replicon_name,
+                                      integron_max,
+                                      intI_file,
+                                      phageI_file)
 
-        if is_func_annot and len(FA_HMM) > 0:
-            func_annot(replicon_name, out_dir, FA_HMM)
 
-        j = 1
-        for i in integrons:
-            if i.type() == "complete":
-                i.draw_integron(file=os.path.join(out_dir_ok,
-                                                  replicon_name + "_" + str(j) + ".pdf"))
-                j += 1
+        ############### Add promoters and attI ###############
 
-        ############### Writing out results ###############
+        outfile = replicon_name + ".integrons"
 
-        integrons_describe = pd.concat([i.describe() for i in integrons])
-        dic_id = {i: "%02i" % (j + 1) for j, i in enumerate(integrons_describe.sort_values("pos_beg").ID_integron.unique())}
-        integrons_describe.ID_integron = ["integron_" + dic_id[i] for i in integrons_describe.ID_integron]
-        integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
-                                                 "pos_beg", "pos_end", "strand", "evalue",
-                                                 "type_elt", "annotation", "model",
-                                                 "type", "default", "distance_2attC"]]
-        integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
-        integrons_describe.index = range(len(integrons_describe))
+        if len(integrons):
+            j = 1
+            for i in integrons:
+                if i.type() != "In0": # complete & CALIN
+                    if args.no_proteins == False:
+                        i.add_proteins()
 
-        integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
+                if i.type() == "complete":
+                    i.add_promoter()
+                    i.add_attI()
+                    j += 1
+                if i.type() == "In0":
+                    i.add_attI()
+                    i.add_promoter()
 
-        integrons_describe.to_csv(os.path.join(out_dir_ok, outfile), sep="\t", index=0, na_rep="NA")
-        to_gbk(integrons_describe, SEQUENCE)
-        if not SEQUENCE.description.endswith('.'):
-            SEQUENCE.description += '.'
-        SeqIO.write(SEQUENCE, os.path.join(out_dir_ok, replicon_name + ".gbk"), "genbank")
-    else:
-        out_f = open(os.path.join(out_dir_ok, outfile), "w")
-        out_f.write("# No Integron found\n")
-        out_f.close()
+            ############### Functional annotation ###############
+
+            if is_func_annot and len(FA_HMM) > 0:
+                func_annot(replicon_name, out_dir, FA_HMM)
+
+            j = 1
+            for i in integrons:
+                if i.type() == "complete":
+                    i.draw_integron(file=os.path.join(out_dir_ok,
+                                                      replicon_name + "_" + str(j) + ".pdf"))
+                    j += 1
+
+            ############### Writing out results ###############
+
+            integrons_describe = pd.concat([i.describe() for i in integrons])
+            dic_id = {i: "%02i" % (j + 1) for j, i in enumerate(integrons_describe.sort_values("pos_beg").ID_integron.unique())}
+            integrons_describe.ID_integron = ["integron_" + dic_id[i] for i in integrons_describe.ID_integron]
+            integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
+                                                     "pos_beg", "pos_end", "strand", "evalue",
+                                                     "type_elt", "annotation", "model",
+                                                     "type", "default", "distance_2attC"]]
+            integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
+            integrons_describe.index = range(len(integrons_describe))
+
+            integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
+
+            integrons_describe.to_csv(os.path.join(out_dir_ok, outfile), sep="\t", index=0, na_rep="NA")
+            to_gbk(integrons_describe, SEQUENCE)
+            SeqIO.write(SEQUENCE, os.path.join(out_dir_ok, replicon_name + ".gbk"), "genbank")
+        else:
+            out_f = open(os.path.join(out_dir_ok, outfile), "w")
+            out_f.write("# No Integron found\n")
+            out_f.close()

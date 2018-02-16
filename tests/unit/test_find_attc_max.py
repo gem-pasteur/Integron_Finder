@@ -1,3 +1,4 @@
+
 import os
 import tempfile
 import shutil
@@ -127,7 +128,7 @@ class TestFindFindAttCMax(unittest.TestCase):
         integron.attC = attC
         integrons = [integron]
 
-        max_final = integron_finder.find_attc_max(integrons)
+        max_final = integron_finder.find_attc_max(integrons, circular=False)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4', 'attC_4'],
@@ -188,7 +189,7 @@ class TestFindFindAttCMax(unittest.TestCase):
         integron.attC = attC
         integrons = [integron]
 
-        max_final = integron_finder.find_attc_max(integrons)
+        max_final = integron_finder.find_attc_max(integrons, circular=True)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4', 'attC_4'],
@@ -236,7 +237,7 @@ class TestFindFindAttCMax(unittest.TestCase):
         integron.attC = attC
         integrons = [integron]
 
-        max_final = integron_finder.find_attc_max(integrons)
+        max_final = integron_finder.find_attc_max(integrons, circular=True)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4'],
