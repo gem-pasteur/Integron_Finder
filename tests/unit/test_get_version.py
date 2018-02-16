@@ -23,6 +23,7 @@ class TestFunctions(unittest.TestCase):
             return False
         return True
 
+    @unittest.skipIf(check_installed(), "integron_finder package not installed")
     def test_get_version_not_packaged(self):
         """
         test on having the version message when integron_finder is not installed
@@ -58,7 +59,9 @@ Python {0}
         test on having the version message when integron_finder is installed
         """
         int_vers = subprocess.check_output(["python", "setup.py", "--version"])
-        p = subprocess.Popen(["integron_finder", "-V"], stderr=subprocess.PIPE)
+        p = subprocess.Popen("integron_finder -V",
+                             stderr=subprocess.PIPE,
+                             shell=True)
         version = p.communicate()[1]
         exp_version = """integron_finder version {1}
 Python {0}
