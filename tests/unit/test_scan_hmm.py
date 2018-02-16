@@ -94,8 +94,7 @@ class TestFunctions(unittest.TestCase):
         exp_files1 = [os.path.abspath(os.path.join(path1, myfile)) for myfile in exp_files1]
         exp_files2 = ["integron_integrase.hmm", "phage-int.hmm"]
         exp_files2 = [os.path.abspath(os.path.join(path2, myfile)) for myfile in exp_files2]
-        exp_files = exp_files1 + exp_files2 + [abs_hmm[2]] + [os.path.normpath(os.path.join(os.environ['INTEGRON_HOME'],
-                                                                                           hmm_paths[2]))]
+        exp_files = exp_files1 + exp_files2 + [abs_hmm[2]]
         # Compare expected and output
         self.assertEqual(set(exp_files), set(files))
         out_stderr = ["the hmm {} will be used for functional annotation".format(path)
