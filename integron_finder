@@ -38,7 +38,6 @@ import glob
 import numpy as np
 import pandas as pd
 from subprocess import call
-from itertools import groupby
 
 if not __version__.endswith('VERSION'):
     # display warning only for non installed integron_finder
