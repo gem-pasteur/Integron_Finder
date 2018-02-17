@@ -7,8 +7,9 @@ class IntegronTest(unittest.TestCase):
 
     _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "data"))
 
-    def find_data(self, name):
-        data_path = os.path.join(self._data_dir, name)
+    @classmethod
+    def find_data(cls, name):
+        data_path = os.path.join(cls._data_dir, name)
         if os.path.exists(data_path):
             return data_path
         else:
