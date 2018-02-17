@@ -7,12 +7,10 @@ from Bio import SeqIO, Seq
 import pandas as pd
 import pandas.util.testing as pdt
 
-
 from Bio import BiopythonExperimentalWarning
 import warnings
 warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
-
 
 try:
     from tests import IntegronTest
