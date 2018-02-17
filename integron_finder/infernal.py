@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 def read_infernal(infile, evalue=1, size_max_attc=200, size_min_attc=40):
     """
     Function that parse cmsearch --tblout output and returns a pandas DataFrame
@@ -127,7 +130,11 @@ def local_max(replicon_name, window_beg, window_end, strand_search="both"):
     df_max = df_max[(abs(df_max.pos_end - df_max.pos_beg) > min_attc_size) & (abs(df_max.pos_end - df_max.pos_beg) < max_attc_size)]
     return df_max
 
-def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_right=False):
+
+def expand(replicon_name, replicon_size,
+           window_beg, window_end, max_elt, df_max,
+           circular, dist_threshold, max_attc_size ,
+           search_left=False, search_right=False):
     """
     for a given element, we can search on the left hand side (if integrase is on the right for instance)
     or right hand side (opposite situation) or both side (only integrase or only attC sites)
@@ -155,27 +162,27 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
     if search_right:
 
         if circular:
-            window_beg = (window_end - max_attc_size) % SIZE_REPLICON
+            window_beg = (window_end - max_attc_size) % replicon_size
             # max_attc_size (200bo by default) to allow the detection of sites that would overlap 2 consecutive windows
-            window_end = (window_end + DISTANCE_THRESHOLD) % SIZE_REPLICON
+            window_end = (window_end + dist_threshold) % replicon_size
         else:
             window_beg = max(0, window_end - max_attc_size)
             # max_attc_size (200bo by default) to allow the detection of sites that would overlap 2 consecutive windows
-            window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD)
+            window_end = min(replicon_size, window_end + dist_threshold)
 
-        searched_strand = "both" if search_left else "top" # search on both strands if search in both directions
+        searched_strand = "both" if search_left else "top"  # search on both strands if search in both directions
 
-        while len(df_max) > 0 and 0 < (window_beg and window_end) < SIZE_REPLICON:
+        while len(df_max) > 0 and 0 < (window_beg and window_end) < replicon_size:
 
             df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
             max_elt = pd.concat([max_elt, df_max])
 
             if circular:
-                window_beg = (window_end - max_attc_size) % SIZE_REPLICON
-                window_end = (window_end + DISTANCE_THRESHOLD) % SIZE_REPLICON
+                window_beg = (window_end - max_attc_size) % replicon_size
+                window_end = (window_end + dist_threshold) % replicon_size
             else:
                 window_beg = max(0, window_end - max_attc_size)
-                window_end = min(SIZE_REPLICON, window_end + DISTANCE_THRESHOLD)
+                window_end = min(replicon_size, window_end + dist_threshold)
 
         # re-initialize in case we enter search left too.
         df_max = max_elt.copy()
@@ -185,27 +192,27 @@ def expand(window_beg, window_end, max_elt, df_max, search_left=False, search_ri
     if search_left:
 
         if circular:
-            window_end = (window_beg + 200) % SIZE_REPLICON
-            window_beg = (window_beg - DISTANCE_THRESHOLD) % SIZE_REPLICON
+            window_end = (window_beg + 200) % replicon_size
+            window_beg = (window_beg - dist_threshold) % replicon_size
 
         else:
-            window_beg = max(0, window_beg - DISTANCE_THRESHOLD)
-            window_end = min(SIZE_REPLICON, window_beg + 200)
+            window_beg = max(0, window_beg - dist_threshold)
+            window_end = min(replicon_size, window_beg + 200)
 
         searched_strand = "both" if search_right else "bottom"
 
-        while len(df_max) > 0 and 0 < (window_beg and window_end) < SIZE_REPLICON:
+        while len(df_max) > 0 and 0 < (window_beg and window_end) < replicon_size:
 
             df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
             max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
 
             if circular:
-                window_end = (window_beg + 200) % SIZE_REPLICON
-                window_beg = (window_beg - DISTANCE_THRESHOLD) % SIZE_REPLICON
+                window_end = (window_beg + 200) % replicon_size
+                window_beg = (window_beg - dist_threshold) % replicon_size
 
             else:
-                window_end = min(SIZE_REPLICON, window_beg + 200)
-                window_beg = max(0, window_beg - DISTANCE_THRESHOLD)
+                window_end = min(replicon_size, window_beg + 200)
+                window_beg = max(0, window_beg - dist_threshold)
 
     max_elt.drop_duplicates(inplace=True)
     max_elt.index = range(len(max_elt))
