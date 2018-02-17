@@ -1,33 +1,34 @@
-#!/usr/bin/env python
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 """
 Unit tests func_annot function of integron_finder
 """
-
-import integron_finder
-import unittest
+import os
 import pandas as pd
 import numpy as np
-import os
 from Bio import SeqIO
 from Bio import Seq
-from Bio import SeqFeature
+
+try:
+    from tests import IntegronTest
+except ImportError as err:
+    msg = "Cannot import integron_finder: {0!s}".format(err)
+    raise ImportError(msg)
+
+from integron_finder.genbank import to_gbk
 
 
-class TestFunctions(unittest.TestCase):
+class TestFunctions(IntegronTest):
+
     def setUp(self):
         """
         Define variables common to all tests
         """
-        self.replicon_path = os.path.join("tests", "data", 'Replicons', "acba.007.p01.13.fst")
-        self.seq = SeqIO.read(self.replicon_path, "fasta",
-                              alphabet=Seq.IUPAC.unambiguous_dna)
-        integron_finder.PROT_file = os.path.join("tests", "data",
-                                                 "Results_Integron_Finder_acba.007.p01.13",
-                                                 "acba.007.p01.13.prt")
-        integron_finder.DISTANCE_THRESHOLD = 4000
-        integron_finder.SIZE_REPLICON = len(self.seq)
+        self.replicon_path = self.find_data(os.path.join('Replicons', "acba.007.p01.13.fst"))
+        self.seq = SeqIO.read(self.replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        self.prot_file = self.find_data(os.path.join("Results_Integron_Finder_acba.007.p01.13", "acba.007.p01.13.prt"))
+        self.dist_threshold = 4000
+
 
     def tearDown(self):
         """
@@ -66,14 +67,14 @@ class TestFunctions(unittest.TestCase):
                  "type": "complete",
                  "default": "Yes",
                  "distance_2attC": np.nan
-                }
+                 }
 
-        df = pd.DataFrame(infos, index = [0])
+        df = pd.DataFrame(infos, index=[0])
 
         start_seq = self.seq.seq
         start_id = self.seq.id
 
-        integron_finder.to_gbk(df, self.seq)
+        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
 
         # Translation should be protein ACBA.007.P01_13_20 in
         # tests/data/Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.prt
@@ -100,7 +101,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(self.seq.features[1].qualifiers["protein_id"], infos["element"])
         self.assertEqual(self.seq.features[1].qualifiers["gene"], infos["annotation"])
         self.assertEqual(self.seq.features[1].qualifiers["model"], infos["model"])
-        self.assertEqual(self.seq.features[1].qualifiers["translation"].tostring(), translate)
+        self.assertEqual(str(self.seq.features[1].qualifiers["translation"]), translate)
 
 
     def test_integron_1elem_int(self):
@@ -123,12 +124,12 @@ class TestFunctions(unittest.TestCase):
                  "distance_2attC": np.nan
                 }
 
-        df = pd.DataFrame(infos, index = [0])
+        df = pd.DataFrame(infos, index=[0])
 
         start_seq = self.seq.seq
         start_id = self.seq.id
 
-        integron_finder.to_gbk(df, self.seq)
+        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
 
         # Translation should be protein ACBA.007.P01_13_1 in
         # tests/data/Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.prt
@@ -159,7 +160,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(self.seq.features[1].qualifiers["protein_id"], infos["element"])
         self.assertEqual(self.seq.features[1].qualifiers["gene"], infos["annotation"])
         self.assertEqual(self.seq.features[1].qualifiers["model"], infos["model"])
-        self.assertEqual(self.seq.features[1].qualifiers["translation"].tostring(), translate)
+        self.assertEqual(str(self.seq.features[1].qualifiers["translation"]), translate)
 
 
     def test_integron_1elem_prom(self):
@@ -180,14 +181,14 @@ class TestFunctions(unittest.TestCase):
                  "type": "complete",
                  "default": "Yes",
                  "distance_2attC": np.nan
-                }
+                 }
 
-        df = pd.DataFrame(infos, index = [0])
+        df = pd.DataFrame(infos, index=[0])
 
         start_seq = self.seq.seq
         start_id = self.seq.id
 
-        integron_finder.to_gbk(df, self.seq)
+        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
 
         # Check that there are 2 features (integron and promoter)
         self.assertEqual(len(self.seq.features), 2)
@@ -235,7 +236,7 @@ class TestFunctions(unittest.TestCase):
                       "type": int_type,
                       "default": "Yes",
                       "distance_2attC": np.nan
-                     }
+                      }
         infos_int = {"ID_replicon": rep_id,
                      "ID_integron": int_id,
                      "element": "ACBA.007.P01_13_1",
@@ -249,7 +250,7 @@ class TestFunctions(unittest.TestCase):
                      "type": int_type,
                      "default": "Yes",
                      "distance_2attC": np.nan
-                    }
+                     }
         infos_prot = {"ID_replicon": rep_id,
                       "ID_integron": int_id,
                       "element": "ACBA.007.P01_13_20",
@@ -263,7 +264,7 @@ class TestFunctions(unittest.TestCase):
                       "type": int_type,
                       "default": "Yes",
                       "distance_2attC": np.nan
-                     }
+                      }
         infos_attC = {"ID_replicon": rep_id,
                       "ID_integron": int_id,
                       "element": "attc_001",
@@ -277,13 +278,12 @@ class TestFunctions(unittest.TestCase):
                       "type": int_type,
                       "default": "Yes",
                       "distance_2attC": np.nan
-                     }
+                      }
 
-
-        df1 = pd.DataFrame(infos_prom, index = [0])
-        df2 = pd.DataFrame(infos_int, index = [0])
-        df3 = pd.DataFrame(infos_prot, index = [0])
-        df4 = pd.DataFrame(infos_attC, index = [0])
+        df1 = pd.DataFrame(infos_prom, index=[0])
+        df2 = pd.DataFrame(infos_int, index=[0])
+        df3 = pd.DataFrame(infos_prot, index=[0])
+        df4 = pd.DataFrame(infos_attC, index=[0])
 
         df = pd.concat([df1, df2, df3, df4])
 
@@ -300,7 +300,7 @@ class TestFunctions(unittest.TestCase):
         tr_prot = ("MKGWLFLVIAIVGEVIATSALKSSEGFTKLAPSAVVIIGYGIAFYFLSLVLKSIPVGVAY"
                    "AVWSGLGVVIITAIAWLLHGQKLDAWGFVGMGLIIAAFLLARSPSWKSLRRPTPW*")
 
-        integron_finder.to_gbk(df, self.seq)
+        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
 
         # Check that there are 5 features (integron, promoter, integrase, protein, attC)
         self.assertEqual(len(self.seq.features), 5)
@@ -331,7 +331,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(self.seq.features[2].qualifiers["protein_id"], infos_int["element"])
         self.assertEqual(self.seq.features[2].qualifiers["gene"], infos_int["annotation"])
         self.assertEqual(self.seq.features[2].qualifiers["model"], infos_int["model"])
-        self.assertEqual(self.seq.features[2].qualifiers["translation"].tostring(), tr_int)
+        self.assertEqual(str(self.seq.features[2].qualifiers["translation"]), tr_int)
         # Check second feature: protein
         self.assertEqual(self.seq.features[3].location.start, infos_prot["pos_beg"] - 1)
         self.assertEqual(self.seq.features[3].location.end, infos_prot["pos_end"])
@@ -340,7 +340,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(self.seq.features[3].qualifiers["protein_id"], infos_prot["element"])
         self.assertEqual(self.seq.features[3].qualifiers["gene"], infos_prot["annotation"])
         self.assertEqual(self.seq.features[3].qualifiers["model"], infos_prot["model"])
-        self.assertEqual(self.seq.features[3].qualifiers["translation"].tostring(), tr_prot)
+        self.assertEqual(str(self.seq.features[3].qualifiers["translation"]), tr_prot)
         # Check second feature: attC
         self.assertEqual(self.seq.features[4].location.start, infos_attC["pos_beg"] - 1)
         self.assertEqual(self.seq.features[4].location.end, infos_attC["pos_end"])
@@ -348,6 +348,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(self.seq.features[4].type, "attC")
         self.assertEqual(self.seq.features[4].qualifiers["attC"], infos_attC["element"])
         self.assertEqual(self.seq.features[4].qualifiers["model"], infos_attC["model"])
+
 
     def test_integron_2int_nelem(self):
         """
@@ -373,7 +374,7 @@ class TestFunctions(unittest.TestCase):
                       "type": int_type,
                       "default": "Yes",
                       "distance_2attC": np.nan
-                     }
+                      }
         infos_int = {"ID_replicon": rep_id,
                      "ID_integron": int_id,
                      "element": "ACBA.007.P01_13_1",
@@ -387,7 +388,7 @@ class TestFunctions(unittest.TestCase):
                      "type": int_type,
                      "default": "Yes",
                      "distance_2attC": np.nan
-                    }
+                     }
         infos_prot = {"ID_replicon": rep_id,
                       "ID_integron": int_id,
                       "element": "ACBA.007.P01_13_20",
@@ -401,7 +402,7 @@ class TestFunctions(unittest.TestCase):
                       "type": int_type,
                       "default": "Yes",
                       "distance_2attC": np.nan
-                     }
+                      }
         # integron 2
         infos_attC = {"ID_replicon": rep_id,
                       "ID_integron": "integron_02",
@@ -416,18 +417,17 @@ class TestFunctions(unittest.TestCase):
                       "type": int_type,
                       "default": "Yes",
                       "distance_2attC": np.nan
-                     }
+                      }
 
-        df1 = pd.DataFrame(infos_prom, index = [0])
-        df2 = pd.DataFrame(infos_int, index = [0])
-        df3 = pd.DataFrame(infos_prot, index = [0])
-        df4 = pd.DataFrame(infos_attC, index = [0])
+        df1 = pd.DataFrame(infos_prom, index=[0])
+        df2 = pd.DataFrame(infos_int, index=[0])
+        df3 = pd.DataFrame(infos_prot, index=[0])
+        df4 = pd.DataFrame(infos_attC, index=[0])
 
         df = pd.concat([df1, df2, df3, df4])
 
         start_seq = self.seq.seq
         start_id = self.seq.id
-        lenseq = len(self.seq)
 
         tr_int = ("MKTATAPLPPLRSVKVLDQLRERIRYLHYSLRTEQAYVNWVRAFIRFHGVRHPATLGSSE"
                   "VEAFLSWLANERKVSVSTHRQALAALLFFYGKVLCTDLPWLQEIGRPRPSRRLPVVLTPD"
@@ -438,7 +438,7 @@ class TestFunctions(unittest.TestCase):
         tr_prot = ("MKGWLFLVIAIVGEVIATSALKSSEGFTKLAPSAVVIIGYGIAFYFLSLVLKSIPVGVAY"
                    "AVWSGLGVVIITAIAWLLHGQKLDAWGFVGMGLIIAAFLLARSPSWKSLRRPTPW*")
 
-        integron_finder.to_gbk(df, self.seq)
+        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
 
         # Check that there are 6 features (integron1, promoter, integrase, protein,
         #                                  integron2, attC)
@@ -468,7 +468,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(self.seq.features[2].qualifiers["protein_id"], infos_int["element"])
         self.assertEqual(self.seq.features[2].qualifiers["gene"], infos_int["annotation"])
         self.assertEqual(self.seq.features[2].qualifiers["model"], infos_int["model"])
-        self.assertEqual(self.seq.features[2].qualifiers["translation"].tostring(), tr_int)
+        self.assertEqual(str(self.seq.features[2].qualifiers["translation"]), tr_int)
         # Check feature 4: protein
         self.assertEqual(self.seq.features[3].location.start, infos_prot["pos_beg"] - 1)
         self.assertEqual(self.seq.features[3].location.end, infos_prot["pos_end"])
@@ -477,7 +477,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(self.seq.features[3].qualifiers["protein_id"], infos_prot["element"])
         self.assertEqual(self.seq.features[3].qualifiers["gene"], infos_prot["annotation"])
         self.assertEqual(self.seq.features[3].qualifiers["model"], infos_prot["model"])
-        self.assertEqual(self.seq.features[3].qualifiers["translation"].tostring(), tr_prot)
+        self.assertEqual(str(self.seq.features[3].qualifiers["translation"]), tr_prot)
         # Check feature 5: integron2
         self.assertEqual(self.seq.features[4].location.start, infos_attC["pos_beg"] - 1)
         self.assertEqual(self.seq.features[4].location.end, infos_attC["pos_end"])
@@ -492,6 +492,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(self.seq.features[5].type, "attC")
         self.assertEqual(self.seq.features[5].qualifiers["attC"], infos_attC["element"])
         self.assertEqual(self.seq.features[5].qualifiers["model"], infos_attC["model"])
+
 
     def test_integron_long_seqname(self):
         """
@@ -511,21 +512,21 @@ class TestFunctions(unittest.TestCase):
                  "type": "complete",
                  "default": "Yes",
                  "distance_2attC": np.nan
-                }
+                 }
 
-        df = pd.DataFrame(infos, index = [0])
+        df = pd.DataFrame(infos, index=[0])
 
         start_seq = self.seq.seq
         start_id = self.seq.id
         seq_name = self.seq.name
         self.seq.name = "abcdefgh" + seq_name
 
-        integron_finder.to_gbk(df, self.seq)
+        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
 
         # Translation should be protein ACBA.007.P01_13_20 in
         # tests/data/Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.prt
-        translate = ("MKGWLFLVIAIVGEVIATSALKSSEGFTKLAPSAVVIIGYGIAFYFLSLVLKSIPVGVAY"
-                     "AVWSGLGVVIITAIAWLLHGQKLDAWGFVGMGLIIAAFLLARSPSWKSLRRPTPW*")
+        # translate = ("MKGWLFLVIAIVGEVIATSALKSSEGFTKLAPSAVVIIGYGIAFYFLSLVLKSIPVGVAY"
+        #             "AVWSGLGVVIITAIAWLLHGQKLDAWGFVGMGLIIAAFLLARSPSWKSLRRPTPW*")
 
         # Check that there are 2 features (integron and protein)
         self.assertEqual(len(self.seq.features), 2)
