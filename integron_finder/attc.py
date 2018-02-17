@@ -78,7 +78,7 @@ def search_attc(attc_df, keep_palindromes):
 
 
 
-def find_attc(replicon_path, replicon_name, out_dir, cpu=1):
+def find_attc(replicon_path, replicon_name, cmsearch_path, out_dir, model_attc, cpu=1):
     """
     Call cmsearch to find attC sites in a single replicon.
 
@@ -91,12 +91,12 @@ def find_attc(replicon_path, replicon_name, out_dir, cpu=1):
     :returns: None, the results are written on the disk
     :raises RuntimeError: when cmsearch run failed
     """
-    cmsearch_cmd = [CMSEARCH,
-                    "--cpu", cpu,
+    cmsearch_cmd = [cmsearch_path,
+                    "--cpu", str(cpu),
                     "-o", os.path.join(out_dir, replicon_name + "_attc.res"),
                     "--tblout", os.path.join(out_dir, replicon_name + "_attc_table.res"),
                     "-E", "10",
-                    MODEL_attc,
+                    model_attc,
                     replicon_path]
     try:
         returncode = call(cmsearch_cmd)

@@ -8,14 +8,18 @@ import warnings
 warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
+try:
+    from tests import IntegronTest
+except ImportError as err:
+    msg = "Cannot import integron_finder: {0!s}".format(err)
+    raise ImportError(msg)
 
-import unittest
-import integron_finder
+from integron_finder import attc
+
 from tests import which
 
-class TestFindAttc(unittest.TestCase):
+class TestFindAttc(IntegronTest):
 
-    _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', "data"))
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
@@ -27,9 +31,11 @@ class TestFindAttc(unittest.TestCase):
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
-        integron_finder.CMSEARCH = which('cmsearch')
-        integron_finder.N_CPU = '1'
-        integron_finder.MODEL_attc = os.path.join(self.integron_home, 'data', 'Models', 'attc_4.cm')
+        self.cmsearch_path = which('cmsearch')
+        self.cpu_nb = 1
+        self.model_attc = self.find_data(os.path.join('Models', 'attc_4.cm'))
+        self.replicon_name = 'acba.007.p01.13'
+        self.replicon_path = self.find_data(os.path.join('Replicons', self.replicon_name + '.fst'))
 
 
     def tearDown(self):
@@ -39,25 +45,21 @@ class TestFindAttc(unittest.TestCase):
             pass
 
     def test_find_attc(self):
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-        integron_finder.find_attc(replicon_path, replicon_name, self.tmp_dir)
+        attc.find_attc(self.replicon_path, self.replicon_name, self.cmsearch_path, self.tmp_dir, self.model_attc)
         for suffix in ('_attc.res', '_attc_table.res'):
-            res = os.path.join(self.tmp_dir, replicon_name + suffix)
+            res = os.path.join(self.tmp_dir, self.replicon_name + suffix)
             self.assertTrue(os.path.exists(res))
 
     def test_find_attc_no_infernal(self):
-        integron_finder.CMSEARCH = 'foo'
+        cmsearch_bin = 'foo'
         replicon_name = 'acba.007.p01.13'
         replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         with self.assertRaises(RuntimeError) as ctx:
-            integron_finder.find_attc(replicon_path, replicon_name, self.tmp_dir)
+            attc.find_attc(replicon_path, self.replicon_name, cmsearch_bin, self.tmp_dir, self.model_attc)
         self.assertEqual(str(ctx.exception), 'foo failed : [Errno 2] No such file or directory')
 
     def test_find_attc_no_model(self):
-        integron_finder.MODEL_attc = 'foo'
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
+        model_attc = 'foo'
         with self.assertRaises(RuntimeError) as ctx:
-            integron_finder.find_attc(replicon_path, replicon_name, self.tmp_dir)
-        self.assertEqual(str(ctx.exception), '{} failed returncode = 1'.format(integron_finder.CMSEARCH))
+            attc.find_attc(self.replicon_path, self.replicon_name, self.cmsearch_path, self.tmp_dir, model_attc)
+        self.assertEqual(str(ctx.exception), '{} failed returncode = 1'.format(self.cmsearch_path))
