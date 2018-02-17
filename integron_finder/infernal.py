@@ -129,6 +129,7 @@ def local_max(replicon_name, sequence,
                            evalue=evalue_attc,
                            size_max_attc=max_attc_size,
                            size_min_attc=min_attc_size)
+
     df_max.pos_beg = (df_max.pos_beg + window_beg) % replicon_size
     df_max.pos_end = (df_max.pos_end + window_beg) % replicon_size
     df_max.to_csv(os.path.join(out_dir, replicon_name + "_subseq_attc_table_end.res"),
