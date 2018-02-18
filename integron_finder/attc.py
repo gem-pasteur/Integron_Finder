@@ -4,6 +4,7 @@ from subprocess import call
 import numpy as np
 import pandas as pd
 
+from integron_finder.infernal import local_max, expand
 
 def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     """
@@ -75,8 +76,6 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
         return attc_array
 
 
-
-
 def find_attc(replicon_path, replicon_name, cmsearch_path, out_dir, model_attc, cpu=1):
     """
     Call cmsearch to find attC sites in a single replicon.
@@ -103,7 +102,6 @@ def find_attc(replicon_path, replicon_name, cmsearch_path, out_dir, model_attc, 
         raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd[0], err))
     if returncode != 0:
         raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd[0], returncode))
-
 
 
 def find_attc_max(integrons, replicon_name, size_replicon, distance_threshold, circular=True, outfile="attC_max_1.res"):
@@ -161,22 +159,22 @@ def find_attc_max(integrons, replicon_name, size_replicon, distance_threshold, c
 
             if integrase_is_left:
                 window_beg = full_element[full_element.annotation == "intI"].pos_end.values[0]
-                distance_threshold_LEFT = 0
+                distance_threshold_left = 0
                 window_end = full_element[full_element.type_elt == "attC"].pos_end.values[-1]
-                distance_threshold_RIGHT = distance_threshold
+                distance_threshold_right = distance_threshold
 
             else:  # is right
                 window_beg = full_element[full_element.type_elt == "attC"].pos_beg.values[0]
-                distance_threshold_LEFT = distance_threshold
+                distance_threshold_left = distance_threshold
                 window_end = full_element[full_element.annotation == "intI"].pos_end.values[-1]
-                distance_threshold_RIGHT = 0
+                distance_threshold_right = 0
 
             if circular:
-                window_beg = (window_beg - distance_threshold_LEFT) % size_replicon
-                window_end = (window_end + distance_threshold_RIGHT) % size_replicon
+                window_beg = (window_beg - distance_threshold_left) % size_replicon
+                window_end = (window_end + distance_threshold_right) % size_replicon
             else:
-                window_beg = max(0, window_beg - distance_threshold_LEFT)
-                window_end = min(size_replicon, window_end + distance_threshold_RIGHT)
+                window_beg = max(0, window_beg - distance_threshold_left)
+                window_end = min(size_replicon, window_end + distance_threshold_right)
 
             strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
             df_max = local_max(replicon_name, window_beg, window_end, strand)
@@ -208,7 +206,7 @@ def find_attc_max(integrons, replicon_name, size_replicon, distance_threshold, c
                 df_max = local_max(replicon_name, window_beg, window_end, strand)
                 max_elt = pd.concat([max_elt, df_max])
 
-                if len(df_max) > 0: # Max can sometimes find bigger attC than permitted
+                if len(df_max) > 0:  # Max can sometimes find bigger attC than permitted
                     go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - df_max.pos_end.values[0]
                                ) % size_replicon < distance_threshold
                     go_right = (df_max.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
