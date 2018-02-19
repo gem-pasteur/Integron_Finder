@@ -1,4 +1,3 @@
-
 import os
 import tempfile
 import shutil
@@ -17,16 +16,19 @@ import warnings
 warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
-import integron_finder
-from integron_finder import Integron
+try:
+    from tests import IntegronTest
+except ImportError as err:
+    msg = "Cannot import integron_finder: {0!s}".format(err)
+    raise ImportError(msg)
+
+from integron_finder.integron import Integron
+from integron_finder import attc
 
 from tests import which
 
 
-class TestFindFindAttCMax(unittest.TestCase):
-
-    _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', "data"))
-
+class TestFindFindAttCMax(IntegronTest):
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
@@ -39,22 +41,26 @@ class TestFindFindAttCMax(unittest.TestCase):
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
 
-        integron_finder.PRODIGAL = which('prodigal')
-        integron_finder.HMMSEARCH = which('hmmsearch')
-        integron_finder.N_CPU = '1'
-        integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
-        integron_finder.MODEL_integrase = os.path.join(integron_finder.MODEL_DIR, "integron_integrase.hmm")
-        integron_finder.MODEL_phage_int = os.path.join(integron_finder.MODEL_DIR, "phage-int.hmm")
-        integron_finder.MODEL_attc = os.path.join(self.integron_home, 'data', 'Models', 'attc_4.cm')
-
-        integron_finder.circular = True
-        integron_finder.out_dir = self.tmp_dir
-        integron_finder.CMSEARCH = which('cmsearch')
-        integron_finder.evalue_attc = 1.
-        integron_finder.max_attc_size = 200
-        integron_finder.min_attc_size = 40
-        integron_finder.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
-        integron_finder.DISTANCE_THRESHOLD = 4000  # (4kb at least between 2 different arrays)
+        # integron_finder.PRODIGAL = which('prodigal')
+        # integron_finder.HMMSEARCH = which('hmmsearch')
+        # integron_finder.N_CPU = '1'
+        # integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
+        # integron_finder.MODEL_integrase = os.path.join(integron_finder.MODEL_DIR, "integron_integrase.hmm")
+        # integron_finder.MODEL_phage_int = os.path.join(integron_finder.MODEL_DIR, "phage-int.hmm")
+        # integron_finder.MODEL_attc = os.path.join(self.integron_home, 'data', 'Models', 'attc_4.cm')
+        #
+        # integron_finder.circular = True
+        # integron_finder.out_dir = self.tmp_dir
+        # integron_finder.CMSEARCH = which('cmsearch')
+        # integron_finder.evalue_attc = 1.
+        # integron_finder.max_attc_size = 200
+        # integron_finder.min_attc_size = 40
+        self.replicon_name = 'OBAL001.B.00005.C001'
+        replicon_path = self.find_data(os.path.join('Replicons', self.replicon_name + '.fst'))
+        sequence = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        self.size_replicon = len(sequence)
+        self.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
+        self.dist_threshold = 4000  # (4kb at least between 2 different arrays)
 
         self.columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
         self.dtype = {"pos_beg": 'int',
@@ -85,20 +91,14 @@ class TestFindFindAttCMax(unittest.TestCase):
 
 
     def test_find_attc_max_linear(self):
-        replicon_name = 'OBAL001.B.00005.C001'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
 
         args = argparse.Namespace
         args.eagle_eyes = False
         args.local_max = False
 
-        integron_finder.replicon_name = replicon_name
-        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
-        integron_finder.args = args
-        integron_finder.circular = False
+        #integron_finder.args = args
 
-        integron = Integron(replicon_name)
+        integron = Integron(self.replicon_name)
         integrase = pd.DataFrame({'pos_beg': 1545830,
                                   'pos_end': 1546807,
                                   'strand': -1,
@@ -128,7 +128,8 @@ class TestFindFindAttCMax(unittest.TestCase):
         integron.attC = attC
         integrons = [integron]
 
-        max_final = integron_finder.find_attc_max(integrons, circular=False)
+        max_final = attc.find_attc_max(integrons, self.replicon_name, self.replicon_size,
+                                       self.dist_threshold, circular=False)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4', 'attC_4'],
