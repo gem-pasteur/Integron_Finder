@@ -1,26 +1,26 @@
 __author__ = 'bneron'
 
 import os
-import unittest
 import argparse
 
 import pandas as pd
 import pandas.util.testing as pdt
 import numpy as np
 from Bio import SeqIO, Seq
+from Bio.SeqRecord import SeqRecord
 
-from integron_finder import Integron
+try:
+    from tests import IntegronTest
+except ImportError as err:
+    msg = "Cannot import integron_finder: {0!s}".format(err)
+    raise ImportError(msg)
 
-### TODO ###
-# to remove when global variables will be replaced
-# still N_CPU, SIZE_REPLICON, DISTANCE_THRESHOLD, ...
+from integron_finder.config import Config
+from integron_finder.integron import Integron
 
-import integron_finder
-##########
 
-class Test(unittest.TestCase):
+class Test(IntegronTest):
 
-    _data_dir = os.path.join(os.path.join(os.path.dirname(__file__), '..', "data"))
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
@@ -39,10 +39,15 @@ class Test(unittest.TestCase):
                       "annotation": 'str',
                       "model": 'str',
                       "distance_2attC": 'float'}
-
+        args=argparse.Namespace()
+        self.cfg = Config(args)
+        self._prefix_data = os.path.join(__file__, 'data')
 
     def test_add_integrase(self):
-        id_replicon = "acba.007.p01.13"
+        replicon_name = "acba.007.p01.13"
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+
         data_integrase = {"pos_beg": 55,
                           "pos_end": 1014,
                           "strand": 1,
@@ -58,7 +63,7 @@ class Test(unittest.TestCase):
                           index=[id_int])
         df = df.astype(dtype=self.dtype)
 
-        integron = Integron(id_replicon)
+        integron = Integron(replicon, self.cfg)
         integron.add_integrase(data_integrase["pos_beg"],
                                data_integrase["pos_end"],
                                id_int,
@@ -80,7 +85,9 @@ class Test(unittest.TestCase):
 
 
     def test_add_attc(self):
-        id_replicon = "acba.007.p01.13"
+        replicon_name = "acba.007.p01.13"
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
 
         data_attc_1 = {"pos_beg": 10,
                        "pos_end": 100,
@@ -96,7 +103,7 @@ class Test(unittest.TestCase):
                               index=['attc_001'])
         attc_1 = attc_1.astype(dtype=self.dtype)
 
-        integron = Integron(id_replicon)
+        integron = Integron(replicon, self.cfg)
         integron.add_attC(attc_1.loc['attc_001', 'pos_beg'],
                           attc_1.loc['attc_001', 'pos_end'],
                           attc_1.loc['attc_001', 'strand'],
@@ -105,16 +112,14 @@ class Test(unittest.TestCase):
 
         pdt.assert_frame_equal(attc_1, integron.attC)
 
-        integron_finder.SIZE_REPLICON = 3
-
         attc_2 = pd.DataFrame(data_attc_1,
                               columns=self.columns,
                               index=['attc_002'])
         attc_2 = attc_2.astype(dtype=self.dtype)
         attc_2['pos_beg'] = attc_2['pos_beg'] + 100
         attc_2['pos_end'] = attc_2['pos_end'] + 100
-        attc_2["distance_2attC"] = (attc_2.loc['attc_002', 'pos_beg'] - attc_1.loc['attc_001', 'pos_end']) % \
-                                   integron_finder.SIZE_REPLICON
+        attc_2["distance_2attC"] = (attc_2.loc['attc_002', 'pos_beg'] - attc_1.loc['attc_001', 'pos_end']) % len(replicon)
+
         attc = attc_1.append(attc_2)
 
         integron.add_attC(attc_2.loc['attc_002', 'pos_beg'],
@@ -126,10 +131,12 @@ class Test(unittest.TestCase):
 
 
     def test_type(self):
-        no_integrase = Integron("foo")
+        replicon = SeqRecord(Seq.Seq(''), id='foo')
+        no_integrase = Integron(replicon, self.cfg)
         self.assertIsNone(no_integrase.type())
 
-        just_one_integrase = Integron("just_one_integrase")
+        replicon = SeqRecord(Seq.Seq(''), id='just_one_integrase')
+        just_one_integrase = Integron(replicon, self.cfg)
         just_one_integrase.add_integrase(10,
                                          100,
                                          'foo',
@@ -138,7 +145,8 @@ class Test(unittest.TestCase):
                                          "intersection_tyr_intI")
         self.assertEqual(just_one_integrase.type(), "In0")
 
-        just_one_attC = Integron("just_one_attC")
+        replicon = SeqRecord(Seq.Seq(''), id='just_one_attC')
+        just_one_attC = Integron(replicon, self.cfg)
         just_one_attC.add_attC(10,
                                100,
                                1,
@@ -146,7 +154,8 @@ class Test(unittest.TestCase):
                                "intersection_tyr_intI")
         self.assertEqual(just_one_attC.type(), "CALIN")
 
-        one_integrase_one_attC = Integron("one_integrase_one_attC")
+        replicon = SeqRecord(Seq.Seq(''), id='one_integrase_one_attC')
+        one_integrase_one_attC = Integron(replicon, self.cfg)
         one_integrase_one_attC.add_integrase(10,
                                              100,
                                              'foo',
@@ -163,13 +172,13 @@ class Test(unittest.TestCase):
 
     def test_add_promoter(self):
         replicon_name = 'saen.040.p01.10'
-        replicon_path = os.path.join(self._data_dir, "Replicons", replicon_name + '.fst')
-        integron_finder.SIZE_REPLICON = 148711
-        integron_finder.PROT_file = os.path.join(self._data_dir,
-                                                 'Proteins',
-                                                 '{}.prt'.format(replicon_name))
-        integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
-        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+
+        ## integron_finder.SIZE_REPLICON = 148711
+        prot_file = os.path.join(self._data_dir,
+                                 'Proteins',
+                                 '{}.prt'.format(replicon_name))
 
         # to test promoter we need to ad attC and integrase first
         # as add_promoter use attc and integrase
@@ -202,7 +211,7 @@ class Test(unittest.TestCase):
         ##########################################
         # test promoter with attC with integrase #
         ##########################################
-        integron = Integron(replicon_name)
+        integron = Integron(replicon, self.cfg)
         integron.attC = attC
         integron.integrase = integrase
 
@@ -227,7 +236,7 @@ class Test(unittest.TestCase):
         #############################################
         # test promoter with attC without integrase #
         #############################################
-        integron = Integron(replicon_name)
+        integron = Integron(replicon, self.cfg)
         integron.attC = attC
         integron.add_promoter()
 
@@ -239,7 +248,7 @@ class Test(unittest.TestCase):
         #############################################
         # test promoter without attC with integrase #
         #############################################
-        integron = Integron(replicon_name)
+        integron = Integron(replicon, self.cfg)
         integron.integrase = integrase
 
         integron.add_promoter()
@@ -249,13 +258,8 @@ class Test(unittest.TestCase):
 
     def test_attI(self):
         replicon_name = 'saen.040.p01.10'
-        replicon_path = os.path.join(self._data_dir, "Replicons", replicon_name + '.fst')
-        integron_finder.SIZE_REPLICON = 148711
-        integron_finder.PROT_file = os.path.join(self._data_dir,
-                                                 'Proteins',
-                                                 '{}.prt'.format(replicon_name))
-        integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
-        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
 
         attC = pd.DataFrame({'pos_beg': [104651, 105162, 106018, 107567, 108423, 108743],
                              'pos_end': [104710, 105221, 106087, 107626, 108482, 108832],
@@ -287,7 +291,7 @@ class Test(unittest.TestCase):
         ##########################################
         # test promoter with attC with integrase #
         ##########################################
-        integron = Integron(replicon_name)
+        integron = Integron(replicon, self.cfg)
         integron.attC = attC
         integron.integrase = integrase
 
@@ -311,7 +315,7 @@ class Test(unittest.TestCase):
         #############################################
         # test promoter with attC without integrase #
         #############################################
-        integron = Integron(replicon_name)
+        integron = Integron(replicon, self.cfg)
         integron.attC = attC
 
         empty_attI = pd.DataFrame(columns=self.columns)
@@ -324,7 +328,7 @@ class Test(unittest.TestCase):
         #############################################
         # test promoter without attC with integrase #
         #############################################
-        integron = Integron(replicon_name)
+        integron = Integron(replicon, self.cfg)
         integron.integrase = integrase
 
         integron.add_attI()
@@ -334,14 +338,16 @@ class Test(unittest.TestCase):
 
     def test_add_proteins(self):
         replicon_name = 'pssu.001.c01.13'
-        integron_finder.SIZE_REPLICON = 3419049
-        integron_finder.PROT_file = os.path.join(self._data_dir,
-                                                 '{}.prt.short'.format(replicon_name))
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+
+        prot_file = os.path.join(self._data_dir,
+                                 '{}.prt.short'.format(replicon_name))
+
         args = argparse.Namespace()
         args.gembase = False
-        integron_finder.args = args
-
-        integron = Integron(replicon_name)
+        cfg = Config(args)
+        integron = Integron(replicon, cfg)
 
         data_attc = {"pos_beg": [3072863, 3073496, 3074121, 3075059, 3075593, 3076281, 3076659],
                      "pos_end": [3072931, 3073555, 3074232, 3075118, 3075652, 3076340, 3076718],
@@ -359,7 +365,7 @@ class Test(unittest.TestCase):
 
         integron.attC = attC
 
-        integron.add_proteins()
+        integron.add_proteins(prot_file)
 
         exp_proteins = pd.DataFrame({'pos_beg': [3071974, 3072950, 3074243, 3076720],
                                      'pos_end': [3072855, 3073468, 3075055, 3077511],
@@ -378,8 +384,16 @@ class Test(unittest.TestCase):
 
 
     def test_describe(self):
-        id_replicon = "acba.007.p01.13"
-        integron = Integron(id_replicon)
+        replicon_name = "acba.007.p01.13"
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+
+        args = argparse.Namespace()
+        args.eagle_eyes = False
+        args.local_max = False
+        cfg = Config(args)
+
+        integron = Integron(replicon, cfg)
 
         data_integrase = {"pos_beg": 55,
                           "pos_end": 1014,
@@ -391,9 +405,7 @@ class Test(unittest.TestCase):
                           "distance_2attC": np.nan}
 
         id_int = "ACBA.007.P01_13_1"
-        integrase = pd.DataFrame(data_integrase,
-                                 columns=self.columns,
-                                 index=[id_int])
+        integrase = pd.DataFrame(data_integrase, columns=self.columns, index=[id_int])
         integrase = integrase.astype(dtype=self.dtype)
 
         data_attc = {"pos_beg": 10,
@@ -405,37 +417,26 @@ class Test(unittest.TestCase):
                      "model": "attc_4",
                      "distance_2attC": np.nan}
 
-        attC = pd.DataFrame(data_attc,
-                            columns=self.columns,
-                            index=['attc_001'])
+        attC = pd.DataFrame(data_attc, columns=self.columns, index=['attc_001'])
         attC = attC.astype(dtype=self.dtype)
-        promoter = pd.DataFrame(data_attc,
-                                columns=self.columns,
-                                index=['prom_001'])
+        promoter = pd.DataFrame(data_attc, columns=self.columns, index=['prom_001'])
         promoter = promoter.astype(dtype=self.dtype)
-        attI = pd.DataFrame(data_attc,
-                            columns=self.columns,
-                            index=['attI_001'])
+        attI = pd.DataFrame(data_attc, columns=self.columns, index=['attI_001'])
         attI = attI.astype(dtype=self.dtype)
-        proteins = pd.DataFrame(data_attc,
-                                columns=self.columns,
-                                index=['prot_001'])
+        proteins = pd.DataFrame(data_attc, columns=self.columns, index=['prot_001'])
         proteins = proteins.astype(dtype=self.dtype)
 
         excp_description = pd.concat([integrase, attC, promoter, attI, proteins], ignore_index=False)
         excp_description = excp_description.reset_index()
         excp_description.columns = ["element"] + list(excp_description.columns[1:])
         excp_description["type"] = "complete"
-        excp_description["ID_replicon"] = id_replicon
+        excp_description["ID_replicon"] = replicon.id
         excp_description["ID_integron"] = id(integron)  # uniq identifier of a given Integron
         excp_description["default"] = "Yes"
         excp_description.drop_duplicates(subset=["element"], inplace=True)
 
-        args = argparse.Namespace
-        args.eagle_eyes = False
-        args.local_max = False
-        integron_finder.args = args
-
+        self.cfg._args.eagle_eyes = False
+        self.cfg._args.eagle_eyes = False
         integron.integrase = integrase
         integron.attC = attC
         integron.promoter = promoter
@@ -451,10 +452,12 @@ class Test(unittest.TestCase):
 
 
     def test_has_integrase(self):
-        integron = Integron("foo")
+        replicon = SeqRecord(Seq.Seq(''), id='foo')
+        integron = Integron(replicon, self.cfg)
         self.assertFalse(integron.has_integrase())
 
-        just_one_integrase = Integron("just_one_integrase")
+        replicon = SeqRecord(Seq.Seq(''), id='just_one_integrase')
+        just_one_integrase = Integron(replicon, self.cfg)
         just_one_integrase.add_integrase(10,
                                          100,
                                          'foo',
@@ -465,10 +468,12 @@ class Test(unittest.TestCase):
 
 
     def test_has_attC(self):
-        integron = Integron("foo")
+        replicon = SeqRecord(Seq.Seq(''), id='foo')
+        integron = Integron(replicon, self.cfg)
         self.assertFalse(integron.has_attC())
 
-        just_one_attC = Integron("just_one_attC")
+        replicon = SeqRecord(Seq.Seq(''), id='just_one_attC')
+        just_one_attC = Integron(replicon, self.cfg)
         just_one_attC.add_attC(10,
                                100,
                                1,
