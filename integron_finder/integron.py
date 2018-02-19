@@ -1,3 +1,11 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from Bio import Seq
+from Bio import SeqIO
+from Bio import motifs
+
+
 def find_integron(replicon_name, attc_file, intI_file, phageI_file):
     """
     Function that looks for integrons given rules :
@@ -34,10 +42,8 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
             tmp.loc[:, "query_name"] = "intersection_tyr_intI"
 
         if args.union_integrases:
-            intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0
-                          ].merge(phageI[phageI.ID_prot.isin(tmp.ID_prot) == 0],
-                                  how="outer"
-                                 ).merge(tmp, how="outer")
+            intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0].merge(phageI[phageI.ID_prot.isin(tmp.ID_prot) == 0],
+                                                                      how="outer").merge(tmp, how="outer")
         else:
             intI_ac = tmp
     else:
@@ -286,7 +292,8 @@ class Integron(object):
 
             motifs_Pint = [p_intI1]
 
-            seq_p_int = SEQUENCE.seq[int(self.integrase.pos_beg.min()) - dist_prom : int(self.integrase.pos_end.max()) + dist_prom]
+            seq_p_int = SEQUENCE.seq[int(self.integrase.pos_beg.min()) - dist_prom:
+                                     int(self.integrase.pos_end.max()) + dist_prom]
 
             for m in motifs_Pint:
                 if self.integrase.strand.values[0] == 1:
@@ -479,7 +486,7 @@ class Integron(object):
 
         if self.has_integrase():
             if ((debut - self.integrase.pos_end.values[0]) % SIZE_REPLICON >
-                (self.integrase.pos_beg.values[0] - fin) % SIZE_REPLICON):
+                    (self.integrase.pos_beg.values[0] - fin) % SIZE_REPLICON):
                 # integrase on the right of attC cluster.
                 fin = self.integrase.pos_beg.min()
                 debut -= 200
