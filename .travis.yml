@@ -4,7 +4,7 @@ python:
 # Apply only on main branches
 branches:
   except:
-       - /^feature.*$/
+       - /^feat.*$/
 
 # command to install dependencies
 before_install:
