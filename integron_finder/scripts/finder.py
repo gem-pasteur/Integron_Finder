@@ -41,7 +41,6 @@ m_use("Agg")
 import pandas as pd
 
 import integron_finder
-
 if not integron_finder.__version__.endswith('VERSION'):
     # display warning only for non installed integron_finder
     from Bio import BiopythonExperimentalWarning
@@ -51,6 +50,7 @@ if not integron_finder.__version__.endswith('VERSION'):
 
 from Bio import SeqIO
 from Bio import Seq
+
 from integron_finder import IntegronError
 
 from integron_finder.topology import Topology
@@ -158,6 +158,7 @@ def main(args=None):
                         help='set evalue threshold to filter out hits above it (default: 1)')
 
     parser.add_argument("--keep_palindromes",
+                        default=False,
                         help="for a given hit, if the palindromic version is found,"
                              " don't remove the one with highest evalue ",
                         action="store_true")
