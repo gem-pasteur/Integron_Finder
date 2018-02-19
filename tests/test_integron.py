@@ -19,7 +19,7 @@ from integron_finder.config import Config
 from integron_finder.integron import Integron
 
 
-class Test(IntegronTest):
+class TestIntegron(IntegronTest):
 
 
     def setUp(self):
@@ -39,7 +39,7 @@ class Test(IntegronTest):
                       "annotation": 'str',
                       "model": 'str',
                       "distance_2attC": 'float'}
-        args=argparse.Namespace()
+        args = argparse.Namespace()
         self.cfg = Config(args)
         self._prefix_data = os.path.join(__file__, 'data')
 
