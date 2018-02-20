@@ -1,3 +1,19 @@
+import os
+import sys
+import glob
+
+import numpy as np
+import pandas as pd
+
+# display warning only for non installed integron_finder
+from Bio import BiopythonExperimentalWarning
+import warnings
+warnings.simplefilter('ignore', FutureWarning)
+warnings.simplefilter('ignore', BiopythonExperimentalWarning)
+
+from Bio import SearchIO
+
+
 def scan_hmm_bank(path):
     """
     :param path: - if the path is a dir:
@@ -36,7 +52,7 @@ def scan_hmm_bank(path):
         raise IOError("{} no such file or directory".format(path))
 
 
-def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
+def read_hmm(replicon_name, infile, cfg, evalue=1, coverage=0.5):
     """
     Function that parse hmmer --out output and returns a pandas DataFrame
     filter output by evalue and coverage. (Being % of the profile aligned)
@@ -57,7 +73,7 @@ def read_hmm(replicon_name, infile, evalue=1, coverage=0.5):
             id_query = "-"
         for idx2, hit in enumerate(query_result.hits):
             id_prot = hit.id
-            if args.gembase == False:
+            if not cfg.gembase:
                 pos_beg, pos_end, strand = [x.strip() for x in hit.description_all[0].split('#') if x][:-1]
             else:
                 desc = [j for j in hit.description_all[0].split(" ")]
