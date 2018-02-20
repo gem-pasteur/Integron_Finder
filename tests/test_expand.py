@@ -1,9 +1,7 @@
 import os
-import unittest
 import tempfile
 import shutil
 
-from Bio import SeqIO, Seq
 import pandas as pd
 import pandas.util.testing as pdt
 
@@ -19,7 +17,7 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder import infernal
-
+from integron_finder.utils import read_fasta
 
 _local_max_ori = infernal.local_max
 
@@ -75,7 +73,7 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequence = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        sequence = read_fasta(replicon_path)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -94,7 +92,7 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequence = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        sequence = read_fasta(replicon_path)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -113,7 +111,7 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequence = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        sequence = read_fasta(replicon_path)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -132,7 +130,7 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequence = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        sequence = read_fasta(replicon_path)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))

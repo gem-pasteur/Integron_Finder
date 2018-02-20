@@ -6,8 +6,6 @@ Unit tests func_annot function of integron_finder
 import os
 import pandas as pd
 import numpy as np
-from Bio import SeqIO
-from Bio import Seq
 
 try:
     from tests import IntegronTest
@@ -16,7 +14,7 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder.genbank import to_gbk
-
+from integron_finder.utils import read_fasta
 
 class TestFunctions(IntegronTest):
 
@@ -25,7 +23,7 @@ class TestFunctions(IntegronTest):
         Define variables common to all tests
         """
         self.replicon_path = self.find_data(os.path.join('Replicons', "acba.007.p01.13.fst"))
-        self.seq = SeqIO.read(self.replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        self.seq = read_fasta(self.replicon_path)
         self.prot_file = self.find_data(os.path.join("Results_Integron_Finder_acba.007.p01.13", "acba.007.p01.13.prt"))
         self.dist_threshold = 4000
 
@@ -519,6 +517,8 @@ class TestFunctions(IntegronTest):
         start_seq = self.seq.seq
         start_id = self.seq.id
         seq_name = self.seq.name
+
+
         self.seq.name = "abcdefgh" + seq_name
 
         to_gbk(df, self.seq, self.prot_file, self.dist_threshold)

@@ -6,7 +6,7 @@ import argparse
 import pandas as pd
 import pandas.util.testing as pdt
 import numpy as np
-from Bio import SeqIO, Seq
+from Bio import Seq
 from Bio.SeqRecord import SeqRecord
 
 try:
@@ -16,6 +16,7 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder.config import Config
+from integron_finder.utils import read_fasta
 from integron_finder.integron import Integron
 
 
@@ -43,10 +44,11 @@ class TestIntegron(IntegronTest):
         self.cfg = Config(args)
         self._prefix_data = os.path.join(__file__, 'data')
 
+
     def test_add_integrase(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        replicon = read_fasta(replicon_path)
 
         data_integrase = {"pos_beg": 55,
                           "pos_end": 1014,
@@ -87,7 +89,7 @@ class TestIntegron(IntegronTest):
     def test_add_attc(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        replicon = read_fasta(replicon_path)
 
         data_attc_1 = {"pos_beg": 10,
                        "pos_end": 100,
@@ -173,7 +175,7 @@ class TestIntegron(IntegronTest):
     def test_add_promoter(self):
         replicon_name = 'saen.040.p01.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        replicon = read_fasta(replicon_path)
 
         ## integron_finder.SIZE_REPLICON = 148711
         prot_file = os.path.join(self._data_dir,
@@ -259,7 +261,7 @@ class TestIntegron(IntegronTest):
     def test_attI(self):
         replicon_name = 'saen.040.p01.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        replicon = read_fasta(replicon_path)
 
         attC = pd.DataFrame({'pos_beg': [104651, 105162, 106018, 107567, 108423, 108743],
                              'pos_end': [104710, 105221, 106087, 107626, 108482, 108832],
@@ -339,7 +341,7 @@ class TestIntegron(IntegronTest):
     def test_add_proteins(self):
         replicon_name = 'pssu.001.c01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        replicon = read_fasta(replicon_path)
 
         prot_file = os.path.join(self._data_dir,
                                  '{}.prt.short'.format(replicon_name))
@@ -386,7 +388,7 @@ class TestIntegron(IntegronTest):
     def test_describe(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        replicon = read_fasta(replicon_path)
 
         args = argparse.Namespace()
         args.eagle_eyes = False
@@ -452,11 +454,11 @@ class TestIntegron(IntegronTest):
 
 
     def test_has_integrase(self):
-        replicon = SeqRecord(Seq.Seq(''), id='foo')
+        replicon = SeqRecord(Seq.Seq(''), id='foo', name='bar')
         integron = Integron(replicon, self.cfg)
         self.assertFalse(integron.has_integrase())
 
-        replicon = SeqRecord(Seq.Seq(''), id='just_one_integrase')
+        replicon = SeqRecord(Seq.Seq(''), id='just_one_integrase', name='bar')
         just_one_integrase = Integron(replicon, self.cfg)
         just_one_integrase.add_integrase(10,
                                          100,
@@ -472,7 +474,7 @@ class TestIntegron(IntegronTest):
         integron = Integron(replicon, self.cfg)
         self.assertFalse(integron.has_attC())
 
-        replicon = SeqRecord(Seq.Seq(''), id='just_one_attC')
+        replicon = SeqRecord(Seq.Seq(''), id='just_one_attC', name='bar')
         just_one_attC = Integron(replicon, self.cfg)
         just_one_attC.add_attC(10,
                                100,

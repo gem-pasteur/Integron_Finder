@@ -7,7 +7,6 @@ import pandas.util.testing as pdt
 
 # display warning only for non installed integron_finder
 from Bio import BiopythonExperimentalWarning
-from Bio import Seq, SeqIO
 import warnings
 warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
@@ -18,6 +17,7 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
+from integron_finder.utils import read_fasta
 from integron_finder import infernal
 
 _call_ori = infernal.call
@@ -96,7 +96,7 @@ class TestLocalMax(IntegronTest):
         self.cpu_nb = 1
         self.replicon_name = 'lian.001.c02.10'
         self.replicon_path = self.find_data(os.path.join('Replicons', self.replicon_name + '.fst'))
-        self.sequence = SeqIO.read(self.replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        self.sequence = read_fasta(self.replicon_path)
         self.evalue_attc = 1.
         self.max_attc_size = 200
         self.min_attc_size = 40
