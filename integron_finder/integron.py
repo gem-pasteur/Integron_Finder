@@ -8,8 +8,10 @@ from Bio import SeqIO
 from Bio import motifs
 
 from integron_finder.hmm import read_hmm
+from integron_finder.infernal import read_infernal
+from integron_finder.attc import search_attc
 
-def find_integron(replicon_name, attc_file, intI_file, phageI_file):
+def find_integron(replicon, replicon_size, attc_file, intI_file, phageI_file, cfg):
     """
     Function that looks for integrons given rules :
     - presence of intI
@@ -32,11 +34,11 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
     :param phageI_file: the output of hmmsearch with the phage model
     :type phageI_file: file object
     """
-    if args.no_proteins == False:
-        intI = read_hmm(replicon_name, intI_file)
+    if not cfg.no_proteins:
+        intI = read_hmm(replicon.name, intI_file)
         intI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-        phageI = read_hmm(replicon_name, phageI_file)
+        phageI = read_hmm(replicon.name, phageI_file)
         phageI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
         tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
@@ -44,7 +46,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
         if len(tmp) >= 1:
             tmp.loc[:, "query_name"] = "intersection_tyr_intI"
 
-        if args.union_integrases:
+        if cfg.union_integrases:
             intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0].merge(phageI[phageI.ID_prot.isin(tmp.ID_prot) == 0],
                                                                       how="outer").merge(tmp, how="outer")
         else:
@@ -60,13 +62,14 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     else:
-        attc = read_infernal(attc_file,
-                             evalue=evalue_attc,
-                             size_max_attc=max_attc_size,
-                             size_min_attc=min_attc_size)
+        attc = read_infernal(attc_file, replicon.name, cfg.model_len,
+                             evalue=cfg.evalue_attc,
+                             size_max_attc=cfg.max_attc_size,
+                             size_min_attc=cfg.min_attc_size)
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-    attc_ac = search_attc(attc, args.keep_palindromes)  # list of Dataframe, each have an array of attC
+    # attc_ac = list of Dataframe, each have a an array of attC
+    attc_ac = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, replicon_size)
     integrons = []
 
     if len(intI_ac) >= 1 and len(attc_ac) >= 1:
@@ -78,7 +81,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
 
             if n_attc_array == 0:  # No more array to attribute to an integrase
 
-                integrons.append(Integron(replicon_name))
+                integrons.append(Integron(replicon, cfg))
                 integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                        intI_ac.pos_end.values[i],
                                        id_int,
@@ -91,7 +94,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                 attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
 
                 distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
-                                      (intI_ac.pos_beg.values[i] - attc_right)]) % SIZE_REPLICON
+                                      (intI_ac.pos_beg.values[i] - attc_right)]) % replicon_size
 
                 if len(attc_ac) > 1:
                     #tmp = (distances /
@@ -113,8 +116,8 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                     idx_attc = 0
                     side = np.argmin(distances)
 
-                if distances[side, idx_attc] < DISTANCE_THRESHOLD:
-                    integrons.append(Integron(replicon_name))
+                if distances[side, idx_attc] < cfg.dist_threshold:
+                    integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
                                                 id_int,
@@ -128,56 +131,56 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                         integrons[-1].add_attC(a_tmp[4],
                                                a_tmp[5],
                                                1 if a_tmp[6] == "+" else -1,
-                                               a_tmp[7], model_attc_name)
+                                               a_tmp[7], cfg.model_attc_name)
                     n_attc_array -= 1
 
-                else: # no array close to the integrase on both side
-                    integrons.append(Integron(replicon_name))
+                else:  # no array close to the integrase on both side
+                    integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
                                                 id_int,
                                                 int(intI_ac.strand.values[i]),
                                                 intI_ac.evalue.values[i], intI_ac.query_name.values[i])
 
-        if n_attc_array > 0: # after the integrase loop (<=> no more integrases)
+        if n_attc_array > 0:  # after the integrase loop (<=> no more integrases)
             for attc_array in attc_ac:
-                integrons.append(Integron(replicon_name))
+                integrons.append(Integron(replicon, cfg))
 
                 for a_tmp in attc_array.values:
                     integrons[-1].add_attC(a_tmp[4],
                                            a_tmp[5],
                                            1 if a_tmp[6] == "+" else -1,
-                                           a_tmp[7], model_attc_name)
+                                           a_tmp[7], cfg.model_attc_name)
 
     elif len(intI_ac.pos_end.values) == 0 and len(attc_ac) >= 1:  # If attC only
         for attc_array in attc_ac:
-            integrons.append(Integron(replicon_name))
+            integrons.append(Integron(replicon, cfg))
             for a_tmp in attc_array.values:
                 integrons[-1].add_attC(a_tmp[4],
                                               a_tmp[5],
                                               1 if a_tmp[6] == "+" else -1,
-                                              a_tmp[7], model_attc_name)
+                                              a_tmp[7], cfg.model_attc_name)
 
     elif len(intI_ac.pos_end.values) >= 1 and len(attc_ac) == 0: # If intI only
         for i, id_int in enumerate(intI_ac.ID_prot.values):
-            integrons.append(Integron(replicon_name))
+            integrons.append(Integron(replicon, cfg))
             integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
-                                       intI_ac.pos_end.values[i],
-                                       id_int,
-                                       int(intI_ac.strand.values[i]),
-                                       intI_ac.evalue.values[i],
-                                       intI_ac.query_name.values[i])
+                                        intI_ac.pos_end.values[i],
+                                        id_int,
+                                        int(intI_ac.strand.values[i]),
+                                        intI_ac.evalue.values[i],
+                                        intI_ac.query_name.values[i])
 
-    print "In replicon {}, there are:".format(replicon_name)
+    print "In replicon {}, there are:".format(replicon.name)
     print "- {} complete integron(s) found with a total {} attC site(s)".format(sum(
-                                                [1 if i.type() == "complete" else 0 for i in integrons]),
-                                                sum([len(i.attC) if i.type() == "complete" else 0 for i in integrons]))
+        [1 if i.type() == "complete" else 0 for i in integrons]),
+        sum([len(i.attC) if i.type() == "complete" else 0 for i in integrons]))
     print "- {} CALIN element(s) found with a total of {} attC site(s)".format(sum(
-                                                [1 if i.type() == "CALIN" else 0 for i in integrons]),
-                                                sum([len(i.attC) if i.type() == "CALIN" else 0 for i in integrons]))
+        [1 if i.type() == "CALIN" else 0 for i in integrons]),
+        sum([len(i.attC) if i.type() == "CALIN" else 0 for i in integrons]))
     print "- {} In0 element(s) found with a total of {} attC site".format(sum(
-                                                [1 if i.type() == "In0" else 0 for i in integrons]),
-                                                sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons]))
+        [1 if i.type() == "In0" else 0 for i in integrons]),
+        sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons]))
 
     return integrons
 
