@@ -1,34 +1,34 @@
 import os
+import sys
 import tempfile
 import shutil
-import unittest
 import argparse
-import sys
 from StringIO import StringIO
 from contextlib import contextmanager
 
+import numpy as np
 import pandas as pd
 import pandas.util.testing as pdt
 
-import numpy as np
-
 # display warning only for non installed integron_finder
 from Bio import BiopythonExperimentalWarning
-from Bio import Seq, SeqIO
 import warnings
 warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
-import integron_finder
-from tests import which
+try:
+    from tests import IntegronTest
+except ImportError as err:
+    msg = "Cannot import integron_finder: {0!s}".format(err)
+    raise ImportError(msg)
+
+from integron_finder.integron import Integron, find_integron
+from integron_finder.config import Config
+from integron_finder.utils import read_fasta
+from integron_finder.infernal import read_infernal
 
 
-
-
-
-class TestFindIntegons(unittest.TestCase):
-
-    _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', "data"))
+class TestFindIntegons(IntegronTest):
 
 
     def setUp(self):
@@ -42,13 +42,12 @@ class TestFindIntegons(unittest.TestCase):
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
 
-        integron_finder.PRODIGAL = which('prodigal')
-        integron_finder.HMMSEARCH = which('hmmsearch')
-        integron_finder.N_CPU = '1'
-        integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
-        integron_finder.MODEL_integrase = os.path.join(integron_finder.MODEL_DIR, "integron_integrase.hmm")
-        integron_finder.MODEL_phage_int = os.path.join(integron_finder.MODEL_DIR, "phage-int.hmm")
-        integron_finder.MODEL_attc = os.path.join(self.integron_home, 'data', 'Models', 'attc_4.cm')
+        # by default use empty Namespace just to match with api
+        # if need some values create a local config with these values
+        # this rule should avoid side effects
+        args = argparse.Namespace()
+        self.cfg = Config(args)
+        self.cfg._prefix_data = os.path.join(__file__, 'data')
 
         self.columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
         self.dtype = {"pos_beg": 'int',
@@ -85,33 +84,26 @@ class TestFindIntegons(unittest.TestCase):
 
     def test_find_integron(self):
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-        attc_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc_table.res')
-        intI_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_intI.res')
-        phageI_file = os.path.join(self._data_dir,
-                                   'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_phage_int.res')
-        args = argparse.Namespace
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon_results_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name), 'other'))
+        attc_file = os.path.join(replicon_results_path, '{}_attc_table.res'.format(replicon_name))
+        intI_file = os.path.join(replicon_results_path, '{}_intI.res'.format(replicon_name))
+        phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon_name))
+
+        replicon = read_fasta(replicon_path)
+
+        args = argparse.Namespace()
         args.no_proteins = True
         args.keep_palindromes = True
-
-        integron_finder.replicon_name = replicon_name
-        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
-        integron_finder.args = args
-        integron_finder.evalue_attc = 1.
-        integron_finder.max_attc_size = 200
-        integron_finder.min_attc_size = 40
-        integron_finder.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
-        integron_finder.DISTANCE_THRESHOLD = 4000  # (4kb at least between 2 different arrays)
-        integron_finder.model_attc_name = integron_finder.MODEL_attc.split("/")[-1].split(".cm")[0]
-
+        args.distance_threshold = 4000
+        args.attc_model = 'attc_4.cm'
+        args.evalue_attc = 1.0
+        args.max_attc_size = 200
+        args.min_attc_size = 40
+        cfg = Config(args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
         with self.catch_output() as (out, err):
-            integrons = integron_finder.find_integron(replicon_name,
-                                                      attc_file,
-                                                      intI_file,
-                                                      phageI_file)
+            integrons = find_integron(replicon, attc_file, intI_file, phageI_file, cfg)
 
         self.assertEqual(err.getvalue().strip(), "")
         self.assertEqual(out.getvalue().strip(), """In replicon acba.007.p01.13, there are:
@@ -121,7 +113,7 @@ class TestFindIntegons(unittest.TestCase):
 
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
-        self.assertEqual(integron.ID_replicon, replicon_name)
+        self.assertEqual(integron.replicon.id, replicon.id)
 
         exp = pd.DataFrame({'annotation': ['attC'] * 3,
                             'distance_2attC': [np.nan, 1196.0, 469.0],
@@ -147,39 +139,47 @@ class TestFindIntegons(unittest.TestCase):
 
     def test_find_integron_attC_is_df(self):
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-        attc_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc_table.res')
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_fasta(replicon_path)
+        attc_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
+                                                'other', '{}_attc_table.res'.format(replicon_name)))
 
-        intI_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_intI.res')
-        phageI_file = os.path.join(self._data_dir,
-                                   'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_phage_int.res')
-        args = argparse.Namespace
+        intI_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
+                                                'other', '{}_intI.res'.format(replicon_name)))
+        phageI_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
+                                                  'other', '{}_phage_int.res'.format(replicon_name)))
+
+        # integron_finder.replicon_name = replicon_name
+        # integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        # integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
+        # integron_finder.args = args
+        # integron_finder.DISTANCE_THRESHOLD = 4000  # (4kb at least between 2 different arrays)
+        # integron_finder.model_attc_name = integron_finder.MODEL_attc.split("/")[-1].split(".cm")[0]
+
+        args = argparse.Namespace()
         args.no_proteins = True
         args.keep_palindromes = True
+        args.attc_model = 'attc_4.cm'
+        args.evalue_attc = 1.0
+        args.max_attc_size = 200
+        args.min_attc_size = 40
+        args.distance_threshold = 4000
+        cfg = Config(args)
+        cfg._prefix_data = os.path.join(__file__, 'data')
+        len_model_attc = 47  # length in 'CLEN' (value for model attc_4.cm)
 
-        integron_finder.replicon_name = replicon_name
-        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
-        integron_finder.args = args
-        integron_finder.evalue_attc = 1.
-        integron_finder.max_attc_size = 200
-        integron_finder.min_attc_size = 40
-        integron_finder.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
-        integron_finder.DISTANCE_THRESHOLD = 4000  # (4kb at least between 2 different arrays)
-        integron_finder.model_attc_name = integron_finder.MODEL_attc.split("/")[-1].split(".cm")[0]
-
-        attc_file = integron_finder.read_infernal(attc_file,
-                                                  evalue=integron_finder.evalue_attc,
-                                                  size_max_attc=integron_finder.max_attc_size,
-                                                  size_min_attc=integron_finder.min_attc_size)
+        attc_file = read_infernal(attc_file, replicon_name,
+                                  len_model_attc,
+                                  evalue=cfg.evalue_attc,
+                                  size_max_attc=cfg.max_attc_size,
+                                  size_min_attc=cfg.min_attc_size)
 
         with self.catch_output() as (out, err):
-            integrons = integron_finder.find_integron(replicon_name,
-                                                      attc_file,
-                                                      intI_file,
-                                                      phageI_file)
+            integrons = find_integron(replicon,
+                                      attc_file,
+                                      intI_file,
+                                      phageI_file,
+                                      cfg)
 
         self.assertEqual(err.getvalue().strip(), "")
         self.assertEqual(out.getvalue().strip(), """In replicon acba.007.p01.13, there are:
@@ -189,7 +189,7 @@ class TestFindIntegons(unittest.TestCase):
 
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
-        self.assertEqual(integron.ID_replicon, replicon_name)
+        self.assertEqual(integron.replicon.name, replicon_name)
 
         exp = pd.DataFrame({'annotation': ['attC'] * 3,
                             'distance_2attC': [np.nan, 1196.0, 469.0],
@@ -215,36 +215,36 @@ class TestFindIntegons(unittest.TestCase):
 
     def test_find_integron_proteins(self):
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_fasta(replicon_path)
         attc_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc_table.res')
+                                 'Results_Integron_Finder_acba.007.p01.13', 'other', 'acba.007.p01.13_attc_table.res')
         intI_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_intI.res')
+                                 'Results_Integron_Finder_acba.007.p01.13', 'other', 'acba.007.p01.13_intI.res')
         phageI_file = os.path.join(self._data_dir,
-                                   'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_phage_int.res')
+                                   'Results_Integron_Finder_acba.007.p01.13', 'other', 'acba.007.p01.13_phage_int.res')
         args = argparse.Namespace
         args.no_proteins = False
         args.keep_palindromes = True
         args.union_integrases = False
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
 
-        integron_finder.replicon_name = replicon_name
-        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
-        integron_finder.args = args
-        integron_finder.evalue_attc = 1.
-        integron_finder.max_attc_size = 200
-        integron_finder.min_attc_size = 40
-        integron_finder.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
-        integron_finder.DISTANCE_THRESHOLD = 4000  # (4kb at least between 2 different arrays)
-        integron_finder.model_attc_name = integron_finder.MODEL_attc.split("/")[-1].split(".cm")[0]
-
+        replicon = read_fasta(replicon_path)
+        args = argparse.Namespace()
+        args.evalue_attc = 1.
+        args.max_attc_size = 200
+        args.min_attc_size = 40
+        args.distance_threshold = 4000  # (4kb at least between 2 different arrays)
+        args.attc_model = 'attc_4.cm'
+        cfg = Config(args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         with self.catch_output() as (out, err):
-            integrons = integron_finder.find_integron(replicon_name,
-                                                      attc_file,
-                                                      intI_file,
-                                                      phageI_file)
+            integrons = find_integron(replicon,
+                                      attc_file,
+                                      intI_file,
+                                      phageI_file,
+                                      cfg)
 
         self.assertEqual(err.getvalue().strip(), "")
         self.assertEqual(out.getvalue().strip(), """In replicon acba.007.p01.13, there are:
@@ -254,7 +254,7 @@ class TestFindIntegons(unittest.TestCase):
 
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
-        self.assertEqual(integron.ID_replicon, replicon_name)
+        self.assertEqual(integron.replicon.name, replicon_name)
 
         exp = pd.DataFrame({'annotation': 'intI',
                             'distance_2attC': np.nan,
@@ -307,24 +307,24 @@ class TestFindIntegons(unittest.TestCase):
         args.union_integrases = True
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
 
-        integron_finder.replicon_name = replicon_name
-        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
-        integron_finder.args = args
-        integron_finder.evalue_attc = 1.
-        integron_finder.max_attc_size = 200
-        integron_finder.min_attc_size = 40
-        integron_finder.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
-        integron_finder.DISTANCE_THRESHOLD = 4000  # (4kb at least between 2 different arrays)
-        integron_finder.model_attc_name = integron_finder.MODEL_attc.split("/")[-1].split(".cm")[0]
+        replicon= read_fasta(replicon_path)
 
+        args = argparse.Namespace()
+        args.evalue_attc = 1.
+        args.max_attc_size = 200
+        args.min_attc_size = 40
+        args.distance_threshold = 4000  # (4kb at least between 2 different arrays)
+        args.attc_model = 'attc_4.cm'
+        cfg = Config(args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         with self.catch_output() as (out, err):
-            integrons = integron_finder.find_integron(replicon_name,
-                                                      attc_file,
-                                                      intI_file,
-                                                      phageI_file)
-        
+            integrons = find_integron(replicon,
+                                      attc_file,
+                                      intI_file,
+                                      phageI_file,
+                                      cfg)
+
         self.assertEqual(out.getvalue().strip(), """In replicon acba.007.p01.13, there are:
 - 1 complete integron(s) found with a total 3 attC site(s)
 - 0 CALIN element(s) found with a total of 0 attC site(s)
@@ -332,7 +332,7 @@ class TestFindIntegons(unittest.TestCase):
 
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
-        self.assertEqual(integron.ID_replicon, replicon_name)
+        self.assertEqual(integron.replicon.name, replicon_name)
 
         exp = pd.DataFrame({'annotation': 'intI',
                             'distance_2attC': np.nan,

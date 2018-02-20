@@ -11,7 +11,8 @@ from integron_finder.hmm import read_hmm
 from integron_finder.infernal import read_infernal
 from integron_finder.attc import search_attc
 
-def find_integron(replicon, replicon_size, attc_file, intI_file, phageI_file, cfg):
+
+def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
     """
     Function that looks for integrons given rules :
     - presence of intI
@@ -35,10 +36,10 @@ def find_integron(replicon, replicon_size, attc_file, intI_file, phageI_file, cf
     :type phageI_file: file object
     """
     if not cfg.no_proteins:
-        intI = read_hmm(replicon.name, intI_file)
+        intI = read_hmm(replicon.name, intI_file, cfg)
         intI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-        phageI = read_hmm(replicon.name, phageI_file)
+        phageI = read_hmm(replicon.name, phageI_file, cfg)
         phageI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
         tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
@@ -69,7 +70,7 @@ def find_integron(replicon, replicon_size, attc_file, intI_file, phageI_file, cf
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     # attc_ac = list of Dataframe, each have a an array of attC
-    attc_ac = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, replicon_size)
+    attc_ac = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, len(replicon))
     integrons = []
 
     if len(intI_ac) >= 1 and len(attc_ac) >= 1:
@@ -94,7 +95,7 @@ def find_integron(replicon, replicon_size, attc_file, intI_file, phageI_file, cf
                 attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
 
                 distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
-                                      (intI_ac.pos_beg.values[i] - attc_right)]) % replicon_size
+                                      (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
 
                 if len(attc_ac) > 1:
                     #tmp = (distances /
@@ -116,7 +117,7 @@ def find_integron(replicon, replicon_size, attc_file, intI_file, phageI_file, cf
                     idx_attc = 0
                     side = np.argmin(distances)
 
-                if distances[side, idx_attc] < cfg.dist_threshold:
+                if distances[side, idx_attc] < cfg.distance_threshold:
                     integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
