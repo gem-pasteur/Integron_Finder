@@ -6,6 +6,7 @@ import os
 class Config(object):
 
     def __init__(self, args):
+        self._model_len = None  # model_len cache, because it's computation is "heavy" (open file)
         self._args = args
 
         _prefix_share = '$PREFIXSHARE'
@@ -66,12 +67,45 @@ class Config(object):
         return os.path.join(self.model_dir, "phage-int.hmm")
 
     @property
-    def model_attc(self):
-        if len(self._args.attc_model.split("/")) > 1: #contain path
+    def model_attc_path(self):
+        try:
+            self._args.attc_model
+        except AttributeError:
+            raise RuntimeError("'model_attc' is not define.")
+        if len(self._args.attc_model.split(os.sep)) > 1:  # contain path
             model_attc = self._args.attc_model
         else:
             model_attc = os.path.join(self.model_dir, self._args.attc_model)
         return model_attc
+
+    @property
+    def model_attc_name(self):
+        try:
+            self._args.attc_model
+        except AttributeError:
+            raise RuntimeError("'model_attc' is not define.")
+        return os.path.splitext(os.path.split(self.model_attc_path)[1])[0]
+
+    @property
+    def model_len(self):
+        try:
+            self._args.attc_model
+        except AttributeError:
+            raise RuntimeError("'model_attc' is not define.")
+
+        if self._model_len is None:
+            if not os.path.exists(self.model_attc_path):
+                raise RuntimeError("Path to model_attc '{}' doe snot exists".format(self.model_attc_path))
+            with open(self.model_attc_path) as f:
+                for i, line in enumerate(f):
+                    if "CLEN" in line:
+                        model_len = int(line.split()[1])
+                        self._model_len = model_len
+                        return model_len
+                raise RuntimeError("CLEN not found in '{}', maybe it's not infernal model file".format(self.model_attc_path))
+
+        else:
+            return self._model_len
 
     @property
     def func_annot_path(self):
