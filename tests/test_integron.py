@@ -42,7 +42,7 @@ class TestIntegron(IntegronTest):
                       "distance_2attC": 'float'}
         args = argparse.Namespace()
         self.cfg = Config(args)
-        self._prefix_data = os.path.join(__file__, 'data')
+        self._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
 
     def test_add_integrase(self):

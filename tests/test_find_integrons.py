@@ -47,7 +47,7 @@ class TestFindIntegons(IntegronTest):
         # this rule should avoid side effects
         args = argparse.Namespace()
         self.cfg = Config(args)
-        self.cfg._prefix_data = os.path.join(__file__, 'data')
+        self.cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         self.columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
         self.dtype = {"pos_beg": 'int',
@@ -165,7 +165,7 @@ class TestFindIntegons(IntegronTest):
         args.min_attc_size = 40
         args.distance_threshold = 4000
         cfg = Config(args)
-        cfg._prefix_data = os.path.join(__file__, 'data')
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
         len_model_attc = 47  # length in 'CLEN' (value for model attc_4.cm)
 
         attc_file = read_infernal(attc_file, replicon_name,
