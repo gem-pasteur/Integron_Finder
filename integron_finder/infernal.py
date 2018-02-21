@@ -189,7 +189,12 @@ def expand(replicon,
 
         while len(df_max) > 0 and 0 < (window_beg and window_end) < replicon_size:
 
-            df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
+            df_max = local_max(replicon,
+                               window_beg, window_end,
+                               model_attc_path,
+                               strand_search=searched_strand,
+                               out_dir=out_dir
+                               )
             max_elt = pd.concat([max_elt, df_max])
 
             if circular:
@@ -218,7 +223,11 @@ def expand(replicon,
 
         while len(df_max) > 0 and 0 < (window_beg and window_end) < replicon_size:
 
-            df_max = local_max(replicon_name, window_beg, window_end, searched_strand)
+            df_max = local_max(replicon,
+                               window_beg, window_end,
+                               model_attc_path,
+                               strand_search=searched_strand,
+                               out_dir=out_dir)
             max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
 
             if circular:
