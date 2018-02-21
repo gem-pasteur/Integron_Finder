@@ -117,7 +117,8 @@ class TestFindFindAttCMax(IntegronTest):
         max_final = find_attc_max(integrons, self.replicon,
                                   self.cfg.distance_threshold, self.cfg.model_attc_path,
                                   self.cfg.max_attc_size,
-                                  circular=False)
+                                  circular=False,
+                                  out_dir=self.tmp_dir)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4', 'attC_4'],
@@ -168,7 +169,8 @@ class TestFindFindAttCMax(IntegronTest):
         max_final = find_attc_max(integrons, self.replicon,
                                   self.cfg.distance_threshold, self.cfg.model_attc_path,
                                   self.cfg.max_attc_size,
-                                  circular=True)
+                                  circular=True,
+                                  out_dir=self.tmp_dir)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4', 'attC_4'],
@@ -206,7 +208,8 @@ class TestFindFindAttCMax(IntegronTest):
         max_final = find_attc_max(integrons, self.replicon,
                                   self.cfg.distance_threshold, self.cfg.model_attc_path,
                                   self.cfg.max_attc_size,
-                                  circular=True)
+                                  circular=True,
+                                  out_dir=self.tmp_dir)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4'],
