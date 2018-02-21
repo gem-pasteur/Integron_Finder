@@ -143,10 +143,12 @@ def local_max(replicon,
     return df_max
 
 
-def expand(replicon_name, replicon_size,
+def expand(replicon,
            window_beg, window_end, max_elt, df_max,
            circular, dist_threshold, max_attc_size,
-           search_left=False, search_right=False):
+           model_attc_path,
+           search_left=False, search_right=False,
+           out_dir='.'):
     """
     for a given element, we can search on the left hand side (if integrase is on the right for instance)
     or right hand side (opposite situation) or both side (only integrase or only attC sites)
@@ -166,6 +168,7 @@ def expand(replicon_name, replicon_size,
     :return: a copy of max_elt with attC hits
     :rtype: :class:`pandas.DataFrame` object
     """
+    replicon_size = len(replicon)
     # for a given element, we can search on the left hand side (if integrase is on the right for instance)
     # or right hand side (opposite situation) or both side (only integrase or only attC sites)
     wb = window_beg
