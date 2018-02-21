@@ -1,7 +1,7 @@
 import os
 
 
-
+from integron_finder import utils
 
 class Config(object):
 
@@ -92,18 +92,10 @@ class Config(object):
             self._args.attc_model
         except AttributeError:
             raise RuntimeError("'model_attc' is not define.")
-
         if self._model_len is None:
-            if not os.path.exists(self.model_attc_path):
-                raise RuntimeError("Path to model_attc '{}' doe snot exists".format(self.model_attc_path))
-            with open(self.model_attc_path) as f:
-                for i, line in enumerate(f):
-                    if "CLEN" in line:
-                        model_len = int(line.split()[1])
-                        self._model_len = model_len
-                        return model_len
-                raise RuntimeError("CLEN not found in '{}', maybe it's not infernal model file".format(self.model_attc_path))
-
+            model_len = utils.model_len(self.model_attc_path)
+            self._model_len = model_len
+            return model_len
         else:
             return self._model_len
 
