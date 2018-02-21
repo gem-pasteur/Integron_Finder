@@ -40,21 +40,6 @@ class TestFindFindAttCMax(IntegronTest):
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
 
-        # integron_finder.PRODIGAL = which('prodigal')
-        # integron_finder.HMMSEARCH = which('hmmsearch')
-        # integron_finder.N_CPU = '1'
-        # integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
-        # integron_finder.MODEL_integrase = os.path.join(integron_finder.MODEL_DIR, "integron_integrase.hmm")
-        # integron_finder.MODEL_phage_int = os.path.join(integron_finder.MODEL_DIR, "phage-int.hmm")
-        # integron_finder.MODEL_attc = os.path.join(self.integron_home, 'data', 'Models', 'attc_4.cm')
-        #
-        # integron_finder.circular = True
-        # integron_finder.out_dir = self.tmp_dir
-        # integron_finder.CMSEARCH = which('cmsearch')
-        # integron_finder.evalue_attc = 1.
-        # integron_finder.max_attc_size = 200
-        # integron_finder.min_attc_size = 40
-
         args = argparse.Namespace()
         args.attc_model = 'attc_4.cm'
         args.max_attc_size = 40
