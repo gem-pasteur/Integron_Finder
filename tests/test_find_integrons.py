@@ -307,7 +307,7 @@ class TestFindIntegons(IntegronTest):
         args.union_integrases = True
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
 
-        replicon= read_fasta(replicon_path)
+        replicon = read_fasta(replicon_path)
 
         args = argparse.Namespace()
         args.evalue_attc = 1.
