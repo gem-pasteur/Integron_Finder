@@ -92,11 +92,11 @@ class TestLocalMax(IntegronTest):
         self.HMMSEARCH = which('hmmsearch')
         self.cmsearch = which('cmsearch')
         self.out_dir = self.tmp_dir
-        self.model_attc = self.find_data(os.path.join('Models', 'attc_4.cm'))
+        self.model_attc_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
         self.cpu_nb = 1
-        self.replicon_name = 'lian.001.c02.10'
-        self.replicon_path = self.find_data(os.path.join('Replicons', self.replicon_name + '.fst'))
-        self.sequence = read_fasta(self.replicon_path)
+        replicon_name = 'lian.001.c02.10'
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        self.replicon = read_fasta(replicon_path)
         self.evalue_attc = 1.
         self.max_attc_size = 200
         self.min_attc_size = 40
@@ -117,9 +117,10 @@ class TestLocalMax(IntegronTest):
         win_beg = 942899
         win_end = 947099
         strand_search = 'top'
-        local_max_received = infernal.local_max(self.replicon_name, self.sequence,
-                                                win_beg, win_end, self.length_cm,
-                                                model_attc=self.model_attc, strand_search=strand_search,
+        local_max_received = infernal.local_max(self.replicon,
+                                                win_beg, win_end,
+                                                self.model_attc_path,
+                                                strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                                 cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
@@ -136,9 +137,10 @@ class TestLocalMax(IntegronTest):
         win_beg = 946899
         win_end = 951099
         strand_search = 'top'
-        local_max_received = infernal.local_max(self.replicon_name, self.sequence,
-                                                win_beg, win_end, self.length_cm,
-                                                model_attc=self.model_attc, strand_search=strand_search,
+        local_max_received = infernal.local_max(self.replicon,
+                                                win_beg, win_end,
+                                                self.model_attc_path,
+                                                strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                                 cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
@@ -152,9 +154,10 @@ class TestLocalMax(IntegronTest):
         win_beg = 946899
         win_end = 951099
         strand_search = 'bottom'
-        local_max_received = infernal.local_max(self.replicon_name, self.sequence,
-                                                win_beg, win_end, self.length_cm,
-                                                model_attc=self.model_attc, strand_search=strand_search,
+        local_max_received = infernal.local_max(self.replicon,
+                                                win_beg, win_end,
+                                                self.model_attc_path,
+                                                strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                                 cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
@@ -169,9 +172,10 @@ class TestLocalMax(IntegronTest):
         win_end = 951099
         strand_search = 'both'
 
-        local_max_received = infernal.local_max(self.replicon_name, self.sequence,
-                                                win_beg, win_end, self.length_cm,
-                                                model_attc=self.model_attc, strand_search=strand_search,
+        local_max_received = infernal.local_max(self.replicon,
+                                                win_beg, win_end,
+                                                self.model_attc_path,
+                                                strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                                 cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
@@ -188,9 +192,10 @@ class TestLocalMax(IntegronTest):
         win_beg = 946899
         win_end = 951099
         strand_search = 'top'
-        local_max_received = infernal.local_max(self.replicon_name, self.sequence,
-                                                win_beg, win_end, self.length_cm,
-                                                model_attc=self.model_attc, strand_search=strand_search,
+        local_max_received = infernal.local_max(self.replicon,
+                                                win_beg, win_end,
+                                                self.model_attc_path,
+                                                strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                                 cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
@@ -209,24 +214,25 @@ class TestLocalMax(IntegronTest):
 
         cmsearch_bin = 'failed_cmsearch'
         with self.assertRaises(RuntimeError) as ctx:
-            _ = infernal.local_max(self.replicon_name, self.sequence,
-                                   win_beg, win_end, self.length_cm,
-                                   model_attc=self.model_attc, strand_search=strand_search,
+            _ = infernal.local_max(self.replicon,
+                                   win_beg, win_end,
+                                   self.model_attc_path,
+                                   strand_search=strand_search,
                                    evalue_attc=self.evalue_attc,
                                    max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                    cmsearch_bin=cmsearch_bin, out_dir=self.out_dir, cpu_nb=self.cpu_nb
                                    )
-        self.assertEqual(ctx.exception.message,
-                         "{} failed : [Errno 2] No such file or directory".format(cmsearch_bin))
+        self.assertTrue(str(ctx.exception).endswith(
+            "failed : [Errno 2] No such file or directory".format(cmsearch_bin)))
 
         infernal.call = lambda x: 1
         with self.assertRaises(RuntimeError) as ctx:
-            _ = infernal.local_max(self.replicon_name, self.sequence,
-                                   win_beg, win_end, self.length_cm,
-                                   model_attc=self.model_attc, strand_search=strand_search,
+            _ = infernal.local_max(self.replicon,
+                                   win_beg, win_end,
+                                   self.model_attc_path,
+                                   strand_search=strand_search,
                                    evalue_attc=self.evalue_attc,
                                    max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                    cmsearch_bin=cmsearch_bin, out_dir=self.out_dir, cpu_nb=self.cpu_nb
                                    )
-        self.assertEqual(ctx.exception.message, "{} failed returncode = {}".format(cmsearch_bin,
-                                                                                   infernal.call(None)))
+        self.assertTrue(str(ctx.exception).endswith("failed returncode = {}".format(infernal.call(None))))
