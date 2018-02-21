@@ -78,7 +78,7 @@ class TestFunctions(IntegronTest):
         path2 = os.path.join("data", "Models")
         hmm_paths = [os.path.join(path1, "*.hmm"),
                      os.path.join(path2, "*.hmm"),
-                     os.path.join("data", "Functional_annotation", "Resfams.hmm")]
+                     self.find_data(os.path.join("Functional_annotation", "Resfams.hmm"))]
         # Get all paths to include into the hmm_bank file
         abs_hmm = [os.path.abspath(path) for path in hmm_paths]
         # Write the hmm_bank file
