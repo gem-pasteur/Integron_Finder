@@ -86,46 +86,22 @@ def local_max(replicon,
                                                                                                   win_end=window_end))
 
     infile_path = os.path.join(out_dir, replicon.name + "_subseq.fst")
-    if strand_search == "both":
-        cmsearch_cmd = [cmsearch_bin,
-                        "-Z", str(replicon_size / 1000000.),
-                        "--max",
-                        "--cpu", str(cpu_nb),
-                        "-o", output_path,
-                        "--tblout", tblout_path,
-                        "-E", "10",
-                        model_attc_path,
-                        infile_path]
-
-    elif strand_search == "top":
-        cmsearch_cmd = [cmsearch_bin,
-                        "-Z", str(replicon_size / 1000000.),
-                        "--toponly",
-                        "--max",
-                        "--cpu", str(cpu_nb),
-                        "-o", output_path,
-                        "--tblout", tblout_path,
-                        "-E", "10",
-                        model_attc_path,
-                        infile_path]
-
-    elif strand_search == "bottom":
-        cmsearch_cmd = [cmsearch_bin,
-                        "-Z", str(replicon_size / 1000000.),
-                        "--bottomonly",
-                        "--max",
-                        "--cpu", str(cpu_nb),
-                        "-o", output_path,
-                        "--tblout", tblout_path,
-                        "-E", "10",
-                        model_attc_path,
-                        infile_path]
+    cmsearch_cmd = \
+        "{bin} -Z {size} {strand} --max --cpu {cpu} -o {out} --tblout {tblout} -E 10 {mod_attc_path} {infile}".format(
+            bin=cmsearch_bin,
+            size=replicon_size / 1000000.,
+            strand={"both": "", "top": "--toponly", "bottom": "--bottomonly"}[strand_search],
+            cpu=cpu_nb,
+            out=output_path,
+            tblout=tblout_path,
+            mod_attc_path=model_attc_path,
+            infile=infile_path)
     try:
-        returncode = call(cmsearch_cmd)
+        returncode = call(cmsearch_cmd.split())
     except Exception as err:
-        raise RuntimeError("{0} failed : {1}".format(' '.join([str(i) for i in cmsearch_cmd]), err))
+        raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd, err))
     if returncode != 0:
-        raise RuntimeError("{0} failed returncode = {1}".format(' '.join([str(i) for i in cmsearch_cmd]), returncode))
+        raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd, returncode))
 
     df_max = read_infernal(tblout_path,
                            replicon.name, model_len(model_attc_path),
