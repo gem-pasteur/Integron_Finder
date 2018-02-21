@@ -1,11 +1,9 @@
 import os
 import tempfile
 import shutil
-import unittest
 import argparse
 
 import numpy as np
-
 import pandas as pd
 import pandas.util.testing as pdt
 
@@ -23,9 +21,10 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder.integron import Integron
-from integron_finder import attc
+from integron_finder.config import Config
+from integron_finder.utils import read_fasta
+from integron_finder.attc import find_attc_max
 
-from tests import which
 
 
 class TestFindFindAttCMax(IntegronTest):
@@ -55,12 +54,21 @@ class TestFindFindAttCMax(IntegronTest):
         # integron_finder.evalue_attc = 1.
         # integron_finder.max_attc_size = 200
         # integron_finder.min_attc_size = 40
-        self.replicon_name = 'OBAL001.B.00005.C001'
-        replicon_path = self.find_data(os.path.join('Replicons', self.replicon_name + '.fst'))
-        sequence = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        self.size_replicon = len(sequence)
-        self.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
-        self.dist_threshold = 4000  # (4kb at least between 2 different arrays)
+
+        args = argparse.Namespace()
+        args.attc_model = 'attc_4.cm'
+        args.max_attc_size = 40
+        args.distance_threshold = 4000  # (4kb at least between 2 different arrays)
+        args.eagle_eyes = False
+        args.local_max = False
+        self.cfg = Config(args)
+        self.cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+
+        replicon_name = 'OBAL001.B.00005.C001'
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        self.replicon = read_fasta(replicon_path)
+
+        self.integron = Integron(self.replicon, self.cfg)
 
         self.columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
         self.dtype = {"pos_beg": 'int',
@@ -92,13 +100,6 @@ class TestFindFindAttCMax(IntegronTest):
 
     def test_find_attc_max_linear(self):
 
-        args = argparse.Namespace
-        args.eagle_eyes = False
-        args.local_max = False
-
-        #integron_finder.args = args
-
-        integron = Integron(self.replicon_name)
         integrase = pd.DataFrame({'pos_beg': 1545830,
                                   'pos_end': 1546807,
                                   'strand': -1,
@@ -111,7 +112,7 @@ class TestFindFindAttCMax(IntegronTest):
                                  index=['OBAL001.B.00005.C001_141'],
                                  columns=self.columns)
         integrase = integrase.astype(dtype=self.dtype)
-        integron.integrase = integrase
+        self.integron.integrase = integrase
 
         attC = pd.DataFrame({'pos_beg': [1547800, 1548775],
                              'pos_end': [1547859, 1548834],
@@ -125,11 +126,13 @@ class TestFindFindAttCMax(IntegronTest):
                             index=['attc_001', 'attc_002'],
                             columns=self.columns)
         attC = attC.astype(dtype=self.dtype)
-        integron.attC = attC
-        integrons = [integron]
+        self.integron.attC = attC
+        integrons = [self.integron]
 
-        max_final = attc.find_attc_max(integrons, self.replicon_name, self.replicon_size,
-                                       self.dist_threshold, circular=False)
+        max_final = find_attc_max(integrons, self.replicon,
+                                  self.cfg.distance_threshold, self.cfg.model_attc_path,
+                                  self.cfg.max_attc_size,
+                                  circular=False)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4', 'attC_4'],
@@ -148,19 +151,6 @@ class TestFindFindAttCMax(IntegronTest):
 
 
     def test_find_attc_max_complete(self):
-        replicon_name = 'OBAL001.B.00005.C001'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-
-        args = argparse.Namespace
-        args.eagle_eyes = False
-        args.local_max = False
-
-        integron_finder.replicon_name = replicon_name
-        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
-        integron_finder.args = args
-
-        integron = Integron(replicon_name)
         integrase = pd.DataFrame({'pos_beg': 1545830,
                                   'pos_end': 1546807,
                                   'strand': -1,
@@ -173,7 +163,7 @@ class TestFindFindAttCMax(IntegronTest):
                                  index=['OBAL001.B.00005.C001_141'],
                                  columns=self.columns)
         integrase = integrase.astype(dtype=self.dtype)
-        integron.integrase = integrase
+        self.integron.integrase = integrase
 
         attC = pd.DataFrame({'pos_beg': [1547800, 1548775],
                              'pos_end': [1547859, 1548834],
@@ -187,10 +177,13 @@ class TestFindFindAttCMax(IntegronTest):
                             index=['attc_001', 'attc_002'],
                             columns=self.columns)
         attC = attC.astype(dtype=self.dtype)
-        integron.attC = attC
-        integrons = [integron]
+        self.integron.attC = attC
+        integrons = [self.integron]
 
-        max_final = integron_finder.find_attc_max(integrons, circular=True)
+        max_final = find_attc_max(integrons, self.replicon,
+                                  self.cfg.distance_threshold, self.cfg.model_attc_path,
+                                  self.cfg.max_attc_size,
+                                  circular=True)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4', 'attC_4'],
@@ -209,19 +202,6 @@ class TestFindFindAttCMax(IntegronTest):
 
 
     def test_find_attc_max_calin(self):
-        replicon_name = 'OBAL001.B.00005.C001'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-
-        args = argparse.Namespace
-        args.eagle_eyes = False
-        args.local_max = False
-
-        integron_finder.replicon_name = replicon_name
-        integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
-        integron_finder.args = args
-
-        integron = Integron(replicon_name)
 
         attC = pd.DataFrame({'pos_beg': [421689],
                              'pos_end': [421764],
@@ -235,10 +215,13 @@ class TestFindFindAttCMax(IntegronTest):
                             index=['attc_001'],
                             columns=self.columns)
         attC = attC.astype(dtype=self.dtype)
-        integron.attC = attC
-        integrons = [integron]
+        self.integron.attC = attC
+        integrons = [self.integron]
 
-        max_final = integron_finder.find_attc_max(integrons, circular=True)
+        max_final = find_attc_max(integrons, self.replicon,
+                                  self.cfg.distance_threshold, self.cfg.model_attc_path,
+                                  self.cfg.max_attc_size,
+                                  circular=True)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001'],
                             'cm_attC': ['attC_4'],
