@@ -23,7 +23,7 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder.config import Config
-from integron_finder.utils import read_fasta
+from integron_finder.utils import read_single_dna_fasta
 from integron_finder.integrase import find_integrase
 from integron_finder.integron import Integron
 from integron_finder.annotation import func_annot
@@ -36,7 +36,7 @@ class TestFuncAnnot(IntegronTest):
         """
         replicon_name = "acba.007.p01.13"
         self.replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        self.replicon = read_fasta(self.replicon_path)
+        self.replicon = read_single_dna_fasta(self.replicon_path)
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)

@@ -24,7 +24,7 @@ except ImportError as err:
 
 from integron_finder.integron import Integron, find_integron
 from integron_finder.config import Config
-from integron_finder.utils import read_fasta
+from integron_finder.utils import read_single_dna_fasta
 from integron_finder.infernal import read_infernal
 
 
@@ -90,7 +90,7 @@ class TestFindIntegons(IntegronTest):
         intI_file = os.path.join(replicon_results_path, '{}_intI.res'.format(replicon_name))
         phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon_name))
 
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         args = argparse.Namespace()
         args.no_proteins = True
@@ -140,7 +140,7 @@ class TestFindIntegons(IntegronTest):
     def test_find_integron_attC_is_df(self):
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
                                                 'other', '{}_attc_table.res'.format(replicon_name)))
 
@@ -216,7 +216,7 @@ class TestFindIntegons(IntegronTest):
     def test_find_integron_proteins(self):
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
         attc_file = os.path.join(self._data_dir,
                                  'Results_Integron_Finder_acba.007.p01.13', 'other', 'acba.007.p01.13_attc_table.res')
         intI_file = os.path.join(self._data_dir,
@@ -229,7 +229,7 @@ class TestFindIntegons(IntegronTest):
         args.union_integrases = False
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
 
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
         args = argparse.Namespace()
         args.evalue_attc = 1.
         args.max_attc_size = 200
@@ -307,7 +307,7 @@ class TestFindIntegons(IntegronTest):
         args.union_integrases = True
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
 
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         args = argparse.Namespace()
         args.evalue_attc = 1.

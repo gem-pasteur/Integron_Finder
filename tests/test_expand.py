@@ -17,7 +17,7 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder import infernal
-from integron_finder.utils import read_fasta
+from integron_finder.utils import read_single_dna_fasta
 
 _local_max_ori = infernal.local_max
 
@@ -80,7 +80,7 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -100,7 +100,7 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -120,7 +120,7 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -140,7 +140,7 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))

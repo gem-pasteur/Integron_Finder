@@ -16,7 +16,7 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder.config import Config
-from integron_finder.utils import read_fasta
+from integron_finder.utils import read_single_dna_fasta
 from integron_finder.integron import Integron
 
 
@@ -48,7 +48,7 @@ class TestIntegron(IntegronTest):
     def test_add_integrase(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         data_integrase = {"pos_beg": 55,
                           "pos_end": 1014,
@@ -89,7 +89,7 @@ class TestIntegron(IntegronTest):
     def test_add_attc(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         data_attc_1 = {"pos_beg": 10,
                        "pos_end": 100,
@@ -175,7 +175,7 @@ class TestIntegron(IntegronTest):
     def test_add_promoter(self):
         replicon_name = 'saen.040.p01.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         ## integron_finder.SIZE_REPLICON = 148711
         prot_file = os.path.join(self._data_dir,
@@ -261,7 +261,7 @@ class TestIntegron(IntegronTest):
     def test_attI(self):
         replicon_name = 'saen.040.p01.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         attC = pd.DataFrame({'pos_beg': [104651, 105162, 106018, 107567, 108423, 108743],
                              'pos_end': [104710, 105221, 106087, 107626, 108482, 108832],
@@ -341,7 +341,7 @@ class TestIntegron(IntegronTest):
     def test_add_proteins(self):
         replicon_name = 'pssu.001.c01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         prot_file = os.path.join(self._data_dir,
                                  '{}.prt.short'.format(replicon_name))
@@ -388,7 +388,7 @@ class TestIntegron(IntegronTest):
     def test_describe(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_fasta(replicon_path)
+        replicon = read_single_dna_fasta(replicon_path)
 
         args = argparse.Namespace()
         args.eagle_eyes = False

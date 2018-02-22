@@ -22,7 +22,7 @@ except ImportError as err:
 
 from integron_finder.integron import Integron
 from integron_finder.config import Config
-from integron_finder.utils import read_fasta
+from integron_finder.utils import read_single_dna_fasta
 from integron_finder.attc import find_attc_max
 
 
@@ -51,7 +51,7 @@ class TestFindFindAttCMax(IntegronTest):
 
         replicon_name = 'OBAL001.B.00005.C001'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        self.replicon = read_fasta(replicon_path)
+        self.replicon = read_single_dna_fasta(replicon_path)
 
         self.integron = Integron(self.replicon, self.cfg)
 

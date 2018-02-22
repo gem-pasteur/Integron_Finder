@@ -17,7 +17,7 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder.utils import read_fasta
+from integron_finder.utils import read_single_dna_fasta
 from integron_finder import infernal
 
 _call_ori = infernal.call
@@ -93,7 +93,7 @@ class TestLocalMax(IntegronTest):
         self.cpu_nb = 1
         replicon_name = 'lian.001.c02.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        self.replicon = read_fasta(replicon_path)
+        self.replicon = read_single_dna_fasta(replicon_path)
         self.evalue_attc = 1.
         self.max_attc_size = 200
         self.min_attc_size = 40

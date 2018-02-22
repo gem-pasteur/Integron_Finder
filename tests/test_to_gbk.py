@@ -14,7 +14,7 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder.genbank import to_gbk
-from integron_finder.utils import read_fasta
+from integron_finder.utils import read_single_dna_fasta
 
 class TestFunctions(IntegronTest):
 
@@ -23,7 +23,7 @@ class TestFunctions(IntegronTest):
         Define variables common to all tests
         """
         self.replicon_path = self.find_data(os.path.join('Replicons', "acba.007.p01.13.fst"))
-        self.seq = read_fasta(self.replicon_path)
+        self.seq = read_single_dna_fasta(self.replicon_path)
         self.prot_file = self.find_data(os.path.join("Results_Integron_Finder_acba.007.p01.13", "acba.007.p01.13.prt"))
         self.dist_threshold = 4000
 
