@@ -9,7 +9,7 @@ def read_fasta(path):
     :rtype: :class:`Bio.SeqRecord.SeqRecord` object
     """
     seq = SeqIO.read(path, "fasta",  alphabet=Seq.IUPAC.unambiguous_dna)
-    seq.name = os.path.splitext((os.path.split(path)[1]))[0]
+    seq.name = get_name_from_path(path)
     return seq
 
 

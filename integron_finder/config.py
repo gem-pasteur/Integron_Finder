@@ -84,7 +84,7 @@ class Config(object):
             self._args.attc_model
         except AttributeError:
             raise RuntimeError("'model_attc' is not define.")
-        return os.path.splitext(os.path.split(self.model_attc_path)[1])[0]
+        return utils.get_name_from_path(self.model_attc_path)
 
     @property
     def model_len(self):
