@@ -22,3 +22,7 @@ def model_len(path):
                 model_len = int(line.split()[1])
                 return model_len
         raise RuntimeError("CLEN not found in '{}', maybe it's not infernal model file".format(path))
+
+
+def get_name_from_path(path):
+    return os.path.splitext(os.path.split(path)[1])[0]
