@@ -1,4 +1,8 @@
-def find_integrase(replicon_path, replicon_name, out_dir):
+import os
+from subprocess import call
+
+
+def find_integrase(replicon_path, replicon, prot_file, out_dir, cfg):
     """
     Call Prodigal for Gene annotation and hmmer to find integrase, either with phage_int
     HMM profile or with intI profile.
@@ -11,48 +15,41 @@ def find_integrase(replicon_path, replicon_name, out_dir):
     :type out_dir: str
     :returns: None, the results are written on the disk
     """
-    if not args.gembase:
+    if not cfg.gembase:
         # Test whether the protein file exist to avoid new annotation for each run on the same replicon
-        prot_tr_path = os.path.join(out_dir, replicon_name + ".prt")
+        prot_tr_path = os.path.join(out_dir, replicon.name + ".prt")
         if not os.path.isfile(prot_tr_path):
-            dev_null = os.devnull
-            if SIZE_REPLICON > 200000:
-                prodigal_cmd = [PRODIGAL,
-                                "-i", replicon_path,
-                                "-a", prot_tr_path,
-                                "-o", dev_null]
-
-            else: # if small genome, prodigal annotate it as contig.
-                prodigal_cmd = [PRODIGAL,
-                                "-p", "meta",
-                                "-i", replicon_path,
-                                "-a", prot_tr_path,
-                                "-o", dev_null]
+            prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out}".format(
+                prodigal=cfg.prodigal,
+                meta='' if len(replicon) > 200000 else '-p meta',
+                replicon=replicon_path,
+                prot=prot_tr_path,
+                out=os.devnull)
             try:
-                returncode = call(prodigal_cmd)
+                returncode = call(prodigal_cmd.split())
             except Exception as err:
-                raise RuntimeError("{0} failed : {1}".format(prodigal_cmd[0], err))
+                raise RuntimeError("{0} failed : {1}".format(prodigal_cmd, err))
             if returncode != 0:
-                raise RuntimeError("{0} failed returncode = {1}".format(prodigal_cmd[0], returncode))
+                raise RuntimeError("{0} failed returncode = {1}".format(prodigal_cmd, returncode))
 
-    intI_hmm_out = os.path.join(out_dir, replicon_name + "_intI.res")
+    intI_hmm_out = os.path.join(out_dir, replicon.name + "_intI.res")
     hmm_cmd = []
     if not os.path.isfile(intI_hmm_out):
-        hmm_cmd.append([HMMSEARCH,
-                        "--cpu", N_CPU,
-                        "--tblout", os.path.join(out_dir, replicon_name + "_intI_table.res"),
+        hmm_cmd.append([cfg.hmmsearch,
+                        "--cpu", str(cfg.cpu),
+                        "--tblout", os.path.join(out_dir, replicon.name + "_intI_table.res"),
                         "-o", intI_hmm_out,
-                        MODEL_integrase,
-                        PROT_file])
+                        cfg.model_integrase,
+                        prot_file])
 
-    phage_hmm_out = os.path.join(out_dir, replicon_name + "_phage_int.res")
+    phage_hmm_out = os.path.join(out_dir, replicon.name + "_phage_int.res")
     if not os.path.isfile(phage_hmm_out):
-        hmm_cmd.append([HMMSEARCH,
-                        "--cpu", N_CPU,
-                        "--tblout", os.path.join(out_dir, replicon_name + "_phage_int_table.res"),
+        hmm_cmd.append([cfg.hmmsearch,
+                        "--cpu", str(cfg.cpu),
+                        "--tblout", os.path.join(out_dir, replicon.name + "_phage_int_table.res"),
                         "-o", phage_hmm_out,
-                        MODEL_phage_int,
-                        PROT_file])
+                        cfg.model_phage_int,
+                        prot_file])
 
     for cmd in hmm_cmd:
         try:
