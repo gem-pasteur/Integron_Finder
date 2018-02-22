@@ -1,21 +1,22 @@
 import os
 import tempfile
 import shutil
-import unittest
+import argparse
 import re
+import distutils.spawn
 
-from collections import namedtuple
 
-# display warning only for non installed integron_finder
-from Bio import BiopythonExperimentalWarning
-import warnings
-warnings.simplefilter('ignore', FutureWarning)
-warnings.simplefilter('ignore', BiopythonExperimentalWarning)
+try:
+    from tests import IntegronTest
+except ImportError as err:
+    msg = "Cannot import integron_finder: {0!s}".format(err)
+    raise ImportError(msg)
 
-import integron_finder
-_call_ori = integron_finder.call
+from integron_finder.utils import read_fasta
+from integron_finder.config import Config
+from integron_finder import integrase
 
-from tests import which
+_call_ori = integrase.call
 
 
 def call_wrapper():
@@ -37,10 +38,7 @@ def call_wrapper():
     return wrapper
 
 
-class TestFindIntegrase(unittest.TestCase):
-
-    _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', "data"))
-
+class TestFindIntegrase(IntegronTest):
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
@@ -53,18 +51,15 @@ class TestFindIntegrase(unittest.TestCase):
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
 
-        integron_finder.PRODIGAL = which('prodigal')
-        integron_finder.HMMSEARCH = which('hmmsearch')
-        integron_finder.N_CPU = '1'
-        integron_finder.MODEL_DIR = os.path.join(self.integron_home, "data", "Models")
-        integron_finder.MODEL_integrase = os.path.join(integron_finder.MODEL_DIR, "integron_integrase.hmm")
-        integron_finder.MODEL_phage_int = os.path.join(integron_finder.MODEL_DIR, "phage-int.hmm")
-        integron_finder.MODEL_attc = os.path.join(self.integron_home, 'data', 'Models', 'attc_4.cm')
-
-        integron_finder.call = call_wrapper()
+        self.args = argparse.Namespace()
+        self.args.attc_model = 'attc_4.cm'
+        self.args.cpu = 1
+        self.args.hmmsearch = distutils.spawn.find_executable('hmmsearch')
+        self.args.prodigal = distutils.spawn.find_executable("prodigal")
+        integrase.call = call_wrapper()
 
     def tearDown(self):
-        integron_finder.call = _call_ori
+        integrase.call = _call_ori
         try:
             shutil.rmtree(self.tmp_dir)
             pass
@@ -73,144 +68,165 @@ class TestFindIntegrase(unittest.TestCase):
 
 
     def test_find_integrase_gembase(self):
-        FakeArgs = namedtuple('FakeArgs', 'gembase')
-        integron_finder.args = FakeArgs(True)
+        cfg = Config(self.args)
+        self.args.gembase = True
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_fasta(replicon_path)
+        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
 
-        integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
-                        integron_finder.PROT_file)
+        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon_name + ".prt")), prot_file)
 
-        integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
+        integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+
         for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
             res = os.path.join(self.tmp_dir, replicon_name + suffix)
             self.assertTrue(os.path.exists(res))
 
 
     def test_find_integrase_no_gembase_with_protfile(self):
-        FakeArgs = namedtuple('FakeArgs', 'gembase')
-        integron_finder.args = FakeArgs(False)
-        integron_finder.SIZE_REPLICON = 200
+        cfg = Config(self.args)
+        self.args.gembase = False
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_fasta(replicon_path)
 
-        integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
-                        integron_finder.PROT_file)
+        len_ori = replicon.__class__.__len__
+        replicon.__class__.__len__ = lambda x: 200
 
-        integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
-        for suffix in ('_intI.res', '_intI_table.res','_phage_int.res', '_phage_int_table.res'):
+        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon_name + ".prt")), prot_file)
+
+        integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+        for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
             res = os.path.join(self.tmp_dir, replicon_name + suffix)
             self.assertTrue(os.path.exists(res))
+        replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_no_gembase_no_protfile_short_seq(self):
-        FakeArgs = namedtuple('FakeArgs', 'gembase')
-        integron_finder.args = FakeArgs(False)
-        integron_finder.SIZE_REPLICON = 200
+        cfg = Config(self.args)
+        self.args.gembase = False
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_fasta(replicon_path)
 
-        integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        len_ori = replicon.__class__.__len__
+        replicon.__class__.__len__ = lambda x: 200
 
-        integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
-        for suffix in ('_intI.res', '_intI_table.res','_phage_int.res', '_phage_int_table.res'):
+        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+
+        integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+        for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
             res = os.path.join(self.tmp_dir, replicon_name + suffix)
             self.assertTrue(os.path.exists(res))
+        replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_no_gembase_no_protfile_long_seq(self):
-        FakeArgs = namedtuple('FakeArgs', 'gembase')
-        integron_finder.args = FakeArgs(False)
-        integron_finder.SIZE_REPLICON = 500000
+        cfg = Config(self.args)
+        self.args.gembase = False
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_fasta(replicon_path)
 
-        integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
-        for suffix in ('_intI.res', '_intI_table.res','_phage_int.res', '_phage_int_table.res'):
+        len_ori = replicon.__class__.__len__
+        replicon.__class__.__len__ = lambda x: 500000
+
+        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+
+        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon_name + ".prt")), prot_file)
+
+        integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+        for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
             res = os.path.join(self.tmp_dir, replicon_name + suffix)
             self.assertTrue(os.path.exists(res))
+        replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_no_gembase_no_protfile_no_prodigal(self):
-        FakeArgs = namedtuple('FakeArgs', 'gembase')
-        integron_finder.args = FakeArgs(False)
-        integron_finder.SIZE_REPLICON = 500000
+        self.args.hmmsearch = 'foo'
+        self.args.gembase = False
+        cfg = Config(self.args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+
+        replicon_name = 'acba.007.p01.13'
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_fasta(replicon_path)
+
+        len_ori = replicon.__class__.__len__
+        replicon.__class__.__len__ = lambda x: 500000
+
+        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+
+        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon_name + ".prt")), prot_file)
+
+        with self.assertRaises(RuntimeError) as ctx:
+            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+        self.assertTrue(str(ctx.exception).endswith('failed : [Errno 2] No such file or directory'))
+
+        replicon.__class__.__len__ = len_ori
+
+
+    def test_find_integrase_no_gembase_no_protfile(self):
+        cfg = Config(self.args)
+        self.args.gembase = False
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+
+        replicon_name = 'acba.007.p01.13'
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_fasta(replicon_path)
+
+        len_ori = replicon.__class__.__len__
+        replicon.__class__.__len__ = lambda x: 500000
+        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+
+        with self.assertRaises(RuntimeError) as ctx:
+            integrase.find_integrase('foo', replicon,  prot_file, self.tmp_dir, cfg)
+        self.assertTrue(str(ctx.exception).endswith('failed returncode = 5'.format(cfg.prodigal)))
+
+        replicon.__class__.__len__ = len_ori
+
+
+    def test_find_integrase_gembase_no_hmmer_no_replicon(self):
+        self.args.gembase = True
+        self.args.hmmsearch = 'foo'
+        cfg = Config(self.args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
+        replicon = read_fasta(replicon_path)
 
-        integron_finder.PRODIGAL = 'foo'
-        with self.assertRaises(RuntimeError) as ctx:
-            integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
-        self.assertEqual(str(ctx.exception), 'foo failed : [Errno 2] No such file or directory')
-
-
-    def test_find_integrase_no_gembase_no_protfile_no_replicon(self):
-        FakeArgs = namedtuple('FakeArgs', 'gembase')
-        integron_finder.args = FakeArgs(False)
-        integron_finder.SIZE_REPLICON = 500000
-
-        replicon_name = 'acba.007.p01.13'
+        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
 
         with self.assertRaises(RuntimeError) as ctx:
-            integron_finder.find_integrase('foo', replicon_name, self.tmp_dir)
-        self.assertEqual(str(ctx.exception), '{} failed returncode = 5'.format(integron_finder.PRODIGAL))
-
-
-    def test_find_integrase_gembase_no_hmmer(self):
-        FakeArgs = namedtuple('FakeArgs', 'gembase')
-        integron_finder.args = FakeArgs(True)
-        integron_finder.HMMSEARCH = 'foo'
-
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-
-        integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
-                        integron_finder.PROT_file)
-        with self.assertRaises(RuntimeError) as ctx:
-            integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
-
-        self.assertEqual(str(ctx.exception), 'foo failed : [Errno 2] No such file or directory')
-
-
-    def test_find_integrase_gembase_no_hmmer(self):
-        FakeArgs = namedtuple('FakeArgs', 'gembase')
-        integron_finder.args = FakeArgs(True)
-        integron_finder.HMMSEARCH = 'foo'
-
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-
-        integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
-                        integron_finder.PROT_file)
-        with self.assertRaises(RuntimeError) as ctx:
-            integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
+            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
         self.assertTrue(re.match('^foo .* failed : \[Errno 2\] No such file or directory$',
                                  str(ctx.exception)))
 
 
     def test_find_integrase_gembase_hmmer_error(self):
-        FakeArgs = namedtuple('FakeArgs', 'gembase')
-        integron_finder.args = FakeArgs(True)
-        integron_finder.N_CPU = 'foo'
+        self.args.gembase = True
+        self.args.cpu = 'foo'
+        cfg = Config(self.args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
+        replicon = read_fasta(replicon_path)
 
-        integron_finder.PROT_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
         shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
-                        integron_finder.PROT_file)
+                        prot_file)
         with self.assertRaises(RuntimeError) as ctx:
-            integron_finder.find_integrase(replicon_path, replicon_name, self.tmp_dir)
+            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
         self.assertTrue(str(ctx.exception).endswith('failed return code = 1'))
-
-
