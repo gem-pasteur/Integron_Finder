@@ -3,6 +3,11 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+# display warning only for non installed integron_finder
+from Bio import BiopythonExperimentalWarning
+import warnings
+warnings.simplefilter('ignore', FutureWarning)
+warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 from Bio import Seq
 from Bio import SeqIO
 from Bio import motifs
