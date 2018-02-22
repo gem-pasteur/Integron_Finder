@@ -87,9 +87,6 @@ class TestLocalMax(IntegronTest):
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
-
-        self.PRODIGAL = which('prodigal')
-        self.HMMSEARCH = which('hmmsearch')
         self.cmsearch = which('cmsearch')
         self.out_dir = self.tmp_dir
         self.model_attc_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
