@@ -13,7 +13,7 @@ class IntegronTest(unittest.TestCase):
         if os.path.exists(data_path):
             return data_path
         else:
-            raise IOError("data '{}' does not exists".format(name))
+            raise IOError("data '{}' does not exists".format(data_path))
 
 
     def compare_2_files(self, f1, f2):
