@@ -18,7 +18,7 @@ except ImportError as err:
 
 from integron_finder.hmm import scan_hmm_bank
 
-class TestFunctions(IntegronTest):
+class TestScanHmmBank(IntegronTest):
 
     @contextmanager
     def catch_output(self):
