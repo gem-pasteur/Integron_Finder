@@ -13,12 +13,12 @@ from .utils import get_name_from_path
 from .hmm import read_hmm
 
 
-def func_annot(integrons, replicon, prot_file, hmm_files, cfg, evalue=10, coverage=0.5):
+def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', evalue=10, coverage=0.5):
     """
     Call hmmmer to annotate CDS associated with the integron. Use Resfams per default (Gibson et al, ISME J.,  2014)
     """
     print "# Start Functional annotation... : "
-    prot_tmp = os.path.join(cfg.out_dir, replicon.name + "_subseqprot.tmp")
+    prot_tmp = os.path.join(out_dir, replicon.name + "_subseqprot.tmp")
 
     for integron in integrons:
         if os.path.isfile(prot_tmp):
@@ -42,8 +42,8 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, evalue=10, covera
             SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
             for hmm in hmm_files:
                 name_wo_ext = "{}_{}".format(replicon.name, get_name_from_path(hmm))
-                hmm_out = os.path.join(cfg.out_dir, "{}_fa.res".format(name_wo_ext))
-                hmm_tableout = os.path.join(cfg.out_dir, "{}_fa_table.res".format(name_wo_ext))
+                hmm_out = os.path.join(out_dir, "{}_fa.res".format(name_wo_ext))
+                hmm_tableout = os.path.join(out_dir, "{}_fa_table.res".format(name_wo_ext))
                 hmm_cmd = [cfg.hmmsearch,
                             "-Z", str(nb_tot_prot),
                             "--cpu", str(cfg.cpu),
