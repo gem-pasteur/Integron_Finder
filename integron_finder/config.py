@@ -1,11 +1,12 @@
 import os
 
 
-
+from integron_finder import utils
 
 class Config(object):
 
     def __init__(self, args):
+        self._model_len = None  # model_len cache, because it's computation is "heavy" (open file)
         self._args = args
 
         _prefix_share = '$PREFIXSHARE'
@@ -66,12 +67,37 @@ class Config(object):
         return os.path.join(self.model_dir, "phage-int.hmm")
 
     @property
-    def model_attc(self):
-        if len(self._args.attc_model.split("/")) > 1: #contain path
+    def model_attc_path(self):
+        try:
+            self._args.attc_model
+        except AttributeError:
+            raise RuntimeError("'model_attc' is not define.")
+        if len(self._args.attc_model.split(os.sep)) > 1:  # contain path
             model_attc = self._args.attc_model
         else:
             model_attc = os.path.join(self.model_dir, self._args.attc_model)
         return model_attc
+
+    @property
+    def model_attc_name(self):
+        try:
+            self._args.attc_model
+        except AttributeError:
+            raise RuntimeError("'model_attc' is not define.")
+        return utils.get_name_from_path(self.model_attc_path)
+
+    @property
+    def model_len(self):
+        try:
+            self._args.attc_model
+        except AttributeError:
+            raise RuntimeError("'model_attc' is not define.")
+        if self._model_len is None:
+            model_len = utils.model_len(self.model_attc_path)
+            self._model_len = model_len
+            return model_len
+        else:
+            return self._model_len
 
     @property
     def func_annot_path(self):

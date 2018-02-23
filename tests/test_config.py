@@ -85,13 +85,57 @@ class TestConfig(IntegronTest):
         cf._prefix_data = 'foo'
         self.assertEqual(cf.model_phage_int, os.path.join('foo', 'Models', 'phage-int.hmm'))
 
-    def test_model_attc(self):
+    def test_model_attc_path(self):
+        cf = config.Config(self.args)
+        with self.assertRaises(RuntimeError) as ctx:
+            cf.model_len
+        self.assertEqual(str(ctx.exception), "'model_attc' is not define.")
+        
         self.args.attc_model = 'bar'
         cf = config.Config(self.args)
         cf._prefix_data = 'foo'
-        self.assertEqual(cf.model_attc, os.path.join('foo', 'Models', 'bar'))
+        self.assertEqual(cf.model_attc_path, os.path.join('foo', 'Models', 'bar'))
         self.args.attc_model = 'bar/baz'
-        self.assertEqual(cf.model_attc, 'bar/baz')
+        self.assertEqual(cf.model_attc_path, 'bar/baz')
+
+    def test_model_attc_name(self):
+        cf = config.Config(self.args)
+        with self.assertRaises(RuntimeError) as ctx:
+            cf.model_len
+        self.assertEqual(str(ctx.exception), "'model_attc' is not define.")
+
+        self.args.attc_model = 'bar'
+        cf = config.Config(self.args)
+        cf._prefix_data = 'foo'
+        self.assertEqual(cf.model_attc_name, 'bar')
+        self.args.attc_model = 'bar/baz'
+        self.assertEqual(cf.model_attc_name, 'baz')
+
+    def test_model_len(self):
+        cf = config.Config(self.args)
+        with self.assertRaises(RuntimeError) as ctx:
+            cf.model_len
+        self.assertEqual(str(ctx.exception), "'model_attc' is not define.")
+
+        self.args.attc_model = 'foo'
+        cf = config.Config(self.args)
+        with self.assertRaises(RuntimeError) as ctx:
+            cf.model_len
+        self.assertEqual(str(ctx.exception), "Path to model_attc '{}' doe snot exists".format(cf.model_attc_path))
+
+        model_path = os.path.join(os.path.dirname(__file__), 'data', 'Replicons', 'acba.007.p01.13.fst')
+        self.args.attc_model = model_path
+        cf = config.Config(self.args)
+        with self.assertRaises(RuntimeError) as ctx:
+            cf.model_len
+        self.assertEqual(str(ctx.exception), "CLEN not found in '{}', maybe it's not infernal model file".format(model_path))
+
+        self.args.attc_model = 'attc_4.cm'
+        cf = config.Config(self.args)
+        cf._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        self.assertEqual(cf.model_len, 47)
+        # test the model_len cache
+        self.assertEqual(cf.model_len, 47)
 
     def test_func_annot_path(self):
         cf = config.Config(self.args)

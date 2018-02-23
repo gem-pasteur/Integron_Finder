@@ -1,12 +1,23 @@
+import os
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+# display warning only for non installed integron_finder
+from Bio import BiopythonExperimentalWarning
+import warnings
+warnings.simplefilter('ignore', FutureWarning)
+warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 from Bio import Seq
 from Bio import SeqIO
 from Bio import motifs
 
+from integron_finder.hmm import read_hmm
+from integron_finder.infernal import read_infernal
+from integron_finder.attc import search_attc
 
-def find_integron(replicon_name, attc_file, intI_file, phageI_file):
+
+def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
     """
     Function that looks for integrons given rules :
     - presence of intI
@@ -29,11 +40,11 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
     :param phageI_file: the output of hmmsearch with the phage model
     :type phageI_file: file object
     """
-    if args.no_proteins == False:
-        intI = read_hmm(replicon_name, intI_file)
+    if not cfg.no_proteins:
+        intI = read_hmm(replicon.name, intI_file, cfg)
         intI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-        phageI = read_hmm(replicon_name, phageI_file)
+        phageI = read_hmm(replicon.name, phageI_file, cfg)
         phageI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
         tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
@@ -41,7 +52,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
         if len(tmp) >= 1:
             tmp.loc[:, "query_name"] = "intersection_tyr_intI"
 
-        if args.union_integrases:
+        if cfg.union_integrases:
             intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0].merge(phageI[phageI.ID_prot.isin(tmp.ID_prot) == 0],
                                                                       how="outer").merge(tmp, how="outer")
         else:
@@ -57,13 +68,14 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     else:
-        attc = read_infernal(attc_file,
-                             evalue=evalue_attc,
-                             size_max_attc=max_attc_size,
-                             size_min_attc=min_attc_size)
+        attc = read_infernal(attc_file, replicon.name, cfg.model_len,
+                             evalue=cfg.evalue_attc,
+                             size_max_attc=cfg.max_attc_size,
+                             size_min_attc=cfg.min_attc_size)
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-    attc_ac = search_attc(attc, args.keep_palindromes)  # list of Dataframe, each have an array of attC
+    # attc_ac = list of Dataframe, each have a an array of attC
+    attc_ac = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, len(replicon))
     integrons = []
 
     if len(intI_ac) >= 1 and len(attc_ac) >= 1:
@@ -75,7 +87,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
 
             if n_attc_array == 0:  # No more array to attribute to an integrase
 
-                integrons.append(Integron(replicon_name))
+                integrons.append(Integron(replicon, cfg))
                 integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                        intI_ac.pos_end.values[i],
                                        id_int,
@@ -88,7 +100,7 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                 attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
 
                 distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
-                                      (intI_ac.pos_beg.values[i] - attc_right)]) % SIZE_REPLICON
+                                      (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
 
                 if len(attc_ac) > 1:
                     #tmp = (distances /
@@ -110,8 +122,8 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                     idx_attc = 0
                     side = np.argmin(distances)
 
-                if distances[side, idx_attc] < DISTANCE_THRESHOLD:
-                    integrons.append(Integron(replicon_name))
+                if distances[side, idx_attc] < cfg.distance_threshold:
+                    integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
                                                 id_int,
@@ -125,56 +137,56 @@ def find_integron(replicon_name, attc_file, intI_file, phageI_file):
                         integrons[-1].add_attC(a_tmp[4],
                                                a_tmp[5],
                                                1 if a_tmp[6] == "+" else -1,
-                                               a_tmp[7], model_attc_name)
+                                               a_tmp[7], cfg.model_attc_name)
                     n_attc_array -= 1
 
-                else: # no array close to the integrase on both side
-                    integrons.append(Integron(replicon_name))
+                else:  # no array close to the integrase on both side
+                    integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
                                                 id_int,
                                                 int(intI_ac.strand.values[i]),
                                                 intI_ac.evalue.values[i], intI_ac.query_name.values[i])
 
-        if n_attc_array > 0: # after the integrase loop (<=> no more integrases)
+        if n_attc_array > 0:  # after the integrase loop (<=> no more integrases)
             for attc_array in attc_ac:
-                integrons.append(Integron(replicon_name))
+                integrons.append(Integron(replicon, cfg))
 
                 for a_tmp in attc_array.values:
                     integrons[-1].add_attC(a_tmp[4],
                                            a_tmp[5],
                                            1 if a_tmp[6] == "+" else -1,
-                                           a_tmp[7], model_attc_name)
+                                           a_tmp[7], cfg.model_attc_name)
 
     elif len(intI_ac.pos_end.values) == 0 and len(attc_ac) >= 1:  # If attC only
         for attc_array in attc_ac:
-            integrons.append(Integron(replicon_name))
+            integrons.append(Integron(replicon, cfg))
             for a_tmp in attc_array.values:
                 integrons[-1].add_attC(a_tmp[4],
                                               a_tmp[5],
                                               1 if a_tmp[6] == "+" else -1,
-                                              a_tmp[7], model_attc_name)
+                                              a_tmp[7], cfg.model_attc_name)
 
     elif len(intI_ac.pos_end.values) >= 1 and len(attc_ac) == 0: # If intI only
         for i, id_int in enumerate(intI_ac.ID_prot.values):
-            integrons.append(Integron(replicon_name))
+            integrons.append(Integron(replicon, cfg))
             integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
-                                       intI_ac.pos_end.values[i],
-                                       id_int,
-                                       int(intI_ac.strand.values[i]),
-                                       intI_ac.evalue.values[i],
-                                       intI_ac.query_name.values[i])
+                                        intI_ac.pos_end.values[i],
+                                        id_int,
+                                        int(intI_ac.strand.values[i]),
+                                        intI_ac.evalue.values[i],
+                                        intI_ac.query_name.values[i])
 
-    print "In replicon {}, there are:".format(replicon_name)
+    print "In replicon {}, there are:".format(replicon.name)
     print "- {} complete integron(s) found with a total {} attC site(s)".format(sum(
-                                                [1 if i.type() == "complete" else 0 for i in integrons]),
-                                                sum([len(i.attC) if i.type() == "complete" else 0 for i in integrons]))
+        [1 if i.type() == "complete" else 0 for i in integrons]),
+        sum([len(i.attC) if i.type() == "complete" else 0 for i in integrons]))
     print "- {} CALIN element(s) found with a total of {} attC site(s)".format(sum(
-                                                [1 if i.type() == "CALIN" else 0 for i in integrons]),
-                                                sum([len(i.attC) if i.type() == "CALIN" else 0 for i in integrons]))
+        [1 if i.type() == "CALIN" else 0 for i in integrons]),
+        sum([len(i.attC) if i.type() == "CALIN" else 0 for i in integrons]))
     print "- {} In0 element(s) found with a total of {} attC site".format(sum(
-                                                [1 if i.type() == "In0" else 0 for i in integrons]),
-                                                sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons]))
+        [1 if i.type() == "In0" else 0 for i in integrons]),
+        sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons]))
 
     return integrons
 
@@ -186,8 +198,10 @@ class Integron(object):
     the ID of the gene (except attC).
     The object Integron is also characterized by the ID of the replicon."""
 
-    def __init__(self, ID_replicon):
-        self.ID_replicon = ID_replicon
+    def __init__(self, replicon, cfg):
+        self.cfg = cfg
+        self.replicon = replicon
+        self.replicon_size = len(self.replicon)
         self._columns = ["pos_beg", "pos_end", "strand", "evalue", "type_elt", "model", "distance_2attC", "annotation"]
         self._dtype = {"pos_beg": "int",
                        "pos_end": "int",
@@ -211,6 +225,8 @@ class Integron(object):
 
         self.proteins = pd.DataFrame(columns=self._columns)
         self.proteins = self.proteins.astype(dtype=self._dtype)
+
+        self.sizes_cassettes = None
 
     @property
     def dtype(self):
@@ -250,7 +266,7 @@ class Integron(object):
             self.sizes_cassettes = [np.nan]
         else:
             self.sizes_cassettes.append((self.attC.iloc[attC_len - 1].pos_beg -
-                                     self.attC.iloc[attC_len - 2].pos_end) % SIZE_REPLICON)
+                                         self.attC.iloc[attC_len - 2].pos_end) % len(self.replicon))
         self.attC["distance_2attC"] = self.sizes_cassettes
 
         #self.attC.sort_values(["pos_beg"], inplace = True)
@@ -292,8 +308,8 @@ class Integron(object):
 
             motifs_Pint = [p_intI1]
 
-            seq_p_int = SEQUENCE.seq[int(self.integrase.pos_beg.min()) - dist_prom:
-                                     int(self.integrase.pos_end.max()) + dist_prom]
+            seq_p_int = self.replicon.seq[int(self.integrase.pos_beg.min()) - dist_prom:
+                                          int(self.integrase.pos_end.max()) + dist_prom]
 
             for m in motifs_Pint:
                 if self.integrase.strand.values[0] == 1:
@@ -332,7 +348,7 @@ class Integron(object):
         ## Pc-int1
         motifs_Pc = []
 
-        pc = SeqIO.parse(os.path.join(MODEL_DIR, "variants_Pc_intI1.fst"), "fasta")
+        pc = SeqIO.parse(os.path.join(self.cfg.model_dir, "variants_Pc_intI1.fst"), "fasta")
         pseq = [i for i in pc]
         d = {len(i): [] for i in pseq}
         _ = [d[len(i)].append(i.seq.upper()) for i in pseq]
@@ -354,8 +370,8 @@ class Integron(object):
 
         if self.type() == "complete":
 
-            if ((self.attC.pos_beg.values[0] - self.integrase.pos_end.values[0]) % SIZE_REPLICON >
-                (self.integrase.pos_beg.values[0] - self.attC.pos_end.values[-1]) % SIZE_REPLICON):
+            if ((self.attC.pos_beg.values[0] - self.integrase.pos_end.values[0]) % self.replicon_size >
+                    (self.integrase.pos_beg.values[0] - self.attC.pos_end.values[-1]) % self.replicon_size):
                 # if integrase after attcs (on the right)
                 left = int(self.attC.pos_end.values[-1])
                 right = int(self.integrase.pos_beg.values[0])
@@ -376,10 +392,10 @@ class Integron(object):
             strand_array = self.attC.strand.unique()[0]
 
         if left < right:
-            seq_Pc = SEQUENCE.seq[left - dist_prom : right + dist_prom]
+            seq_Pc = self.replicon.seq[left - dist_prom : right + dist_prom]
         else:
-            seq_Pc1 = SEQUENCE.seq[left - dist_prom : SIZE_REPLICON]
-            seq_Pc2 = SEQUENCE.seq[:right + dist_prom]
+            seq_Pc1 = self.replicon.seq[left - dist_prom : self.replicon_size]
+            seq_Pc2 = self.replicon.seq[:right + dist_prom]
             seq_Pc = seq_Pc1 + seq_Pc2
 
         for m in motifs_Pc:
@@ -394,8 +410,8 @@ class Integron(object):
                 for pos, s in mo.instances.search(seq_Pc):
                     tmp_df = pd.DataFrame(columns=self._columns)
                     tmp_df = tmp_df.astype(dtype=self._dtype)
-                    tmp_df["pos_beg"] = [(left - dist_prom + pos) % SIZE_REPLICON]
-                    tmp_df["pos_end"] = [(left - dist_prom + pos + len(s)) % SIZE_REPLICON]
+                    tmp_df["pos_beg"] = [(left - dist_prom + pos) % self.replicon_size]
+                    tmp_df["pos_end"] = [(left - dist_prom + pos + len(s)) % self.replicon_size]
                     tmp_df["strand"] = [strand_array] if strand_array != "both" else [sa * 2 - 1]
                     tmp_df["evalue"] = [np.nan]
                     tmp_df["type_elt"] = "Promoter"
@@ -427,8 +443,8 @@ class Integron(object):
         motif_attI = [attI1, attI2, attI3]
 
         if self.type() == "complete":
-            if ((self.attC.pos_beg.values[0] - self.integrase.pos_end.values[0]) % SIZE_REPLICON >
-                (self.integrase.pos_beg.values[0] - self.attC.pos_end.values[-1]) % SIZE_REPLICON):
+            if ((self.attC.pos_beg.values[0] - self.integrase.pos_end.values[0]) % self.replicon_size >
+                    (self.integrase.pos_beg.values[0] - self.attC.pos_end.values[-1]) % self.replicon_size):
                 # if integrase after attcs (on the right)
 
                 left = int(self.attC.pos_end.values[-1])
@@ -449,10 +465,10 @@ class Integron(object):
             strand_array = self.attC.strand.unique()[0]
 
         if left < right:
-            seq_attI = SEQUENCE.seq[left - dist_atti : right + dist_atti]
+            seq_attI = self.replicon.seq[left - dist_atti:right + dist_atti]
         else:
-            seq_attI1 = SEQUENCE.seq[left - dist_atti : SIZE_REPLICON]
-            seq_attI2 = SEQUENCE.seq[:right + dist_atti]
+            seq_attI1 = self.replicon.seq[left - dist_atti:self.replicon_size]
+            seq_attI2 = self.replicon.seq[:right + dist_atti]
             seq_attI = seq_attI1 + seq_attI2
 
         for m in motif_attI:
@@ -468,8 +484,8 @@ class Integron(object):
                 for pos, s in mo.instances.search(seq_attI):
                     tmp_df = pd.DataFrame(columns=self._columns)
                     tmp_df = tmp_df.astype(dtype=self._dtype)
-                    tmp_df["pos_beg"] = [(left - dist_atti + pos) % SIZE_REPLICON]
-                    tmp_df["pos_end"] = [(left - dist_atti + pos + len(s)) % SIZE_REPLICON]
+                    tmp_df["pos_beg"] = [(left - dist_atti + pos) % self.replicon_size]
+                    tmp_df["pos_end"] = [(left - dist_atti + pos + len(s)) % self.replicon_size]
                     tmp_df["strand"] = [strand_array] if strand_array != "both" else [sa * 2 - 1]
                     tmp_df["evalue"] = [np.nan]
                     tmp_df["type_elt"] = "attI"
@@ -480,13 +496,13 @@ class Integron(object):
                     self.attI = self.attI.append(tmp_df)
 
 
-    def add_proteins(self):
+    def add_proteins(self, prot_file):
         debut = self.attC.pos_beg.values[0]
         fin = self.attC.pos_end.values[-1]
 
         if self.has_integrase():
-            if ((debut - self.integrase.pos_end.values[0]) % SIZE_REPLICON >
-                    (self.integrase.pos_beg.values[0] - fin) % SIZE_REPLICON):
+            if ((debut - self.integrase.pos_end.values[0]) % self.replicon_size >
+                    (self.integrase.pos_beg.values[0] - fin) % self.replicon_size):
                 # integrase on the right of attC cluster.
                 fin = self.integrase.pos_beg.min()
                 debut -= 200
@@ -498,8 +514,8 @@ class Integron(object):
             debut -= 200
             fin += 200
 
-        for i in SeqIO.parse(PROT_file, "fasta"):
-            if not args.gembase:
+        for i in SeqIO.parse(prot_file, "fasta"):
+            if not self.cfg.gembase:
                 desc = [j.strip() for j in i.description.split("#")][:-1]
                 start = int(desc[1])
                 end = int(desc[2])
@@ -511,9 +527,9 @@ class Integron(object):
                 start = int(desc[2])
                 end = int(desc[3])
 
-            s_int = (fin - debut) % SIZE_REPLICON
+            s_int = (fin - debut) % self.replicon_size
 
-            if ((fin - end) % SIZE_REPLICON < s_int) or ((start - debut) % SIZE_REPLICON < s_int):
+            if ((fin - end) % self.replicon_size < s_int) or ((start - debut) % self.replicon_size < s_int):
                 # We keep proteins (<--->) if start (<) and end (>) follows that scheme:
                 #
                 # ok:            <--->         <--->
@@ -526,7 +542,7 @@ class Integron(object):
                 prot_evalue = np.nan
                 prot_model = "NA"
 
-                if args.gembase:
+                if self.cfg.gembase:
                     self.proteins.loc[desc[0]] = desc[2:] + [desc[1]] + [prot_evalue, "protein",
                                                                          prot_model, np.nan, prot_annot]
                 else:
@@ -540,7 +556,6 @@ class Integron(object):
 
     def describe(self):
         """ Method describing the integron object """
-
         full = pd.concat([self.integrase, self.attC, self.promoter, self.attI, self.proteins])
         full["pos_beg"] = full["pos_beg"].astype(int)
         full["pos_end"] = full["pos_end"].astype(int)
@@ -549,14 +564,14 @@ class Integron(object):
         full = full.reset_index()
         full.columns = ["element"] + list(full.columns[1:])
         full["type"] = self.type()
-        full["ID_replicon"] = self.ID_replicon
+        full["ID_replicon"] = self.replicon.id
         full["ID_integron"] = id(self)  # uniq identifier of a given Integron
-        full["default"] = "Yes" if not (args.eagle_eyes or args.local_max) else "No"
+        full["default"] = "Yes" if not (self.cfg.eagle_eyes or self.cfg.local_max) else "No"
         full.drop_duplicates(subset=["element"], inplace=True)
         return full
 
 
-    def draw_integron(self, file=0):
+    def draw_integron(self, path=None):
         """
         Represent the different element of the integrons
         """
@@ -604,7 +619,7 @@ class Integron(object):
         ax.grid("on", "major", axis="x")
         ax.set_ylim(-4, 4)
         ax.get_yaxis().set_visible(False)
-        if file != 0:
+        if file:
             fig.savefig(file, format="pdf")
             plt.close(fig)
         else:

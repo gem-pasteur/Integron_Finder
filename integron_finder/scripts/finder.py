@@ -49,30 +49,14 @@ if not integron_finder.__version__.endswith('VERSION'):
     warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 from Bio import SeqIO
-from Bio import Seq
 
 from integron_finder import IntegronError
-
+from integron_finder import utils
 from integron_finder.topology import Topology
 from integron_finder.config import Config
 
 
-def main(args=None):
-    args = sys.argv[1:] if args is None else args
-
-    _prefix_share = '$PREFIXSHARE'
-
-    # integron was not installed using the setup.py
-    # it's a development version using environment variable
-    if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
-        _prefix_share = os.environ['INTEGRON_HOME']
-    elif _prefix_share.endswith('PREFIXSHARE'):
-        _prefix_share = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    _prefix_data = os.path.join(_prefix_share, 'data')
-
-    if not os.path.exists(_prefix_data):
-        raise Exception("""cannot find integron_finder data check your installation
-    or define INTEGRON_HOME environment variable.""")
+def parse_args(args):
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("replicon",
@@ -91,8 +75,7 @@ def main(args=None):
 
     parser.add_argument('--cpu',
                         default='1',
-                        action='store',
-                        type=str,
+                        type=int,
                         help='Number of CPUs used by INFERNAL and HMMER')
 
     parser.add_argument('-dt', '--distance_thresh',
@@ -104,9 +87,6 @@ def main(args=None):
 
     parser.add_argument('--outdir',
                         default=".",
-                        action='store',
-                        type=str,
-                        metavar='.',
                         help='Set the output directory (default: current)')
 
     parser.add_argument("--union_integrases",
@@ -116,26 +96,19 @@ def main(args=None):
 
     parser.add_argument('--cmsearch',
                         default=distutils.spawn.find_executable("cmsearch"),
-                        action='store',
                         type=str,
                         help='Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch')
 
     parser.add_argument('--hmmsearch',
                         default=distutils.spawn.find_executable("hmmsearch"),
-                        action='store',
-                        type=str,
                         help='Complete path to hmmsearch if not in PATH. eg: /usr/local/bin/hmmsearch')
 
     parser.add_argument('--prodigal',
                         default=distutils.spawn.find_executable("prodigal"),
-                        action='store',
-                        type=str,
                         help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
 
     parser.add_argument('--path_func_annot',
-                        action='store',
                         metavar='bank_hmm',
-                        type=str,
                         help='Path to file containing all hmm bank paths (one per line)')
 
     parser.add_argument("--gembase",
@@ -145,16 +118,11 @@ def main(args=None):
 
     parser.add_argument('--attc_model',
                         default='attc_4.cm',
-                        action='store',
-                        type=str,
-                        metavar='file.cm',
                         help='path or file to the attc model (Covariance Matrix)')
 
     parser.add_argument('--evalue_attc',
                         default=1.,
-                        action='store',
                         type=float,
-                        metavar='1',
                         help='set evalue threshold to filter out hits above it (default: 1)')
 
     parser.add_argument("--keep_palindromes",
@@ -170,16 +138,12 @@ def main(args=None):
 
     parser.add_argument('--max_attc_size',
                         default=200,
-                        action='store',
                         type=int,
-                        metavar='200',
                         help='set maximum value fot the attC size (default: 200bp)')
 
     parser.add_argument('--min_attc_size',
                         default=40,
-                        action='store',
                         type=int,
-                        metavar='40',
                         help='set minimum value fot the attC size (default: 40bp)')
 
     parser.add_argument("--eagle_eyes",
@@ -190,9 +154,11 @@ def main(args=None):
     topology_grp = parser.add_mutually_exclusive_group()
     topology_grp.add_argument("--circ",
                               dest='circular',
+                              default=False,
                               help="Set the default topology for replicons to 'cirular'",
                               action="store_true")
     topology_grp.add_argument("--linear",
+                              default=False,
                               help="Set the default topology for replicons to 'linear'",
                               action="store_true")
     parser.add_argument("--topology-file",
@@ -204,7 +170,27 @@ def main(args=None):
 
     args = parser.parse_args(args)
 
-    config = Config(args)
+    return Config(args)
+
+
+def main(args=None):
+    args = sys.argv[1:] if args is None else args
+
+    _prefix_share = '$PREFIXSHARE'
+
+    # integron was not installed using the setup.py
+    # it's a development version using environment variable
+    if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
+        _prefix_share = os.environ['INTEGRON_HOME']
+    elif _prefix_share.endswith('PREFIXSHARE'):
+        _prefix_share = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    _prefix_data = os.path.join(_prefix_share, 'data')
+
+    config = parse_args(args)
+
+    if not os.path.exists(_prefix_data):
+        raise Exception("""cannot find integron_finder data check your installation
+or define INTEGRON_HOME environment variable.""")
 
     in_dir, sequence_file = os.path.split(config.replicon_path)
     replicon_name = config.replicon_name
@@ -220,21 +206,14 @@ def main(args=None):
         pass
 
     try:
-        os.mkdir(os.path.join(args.outdir,
-                              "Results_Integron_Finder_" + replicon_name,
-                              "other"))
+        os.mkdir(os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name, "other"))
     except OSError:
         pass
 
-    result_dir_other = os.path.join(config.outdir,
-                                    "Results_Integron_Finder_" + replicon_name,
-                                    "other")
-    result_dir = os.path.join(args.outdir,
-                              "Results_Integron_Finder_" + replicon_name)
+    result_dir_other = os.path.join(config.outdir,  "Results_Integron_Finder_" + replicon_name, "other")
+    result_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name)
 
-    sequences_db = SeqIO.index(config.replicon_path,
-                               "fasta",
-                               alphabet=Seq.IUPAC.unambiguous_dna)
+    sequences_db = utils.read_single_dna_fasta(config.replicon_path)
 
     ################
     # set topology #
@@ -253,8 +232,8 @@ def main(args=None):
     # Definitions #
     ###############
     for seq_id in sequences_db:
-        sequence = sequences_db[seq_id]
-        replicon_size = len(sequence)
+        replicon = sequences_db[seq_id]
+        replicon_size = len(replicon)
 
         # If sequence is too small, it can be problematic when using circularity
         topology = topologies[seq_id]
@@ -292,19 +271,14 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
             is_func_annot = False
 
         if is_func_annot and not fa_hmm:
-            print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, \
-                skip functional annotation step."
+            print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, " \
+                                 "skip functional annotation step."
 
-        model_attc_name = config.model_attc.split("/")[-1].split(".cm")[0]
+        model_attc_name = config.model_attc.name
+        model_len = config.model_len
 
-        max_attc_size = args.max_attc_size
-        min_attc_size = args.min_attc_size
-
-        with open(config.model_attc) as f:
-            for i, line in enumerate(f):
-                if "CLEN" in line:
-                    length_cm = int(line.split()[1])
-                    break
+        max_attc_size = config.max_attc_size
+        min_attc_size = config.min_attc_size
 
         if config.gembase:
             prot_dir = os.path.join(in_dir, "..", "Proteins")
@@ -322,17 +296,17 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         if not config.no_proteins:
             if (os.path.isfile(intI_file) == 0 or
                     os.path.isfile(phageI_file) == 0):
-                integron_finder.integrase.find_integrase(config.replicon_path, replicon_name, result_dir_other)
+                integron_finder.integrase.find_integrase(config.replicon_path, replicon,
+                                                         prot_file, result_dir_other, config)
 
         print "\n>>> Starting Default search ... :"
         if os.path.isfile(attC_default_file) == 0:
-            integron_finder.attc.find_attc(config.replicon_path, replicon_name, result_dir_other)
+            integron_finder.attc.find_attc(integrons, replicon, config.distance_threshold,
+                                           config.model_attc_path, config.model_attc_size,
+                                           circular=circular, out_dir=result_dir_other)
 
         print ">>> Default search done... : \n"
-        integrons = integron_finder.integron.find_integron(replicon_name,
-                                                    attC_default_file,
-                                                    intI_file,
-                                                    phageI_file)
+        integrons = integron_finder.integron.find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
 
         #########################
         # Search with local_max #
@@ -351,10 +325,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                                                            "integron_max.pickle"))
                 print ">>>>>> Search with local_max was already done, continue... : \n"
 
-            integrons = integron_finder.integrase.find_integron(replicon_name,
-                                                         integron_max,
-                                                         intI_file,
-                                                         phageI_file)
+            integrons = integron_finder.integrase.find_integron(replicon, attC_default_file,
+                                                                intI_file, phageI_file, config)
 
         ##########################
         # Add promoters and attI #
@@ -381,12 +353,14 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
             # Functional annotation #
             #########################
             if is_func_annot and len(fa_hmm) > 0:
-                integron_finder.annotation.func_annot(replicon_name, result_dir_other, fa_hmm)
+                integron_finder.annotation.func_annot(integrons, replicon,
+                                                      prot_file, fa_hmm, result_dir_other,
+                                                      config)
 
             j = 1
             for i in integrons:
                 if i.type() == "complete":
-                    i.draw_integron(file=os.path.join(result_dir, "{}_{}.pd".format(replicon_name, j)))
+                    i.draw_integron(file=os.path.join(result_dir, "{}_{}.pd".format(replicon.name, j)))
                     j += 1
 
             #######################
@@ -407,12 +381,11 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
             integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
 
             integrons_describe.to_csv(os.path.join(result_dir, outfile), sep="\t", index=0, na_rep="NA")
-            integron_finder.genbank.to_gbk(integrons_describe, sequence)
-            SeqIO.write(sequence, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
+            integron_finder.genbank.to_gbk(integrons_describe, replicon)
+            SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
         else:
-            out_f = open(os.path.join(result_dir, outfile), "w")
-            out_f.write("# No Integron found\n")
-            out_f.close()
+            with open(os.path.join(result_dir, outfile), "w") as out_f:
+                out_f.write("# No Integron found\n")
 
 
 if __name__ == "__main__":

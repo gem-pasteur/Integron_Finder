@@ -5,15 +5,20 @@
 Unit tests scan_hmm_bank function of integron_finder
 """
 
-import integron_finder
-import unittest
 import os
 import sys
 from contextlib import contextmanager
 from StringIO import StringIO
 
+try:
+    from tests import IntegronTest
+except ImportError as err:
+    msg = "Cannot import integron_finder: {0!s}".format(err)
+    raise ImportError(msg)
 
-class TestFunctions(unittest.TestCase):
+from integron_finder.hmm import scan_hmm_bank
+
+class TestScanHmmBank(IntegronTest):
 
     @contextmanager
     def catch_output(self):
@@ -34,7 +39,7 @@ class TestFunctions(unittest.TestCase):
         Test that when the given path does not exist, the function raises an exception
         """
         with self.assertRaises(IOError) as exp:
-            integron_finder.scan_hmm_bank("wrong_path")
+            scan_hmm_bank("wrong_path")
         raised = exp.exception
         self.assertEqual(raised.message, "wrong_path no such file or directory")
 
@@ -44,7 +49,7 @@ class TestFunctions(unittest.TestCase):
         directory (and not other files)
         """
         mypath = os.path.join("tests", "data", "hmm_files")
-        files = integron_finder.scan_hmm_bank(mypath)
+        files = scan_hmm_bank(mypath)
         exp_files = ["Resfam.hmm", "integrase.hmm", "phage_int.hmm"]
         exp_files = [os.path.abspath(os.path.join(mypath, myfile)) for myfile in exp_files]
         self.assertEqual(set(exp_files), set(files))
@@ -56,7 +61,7 @@ class TestFunctions(unittest.TestCase):
         """
         mypath = os.path.join("tests", "data", "hmm_files", "list_hmm.txt")
         with self.catch_output() as (out, err):
-            files = integron_finder.scan_hmm_bank(mypath)
+            files = scan_hmm_bank(mypath)
         self.assertEqual(out.getvalue().strip(), "")
         self.assertEqual(err.getvalue().strip(), "WARNING func_annot '/my_hmms' does not " +
                                                   "match any files.")
@@ -73,7 +78,7 @@ class TestFunctions(unittest.TestCase):
         path2 = os.path.join("data", "Models")
         hmm_paths = [os.path.join(path1, "*.hmm"),
                      os.path.join(path2, "*.hmm"),
-                     os.path.join("data", "Functional_annotation", "Resfams.hmm")]
+                     self.find_data(os.path.join("Functional_annotation", "Resfams.hmm"))]
         # Get all paths to include into the hmm_bank file
         abs_hmm = [os.path.abspath(path) for path in hmm_paths]
         # Write the hmm_bank file
@@ -88,7 +93,7 @@ class TestFunctions(unittest.TestCase):
             lhmm.write("# " + hmm_paths[2] + ".hmm\n")
         # Read hmm_bank file and get list of all files found
         with self.catch_output() as (out, err):
-            files = integron_finder.scan_hmm_bank("list_hmm2.txt")
+            files = scan_hmm_bank("list_hmm2.txt")
         # Write expected list of hmm files
         exp_files1 = ["Resfam.hmm", "integrase.hmm", "phage_int.hmm"]
         exp_files1 = [os.path.abspath(os.path.join(path1, myfile)) for myfile in exp_files1]
