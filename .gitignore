@@ -31,7 +31,7 @@ dist/
 
 ########################
 # setup generated file #
-# ######################
+########################
 MANIFEST
 
 #############################
@@ -43,6 +43,7 @@ doc/build/
 # integron_finder results #
 ###########################
 Results_Integron_Finder*/
+!tests/data/Results_Integron_Finder*/
 
 ############################################
 # workaround for integron_finder as module #
