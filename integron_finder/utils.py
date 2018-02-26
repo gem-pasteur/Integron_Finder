@@ -19,8 +19,29 @@ def make_single_fasta_reader(alphabet):
 
 read_single_dna_fasta = make_single_fasta_reader(Seq.IUPAC.unambiguous_dna)
 
-
 read_single_prot_fasta = make_single_fasta_reader(Seq.IUPAC.protein)
+
+
+def make_multi_fasta_reader(alphabet):
+
+    def fasta_iterator(path):
+        """
+        :param path:the path to the fasta file
+        :return: the sequence parsed
+        :rtype: :class:`Bio.SeqRecord.SeqRecord` object
+        """
+        name = get_name_from_path(path)
+        seq_it = SeqIO.parse(path, "fasta",  alphabet=alphabet)
+        for seq in seq_it:
+            seq.name = name
+            yield seq
+
+    return fasta_iterator
+
+
+read_multi_dna_fasta = make_multi_fasta_reader(Seq.IUPAC.unambiguous_dna)
+
+read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.protein)
 
 
 def model_len(path):
