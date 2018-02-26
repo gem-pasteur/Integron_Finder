@@ -1,3 +1,4 @@
+# comment should disturb topology parser
 seq1 circ
 seq2 circular
 seq3 lin

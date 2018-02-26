@@ -17,6 +17,9 @@ class TestFunctions(IntegronTest):
             self.assertEqual(topo._parse_topology(t), 'circ')
         for t in ('lin', 'linear', 'LIN', 'LINEAR'):
             self.assertEqual(topo._parse_topology(t), 'lin')
+        with self.assertRaises(RuntimeError) as ctx:
+            topo._parse_topology('foo')
+        self.assertEqual(str(ctx.exception), "'foo' is not allowed for topology")
 
 
     def test_parse(self):
