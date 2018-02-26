@@ -1,7 +1,9 @@
-import os.path
+import os
+import sys
 import unittest
 import platform
-
+from StringIO import StringIO
+from contextlib import contextmanager
 
 class IntegronTest(unittest.TestCase):
 
@@ -14,6 +16,26 @@ class IntegronTest(unittest.TestCase):
             return data_path
         else:
             raise IOError("data '{}' does not exists".format(data_path))
+
+
+    @contextmanager
+    def catch_io(self, out=False, err=False):
+        """
+        Catch stderr and stdout of the code running within this block.
+        """
+        old_out = sys.stdout
+        new_out = old_out
+        old_err = sys.stderr
+        new_err = old_err
+        if out:
+            new_out = StringIO()
+        if err:
+            new_err = StringIO()
+        try:
+            sys.stdout, sys.stderr = new_out, new_err
+            yield sys.stdout, sys.stderr
+        finally:
+            sys.stdout, sys.stderr = old_out, old_err
 
 
     def compare_2_files(self, f1, f2):
