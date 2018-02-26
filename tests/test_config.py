@@ -42,20 +42,6 @@ class TestConfig(IntegronTest):
         cf = config.Config(self.args)
         self.assertEqual(cf.input_dir, os.path.split(os.path.abspath('../foo'))[0])
 
-    def test_mode_name(self):
-        self.args.eagle_eyes = True
-        self.args.local_max = False
-        cf = config.Config(self.args)
-        self.assertEqual(cf.mode_name, 'local_max')
-        self.args.eagle_eyes = False
-        self.args.local_max = True
-        cf = config.Config(self.args)
-        self.assertEqual(cf.mode_name, 'local_max')
-        self.args.eagle_eyes = False
-        self.args.local_max = False
-        cf = config.Config(self.args)
-        self.assertEqual(cf.mode_name, 'default')
-
     def test_default_topology(self):
         self.args.circular = True
         self.args.linear = False
