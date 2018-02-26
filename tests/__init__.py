@@ -37,6 +37,10 @@ class IntegronTest(unittest.TestCase):
         finally:
             sys.stdout, sys.stderr = old_out, old_err
 
+    @staticmethod
+    def fake_exit(*args, **kwargs):
+        returncode = args[0]
+        raise TypeError(returncode)
 
     def compare_2_files(self, f1, f2):
         with open(f1) as fh1, open(f2) as fh2:

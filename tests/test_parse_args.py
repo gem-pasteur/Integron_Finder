@@ -8,15 +8,10 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-import integron_finder
 from integron_finder.scripts.finder import parse_args
 
 
 class TestParseArgs(IntegronTest):
-
-    def _fake_exit(*args, **kwargs):
-        returncode = args[1]
-        raise TypeError(returncode)
 
     def test_replicon(self):
         replicon = 'foo'
@@ -26,7 +21,7 @@ class TestParseArgs(IntegronTest):
     def test_wo_replicon(self):
         real_exit = sys.exit
 
-        sys.exit = self._fake_exit
+        sys.exit = self.fake_exit
         with self.catch_io(err=True):
             try:
                 _ = parse_args([])
@@ -175,7 +170,7 @@ class TestParseArgs(IntegronTest):
     def test_cirular_n_linear(self):
         real_exit = sys.exit
 
-        sys.exit = self._fake_exit
+        sys.exit = self.fake_exit
         with self.catch_io(err=True):
             try:
                 _ = parse_args(['--circ', '--linear', 'replicon'])
@@ -198,7 +193,7 @@ class TestParseArgs(IntegronTest):
     def test_version(self):
         real_exit = sys.exit
 
-        sys.exit = self._fake_exit
+        sys.exit = self.fake_exit
         with self.catch_io(err=True):
             try:
                 _ = cfg = parse_args(['--version'])
