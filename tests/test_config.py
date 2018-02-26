@@ -105,9 +105,9 @@ class TestConfig(IntegronTest):
 
         self.args.attc_model = 'foo'
         cf = config.Config(self.args)
-        with self.assertRaises(RuntimeError) as ctx:
+        with self.assertRaises(IOError) as ctx:
             cf.model_len
-        self.assertEqual(str(ctx.exception), "Path to model_attc '{}' doe snot exists".format(cf.model_attc_path))
+        self.assertEqual(str(ctx.exception), "Path to model_attc '{}' does not exists".format(cf.model_attc_path))
 
         model_path = os.path.join(os.path.dirname(__file__), 'data', 'Replicons', 'acba.007.p01.13.fst')
         self.args.attc_model = model_path

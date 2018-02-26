@@ -46,7 +46,7 @@ read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.protein)
 
 def model_len(path):
     if not os.path.exists(path):
-        raise IOError("Path to model_attc '{}' does snot exists".format(path))
+        raise IOError("Path to model_attc '{}' does not exists".format(path))
     with open(path) as model_file:
         for line in model_file:
             if line.startswith('CLEN'):

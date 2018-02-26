@@ -85,6 +85,11 @@ class Config(object):
 
     @property
     def model_len(self):
+        """
+        :return: The length of the attc model (corresponding to CLEN field).
+        :raises: IOError if model_attc_path does moetch an existing file
+                 RuntimeError if the file doe not content CLEN flield.
+        """
         try:
             self._args.attc_model
         except AttributeError:
