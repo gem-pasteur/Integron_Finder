@@ -69,6 +69,7 @@ def parse_args(args):
                         help="Path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst")
 
     parser.add_argument("--local_max",
+                        default=False,
                         help="Allows thorough local detection "
                              "(slower but more sensitive and do not increase false positive rate).",
                         action="store_true")
@@ -96,6 +97,7 @@ def parse_args(args):
                         help='Set the output directory (default: current)')
 
     parser.add_argument("--union_integrases",
+                        default=False,
                         help="Instead of taking intersection of hits from Phage_int profile (Tyr recombinases)"
                              " and integron_integrase profile, use the union of the hits",
                         action="store_true")
@@ -114,10 +116,10 @@ def parse_args(args):
                         help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
 
     parser.add_argument('--path_func_annot',
-                        metavar='bank_hmm',
                         help='Path to file containing all hmm bank paths (one per line)')
 
     parser.add_argument("--gembase",
+                        default=False,
                         help="Use gembase formatted protein file instead of Prodigal."
                              " Folder structure must be preserved",
                         action="store_true")
@@ -139,7 +141,7 @@ def parse_args(args):
 
     parser.add_argument("--no_proteins",
                         help="Don't annotate CDS and don't find integrase, just look for attC sites.",
-                        default=True,
+                        default=False,
                         action="store_true")
 
     parser.add_argument('--max_attc_size',
@@ -153,6 +155,7 @@ def parse_args(args):
                         help='set minimum value fot the attC size (default: 40bp)')
 
     parser.add_argument("--eagle_eyes",
+                        default=False,
                         help="Synonym of --local_max. Like a soaring eagle in the sky,"
                              " catching rabbits(or attC sites) by surprise.",
                         action="store_true")
@@ -167,17 +170,17 @@ def parse_args(args):
                               default=False,
                               help="Set the default topology for replicons to 'linear'",
                               action="store_true")
-    parser.add_argument("--topology-file",
+    parser.add_argument("--topology_file",
                         help="The path to a file where the topology for each replicon is specified")
 
     parser.add_argument("-V", "--version",
                         action="version",
                         version=integron_finder.get_version_message())
 
+    args = parser.parse_args(args)
+
     # eagle_eyes is just an alias to local_max in whole program use local_max
     args.local_max = args.local_max or args.eagle_eyes
-
-    args = parser.parse_args(args)
 
     return Config(args)
 
