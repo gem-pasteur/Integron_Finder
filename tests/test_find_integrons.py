@@ -223,7 +223,7 @@ class TestFindIntegons(IntegronTest):
                                  'Results_Integron_Finder_acba.007.p01.13', 'other', 'acba.007.p01.13_intI.res')
         phageI_file = os.path.join(self._data_dir,
                                    'Results_Integron_Finder_acba.007.p01.13', 'other', 'acba.007.p01.13_phage_int.res')
-        args = argparse.Namespace
+        args = argparse.Namespace()
         args.no_proteins = False
         args.keep_palindromes = True
         args.union_integrases = False
@@ -236,6 +236,10 @@ class TestFindIntegons(IntegronTest):
         args.min_attc_size = 40
         args.distance_threshold = 4000  # (4kb at least between 2 different arrays)
         args.attc_model = 'attc_4.cm'
+        args.no_proteins = False
+        args.gembase = False  # needed by read_hmm which is called when no_proteins == False
+        args.union_integrases = False
+        args.keep_palindromes = True
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -301,7 +305,7 @@ class TestFindIntegons(IntegronTest):
                                  'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_intI.res')
         phageI_file = os.path.join(self._data_dir,
                                    'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_phage_int.res')
-        args = argparse.Namespace
+        args = argparse.Namespace()
         args.no_proteins = False
         args.keep_palindromes = True
         args.union_integrases = True
@@ -315,6 +319,10 @@ class TestFindIntegons(IntegronTest):
         args.min_attc_size = 40
         args.distance_threshold = 4000  # (4kb at least between 2 different arrays)
         args.attc_model = 'attc_4.cm'
+        args.no_proteins = False
+        args.keep_palindromes = True
+        args.union_integrases = True
+        args.gembase = False  # needed by read_hmm which is called when no_proteins == False
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 

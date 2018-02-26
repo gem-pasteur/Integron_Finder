@@ -63,7 +63,6 @@ from integron_finder.genbank import to_gbk
 
 
 def parse_args(args):
-
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("replicon",
                         help="Path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst")
@@ -177,12 +176,11 @@ def parse_args(args):
                         action="version",
                         version=integron_finder.get_version_message())
 
-    args = parser.parse_args(args)
+    parsed_args = parser.parse_args(args)
 
     # eagle_eyes is just an alias to local_max in whole program use local_max
-    args.local_max = args.local_max or args.eagle_eyes
-
-    return Config(args)
+    parsed_args.local_max = parsed_args.local_max or parsed_args.eagle_eyes
+    return Config(parsed_args)
 
 
 def find_integron_in_one_replicon(replicon, topology, config):
