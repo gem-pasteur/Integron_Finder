@@ -17,7 +17,7 @@ class Topology(object):
         elif s in 'linear':
             return 'lin'
         else:
-            raise RuntimeError("'' is not allowed for topology".format(s))
+            raise RuntimeError("'{}' is not allowed for topology".format(s))
 
 
     def _parse(self, topology_file):
