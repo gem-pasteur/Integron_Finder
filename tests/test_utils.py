@@ -29,7 +29,7 @@ class TestUtils(IntegronTest):
         with self.assertRaises(IOError) as ctx:
             utils.model_len(bad_path)
         self.assertEqual(str(ctx.exception),
-                         "Path to model_attc '{}' does snot exists".format(bad_path))
+                         "Path to model_attc '{}' does not exists".format(bad_path))
         bad_path = self.find_data(os.path.join('Models', 'phage-int.hmm'))
         with self.assertRaises(RuntimeError) as ctx:
             utils.model_len(bad_path)
