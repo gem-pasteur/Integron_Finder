@@ -54,6 +54,12 @@ from integron_finder import IntegronError
 from integron_finder import utils
 from integron_finder.topology import Topology
 from integron_finder.config import Config
+from integron_finder.hmm import scan_hmm_bank
+from integron_finder.integrase import find_integrase
+from integron_finder.attc import find_attc, find_attc_max
+from integron_finder.integron import find_integron
+from integron_finder.annotation import func_annot
+from integron_finder.genbank import to_gbk
 
 
 def parse_args(args):
@@ -168,9 +174,163 @@ def parse_args(args):
                         action="version",
                         version=integron_finder.get_version_message())
 
+    # eagle_eyes is just an alias to local_max in whole program use local_max
+    args.local_max = args.local_max or args.eagle_eyes
+
     args = parser.parse_args(args)
 
     return Config(args)
+
+
+def find_integron_in_one_replicon(replicon, topology, config):
+    in_dir, sequence_file = os.path.split(config.replicon_path)
+    replicon_name = replicon.name
+
+    ###################################
+    # Prepare directories for results #
+    ###################################
+    if not os.path.exists(config.outdir):
+        os.mkdir(config.outdir)
+    else:
+        if not os.path.isdir(config.outdir):
+            raise IOError("outdir '{}' already exists and is not a directory".format(config.outdir))
+
+    result_dir = os.path.join(config.outdir, "Results_Integron_Finder_" + replicon_name)
+    try:
+        os.mkdir(result_dir)
+    except OSError:
+        pass
+
+    result_dir_other = os.path.join(config.outdir, "Results_Integron_Finder_" + replicon_name, "other")
+    try:
+        os.mkdir(result_dir_other)
+    except OSError:
+        pass
+
+    # If sequence is too small, it can be problematic when using circularity
+    if topology == 'circ' and len(replicon) > 4 * config.distance_threshold:
+        circular = True
+    else:
+        circular = False
+
+    if config.func_annot and not config.no_proteins:
+        if os.path.exists('bank_hmm'):
+            fa_hmm = scan_hmm_bank('bank_hmm')
+        elif os.path.exists(config.func_annot_path):
+            fa_hmm = scan_hmm_bank(config.func_annot_path)
+        else:
+            raise IntegronError("the dir '{}' neither 'bank_hmm' exists, specify the location of hmm "
+                                "profile with --path_func_annot option".format(config.func_annot_path))
+        is_func_annot = True
+
+    elif config.path_func_annot and config.no_proteins is False:
+        fa_hmm = scan_hmm_bank(config.path_func_annot)
+        is_func_annot = True
+    else:
+        is_func_annot = False
+
+    if is_func_annot and not fa_hmm:
+        print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, " \
+                             "skip functional annotation step."
+
+    model_attc_name = config.model_attc.name
+    model_len = config.model_len
+
+    max_attc_size = config.max_attc_size
+    min_attc_size = config.min_attc_size
+
+    if config.gembase:
+        prot_file = os.path.join(in_dir, "..", "Proteins", replicon_name + ".prt")
+    else:
+        prot_file = os.path.join(result_dir_other, replicon_name + ".prt")
+
+    ##################
+    # Default search #
+    ##################
+    intI_file = os.path.join(result_dir_other, replicon_name + "_intI.res")
+    phageI_file = os.path.join(result_dir_other, replicon_name + "_phage_int.res")
+    attC_default_file = os.path.join(result_dir_other, replicon_name + "_attc_table.res")
+
+    if not config.no_proteins:
+        if not os.path.isfile(intI_file) or not os.path.isfile(phageI_file):
+            find_integrase(config.replicon_path, replicon, prot_file, result_dir_other, config)
+
+    print "\n>>> Starting Default search ... :"
+    if not os.path.isfile(attC_default_file):
+        find_attc(integrons, replicon, config.distance_threshold, config.model_attc_path, config.model_attc_size,
+                  circular=circular, out_dir=result_dir_other)
+
+    print ">>> Default search done... : \n"
+    integrons = find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
+
+    #########################
+    # Search with local_max #
+    #########################
+    if config.local_max:
+
+        print "\n>>>>>> Starting search with local_max...:"
+        if not os.path.isfile(os.path.join(result_dir_other, "integron_max.pickle")):
+
+            integron_max = find_attc_max(integrons, circular=circular)
+            integron_max.to_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
+            print ">>>>>> Search with local_max done... : \n"
+
+        else:
+            integron_max = pd.read_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
+            print ">>>>>> Search with local_max was already done, continue... : \n"
+
+        integrons = find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
+
+    ##########################
+    # Add promoters and attI #
+    ##########################
+
+    outfile = replicon_name + ".integrons"
+    for integron in integrons:
+        if integron.type() != "In0":  # complete & CALIN
+            if not config.no_proteins:
+                integron.add_proteins()
+        elif integron.type() == "complete":
+            integron.add_promoter()
+            integron.add_attI()
+        elif integron.type() == "In0":
+            integron.add_attI()
+            integron.add_promoter()
+
+    #########################
+    # Functional annotation #
+    #########################
+    if is_func_annot and len(fa_hmm) > 0:
+        func_annot(integrons, replicon, prot_file, fa_hmm, result_dir_other, config)
+
+    for j, integron in enumerate(integrons, 1):
+        if integron.type() == "complete":
+            integron.draw_integron(file=os.path.join(result_dir, "{}_{}.pd".format(replicon.name, j)))
+
+    #######################
+    # Writing out results #
+    #######################
+
+    integrons_describe = pd.concat([i.describe() for i in integrons])
+    dic_id = {id_: "{:02}".format(j) for j, id_ in
+              enumerate(integrons_describe.sort_values("pos_beg").id_integron.unique(), 1)}
+    integrons_describe.id_integron = ["integron_" + dic_id[id_] for id_ in integrons_describe.id_integron]
+    integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
+                                             "pos_beg", "pos_end", "strand", "evalue",
+                                             "type_elt", "annotation", "model",
+                                             "type", "default", "distance_2attC"]]
+    integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
+    integrons_describe.index = range(len(integrons_describe))
+
+    integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
+
+    integrons_describe.to_csv(os.path.join(result_dir, outfile), sep="\t", index=0, na_rep="NA")
+    to_gbk(integrons_describe, replicon)
+    SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
+
+    if not integrons:
+        with open(os.path.join(result_dir, outfile), "w") as out_f:
+            out_f.write("# No Integron found\n")
 
 
 def main(args=None):
@@ -182,8 +342,6 @@ def main(args=None):
     # it's a development version using environment variable
     if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
         _prefix_share = os.environ['INTEGRON_HOME']
-    elif _prefix_share.endswith('PREFIXSHARE'):
-        _prefix_share = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     _prefix_data = os.path.join(_prefix_share, 'data')
 
     config = parse_args(args)
@@ -192,200 +350,39 @@ def main(args=None):
         raise Exception("""cannot find integron_finder data check your installation
 or define INTEGRON_HOME environment variable.""")
 
-    in_dir, sequence_file = os.path.split(config.replicon_path)
-    replicon_name = config.replicon_name
+    if config.cmsearch is None:
+        raise RuntimeError("""cannot find 'cmsearch' in PATH.
+Please install infernal package or setup 'cmsearch' binary path with --cmsearch option""")
 
-    if not os.path.exists(config.outdir):
-        os.mkdir(config.outdir)
-    else:
-        if not os.path.isdir(config.outdir):
-            raise IOError("outdir '{}' is not a directory".format(config.outdir))
-    try:
-        os.mkdir(os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name))
-    except OSError:
-        pass
+    if config.hmmsearch is None:
+        raise RuntimeError("""cannot find 'hmmsearch' in PATH.
+Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option""")
 
-    try:
-        os.mkdir(os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name, "other"))
-    except OSError:
-        pass
+    if config.prodigal is None:
+        raise RuntimeError("""cannot find 'prodigal' in PATH.
+Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
-    result_dir_other = os.path.join(config.outdir,  "Results_Integron_Finder_" + replicon_name, "other")
-    result_dir = os.path.join(args.outdir, "Results_Integron_Finder_" + replicon_name)
-
-    sequences_db = utils.read_single_dna_fasta(config.replicon_path)
+    sequences_db = utils.read_multi_dna_fasta(config.replicon_path)
 
     ################
     # set topology #
     ################
-    default_topology = None
 
-    if default_topology is None:
-        if len(sequences_db) == 1:
-            default_topology = 'circ'
-        else:
-            default_topology = 'lin'
+    default_topology = 'circ' if len(sequences_db) == 1 else 'lin'
+    if config.linear:
+        default_topology = 'lin'
+    elif config.circular:
+        default_topology = 'circ'
+    # the both options are mutually exclusive
 
-    topologies = Topology(default_topology, topology_file=args.topology_file)
+    topologies = Topology(default_topology, topology_file=config.topology_file)
 
-    ###############
-    # Definitions #
-    ###############
-    for seq_id in sequences_db:
-        replicon = sequences_db[seq_id]
-        replicon_size = len(replicon)
-
-        # If sequence is too small, it can be problematic when using circularity
-        topology = topologies[seq_id]
-        if topology == 'circ' and replicon_size > 4 * config.distance_threshold:
-            circular = True
-        else:
-            circular = False
-
-        if config.cmsearch is None:
-            raise RuntimeError("""cannot find 'cmsearch' in PATH.
-Please install infernal package or setup 'cmsearch' binary path with --cmsearch option""")
-
-        if config.hmmsearch is None:
-            raise RuntimeError("""cannot find 'hmmsearch' in PATH.
-Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option""")
-
-        if config.prodigal is None:
-            raise RuntimeError("""cannot find 'prodigal' in PATH.
-Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
-
-        if config.func_annot and not config.no_proteins:
-            if os.path.exists('bank_hmm'):
-                fa_hmm = integron_finder.hmm.scan_hmm_bank('bank_hmm')
-            elif os.path.exists(config.func_annot_path):
-                fa_hmm = integron_finder.hmm.scan_hmm_bank(config.func_annot_path)
-            else:
-                raise IntegronError("the dir '{}' neither '{}' exists, specify the location of hmm \
-                    profile with --path_func_annot option".format(config.func_annot_path, 'bank_hmm'))
-            is_func_annot = True
-
-        elif args.path_func_annot and args.no_proteins is False:
-            fa_hmm = integron_finder.hmm.scan_hmm_bank(args.path_func_annot)
-            is_func_annot = True
-        else:
-            is_func_annot = False
-
-        if is_func_annot and not fa_hmm:
-            print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, " \
-                                 "skip functional annotation step."
-
-        model_attc_name = config.model_attc.name
-        model_len = config.model_len
-
-        max_attc_size = config.max_attc_size
-        min_attc_size = config.min_attc_size
-
-        if config.gembase:
-            prot_dir = os.path.join(in_dir, "..", "Proteins")
-            prot_file = os.path.join(prot_dir, replicon_name + ".prt")
-        else:
-            prot_file = os.path.join(result_dir_other, replicon_name + ".prt")
-
-        ##################
-        # Default search #
-        ##################
-        intI_file = os.path.join(result_dir_other, replicon_name + "_intI.res")
-        phageI_file = os.path.join(result_dir_other, replicon_name + "_phage_int.res")
-        attC_default_file = os.path.join(result_dir_other, replicon_name + "_attc_table.res")
-
-        if not config.no_proteins:
-            if (os.path.isfile(intI_file) == 0 or
-                    os.path.isfile(phageI_file) == 0):
-                integron_finder.integrase.find_integrase(config.replicon_path, replicon,
-                                                         prot_file, result_dir_other, config)
-
-        print "\n>>> Starting Default search ... :"
-        if os.path.isfile(attC_default_file) == 0:
-            integron_finder.attc.find_attc(integrons, replicon, config.distance_threshold,
-                                           config.model_attc_path, config.model_attc_size,
-                                           circular=circular, out_dir=result_dir_other)
-
-        print ">>> Default search done... : \n"
-        integrons = integron_finder.integron.find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
-
-        #########################
-        # Search with local_max #
-        #########################
-        if config.eagle_eyes or config.local_max:
-
-            print "\n>>>>>> Starting search with local_max...:"
-            if os.path.isfile(os.path.join(result_dir_other, "integron_max.pickle")) == 0:
-
-                integron_max = integron_finder.attc.find_attc_max(integrons, circular=circular)
-                integron_max.to_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
-                print ">>>>>> Search with local_max done... : \n"
-
-            else:
-                integron_max = pd.read_pickle(os.path.join(result_dir_other,
-                                                           "integron_max.pickle"))
-                print ">>>>>> Search with local_max was already done, continue... : \n"
-
-            integrons = integron_finder.integrase.find_integron(replicon, attC_default_file,
-                                                                intI_file, phageI_file, config)
-
-        ##########################
-        # Add promoters and attI #
-        ##########################
-
-        outfile = replicon_name + ".integrons"
-
-        if len(integrons):
-            j = 1
-            for i in integrons:
-                if i.type() != "In0":  # complete & CALIN
-                    if not config.no_proteins:
-                        i.add_proteins()
-
-                if i.type() == "complete":
-                    i.add_promoter()
-                    i.add_attI()
-                    j += 1
-                if i.type() == "In0":
-                    i.add_attI()
-                    i.add_promoter()
-
-            #########################
-            # Functional annotation #
-            #########################
-            if is_func_annot and len(fa_hmm) > 0:
-                integron_finder.annotation.func_annot(integrons, replicon,
-                                                      prot_file, fa_hmm, result_dir_other,
-                                                      config)
-
-            j = 1
-            for i in integrons:
-                if i.type() == "complete":
-                    i.draw_integron(file=os.path.join(result_dir, "{}_{}.pd".format(replicon.name, j)))
-                    j += 1
-
-            #######################
-            # Writing out results #
-            #######################
-
-            integrons_describe = pd.concat([i.describe() for i in integrons])
-            dic_id = {i: "%02i" % (j + 1) for j, i in
-                      enumerate(integrons_describe.sort_values("pos_beg").id_integron.unique())}
-            integrons_describe.id_integron = ["integron_" + dic_id[i] for i in integrons_describe.id_integron]
-            integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
-                                                     "pos_beg", "pos_end", "strand", "evalue",
-                                                     "type_elt", "annotation", "model",
-                                                     "type", "default", "distance_2attC"]]
-            integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
-            integrons_describe.index = range(len(integrons_describe))
-
-            integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
-
-            integrons_describe.to_csv(os.path.join(result_dir, outfile), sep="\t", index=0, na_rep="NA")
-            integron_finder.genbank.to_gbk(integrons_describe, replicon)
-            SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
-        else:
-            with open(os.path.join(result_dir, outfile), "w") as out_f:
-                out_f.write("# No Integron found\n")
+    ##############
+    # do the job #
+    ##############
+    for replicon in sequences_db:
+        topology = topologies[replicon.id]
+        find_integron_in_one_replicon(replicon, topology, config)
 
 
 if __name__ == "__main__":
