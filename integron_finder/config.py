@@ -39,6 +39,10 @@ class Config(object):
         return in_dir
 
     @property
+    def outdir(self):
+        return os.path.abspath(self._args.outdir)
+
+    @property
     def default_topology(self):
         if self._args.circular:
             return 'circ'
