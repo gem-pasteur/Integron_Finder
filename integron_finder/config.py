@@ -39,13 +39,6 @@ class Config(object):
         return in_dir
 
     @property
-    def mode_name(self):
-        if self._args.eagle_eyes or self._args.local_max:
-            return "local_max"
-        else:
-            return "default"
-
-    @property
     def default_topology(self):
         if self._args.circular:
             return 'circ'
