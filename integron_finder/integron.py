@@ -2,6 +2,9 @@ import os
 
 import numpy as np
 import pandas as pd
+
+from matplotlib import use as m_use
+m_use("Agg")
 import matplotlib.pyplot as plt
 # display warning only for non installed integron_finder
 from Bio import BiopythonExperimentalWarning

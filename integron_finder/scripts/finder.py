@@ -36,8 +36,6 @@ import sys
 import argparse
 import distutils.spawn
 
-from matplotlib import use as m_use
-m_use("Agg")
 import pandas as pd
 
 import integron_finder
