@@ -16,7 +16,7 @@ except ImportError as err:
 from integron_finder.genbank import to_gbk
 from integron_finder.utils import read_single_dna_fasta
 
-class TestFunctions(IntegronTest):
+class TestToGbk(IntegronTest):
 
     def setUp(self):
         """

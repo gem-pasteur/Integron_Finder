@@ -17,7 +17,7 @@ from integron_finder import attc, infernal
 Unit tests search_attc function of integron_finder
 """
 
-class TestFunctions(IntegronTest):
+class TestSearchAttc(IntegronTest):
 
     def setUp(self):
         """

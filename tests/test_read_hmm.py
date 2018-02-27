@@ -20,7 +20,7 @@ from integron_finder.config import Config
 from integron_finder.hmm import read_hmm
 
 
-class TestFunctions(IntegronTest):
+class TestReadHMM(IntegronTest):
 
     def setUp(self):
         """

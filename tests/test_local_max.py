@@ -204,6 +204,7 @@ class TestLocalMax(IntegronTest):
                                                    'pos_end', 'sens', 'evalue'])
         pdt.assert_frame_equal(local_max_expected, local_max_received)
 
+
     def test_local_max_cmsearch_failed(self):
         win_beg = 946899
         win_end = 951099

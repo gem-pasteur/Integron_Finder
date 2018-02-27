@@ -8,7 +8,7 @@ except ImportError as err:
 
 from integron_finder.topology import Topology
 
-class TestFunctions(IntegronTest):
+class TestTopology(IntegronTest):
 
 
     def test_parse_topology(self):

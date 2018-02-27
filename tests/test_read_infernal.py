@@ -19,7 +19,7 @@ except ImportError as err:
 from integron_finder import infernal
 
 
-class TestFunctions(IntegronTest):
+class TestReadInfernal(IntegronTest):
 
     def setUp(self):
         """
