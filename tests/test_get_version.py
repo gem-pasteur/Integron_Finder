@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-
 """
 Unit tests get_version_message function of integron_finder
 """
@@ -15,15 +11,6 @@ except ImportError as err:
 
 import integron_finder
 from integron_finder.scripts import finder
-
-
-def check_installed():
-    """
-    Check that integron_finder is installed. If not, will not run test for version
-    message while installed
-    """
-    installed = False if integron_finder.__version__.endswith('VERSION') else True
-    return installed
 
 
 class TestGetVersion(IntegronTest):
