@@ -38,7 +38,6 @@ class TestFuncAnnot(IntegronTest):
         replicon_name = "acba.007.p01.13"
         self.replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         self.replicon = read_single_dna_fasta(self.replicon_path)
-
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
 
@@ -120,7 +119,8 @@ class TestFuncAnnot(IntegronTest):
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
         # Annotate proteins
-        func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
+        with self.catch_io(out=True):
+            func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
 
         # Check that all files generated are as expected
         files_created = glob.glob(os.path.join(self.tmp_dir, "*"))
@@ -156,7 +156,8 @@ class TestFuncAnnot(IntegronTest):
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
         # Annotate proteins
-        func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
+        with self.catch_io(out=True):
+            func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
 
         # Check that all files generated are as expected
         files_created = glob.glob(os.path.join(self.tmp_dir, "*"))
@@ -193,7 +194,8 @@ class TestFuncAnnot(IntegronTest):
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
         # Annotate proteins
-        func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
+        with self.catch_io(out=True):
+            func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
         # Check that all files generated are as expected
         files_created = glob.glob(os.path.join(self.tmp_dir, "*"))
         exp_files = ["acba.007.p01.13.prt", "acba.007.p01.13_intI_table.res",
@@ -213,13 +215,13 @@ class TestFuncAnnot(IntegronTest):
         - 1 complete with 4 proteins, 3 having a resfam annotation
         """
         # resfam pour: 16, 13, 3, 12
-        #
+
         # Create integron in0
         integron1 = Integron(self.replicon.name, self.cfg)
         integron1.add_integrase(56, 1014, "ACBA.007.P01_13_1", 1, 1.9e-25, "intersection_tyr_intI")
 
         # Create integron CALIN with resfam proteins
-        integron2 = Integron(self.replicon.name, self.cfg)
+        integron2 = Integron(self.replicon, self.cfg)
         integron2.add_attC(7400, 7650, -1, 7e-9, "attc_4")
         integron2.add_attC(8600, 8650, -1, 7e-4, "attc_4")
         integron2.add_attC(10200, 10400, -1, 7e-7, "attc_4")
@@ -227,12 +229,12 @@ class TestFuncAnnot(IntegronTest):
         integron2.add_proteins(self.prot_file)
 
         # Create integron CALIN without any resfam proteins
-        integron3 = Integron(self.replicon.name, self.cfg)
+        integron3 = Integron(self.replicon, self.cfg)
         integron3.add_attC(4320, 4400, -1, 7e-9, "attc_4")
         integron3.add_proteins(self.prot_file)
 
         # Create complete integron
-        integron4 = Integron(self.replicon.name, self.cfg)
+        integron4 = Integron(self.replicon, self.cfg)
         integron4.add_attC(17825, 17884, -1, 7e-9, "attc_4")
         integron4.add_attC(19080, 19149, -1, 7e-4, "attc_4")
         integron4.add_attC(19618, 19726, -1, 7e-7, "attc_4")
@@ -295,11 +297,13 @@ class TestFuncAnnot(IntegronTest):
 
         # Check proteins before annotation
         expected_proteins = [proteins1, proteins2, proteins3, proteins4]
+
         for inte, exp_prot in zip(integrons, expected_proteins):
             pdt.assert_frame_equal(inte.proteins, exp_prot)
 
         # Annotate proteins with evalue threshold
-        func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir, evalue=1e-32)
+        with self.catch_io(out=True):
+            func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir, evalue=1e-32)
 
         # Check that all files generated are as expected
         files_created = glob.glob(os.path.join(self.tmp_dir, "*"))
@@ -316,14 +320,16 @@ class TestFuncAnnot(IntegronTest):
             pdt.assert_frame_equal(inte.proteins, prots)
 
         # Annotate proteins with default evalue (1 more annotation)
-        func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
+        with self.catch_io(out=True):
+            func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
         proteins4.loc["ACBA.007.P01_13_20"] = [17375, 17722, -1, 4.5e-31, "protein",
                                                "RF0066", np.nan, "emrE"]
         for inte, prots in zip(integrons, expected_proteins):
             pdt.assert_frame_equal(inte.proteins, prots)
 
         # Annotate proteins with lower coverage threshold (1 more annotation)
-        func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir, coverage=0.4)
+        with self.catch_io(out=True):
+            func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir, coverage=0.4)
 
         proteins2.loc["ACBA.007.P01_13_12"] = [7710, 8594, -1, 1.6e-5, "protein",
                                                "RF0033", np.nan, "APH3"]
@@ -348,7 +354,8 @@ class TestFuncAnnot(IntegronTest):
         integron1.add_proteins(self.prot_file)
         # Annotate proteins
         with self.assertRaises(RuntimeError) as ctx:
-            func_annot(integrons, self.replicon, self.prot_file, wrong_hmm_files, self.cfg, self.tmp_dir)
+            with self.catch_io(out=True, err=True):
+                func_annot(integrons, self.replicon, self.prot_file, wrong_hmm_files, self.cfg, self.tmp_dir)
         self.assertTrue(str(ctx.exception).endswith(" failed return code = 1"))
 
 
@@ -369,5 +376,6 @@ class TestFuncAnnot(IntegronTest):
         integron1.add_proteins(self.prot_file)
         # Annotate proteins
         with self.assertRaises(RuntimeError) as ctx:
-            func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
+            with self.catch_io(out=True):
+                func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
         self.assertTrue(str(ctx.exception).endswith("failed : [Errno 2] No such file or directory"))
