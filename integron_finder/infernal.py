@@ -71,11 +71,13 @@ def local_max(replicon,
     if window_beg < window_end:
         subseq = replicon[window_beg:window_end]
     else:
-        subseq1 = replicon[window_beg:replicon_size]
+        # the window overlap the replicon origin
+        subseq1 = replicon[window_beg:]
         subseq2 = replicon[:window_end]
         subseq = subseq1 + subseq2
 
-    with open(os.path.join(out_dir, replicon.name + "_subseq.fst"), "w") as f:
+    infile_path = os.path.join(out_dir, replicon.name + "_subseq.fst")
+    with open(infile_path, "w") as f:
         SeqIO.write(subseq, f, "fasta")
 
     output_path = os.path.join(out_dir, "{name}_{win_beg}_{win_end}_subseq_attc.res".format(name=replicon.name,
@@ -85,7 +87,6 @@ def local_max(replicon,
                                                                                                   win_beg=window_beg,
                                                                                                   win_end=window_end))
 
-    infile_path = os.path.join(out_dir, replicon.name + "_subseq.fst")
     cmsearch_cmd = \
         "{bin} -Z {size} {strand} --max --cpu {cpu} -o {out} --tblout {tblout} -E 10 {mod_attc_path} {infile}".format(
             bin=cmsearch_bin,
