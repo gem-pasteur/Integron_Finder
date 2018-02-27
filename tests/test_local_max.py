@@ -87,6 +87,7 @@ class TestLocalMax(IntegronTest):
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
+
         self.cmsearch = which('cmsearch')
         self.out_dir = self.tmp_dir
         self.model_attc_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
@@ -148,8 +149,8 @@ class TestLocalMax(IntegronTest):
 
 
     def test_no_local_max_bottom(self):
-        win_beg = 946899
-        win_end = 951099
+        win_beg = 930689
+        win_end = 934889
         strand_search = 'bottom'
         local_max_received = infernal.local_max(self.replicon,
                                                 win_beg, win_end,
@@ -165,8 +166,8 @@ class TestLocalMax(IntegronTest):
 
 
     def test_local_max_both(self):
-        win_beg = 946899
-        win_end = 951099
+        win_beg = 942899
+        win_end = 947099
         strand_search = 'both'
 
         local_max_received = infernal.local_max(self.replicon,
@@ -186,8 +187,8 @@ class TestLocalMax(IntegronTest):
 
 
     def local_max_end_beg(self):
-        win_beg = 946899
-        win_end = 951099
+        win_beg = 942899
+        win_end = 947099
         strand_search = 'top'
         local_max_received = infernal.local_max(self.replicon,
                                                 win_beg, win_end,
@@ -206,8 +207,8 @@ class TestLocalMax(IntegronTest):
 
 
     def test_local_max_cmsearch_failed(self):
-        win_beg = 946899
-        win_end = 951099
+        win_beg = 942899
+        win_end = 947099
         strand_search = 'top'
 
         cmsearch_bin = 'failed_cmsearch'
