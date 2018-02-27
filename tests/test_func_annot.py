@@ -28,6 +28,7 @@ from integron_finder.integrase import find_integrase
 from integron_finder.integron import Integron
 from integron_finder.annotation import func_annot
 
+
 class TestFuncAnnot(IntegronTest):
 
     def setUp(self):
@@ -78,8 +79,7 @@ class TestFuncAnnot(IntegronTest):
                            "distance_2attC": 'float'}
 
         # Run prodigal to find CDS on replicon (and run hmmsearch on integrase (2 profiles))
-        self.integrases = find_integrase(self.replicon_path, self.replicon, self.prot_file,
-                                         self.tmp_dir, self.cfg)
+        self.integrases = find_integrase(self.replicon_path, self.replicon, self.prot_file, self.tmp_dir, self.cfg)
 
 
     def tearDown(self):
@@ -88,6 +88,7 @@ class TestFuncAnnot(IntegronTest):
         """
         if os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
+
 
     def test_annot_calin(self):
         """
@@ -167,6 +168,7 @@ class TestFuncAnnot(IntegronTest):
 
         # Check proteins after annotation
         pdt.assert_frame_equal(proteins, integron1.proteins)
+
 
     def test_annot_in0(self):
         """
