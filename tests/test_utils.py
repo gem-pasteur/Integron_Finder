@@ -21,6 +21,14 @@ class TestUtils(IntegronTest):
         self.assertTrue(replicon.seq.startswith('TGCTGCTTGGATGCCCGAGGCATAGACTGTACAAAAAAACAGTCATAACAAGCCATGAAA'))
         self.assertTrue(replicon.seq.endswith('CGACCCACGGCGTAACGCGCT'))
 
+    def test_read_multi_prot_fasta(self):
+        replicon_name = 'acba.007.p01.13'
+        replicon_path = self.find_data(os.path.join('Proteins', replicon_name + '.prt'))
+        replicon = utils.read_multi_prot_fasta(replicon_path)
+        expected_seq_id = ['ACBA.007.P01_13_{}'.format(i) for i in range(1, 24)]
+        received_seq_id = [seq.id for seq in replicon]
+        self.assertListEqual(expected_seq_id, received_seq_id)
+
 
     def test_model_len(self):
         model_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
@@ -42,3 +50,20 @@ class TestUtils(IntegronTest):
         self.assertEqual(utils.get_name_from_path('bar.baz'), 'bar')
         self.assertEqual(utils.get_name_from_path('../foo/bar.baz'), 'bar')
         self.assertEqual(utils.get_name_from_path('../foo/bar'), 'bar')
+
+
+    def test_non_gembase_parser(self):
+        desc = 'ACBA.007.P01_13_1 # 55 # 1014 # 1 # ID=1_1;partial=00;start_type=ATG;rbs_motif=None;' \
+               'rbs_spacer=None;gc_cont=0.585'
+        prot_attr = utils.non_gembase_parser(desc)
+
+        expected = utils.ProtDesc('ACBA.007.P01_13_1', 1, 55, 1014)
+        self.assertTupleEqual(expected, prot_attr)
+
+    def test_gembase_parser(self):
+        desc = 'OBAL001.B.00005.C001_00003 C ATG TAA 3317 4294 Valid AKN90_RS00015 978 ' \
+               '@WP_053105352.1@ AKN90_RS00015 1 3317 4294 | alpha-L-glutamate ligase-like protein  (translation)'
+        prot_attr = utils.gembase_parser(desc)
+
+        expected = utils.ProtDesc('OBAL001.B.00005.C001_00003', -1, 3317, 4294)
+        self.assertTupleEqual(expected, prot_attr)
