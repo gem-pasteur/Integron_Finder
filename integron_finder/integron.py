@@ -18,6 +18,7 @@ from Bio import motifs
 from integron_finder.hmm import read_hmm
 from integron_finder.infernal import read_infernal
 from integron_finder.attc import search_attc
+from integron_finder import utils
 
 
 def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
@@ -500,57 +501,47 @@ class Integron(object):
 
 
     def add_proteins(self, prot_file):
-        debut = self.attC.pos_beg.values[0]
-        fin = self.attC.pos_end.values[-1]
+        attc_start = self.attC.pos_beg.values[0]
+        attc_end = self.attC.pos_end.values[-1]
 
         if self.has_integrase():
-            if ((debut - self.integrase.pos_end.values[0]) % self.replicon_size >
-                    (self.integrase.pos_beg.values[0] - fin) % self.replicon_size):
+            if ((attc_start - self.integrase.pos_end.values[0]) % self.replicon_size >
+                    (self.integrase.pos_beg.values[0] - attc_end) % self.replicon_size):
                 # integrase on the right of attC cluster.
-                fin = self.integrase.pos_beg.min()
-                debut -= 200
+                window_start = attc_start - 200
+                window_end = self.integrase.pos_beg.min()
             else:
-                debut = self.integrase.pos_end.max()
-                fin += 200
+                window_start = self.integrase.pos_end.max()
+                window_end = attc_end + 200
         else:
             # To allow the first protein after last attC to aggregate.
-            debut -= 200
-            fin += 200
+            window_start = attc_start - 200
+            window_end = attc_end + 200
 
-        for i in SeqIO.parse(prot_file, "fasta"):
-            if not self.cfg.gembase:
-                desc = [j.strip() for j in i.description.split("#")][:-1]
-                start = int(desc[1])
-                end = int(desc[2])
-
+        for prot in utils.read_multi_prot_fasta(prot_file):
+            if self.cfg.gembase:
+                prot_attr = utils.gembase_parser(prot.description)
             else:
-                desc = [j for j in i.description.split(" ")]
-                desc = desc[:2] + desc[4:6]
-                desc[1] = 1 if desc[1] == "D" else -1
-                start = int(desc[2])
-                end = int(desc[3])
+                prot_attr = utils.non_gembase_parser(prot.description)
 
-            s_int = (fin - debut) % self.replicon_size
+            s_int = (window_end - window_start) % self.replicon_size
 
-            if ((fin - end) % self.replicon_size < s_int) or ((start - debut) % self.replicon_size < s_int):
+            if ((window_end - prot_attr.stop) % self.replicon_size < s_int) or \
+                    ((prot_attr.start - window_start) % self.replicon_size < s_int):
                 # We keep proteins (<--->) if start (<) and end (>) follows that scheme:
                 #
                 # ok:            <--->         <--->
                 # ok:  <--->                                    <--->
                 #          ^ 200pb v                    v 200pb ^
                 #                  |------integron------|
-                #                debut                 fin
+                #                window_start                 fin
 
                 prot_annot = "protein"
                 prot_evalue = np.nan
                 prot_model = "NA"
 
-                if self.cfg.gembase:
-                    self.proteins.loc[desc[0]] = desc[2:] + [desc[1]] + [prot_evalue, "protein",
-                                                                         prot_model, np.nan, prot_annot]
-                else:
-                    self.proteins.loc[desc[0]] = desc[1:] + [prot_evalue, "protein",
-                                                             prot_model, np.nan, prot_annot]
+                self.proteins.loc[prot_attr.id] = [prot_attr.start, prot_attr.stop, prot_attr.strand, prot_evalue,
+                                                   "protein", prot_model, np.nan, prot_annot]
             intcols = ["pos_beg", "pos_end", "strand"]
             floatcols = ["evalue", "distance_2attC"]
             self.proteins[intcols] = self.proteins[intcols].astype(int)

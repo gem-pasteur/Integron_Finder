@@ -1,4 +1,5 @@
 import os
+from collections import namedtuple
 from Bio import Seq
 from Bio import SeqIO
 
@@ -57,3 +58,23 @@ def model_len(path):
 
 def get_name_from_path(path):
     return os.path.splitext(os.path.split(path)[1])[0]
+
+
+ProtDesc = namedtuple('ProtDesc', ('id', 'strand', 'start', 'stop'))
+
+
+def gembase_parser(description):
+    desc = description.split(" ")
+    id_, strand, start, stop = desc[:2] + desc[4:6]
+    strand = 1 if desc[1] == "D" else -1
+    start = int(start)
+    stop = int(stop)
+    return ProtDesc(id_, strand, start, stop)
+
+
+def non_gembase_parser(description):
+    id_, start, stop, strand, _ = description.split(" # ")
+    start = int(start)
+    stop = int(stop)
+    strand = int(strand)
+    return ProtDesc(id_, strand, start, stop)
