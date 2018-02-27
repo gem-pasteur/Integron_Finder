@@ -9,7 +9,7 @@ warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 from Bio import SeqIO
 import pandas as pd
 
-from .utils import get_name_from_path
+from .utils import get_name_from_path, read_multi_prot_fasta
 from .hmm import read_hmm
 
 
@@ -24,7 +24,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
         if os.path.isfile(prot_tmp):
             os.remove(prot_tmp)
 
-        if integron.type() != "In0" and len(integron.proteins) > 0:
+        if integron.type() != "In0" and not integron.proteins.empty:
 
             func_annotate_res = pd.DataFrame(columns=["Accession_number",
                                                       "query_name", "ID_query",
@@ -33,11 +33,11 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
 
             prot_to_annotate = []
             # It's protein file, fasta_reader is dedicated fr dna
-            prot = SeqIO.parse(prot_file, "fasta")
-            n_prot = 0
-            for nb_tot_prot, p in enumerate(prot, 1):
-                if p.id in integron.proteins.index:
-                    prot_to_annotate.append(p)
+            all_prots = read_multi_prot_fasta(prot_file)
+
+            for prot_nb, prot in enumerate(all_prots, 1):
+                if prot.id in integron.proteins.index:
+                    prot_to_annotate.append(prot)
 
             SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
             for hmm in hmm_files:
@@ -45,7 +45,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
                 hmm_out = os.path.join(out_dir, "{}_fa.res".format(name_wo_ext))
                 hmm_tableout = os.path.join(out_dir, "{}_fa_table.res".format(name_wo_ext))
                 hmm_cmd = [cfg.hmmsearch,
-                            "-Z", str(nb_tot_prot),
+                            "-Z", str(prot_nb),
                             "--cpu", str(cfg.cpu),
                             "--tblout", hmm_tableout,
                             "-o", hmm_out,
@@ -58,9 +58,8 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
                     raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
                 if returncode != 0:
                     raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
-                hmm_in = read_hmm(replicon.name, hmm_out, cfg,
-                                  evalue=evalue,
-                                  coverage=coverage).sort_values("evalue").drop_duplicates(subset="ID_prot")
+                hmm_in = read_hmm(replicon.name, hmm_out, cfg, evalue=evalue, coverage=coverage
+                                  ).sort_values("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
             func_annotate_res = func_annotate_res.sort_values("evalue").drop_duplicates(subset="ID_prot")
 
