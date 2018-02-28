@@ -1,7 +1,7 @@
 import os
 
 
-from integron_finder import utils
+from . import utils
 
 class Config(object):
 

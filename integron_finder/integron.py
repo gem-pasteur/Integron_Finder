@@ -15,10 +15,10 @@ from Bio import Seq
 from Bio import SeqIO
 from Bio import motifs
 
-from integron_finder.hmm import read_hmm
-from integron_finder.infernal import read_infernal
-from integron_finder.attc import search_attc
-from integron_finder import utils
+from .hmm import read_hmm
+from .infernal import read_infernal
+from .attc import search_attc
+from . import utils
 
 
 def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
@@ -193,7 +193,6 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
         sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons]))
 
     return integrons
-
 
 
 class Integron(object):

@@ -4,7 +4,7 @@ from subprocess import call
 import numpy as np
 import pandas as pd
 
-from integron_finder.infernal import local_max, expand
+from .infernal import local_max, expand
 
 def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     """

@@ -3,7 +3,7 @@ from subprocess import call
 import pandas as pd
 from Bio import SeqIO
 
-from integron_finder.utils import model_len
+from .utils import model_len
 
 
 def read_infernal(infile, replicon_name, len_model_attc,
