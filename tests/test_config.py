@@ -32,11 +32,6 @@ class TestConfig(IntegronTest):
         cf = config.Config(self.args)
         self.assertEqual(cf.replicon_path, os.path.abspath('../foo'))
 
-    def test_replicon_name(self):
-        self.args.replicon = '../foo.fasta'
-        cf = config.Config(self.args)
-        self.assertEqual(cf.replicon_name, 'foo')
-
     def test_input_dir(self):
         self.args.replicon = '../foo.fasta'
         cf = config.Config(self.args)

@@ -28,12 +28,6 @@ class Config(object):
         return os.path.abspath(self._args.replicon)
 
     @property
-    def replicon_name(self):
-        in_dir, sequence_file = os.path.split(self.replicon_path)
-        replicon_name, extension = os.path.splitext(sequence_file)
-        return replicon_name
-
-    @property
     def input_dir(self):
         in_dir, sequence_file = os.path.split(self.replicon_path)
         return in_dir
