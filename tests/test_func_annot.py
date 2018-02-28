@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-"""
-Unit tests func_annot function of integron_finder
-"""
-
 import os
 import distutils.spawn
 import shutil
