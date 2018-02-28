@@ -46,8 +46,7 @@ class TestReadInfernal(IntegronTest):
         Test that if the infernal file exists but there is no hit
         inside, it returns an empty dataframe.
         """
-        filename = self.find_data(os.path.join("Results_Integron_Finder_" + self.replicon_name,
-                                  "other", self.replicon_name + "_attc_table-empty.res"))
+        filename = self.find_data(os.path.join("fictive_results", self.replicon_name + "_attc_table-empty.res"))
         df = infernal.read_infernal(filename, self.replicon_name, self.length_cm)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
@@ -160,8 +159,7 @@ class TestReadInfernal(IntegronTest):
         Test that when the model did not completely match on the sequence,
         the start and end positions of hit are well recalculated. All hits are on strand +
         """
-        filename = self.find_data(os.path.join("Results_Integron_Finder_" + self.replicon_name,
-                                  "other", self.replicon_name + "_attc_table-partial.res"))
+        filename = self.find_data(os.path.join("fictive_results", self.replicon_name + "_attc_table-partial.res"))
         df = infernal.read_infernal(filename, self.replicon_name, self.length_cm)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
@@ -187,8 +185,7 @@ class TestReadInfernal(IntegronTest):
         Test that when the model did not completely match on the sequence,
         the start and end positions of hit are well recalculated. All hits are on strand -
         """
-        filename = self.find_data(os.path.join("Results_Integron_Finder_" + self.replicon_name,
-                                  "other", self.replicon_name + "_attc_table-partialm.res"))
+        filename = self.find_data(os.path.join("fictive_results", self.replicon_name + "_attc_table-partialm.res"))
         df = infernal.read_infernal(filename, self.replicon_name, self.length_cm)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])

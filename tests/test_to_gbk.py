@@ -24,7 +24,7 @@ class TestToGbk(IntegronTest):
         """
         self.replicon_path = self.find_data(os.path.join('Replicons', "acba.007.p01.13.fst"))
         self.seq = read_single_dna_fasta(self.replicon_path)
-        self.prot_file = self.find_data(os.path.join("Results_Integron_Finder_acba.007.p01.13", "acba.007.p01.13.prt"))
+        self.prot_file = self.find_data(os.path.join("Results_Integron_Finder_acba.007.p01.13", "other", "acba.007.p01.13.prt"))
         self.dist_threshold = 4000
 
 

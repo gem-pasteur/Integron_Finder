@@ -33,8 +33,7 @@ class TestSearchAttc(IntegronTest):
         """
         Test that when there are no attC sites detected, the attc array is empty.
         """
-        attc_file = self.find_data(os.path.join("Results_Integron_Finder_" + self.replicon_name,
-                                   "other", self.replicon_name + "_attc_table-empty.res"))
+        attc_file = self.find_data(os.path.join("fictive_results", self.replicon_name + "_attc_table-empty.res"))
         # Construct attC dataframe (read from infernal file)
         attc_df = infernal.read_infernal(attc_file, self.replicon_name, self.length_cm)
         attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size)

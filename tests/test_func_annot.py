@@ -20,7 +20,9 @@ from integron_finder.utils import read_single_dna_fasta
 from integron_finder.integrase import find_integrase
 from integron_finder.integron import Integron
 from integron_finder.annotation import func_annot
+from integron_finder import annotation
 
+_annot_call_ori = annotation.call
 
 class TestFuncAnnot(IntegronTest):
 
@@ -72,7 +74,7 @@ class TestFuncAnnot(IntegronTest):
 
         # Run prodigal to find CDS on replicon (and run hmmsearch on integrase (2 profiles))
         self.integrases = find_integrase(self.replicon_path, self.replicon, self.prot_file, self.tmp_dir, self.cfg)
-
+        annotation.call = self.call_wrapper(_annot_call_ori)
 
     def tearDown(self):
         """
@@ -80,7 +82,7 @@ class TestFuncAnnot(IntegronTest):
         """
         if os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
-
+        annotation.call = _annot_call_ori
 
     def test_annot_calin(self):
         """
