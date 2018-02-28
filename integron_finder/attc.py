@@ -99,9 +99,9 @@ def find_attc(replicon_path, replicon_name, cmsearch_path, out_dir, model_attc, 
     try:
         returncode = call(cmsearch_cmd)
     except Exception as err:
-        raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd[0], err))
+        raise RuntimeError("{0} failed : {1}".format(' '.join(cmsearch_cmd), err))
     if returncode != 0:
-        raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd[0], returncode))
+        raise RuntimeError("{0} failed returncode = {1}".format(' '.join(cmsearch_cmd), returncode))
 
 
 def find_attc_max(integrons, replicon, distance_threshold,
