@@ -4,60 +4,60 @@ from Bio import SeqFeature
 from Bio import SeqIO
 
 
-def to_gbk(df, sequence, prot_file, dist_threshold):
+def to_gbk(integron_desc, sequence, prot_file, dist_threshold):
 
     """ from a dataframe like integrons_describe and a sequence, create an genbank file with integron annotation """
 
-    df = df.set_index("ID_integron").copy()
-    for i in df.index.unique():
+    integron_desc = integron_desc.set_index("ID_integron").copy()
+    for i in integron_desc.index.unique():
 
-        if isinstance(df.loc[i], pd.Series):
-            type_integron = df.loc[i].type
-            start_integron = df.loc[i].pos_beg
-            end_integron = df.loc[i].pos_end
+        if isinstance(integron_desc.loc[i], pd.Series):
+            type_integron = integron_desc.loc[i].type
+            start_integron = integron_desc.loc[i].pos_beg
+            end_integron = integron_desc.loc[i].pos_end
             tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(start_integron - 1, end_integron),
                                         strand=0,
                                         type="integron",
                                         qualifiers={"integron_id": i, "integron_type": type_integron}
                                         )
             sequence.features.append(tmp)
-            if df.loc[i].type_elt == "protein":
+            if integron_desc.loc[i].type_elt == "protein":
 
-                tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(df.loc[i].pos_beg - 1,
-                                                                                df.loc[i].pos_end),
-                                            strand=df.loc[i].strand,
-                                            type="CDS" if df.loc[i].annotation != "intI" else "integrase",
-                                            qualifiers={"protein_id": df.loc[i].element,
-                                                        "gene": df.loc[i].annotation,
-                                                        "model": df.loc[i].model}
+                tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(integron_desc.loc[i].pos_beg - 1,
+                                                                                integron_desc.loc[i].pos_end),
+                                            strand=integron_desc.loc[i].strand,
+                                            type="CDS" if integron_desc.loc[i].annotation != "intI" else "integrase",
+                                            qualifiers={"protein_id": integron_desc.loc[i].element,
+                                                        "gene": integron_desc.loc[i].annotation,
+                                                        "model": integron_desc.loc[i].model}
                                             )
 
                 tmp.qualifiers["translation"] = [prt for prt in SeqIO.parse(prot_file, "fasta")
-                                                 if prt.id == df.loc[i].element][0].seq
+                                                 if prt.id == integron_desc.loc[i].element][0].seq
                 sequence.features.append(tmp)
 
             else:
-                tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(df.loc[i].pos_beg - 1,
-                                                                                df.loc[i].pos_end),
-                                            strand=df.loc[i].strand,
-                                            type=df.loc[i].type_elt,
-                                            qualifiers={df.loc[i].type_elt: df.loc[i].element,
-                                                        "model": df.loc[i].model}
+                tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(integron_desc.loc[i].pos_beg - 1,
+                                                                                integron_desc.loc[i].pos_end),
+                                            strand=integron_desc.loc[i].strand,
+                                            type=integron_desc.loc[i].type_elt,
+                                            qualifiers={integron_desc.loc[i].type_elt: integron_desc.loc[i].element,
+                                                        "model": integron_desc.loc[i].model}
                                             )
 
                 sequence.features.append(tmp)
 
         else:
-            type_integron = df.loc[i].type.values[0]
+            type_integron = integron_desc.loc[i].type.values[0]
             # Should only be true if integron over edge of sequence:
-            diff = df.loc[i].pos_beg.diff() > dist_threshold
+            diff = integron_desc.loc[i].pos_beg.diff() > dist_threshold
 
             if diff.any():
                 pos = np.where(diff)[0][0]
-                start_integron_1 = df.loc[i].pos_beg.values[pos]
+                start_integron_1 = integron_desc.loc[i].pos_beg.values[pos]
                 end_integron_1 = len(sequence)
                 start_integron_2 = 1
-                end_integron_2 = df.loc[i].pos_end.values[pos-1]
+                end_integron_2 = integron_desc.loc[i].pos_end.values[pos-1]
 
                 f1 = SeqFeature.FeatureLocation(start_integron_1 - 1, end_integron_1)
                 f2 = SeqFeature.FeatureLocation(start_integron_2 - 1, end_integron_2)
@@ -67,8 +67,8 @@ def to_gbk(df, sequence, prot_file, dist_threshold):
                                             qualifiers={"integron_id": i, "integron_type": type_integron}
                                             )
             else:
-                start_integron = df.loc[i].pos_beg.values[0]
-                end_integron = df.loc[i].pos_end.values[-1]
+                start_integron = integron_desc.loc[i].pos_beg.values[0]
+                end_integron = integron_desc.loc[i].pos_end.values[-1]
 
                 tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(start_integron - 1, end_integron),
                                             strand=0,
@@ -76,7 +76,7 @@ def to_gbk(df, sequence, prot_file, dist_threshold):
                                             qualifiers={"integron_id": i, "integron_type": type_integron}
                                             )
             sequence.features.append(tmp)
-            for r in df.loc[i].iterrows():
+            for r in integron_desc.loc[i].iterrows():
                 if r[1].type_elt == "protein":
                     tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(r[1].pos_beg - 1, r[1].pos_end),
                                                 strand=r[1].strand,
