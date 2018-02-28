@@ -232,7 +232,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
         print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, " \
                              "skip functional annotation step."
 
-    model_attc_name = config.model_attc.name
+    model_attc_name = config.model_attc_name
     model_len = config.model_len
 
     max_attc_size = config.max_attc_size
@@ -256,8 +256,8 @@ def find_integron_in_one_replicon(replicon, topology, config):
 
     print "\n>>> Starting Default search ... :"
     if not os.path.isfile(attC_default_file):
-        find_attc(integrons, replicon, config.distance_threshold, config.model_attc_path, config.model_attc_size,
-                  circular=circular, out_dir=result_dir_other)
+        find_attc(config.replicon_path, replicon.name, config.cmsearch, result_dir_other, config.model_attc_path,
+                  cpu=config.cpu)
 
     print ">>> Default search done... : \n"
     integrons = find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
@@ -285,17 +285,19 @@ def find_integron_in_one_replicon(replicon, topology, config):
     ##########################
 
     outfile = replicon_name + ".integrons"
+    print "len(integrons)", len(integrons)
     for integron in integrons:
-        if integron.type() != "In0":  # complete & CALIN
+        integron_type = integron.type()
+        if integron_type != "In0":  # complete & CALIN
             if not config.no_proteins:
-                integron.add_proteins()
-        elif integron.type() == "complete":
-            integron.add_promoter()
-            integron.add_attI()
-        elif integron.type() == "In0":
-            integron.add_attI()
-            integron.add_promoter()
+                integron.add_proteins(prot_file)
 
+        if integron_type == "complete":
+            integron.add_promoter()
+            integron.add_attI()
+        elif integron_type == "In0":
+            integron.add_attI()
+            integron.add_promoter()
     #########################
     # Functional annotation #
     #########################
@@ -304,7 +306,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
 
     for j, integron in enumerate(integrons, 1):
         if integron.type() == "complete":
-            integron.draw_integron(file=os.path.join(result_dir, "{}_{}.pd".format(replicon.name, j)))
+            integron.draw_integron(file=os.path.join(result_dir, "{}_{}.pdf".format(replicon.name, j)))
 
     #######################
     # Writing out results #
@@ -312,8 +314,8 @@ def find_integron_in_one_replicon(replicon, topology, config):
 
     integrons_describe = pd.concat([i.describe() for i in integrons])
     dic_id = {id_: "{:02}".format(j) for j, id_ in
-              enumerate(integrons_describe.sort_values("pos_beg").id_integron.unique(), 1)}
-    integrons_describe.id_integron = ["integron_" + dic_id[id_] for id_ in integrons_describe.id_integron]
+              enumerate(integrons_describe.sort_values("pos_beg").ID_integron.unique(), 1)}
+    integrons_describe.ID_integron = ["integron_" + dic_id[id_] for id_ in integrons_describe.ID_integron]
     integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
                                              "pos_beg", "pos_end", "strand", "evalue",
                                              "type_elt", "annotation", "model",
@@ -324,7 +326,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
     integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
 
     integrons_describe.to_csv(os.path.join(result_dir, outfile), sep="\t", index=0, na_rep="NA")
-    to_gbk(integrons_describe, replicon)
+    to_gbk(integrons_describe, replicon, prot_file, config.distance_threshold)
     SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
 
     if not integrons:
@@ -341,6 +343,8 @@ def main(args=None):
     # it's a development version using environment variable
     if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
         _prefix_share = os.environ['INTEGRON_HOME']
+    else:
+        _prefix_share = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
     _prefix_data = os.path.join(_prefix_share, 'data')
 
     config = parse_args(args)
@@ -381,6 +385,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     ##############
     for replicon in sequences_db:
         topology = topologies[replicon.id]
+        if len(sequences_db) == 1:
+            replicon.name = utils.get_name_from_path(config.replicon_path)
         find_integron_in_one_replicon(replicon, topology, config)
 
 
