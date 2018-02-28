@@ -25,13 +25,28 @@ class TestUtils(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Proteins', replicon_name + '.prt'))
         replicon = utils.read_multi_prot_fasta(replicon_path)
-        expected_seq_id = sorted(['ACBA.007.P01_13_{}'.format(i) for i in range(1, 24)])
+        expected_seq_id = ['ACBA.007.P01_13_{}'.format(i) for i in range(1, 24)]
+        received_seq_id = [seq.id for seq in replicon]
+        self.assertListEqual(expected_seq_id, received_seq_id)
+
+    def test_read_multi_dna_fasta(self):
+        file_name = 'multi_fasta'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        replicon = utils.read_multi_dna_fasta(replicon_path)
+        expected_seq_id = sorted(['ACBA.007.P01_13', 'LIAN.001.C02_10', 'PSSU.001.C01_13'])
         received_seq_id = sorted([seq.id for seq in replicon])
         self.assertListEqual(expected_seq_id, received_seq_id)
-        self.assertEqual(len(replicon), 23)
+        self.assertEqual(len(replicon), 3)
+        expected_seq_name = expected_seq_id
+        received_seq_name = sorted([seq.name for seq in replicon])
+        self.assertListEqual(expected_seq_name, received_seq_name)
+
+        replicon_name = 'foo'
+        replicon = utils.read_multi_dna_fasta(replicon_path, replicon_name=replicon_name)
         expected_seq_name = set([replicon_name])
         received_seq_id = set([seq.name for seq in replicon])
         self.assertSetEqual(expected_seq_name, received_seq_id)
+
 
     def test_model_len(self):
         model_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
