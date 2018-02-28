@@ -25,10 +25,13 @@ class TestUtils(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Proteins', replicon_name + '.prt'))
         replicon = utils.read_multi_prot_fasta(replicon_path)
-        expected_seq_id = ['ACBA.007.P01_13_{}'.format(i) for i in range(1, 24)]
-        received_seq_id = [seq.id for seq in replicon]
+        expected_seq_id = sorted(['ACBA.007.P01_13_{}'.format(i) for i in range(1, 24)])
+        received_seq_id = sorted([seq.id for seq in replicon])
         self.assertListEqual(expected_seq_id, received_seq_id)
-
+        self.assertEqual(len(replicon), 23)
+        expected_seq_name = set([replicon_name])
+        received_seq_id = set([seq.name for seq in replicon])
+        self.assertSetEqual(expected_seq_name, received_seq_id)
 
     def test_model_len(self):
         model_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
