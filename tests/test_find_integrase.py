@@ -19,25 +19,6 @@ from integron_finder import integrase
 _call_ori = integrase.call
 
 
-def call_wrapper():
-    """
-    hmmsearch or prodigal write lot of things on stderr or stdout 
-    which noise the unit test output
-    So I replace the `call` function in module integron_finder
-    by a wrapper which call the original function but add redirect stderr and stdout
-    in dev_null
-    :return: wrapper around integron_finder.call
-    :rtype: function
-    """
-    def wrapper(*args, **kwargs):
-        with open(os.devnull, 'w') as f:
-            kwargs['stderr'] = f
-            kwargs['stdout'] = f
-            res = _call_ori(*args, **kwargs)
-        return res
-    return wrapper
-
-
 class TestFindIntegrase(IntegronTest):
 
     def setUp(self):
@@ -56,7 +37,7 @@ class TestFindIntegrase(IntegronTest):
         self.args.cpu = 1
         self.args.hmmsearch = distutils.spawn.find_executable('hmmsearch')
         self.args.prodigal = distutils.spawn.find_executable("prodigal")
-        integrase.call = call_wrapper()
+        integrase.call = self.call_wrapper(_call_ori)
 
     def tearDown(self):
         integrase.call = _call_ori

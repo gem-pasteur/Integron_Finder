@@ -42,6 +42,26 @@ class IntegronTest(unittest.TestCase):
         returncode = args[0]
         raise TypeError(returncode)
 
+    @staticmethod
+    def call_wrapper(call_ori):
+        """
+        hmmsearch or prodigal write lot of things on stderr or stdout
+        which noise the unit test output
+        So I replace the `call` function in module integron_finder
+        by a wrapper which call the original function but add redirect stderr and stdout
+        in dev_null
+        :return: wrapper around call function
+        :rtype: function
+        """
+        def wrapper(*args, **kwargs):
+            with open(os.devnull, 'w') as f:
+                kwargs['stderr'] = f
+                kwargs['stdout'] = f
+                res = call_ori(*args, **kwargs)
+            return res
+        return wrapper
+
+
     def assertFileEqual(self, f1, f2, msg=None):
         self.maxDiff = None
         with open(f1) as fh1, open(f2) as fh2:
