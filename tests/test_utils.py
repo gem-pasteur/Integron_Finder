@@ -60,7 +60,7 @@ class TestUtils(IntegronTest):
                'rbs_spacer=None;gc_cont=0.585'
         prot_attr = utils.non_gembase_parser(desc)
 
-        expected = utils.ProtDesc('ACBA.007.P01_13_1', 1, 55, 1014)
+        expected = utils.SeqDesc('ACBA.007.P01_13_1', 1, 55, 1014)
         self.assertTupleEqual(expected, prot_attr)
 
     def test_gembase_parser(self):
@@ -68,5 +68,5 @@ class TestUtils(IntegronTest):
                '@WP_053105352.1@ AKN90_RS00015 1 3317 4294 | alpha-L-glutamate ligase-like protein  (translation)'
         prot_attr = utils.gembase_parser(desc)
 
-        expected = utils.ProtDesc('OBAL001.B.00005.C001_00003', -1, 3317, 4294)
+        expected = utils.SeqDesc('OBAL001.B.00005.C001_00003', -1, 3317, 4294)
         self.assertTupleEqual(expected, prot_attr)
