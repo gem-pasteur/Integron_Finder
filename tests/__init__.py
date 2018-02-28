@@ -42,9 +42,10 @@ class IntegronTest(unittest.TestCase):
         returncode = args[0]
         raise TypeError(returncode)
 
-    def compare_2_files(self, f1, f2):
+    def assertFileEqual(self, f1, f2, msg=None):
+        self.maxDiff = None
         with open(f1) as fh1, open(f2) as fh2:
-            return fh1.read() == fh2.read()
+            self.assertMultiLineEqual(fh1.read(), fh2.read(), msg=msg)
 
 
 def which(name, flags=os.X_OK):
