@@ -564,7 +564,7 @@ class Integron(object):
         return full
 
 
-    def draw_integron(self, path=None):
+    def draw_integron(self, file=None):
         """
         Represent the different element of the integrons
         """
