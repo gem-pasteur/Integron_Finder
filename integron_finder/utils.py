@@ -51,27 +51,27 @@ class FastaIterator(object):
     """
     def __init__(self, alphabet):
         self.alphabet = alphabet
-        self.name = None
+        self.replicon_name = None
         self.seq_index = None
 
     def __iter__(self):
         for id_ in self.seq_index.keys():
             seq = self.seq_index[id_]
-            seq.name = self.name
+            if self.replicon_name is not None:
+                seq.name = self.replicon_name
             yield seq
 
     def __len__(self):
         return len(self.seq_index)
 
-    def __call__(self, path):
-        self.name = get_name_from_path(path)
+    def __call__(self, path, replicon_name=None):
+        if replicon_name is not None:
+            self.replicon_name = replicon_name
         self.seq_index = SeqIO.index(path, "fasta", alphabet=self.alphabet)
         return self
 
 
 read_multi_dna_fasta = FastaIterator(Seq.IUPAC.unambiguous_dna)
-
-read_multi_prot_fasta = FastaIterator(Seq.IUPAC.protein)
 
 
 def model_len(path):
