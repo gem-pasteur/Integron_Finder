@@ -212,7 +212,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
     else:
         circular = False
 
-    if config.func_annot and not config.no_proteins:
+    if config.func_annot and not config.no_proteins and not config.path_func_annot:
         if os.path.exists('bank_hmm'):
             fa_hmm = scan_hmm_bank('bank_hmm')
         elif os.path.exists(config.func_annot_path):
@@ -302,7 +302,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
     # Functional annotation #
     #########################
     if is_func_annot and len(fa_hmm) > 0:
-        func_annot(integrons, replicon, prot_file, fa_hmm, result_dir_other, config)
+        func_annot(integrons, replicon, prot_file, fa_hmm, config, result_dir_other)
 
     for j, integron in enumerate(integrons, 1):
         if integron.type() == "complete":
