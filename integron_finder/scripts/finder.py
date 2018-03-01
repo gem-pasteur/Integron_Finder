@@ -301,7 +301,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
     #########################
     # Functional annotation #
     #########################
-    if is_func_annot and len(fa_hmm) > 0:
+    if is_func_annot and fa_hmm:
         func_annot(integrons, replicon, prot_file, fa_hmm, config, result_dir_other)
 
     for j, integron in enumerate(integrons, 1):
