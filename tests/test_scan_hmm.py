@@ -48,7 +48,7 @@ class TestScanHmmBank(IntegronTest):
         Test that when the given path is a directory, it lists all hmm files from this
         directory (and not other files)
         """
-        mypath = os.path.join("tests", "data", "hmm_files")
+        mypath = self.find_data("hmm_files")
         files = scan_hmm_bank(mypath)
         exp_files = ["Resfam.hmm", "integrase.hmm", "phage_int.hmm"]
         exp_files = [os.path.abspath(os.path.join(mypath, myfile)) for myfile in exp_files]
@@ -74,7 +74,7 @@ class TestScanHmmBank(IntegronTest):
         - a filename
         it returns the names of all hmm files contained in the directories + given
         """
-        path1 = os.path.join("tests", "data", "hmm_files")
+        path1 = self.find_data("hmm_files")
         path2 = os.path.join("data", "Models")
         hmm_paths = [os.path.join(path1, "*.hmm"),
                      os.path.join(path2, "*.hmm"),
