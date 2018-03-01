@@ -22,7 +22,7 @@ Integron Finder is under [open source licence GPLv3](https://opensource.org/lice
 - Python 2.7
    - Pandas 0.18.0
    - Numpy 1.9.1
-   - Biopython 1.65
+   - Biopython 1.69
    - Matplotlib 1.4.3
    - psutils 2.1.3
 - HMMER 3.1b1
