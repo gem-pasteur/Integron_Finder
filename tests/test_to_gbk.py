@@ -36,7 +36,7 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder.genbank import to_gbk
+from integron_finder.genbank import add_feature
 from integron_finder.utils import read_single_dna_fasta
 
 class TestToGbk(IntegronTest):
@@ -60,7 +60,7 @@ class TestToGbk(IntegronTest):
     #     """
     #     Test blabla
     #     """
-    #     # to_gbk(df, sequence)
+    #     # add_feature(df, sequence)
     #     # sequence is     SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna) -> sequence du replicon donné en entrée
     #     # df is :
     #     # pour chaque integron, tous les éléments de l'integron (integrase, attC, attI, promoteur, proteins)
@@ -72,7 +72,7 @@ class TestToGbk(IntegronTest):
 
     def test_integron_1elem_prot(self):
         """
-        Test to_gbk when the only element is an integron composed of 1 protein only.
+        Test add_feature when the only element is an integron composed of 1 protein only.
 
         """
         infos = {"ID_replicon": "acba.007.p01.13",
@@ -95,7 +95,7 @@ class TestToGbk(IntegronTest):
         start_seq = self.seq.seq
         start_id = self.seq.id
 
-        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
 
         # Translation should be protein ACBA.007.P01_13_20 in
         # tests/data/Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.prt
@@ -127,7 +127,7 @@ class TestToGbk(IntegronTest):
 
     def test_integron_1elem_int(self):
         """
-        Test to_gbk when the only element is an integron composed of 1 integrase only.
+        Test add_feature when the only element is an integron composed of 1 integrase only.
 
         """
         infos = {"ID_replicon": "acba.007.p01.13",
@@ -150,7 +150,7 @@ class TestToGbk(IntegronTest):
         start_seq = self.seq.seq
         start_id = self.seq.id
 
-        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
 
         # Translation should be protein ACBA.007.P01_13_1 in
         # tests/data/Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.prt
@@ -186,7 +186,7 @@ class TestToGbk(IntegronTest):
 
     def test_integron_1elem_prom(self):
         """
-        Test to_gbk when the only element is an integron composed of 1 promoter only.
+        Test add_feature when the only element is an integron composed of 1 promoter only.
 
         """
         infos = {"ID_replicon": "acba.007.p01.13",
@@ -209,7 +209,7 @@ class TestToGbk(IntegronTest):
         start_seq = self.seq.seq
         start_id = self.seq.id
 
-        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
 
         # Check that there are 2 features (integron and promoter)
         self.assertEqual(len(self.seq.features), 2)
@@ -234,7 +234,7 @@ class TestToGbk(IntegronTest):
 
     def test_integron_nelem(self):
         """
-        Test to_gbk when there are several elements in the integron:
+        Test add_feature when there are several elements in the integron:
         protein, integrase, promotor, attC
 
         """
@@ -321,7 +321,7 @@ class TestToGbk(IntegronTest):
         tr_prot = ("MKGWLFLVIAIVGEVIATSALKSSEGFTKLAPSAVVIIGYGIAFYFLSLVLKSIPVGVAY"
                    "AVWSGLGVVIITAIAWLLHGQKLDAWGFVGMGLIIAAFLLARSPSWKSLRRPTPW*")
 
-        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
 
         # Check that there are 5 features (integron, promoter, integrase, protein, attC)
         self.assertEqual(len(self.seq.features), 5)
@@ -373,7 +373,7 @@ class TestToGbk(IntegronTest):
 
     def test_integron_2int_nelem(self):
         """
-        Test to_gbk when there are 2 integrons:
+        Test add_feature when there are 2 integrons:
             integron 1 with several elements: protein, integrase, promoter
             integron 2 with only 1 attC site
         Integrons are not over the edge of sequence
@@ -459,7 +459,7 @@ class TestToGbk(IntegronTest):
         tr_prot = ("MKGWLFLVIAIVGEVIATSALKSSEGFTKLAPSAVVIIGYGIAFYFLSLVLKSIPVGVAY"
                    "AVWSGLGVVIITAIAWLLHGQKLDAWGFVGMGLIIAAFLLARSPSWKSLRRPTPW*")
 
-        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
 
         # Check that there are 6 features (integron1, promoter, integrase, protein,
         #                                  integron2, attC)
@@ -517,7 +517,7 @@ class TestToGbk(IntegronTest):
 
     def test_integron_long_seqname(self):
         """
-        Test to_gbk when the only element is an integron composed of 1 protein only.
+        Test add_feature when the only element is an integron composed of 1 protein only.
 
         """
         infos = {"ID_replicon": "acba.007.p01.13",
@@ -544,7 +544,7 @@ class TestToGbk(IntegronTest):
 
         self.seq.name = "abcdefgh" + seq_name
 
-        to_gbk(df, self.seq, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
 
         # Translation should be protein ACBA.007.P01_13_20 in
         # tests/data/Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.prt
