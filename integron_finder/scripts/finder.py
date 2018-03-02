@@ -57,7 +57,7 @@ from integron_finder.integrase import find_integrase
 from integron_finder.attc import find_attc, find_attc_max
 from integron_finder.integron import find_integron
 from integron_finder.annotation import func_annot
-from integron_finder.genbank import to_gbk
+from integron_finder.genbank import add_feature
 
 
 def parse_args(args):
@@ -328,7 +328,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
     integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
 
     integrons_describe.to_csv(os.path.join(result_dir, outfile), sep="\t", index=0, na_rep="NA")
-    to_gbk(integrons_describe, replicon, prot_file, config.distance_threshold)
+    add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
     SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
 
     if not integrons:
