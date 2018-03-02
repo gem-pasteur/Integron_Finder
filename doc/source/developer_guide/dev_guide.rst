@@ -1,8 +1,5 @@
 .. IntegronFinder - Detection of Integron in DNA sequences
 
-***************
-Developer guide
-***************
 
 This part is for developers, who want to work on IntegronFinder scripts.
 

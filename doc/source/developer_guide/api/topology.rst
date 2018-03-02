@@ -5,3 +5,8 @@
 ********
 topology
 ********
+
+.. automodule:: integron_finder.topology
+   :members:
+   :private-members:
+   :special-members:

@@ -5,3 +5,8 @@
 ********
 infernal
 ********
+
+.. automodule:: integron_finder.infernal
+   :members:
+   :private-members:
+   :special-members:

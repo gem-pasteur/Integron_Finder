@@ -55,7 +55,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
     :param str hmm_files: list of path of hmm profiles to use to scan the prot_file
     :param cfg: the configuration for this analyse
     :type cfg: :class:`integron_finder.config.Config`
-    :param str out_dir: the path of the directory wher to store the results
+    :param str out_dir: the path of the directory where to store the results
     :param float evalue:
     :param float coverage:
     :return: None.

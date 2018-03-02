@@ -5,3 +5,8 @@
 ******
 config
 ******
+
+.. automodule:: integron_finder.config
+   :members:
+   :private-members:
+   :special-members:

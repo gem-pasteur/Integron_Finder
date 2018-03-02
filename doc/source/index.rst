@@ -14,44 +14,21 @@ on the :ref:`Galaxy Pasteur <galaxy>`, or by command line (`IntegronFinder on gi
 
 .. _`IntegronFinder on github`: https://github.com/gem-pasteur/Integron_Finder
 
+
 User Guide
 ==========
-
 .. toctree::
    :maxdepth: 2
 
-   introduction
-   installation
-   tutorial
-   webserver
-   references
+   user_guide/index
 
 
 Developer Guide
 ===============
-
 .. toctree::
    :maxdepth: 2
 
-   dev_guide
-   overview
-
-Integron_finder API documentation
-=================================
-.. toctree::
-   :maxdepth: 2
-
-   annotation
-   attc
-   config
-   genbank
-   hmm
-   infernal
-   integrase
-   integron
-   topology
-   utils
-
+   developer_guide/index
 
 Indices and tables
 ==================

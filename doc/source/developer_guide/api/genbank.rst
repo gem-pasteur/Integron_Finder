@@ -5,3 +5,8 @@
 *******
 genbank
 *******
+
+.. automodule:: integron_finder.genbank
+   :members:
+   :private-members:
+   :special-members:

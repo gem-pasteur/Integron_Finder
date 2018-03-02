@@ -1,16 +1,12 @@
 .. IntegronFinder - Detection of Integron in DNA sequences
 
-.. _attc:
+.. _hmm:
 
-****
-attc
-****
 
-attc API reference
-==================
+hmm
+===
 
-.. automodule:: integron_finder.attc
+.. automodule:: integron_finder.hmm
    :members:
    :private-members:
    :special-members:
-
