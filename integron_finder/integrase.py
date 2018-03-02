@@ -37,10 +37,12 @@ def find_integrase(replicon_path, replicon, prot_file, out_dir, cfg):
 
     :param replicon_path: the path of the replicon to analyse
     :type replicon_path: string
-    :param replicon_name: the name of the replicon to analyse
-    :type replicon_name: string
-    :param out_dir: the relative path to the directory where prodigal outputs will be stored
-    :type out_dir: str
+    :param replicon: The Replicon to search integrase into
+    :type replicon: a :class:`Bio.Seq.SeqRecord` object.
+    :param str prot_file: the path to the fasta file containing the translation of the replicon.
+    :param str out_dir: the relative path to the directory where prodigal outputs will be stored
+    :param cfg: the configuration
+    :type cfg: a :class:`integron_finder.config.Config` object
     :returns: None, the results are written on the disk
     """
     if not cfg.gembase:
