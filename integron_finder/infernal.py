@@ -52,7 +52,7 @@ def read_infernal(infile, replicon_name, len_model_attc,
     df = df[[2, 5, 6, 7, 8, 9, 15]]
     df = df[(df[15] < evalue)]  # filter on evalue
     df = df[(abs(df[8] - df[7]) < size_max_attc) & (size_min_attc < abs(df[8] - df[7]))]
-    if len(df) > 0:
+    if not df.empty:
         df["Accession_number"] = replicon_name
         c = df.columns.tolist()
         df = df[c[-1:] + c[:-1]]
@@ -192,7 +192,7 @@ def expand(replicon,
 
         searched_strand = "both" if search_left else "top"  # search on both strands if search in both directions
 
-        while len(df_max) > 0 and 0 < (window_beg and window_end) < replicon_size:
+        while not df_max.empty and 0 < (window_beg and window_end) < replicon_size:
 
             df_max = local_max(replicon,
                                window_beg, window_end,
@@ -226,7 +226,7 @@ def expand(replicon,
 
         searched_strand = "both" if search_right else "bottom"
 
-        while len(df_max) > 0 and 0 < (window_beg and window_end) < replicon_size:
+        while not df_max.empty and 0 < (window_beg and window_end) < replicon_size:
 
             df_max = local_max(replicon,
                                window_beg, window_end,
