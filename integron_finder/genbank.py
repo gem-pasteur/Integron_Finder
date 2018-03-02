@@ -40,8 +40,8 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
     :type replicon: a :class:`Bio.Seq.SeqRecord` object.
     :param integron_desc:
     :type integron_desc: a :class:`pandas.DataFrame`
-    :param prot_file:
-    :param int dist_threshold:
+    :param prot_file: the path to the fasta file containing the traduction of the replicon.
+    :param int dist_threshold: Two elements are aggregated if they are distant of dist_threshold or less.
     """
 
     integron_desc = integron_desc.set_index("ID_integron").copy()
