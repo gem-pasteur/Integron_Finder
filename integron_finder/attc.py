@@ -37,8 +37,7 @@ from .infernal import local_max, expand
 def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     """
     Parse the attc dataset (sorted along start site) for the given replicon and return list of arrays.
-    One array is composed of attC sites on the same strand and separated by a
-    distance less than 5kb.
+    One array is composed of attC sites on the same strand and separated by a distance less than 5kb.
 
     :param attc_df:
     :param bool keep_palindromes:
@@ -83,7 +82,9 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
         else:
             array_plus = np.split(attc_plus.values, position_bkp_plus)
             # array_plus is a list of np.array
-            if len(array_plus) > 1 and (array_plus[0][0][4] - array_plus[-1][-1][4]) % replicon_size < dist_threshold:
+            first_pos_beg = array_plus[0][0][4]
+            last_pos_beg = array_plus[-1][-1][4]
+            if len(array_plus) > 1 and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
                 array_plus[0] = np.concatenate((array_plus[-1], array_plus[0]))
                 del array_plus[-1]
 
@@ -92,7 +93,9 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
         else:
             array_minus = np.split(attc_minus.values, position_bkp_minus)
             # array_minus is a list of np.array
-            if len(array_minus) > 1 and (array_minus[0][0][4] - array_minus[-1][-1][4]) % replicon_size < dist_threshold:
+            first_pos_beg = array_minus[0][0][4]
+            last_pos_beg = array_minus[-1][-1][4]
+            if len(array_minus) > 1 and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
                 array_minus[0] = np.concatenate((array_minus[-1], array_minus[0]))
                 del array_minus[-1]
 
