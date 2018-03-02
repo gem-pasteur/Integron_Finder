@@ -32,6 +32,9 @@ import shlex
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
+    'sphinx.ext.todo',
+    'sphinx.ext.coverage',
+    'sphinx.ext.ifconfig',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -50,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'IntegronFinder'
-copyright = u'2015, 2016 Jean Cury, Bertrand Néron, Eduardo PC Rocha'
+copyright = u'2015, 2018 Institut Pasteur, Paris'
 author = u'Jean Cury, Bertrand Néron, Eduardo PC Rocha'
 
 # The version info for the project you're documenting, acts as replacement for
