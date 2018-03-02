@@ -62,17 +62,13 @@ def read_infernal(infile, replicon_name, len_model_attc,
     # Keep only columns: query_name(2), mdl from(5), mdl to(6), seq from(7),
     # seq to(8), strand(9), E-value(15)
     df = df[[2, 5, 6, 7, 8, 9, 15]]
-    df = df[(df[15] < evalue)]  # filter on evalue
-    df = df[(abs(df[8] - df[7]) < size_max_attc) & (size_min_attc < abs(df[8] - df[7]))]
+    df.columns = ["cm_attC", "cm_debut", "cm_fin", "pos_beg_tmp", "pos_end_tmp", "sens", "evalue"]
+    df["Accession_number"] = replicon_name
+    df = df[df.evalue < evalue]  # filter on evalue
+    df = df[(abs(df.pos_end_tmp - df.pos_beg_tmp) < size_max_attc) & (size_min_attc < abs(df.pos_end_tmp - df.pos_beg_tmp))]
     if not df.empty:
-        df["Accession_number"] = replicon_name
-        c = df.columns.tolist()
-        df = df[c[-1:] + c[:-1]]
-        df.sort_values([8, 15], inplace=True)
+        df.sort_values(['pos_end_tmp', 'evalue'], inplace=True)
         df.index = range(0, len(df))
-        df.columns = ["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                      "pos_beg_tmp", "pos_end_tmp",
-                      "sens", "evalue"]
         idx = (df.pos_beg_tmp > df.pos_end_tmp)
         df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: x["pos_end_tmp"] - (len_model_attc - x["cm_fin"]), axis=1)
         df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: x["pos_beg_tmp"] + (x["cm_debut"] - 1), axis=1)
@@ -80,9 +76,7 @@ def read_infernal(infile, replicon_name, len_model_attc,
         df.loc[~idx, "pos_end"] = df.loc[~idx].apply(lambda x: x["pos_end_tmp"] + (len_model_attc - x["cm_fin"]), axis=1)
         df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: x["pos_beg_tmp"] - (x["cm_debut"] - 1), axis=1)
 
-        return df[["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                      "pos_beg", "pos_end",
-                      "sens", "evalue"]]
+        return df[["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"]]
     else:
         return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
