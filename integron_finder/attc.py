@@ -149,23 +149,22 @@ def find_attc_max(integrons, replicon, distance_threshold,
     As this option make the algorithm way slower, we only run it in the region around a
     hit. We call it local_max or eagle_eyes.
 
+    **Default hit**
+    ::
+                         attC
+        __________________-->____-->_________-->_____________
+        ______<--------______________________________________
+                 intI
+                      ^-------------------------------------^
+                     Search-space with --local_max
 
-    Default hit :
-    =============
-                     attC
-    __________________-->____-->_________-->_____________
-    ______<--------______________________________________
-             intI
-                  ^-------------------------------------^
-                 Search-space with --local_max
+    **Updated hit**
+    ::
 
-    Updated hit :
-    =============
-
-                     attC          ***         ***
-    __________________-->____-->___-->___-->___-->_______
-    ______<--------______________________________________
-             intI
+                         attC          ***         ***
+        __________________-->____-->___-->___-->___-->_______
+        ______<--------______________________________________
+                 intI
 
     :param integrons: the integrons may contain or not attC or intI.
     :type integrons: list of :class:`Integron` objects.
@@ -177,7 +176,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
     :param bool circular: True if replicon is circular, False otherwise.
     :param str outfile: the name of cmsearch result file
     :return:
-    :rtype: :class:`pd.DataFrame`
+    :rtype: :class:`pd.DataFrame` object
+
     """
     size_replicon = len(replicon)
     columns = ['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']
