@@ -38,8 +38,15 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     """
     Parse the attc dataset (sorted along start site) for the given replicon and return list of arrays.
     One array is composed of attC sites on the same strand and separated by a
-    distance less than 5kb
+    distance less than 5kb.
+
+    :param attc_df:
+    :param bool keep_palindromes:
+    :param dist_threshold:
+    :param int replicon_size:
+    :return:
     """
+
     ok = False
 
     position_bkp_minus = []
@@ -108,12 +115,12 @@ def find_attc(replicon_path, replicon_name, cmsearch_path, out_dir, model_attc, 
     """
     Call cmsearch to find attC sites in a single replicon.
 
-    :param replicon_path: the path of the replicon to analyse
-    :type replicon_path: string
-    :param replicon_name: the name of the replicon to analyse
-    :type replicon_name: string
-    :param out_dir: the relative path to the directory where cmsearch outputs will be stored
-    :type out_dir: str
+    :param str replicon_path: the path of the replicon to analyse
+    :param str replicon_name: the name of the replicon to analyse
+    :param str cmsearch_path: the path to the cmsearch executable
+    :param str out_dir: the path to the directory where cmsearch outputs will be stored
+    :param str model_attc: 
+    :param int cpu: the number of cpu used by cmsearch
     :returns: None, the results are written on the disk
     :raises RuntimeError: when cmsearch run failed
     """
