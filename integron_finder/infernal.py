@@ -38,7 +38,19 @@ def read_infernal(infile, replicon_name, len_model_attc,
                   evalue=1, size_max_attc=200, size_min_attc=40):
     """
     Function that parse cmsearch --tblout output and returns a pandas DataFrame
+
+    :param str infile: the path to the output of cmsearch in tabulated format (--tblout)
+    :param str replicon_name: the name of the replicon are the integrons were found.
+    :param int len_model_attc: the lenght of the attc model
+    :param float evalue: evalue threshold to filter out hits above it
+    :param int size_max_attc: The maximum value fot the attC size
+    :param int size_min_attc: The minimum value fot the attC size
+    :return: table with columns:
+            | "Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"
+            | and each row is a hit that match the attc covariance model
+    :rtype: :class:`pandas.DataFrame`
     """
+
 
     try:
         _ = pd.read_table(infile, comment="#")
@@ -80,19 +92,29 @@ def local_max(replicon,
               window_beg, window_end,
               model_attc_path,
               strand_search="both",
-              evalue_attc=1, max_attc_size=200, min_attc_size=40,
+              evalue_attc=1., max_attc_size=200, min_attc_size=40,
               cmsearch_bin='cmsearch', out_dir='.', cpu_nb=1):
     """
 
-    :param replicon_name: the name of replicon (without suffix)
-    :type replicon_name: str
-    :param window_beg:
-    :type window_beg: int
-    :param window_end:
-    :type window_end: int
-    :param strand_search:
-    :type strand_search: str
-    :return:
+    :param str replicon_name: The name of replicon (without suffix)
+    :param int window_beg: start of window to search for attc (position of protein)
+    :param int window_end: end of window to search for attc (position of protein)
+    :param str strand_search: The strand on which to looking for attc.
+                              available values:
+                               * 'top': Only search the top (Watson) strand of target sequences.
+                               * 'bottom': Only search the bottom (Crick) strand of target sequences
+                               * 'both': search on both strands
+    :param float evalue_attc: evalue threshold to filter out hits above it
+    :param int max_attc_size: The maximum value fot the attC size
+    :param int min_attc_size: The minimum value fot the attC size
+    :param str cmsearch_bin: the path to cmsearch
+    :param str out_dir: the path to directory where to write results
+    :param int cpu_nb: The number of cpu used by cmsearch
+    :return: DataFrame with same structure as the DataFrame returns by :function:`read_infernal`
+            | where position are converted on position on replicon and attc are filtered
+            | by evalue, min_attc_size, max_attc_size
+            | also write a file with intermediate results <replicon_name>_subseq_attc_table_end.res
+            | this file store the local_max results before filtering by max_attc_size and min_attc_size
     :rtype: :class:`pd.DataFrame` object
     """
     replicon_size = len(replicon)
@@ -138,6 +160,14 @@ def local_max(replicon,
                            size_max_attc=max_attc_size,
                            size_min_attc=min_attc_size)
 
+    # if replicon is linear
+    # df_max.pos_beg + window_beg is always < replicon_size
+    # (df_max.pos_beg + window_beg) % replicon_size = (df_max.pos_beg + window_beg)
+    # if replicon is circular and attc site overlap origin
+    # df_max.pos_beg + window_beg  > replicon_size
+    # (df_max.pos_beg + window_beg) % replicon_size is position on replicon
+    # for instance with pos = 100 and replicon size = 90
+    # 100 % 90 = 10
     df_max.pos_beg = (df_max.pos_beg + window_beg) % replicon_size
     df_max.pos_end = (df_max.pos_end + window_beg) % replicon_size
     df_max.to_csv(os.path.join(out_dir, replicon.name + "_subseq_attc_table_end.res"),
@@ -158,18 +188,25 @@ def expand(replicon,
     for a given element, we can search on the left hand side (if integrase is on the right for instance)
     or right hand side (opposite situation) or both side (only integrase or only attC sites)
 
-    :param window_beg:
-    :type window_beg: int
-    :param window_end:
-    :type window_end: int
-    :param max_elt:
-    :type max_elt: int
-    :param df_max:
+    :param replicon: The Replicon to annotate
+    :type replicon: a :class:`Bio.Seq.SeqRecord` object.
+    :param int window_beg: start of window to search for attc (position of protein)
+    :param int window_end: end of window to search for attc (position of protein)
+    :param max_elt: DataFrame with columns:
+                    | Accession_number cm_attC  cm_debut  cm_fin   pos_beg   pos_end sens   evalue
+                    | and each row is an occurrence of attc site
+    :type max_elt: :class:`pandas.DataFrame` object
+    :param df_max: DataFrame with columns:
+                  | Accession_number cm_attC  cm_debut  cm_fin   pos_beg   pos_end sens   evalue
+                  | and each row is an occurrence of attc site
     :type df_max: :class:`pandas.DataFrame` object
-    :param search_left: need to search on right of ???
-    :type search_left: bool
-    :param search_right: need to search on right of ???
-    :type search_right: bool
+    :param bool circular: True if replicon topology is circular otherwise False.
+    :param int dist_threshold: Two elements are aggregated if they are distant of dist_threshold [4kb] or less
+    :param int max_attc_size: The maximum value fot the attC size
+    :param str model_attc_path: the path to the attc model file
+    :param bool search_left: need to search on right of ???
+    :param bool search_right: need to search on right of ???
+    :param str out_dir: The path to directory where to write results
     :return: a copy of max_elt with attC hits
     :rtype: :class:`pandas.DataFrame` object
     """
@@ -219,7 +256,6 @@ def expand(replicon,
         if circular:
             window_end = (window_beg + 200) % replicon_size
             window_beg = (window_beg - dist_threshold) % replicon_size
-
         else:
             window_beg = max(0, window_beg - dist_threshold)
             window_end = min(replicon_size, window_beg + 200)
@@ -238,7 +274,6 @@ def expand(replicon,
             if circular:
                 window_end = (window_beg + 200) % replicon_size
                 window_beg = (window_beg - dist_threshold) % replicon_size
-
             else:
                 window_end = min(replicon_size, window_beg + 200)
                 window_beg = max(0, window_beg - dist_threshold)
