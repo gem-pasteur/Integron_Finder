@@ -44,12 +44,14 @@ from Bio import SearchIO
 
 def scan_hmm_bank(path):
     """
-    :param path: - if the path is a dir:
-                   return all files ending with .hmm in the dir
-                 - if the path is a file:
-                   parse the file, each line must be an expression (glob)
-                   pointing to hmm files
+    :param str path: - if the path is a dir:
+                       return all files ending with .hmm in the dir
+                     - if the path is a file:
+                       parse the file, each line must be an expression (glob)
+                       pointing to hmm files
     :return: lists of hmm files to consider for annotation
+    :rtype: list of str
+    :raise IOError: if the path does not exists
     """
     real_path = os.path.realpath(path)
     files = []
@@ -80,10 +82,21 @@ def scan_hmm_bank(path):
         raise IOError("{} no such file or directory".format(path))
 
 
-def read_hmm(replicon_name, infile, cfg, evalue=1, coverage=0.5):
+def read_hmm(replicon_name, infile, cfg, evalue=1., coverage=0.5):
     """
     Function that parse hmmer --out output and returns a pandas DataFrame
     filter output by evalue and coverage. (Being % of the profile aligned)
+
+    :param str replicon_name: the name of the replicon
+    :param str infile: the hmm output (in tabulated format) to parse
+    :param cfg: the config
+    :type cfg: :class:`integron_finder.config.Config` object.
+    :param float evalue: filter out hitst with evalue greater tha evalue.
+    :param float coverage: filter out hits with coverage under coverage (% of the profile aligned)
+    :returns: data Frame with columns:
+              | "Accession_number", "query_name", "ID_query", "ID_prot", "strand", "pos_beg", "pos_end", "evalue"
+              | each row correspond to a hit.
+    :rtype: a :class:`pandas.DataFrame`
     """
 
     df = pd.DataFrame(columns=["Accession_number", "query_name", "ID_query",
@@ -116,7 +129,7 @@ def read_hmm(replicon_name, infile, cfg, evalue=1, coverage=0.5):
             alito = []
 
             for hsp in hit.hsps:
-                #strand = hsp.query_strand
+                # strand = hsp.query_strand
                 evalue_tmp.append(hsp.evalue)
                 hmmfrom.append(hsp.query_start + 1)
                 hmmto.append(hsp.query_end)
@@ -144,7 +157,7 @@ def read_hmm(replicon_name, infile, cfg, evalue=1, coverage=0.5):
     df[intcols] = df[intcols].astype(int)
     df[floatcol] = df[floatcol].astype(float)
 
-    df = df[((df.hmmto - df.hmmfrom) / df.len_profile > coverage) & (df.evalue < evalue)]
+    df = df[(((df.hmmto - df.hmmfrom) / df.len_profile) > coverage) & (df.evalue < evalue)]
     df.index = range(len(df))
 
     df_out = df[["Accession_number", "query_name", "ID_query", "ID_prot",
