@@ -64,14 +64,16 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
     attc_file :
         Accession_number    attC    cm_debut    cm_fin    pos_beg    pos_end    sens    evalue
 
-    :param replicon_name: the name of the replicon
-    :type replicon_name: str
+    :param replicon: the name of the replicon
+    :type replicon:
     :param attc_file: the output of cmsearch or the parsing of this file by read_infernal
     :type attc_file: file object or :class:`pd.Dataframe`
-    :param intI_file: the output of hmmsearch with the integrase model
-    :type intI_file: file object
-    :param phageI_file: the output of hmmsearch with the phage model
-    :type phageI_file: file object
+    :param str intI_file: the output of hmmsearch with the integrase model
+    :param str phageI_file: the output of hmmsearch with the phage model
+    :param cfg: configuration
+    :type cfg: a :class:`integron_finder.config.Config` object
+    :returns: list of all integrons, be they complete or not
+    :retype: list of :class:`Integron` object
     """
     if not cfg.no_proteins:
         intI = read_hmm(replicon.name, intI_file, cfg)
@@ -231,6 +233,13 @@ class Integron(object):
     The object Integron is also characterized by the ID of the replicon."""
 
     def __init__(self, replicon, cfg):
+        """
+
+        :param replicon: The replicon where integrons has been found
+        :type replicon: a :class:`Bio.Seq.SeqRecord` object
+        :param cfg: the configuration
+        :type cfg: a :class:`integron_finder.config.Config` object
+        """
         self.cfg = cfg
         self.replicon = replicon
         self.replicon_size = len(self.replicon)
@@ -265,7 +274,16 @@ class Integron(object):
         return {k: v for k, v in self._dtype.items()}
 
     def add_integrase(self, pos_beg_int, pos_end_int, id_int, strand_int, evalue, model):
-        """Function which adds integrases to the integron. Should be called once"""
+        """Adds integrases to the integron. Should be called once.
+
+        :param int pos_beg_int: the position on the replicon of the beginning integrase site
+        :param int pos_end_int: the position on replicon of the end of the integrase site
+        :param str id_int: The protein id corresponding to the integrase
+        :param int strand_int: the strand where is found the attc 1 for forward, -1 for reverse
+        :param float evalue: the evalue associated to this attc site
+        :param str model: the name of integrase model (for instance intersection_tyr_intI)
+        """
+
         if not self.integrase.empty:
             raise RuntimeError("add_integrase should be called once.")
         tmp_df = pd.DataFrame(columns=self._columns)
@@ -281,8 +299,16 @@ class Integron(object):
         tmp_df["distance_2attC"] = [np.nan]
         self.integrase = self.integrase.append(tmp_df)
 
+
     def add_attC(self, pos_beg_attC, pos_end_attC, strand, evalue, model):
-        """ Function which adds attC site to the Integron object. """
+        """Adds attC site to the Integron object.
+
+        :param int pos_beg_attC: the position on the replicon of the beginning attc site
+        :param int pos_end_attC: the position on replicon of the end of the attc site
+        :param int strand: the strand where is found the attc 1 for forward, -1 for reverse
+        :param float evalue: the evalue associated to this attc site
+        :param str model: the name of attc model (for instance attc4)
+        """
         tmp_df = pd.DataFrame(columns=self._columns)
         tmp_df = tmp_df.astype(dtype=self._dtype)
         tmp_df["pos_beg"] = [pos_beg_attC]
@@ -304,12 +330,14 @@ class Integron(object):
         #self.attC.sort_values(["pos_beg"], inplace = True)
         self.attC.index = ["attc_%03i" % int(j + 1) for j in self.attC.index]
 
+
     def type(self):
         """
-        Tells you whether the integrons is :
-        - complete : Have one integrase and at least one attC
-        - CALIN : Have at least one attC
-        - In0 : Just an integrase intI
+        :returns: The type of the integrons:
+                    - 'complete' : Have one integrase and at least one attC
+                    - 'CALIN' : Have at least one attC
+                    - 'In0' : Just an integrase intI
+        :rtype: str
         """
         if not self.attC.empty and not self.integrase.empty:
             return "complete"
@@ -318,9 +346,10 @@ class Integron(object):
         elif not self.attC.empty and self.integrase.empty:
             return "CALIN"
 
+
     def add_promoter(self):
         """
-        Function that looks for known promoters if they exists within your integrons element.
+        Looks for known promoters if they exists within your integrons element.
         It takes 1s for about 13kb.
         """
         dist_prom = 500  # pb distance from edge of the element for which we seek promoter
@@ -455,6 +484,9 @@ class Integron(object):
 
 
     def add_attI(self):
+        """
+        Looking for Att1 sites and add them to this integron.
+        """
         dist_atti = 500
 
         ## attI1
@@ -490,7 +522,6 @@ class Integron(object):
             left = int(self.integrase.pos_beg)
             right = int(self.integrase.pos_end)
             strand_array = "both"
-
         elif self.type() == "CALIN":
             left = int(self.attC.pos_beg.values[0])
             right = int(self.attC.pos_end.values[-1])
@@ -529,6 +560,11 @@ class Integron(object):
 
 
     def add_proteins(self, prot_file):
+        """
+
+        :param prot_file:
+        :return:
+        """
         attc_start = self.attC.pos_beg.values[0]
         attc_end = self.attC.pos_end.values[-1]
 
@@ -577,7 +613,10 @@ class Integron(object):
 
 
     def describe(self):
-        """ Method describing the integron object """
+        """
+        :returns: DataFrame describing the integron object
+
+        """
         full = pd.concat([self.integrase, self.attC, self.promoter, self.attI, self.proteins])
         full["pos_beg"] = full["pos_beg"].astype(int)
         full["pos_end"] = full["pos_end"].astype(int)
@@ -595,17 +634,20 @@ class Integron(object):
 
     def draw_integron(self, file=None):
         """
-        Represent the different element of the integrons
+        Represent the different element of the integrons if file is provide
+        save the drawing on the file otherwise display it on screen.
+
+        :param str file: the path to save the integron schema (in pdf format)
         """
         full = self.describe()
         full["evalue"] = full["evalue"].astype("float")
         h = [i + (0.5*i) if j == "Promoter" else i for i, j in zip(full.strand, full.type_elt)]
         fig, ax = plt.subplots(1, 1, figsize=(16, 9))
         alpha = [i if i < 1 else 1 for i in (
-                 (np.log10(full.evalue) - np.ones(len(full)) * -1) /
-                 (np.ones(len(full)) * -10 - np.ones(len(full)) * -1)
-                 * (1 - 0.2) + 0.2).fillna(1).tolist()]
-                 # normalize alpha value with 0.2 as min value
+                (np.log10(full.evalue) - np.ones(len(full)) * -1) /
+                (np.ones(len(full)) * -10 - np.ones(len(full)) * -1)
+                * (1 - 0.2) + 0.2).fillna(1).tolist()]
+        # normalize alpha value with 0.2 as min value
 
         colors = ["#749FCD" if i == "attC" else
                   "#DD654B" if i == "intI" else
@@ -614,11 +656,10 @@ class Integron(object):
                   "#C3B639" if (i[-2:] == "_3" and j == "Promoter") else
                   "#e8950e" if i != "protein" else
                   "#d3d3d3" for (i, j) in zip(full.annotation,
-                                             full.type_elt)]
+                                              full.type_elt)]
 
         colors_alpha = [j+[i] for j, i in zip([[ord(c)/255. for c in i[1:].decode("hex")] for i in colors],
                                               alpha)]
-
 
         #ec = ["red" if i =="attC" else
         #      "white" for i in full.type_elt]
@@ -649,9 +690,15 @@ class Integron(object):
 
 
     def has_integrase(self):
+        """
+        :return: True if integron has integrase False otherwise.
+        """
         return not self.integrase.empty
 
 
     def has_attC(self):
+        """
+        :return: True if integron has attc sites False otherwise.
+        """
         return not self.attC.empty
 
