@@ -82,7 +82,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
 
         tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
 
-        if len(tmp) >= 1:
+        if not tmp.empty:
             tmp.loc[:, "query_name"] = "intersection_tyr_intI"
 
         if cfg.union_integrases:
@@ -111,7 +111,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
     attc_ac = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, len(replicon))
     integrons = []
 
-    if len(intI_ac) >= 1 and len(attc_ac) >= 1:
+    if not intI_ac.empty and attc_ac:
         n_attc_array = len(attc_ac)  # If an array hasn't been clustered with an Integrase
                                      # or if an integrase lacks an array
                                      # redontant info, we could check for len(attc_ac)==0
@@ -135,11 +135,11 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                 distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
                                       (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
 
-                if len(attc_ac) > 1:
+                if attc_ac:
                     #tmp = (distances /
                     #       np.array([[len(aac) for aac in attc_ac]]))
 
-                    side, idx_attc = np.where((distances) == (distances).min())
+                    side, idx_attc = np.where(distances == distances.min())
                     # side : 0 <=> left; 1 <=> right
                     # index of the closest and biggest attC array to the integrase
                     # exactly tmp = dist(cluster to integrase) / size cluster
@@ -191,7 +191,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                                            1 if a_tmp[6] == "+" else -1,
                                            a_tmp[7], cfg.model_attc_name)
 
-    elif len(intI_ac.pos_end.values) == 0 and len(attc_ac) >= 1:  # If attC only
+    elif intI_ac.pos_end.values.size == 0 and attc_ac:  # If attC only
         for attc_array in attc_ac:
             integrons.append(Integron(replicon, cfg))
             for a_tmp in attc_array.values:
@@ -200,7 +200,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                                               1 if a_tmp[6] == "+" else -1,
                                               a_tmp[7], cfg.model_attc_name)
 
-    elif len(intI_ac.pos_end.values) >= 1 and len(attc_ac) == 0: # If intI only
+    elif intI_ac.pos_end.values.size >= 1 and not attc_ac: # If intI only
         for i, id_int in enumerate(intI_ac.ID_prot.values):
             integrons.append(Integron(replicon, cfg))
             integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
@@ -311,11 +311,11 @@ class Integron(object):
         - CALIN : Have at least one attC
         - In0 : Just an integrase intI
         """
-        if len(self.attC) >= 1 and len(self.integrase) == 1:
+        if not self.attC.empty and not self.integrase.empty:
             return "complete"
-        elif len(self.attC) == 0 and len(self.integrase) == 1:
+        elif self.attC.empty and not self.integrase.empty:
             return "In0"
-        elif len(self.attC) >= 1 and len(self.integrase) == 0:
+        elif not self.attC.empty and self.integrase.empty:
             return "CALIN"
 
     def add_promoter(self):
@@ -649,9 +649,9 @@ class Integron(object):
 
 
     def has_integrase(self):
-        return len(self.integrase) >= 1
+        return not self.integrase.empty
 
 
     def has_attC(self):
-        return len(self.attC) >= 1
+        return not self.attC.empty
 
