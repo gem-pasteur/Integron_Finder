@@ -5,13 +5,17 @@ Welcome to IntegronFinder's documentation!
 ==========================================
 
 IntegronFinder is a program that detects integrons in DNA sequences.
-The program is available on a webserver :ref:`Mobyle <mobyle>` (closing end of 2016), on the :ref:`Galaxy Pasteur <galaxy>`, or by command line (`IntegronFinder on github`_).
+The program is available on a webserver :ref:`Mobyle <mobyle>` (closing end of 2016),
+on the :ref:`Galaxy Pasteur <galaxy>`, or by command line (`IntegronFinder on github`_).
 
-- You already read the :ref:`paper <references>` and want to install it ? Click :ref:`here <install>`
-- You did not read the paper (yet) but you would like to have rapid introduction to integrons and the program? click :ref:`here <introduction>`
+   * You already read the :ref:`paper <references>` and want to install it ? Click :ref:`here <install>`
+   * You did not read the paper (yet) but you would like to have rapid introduction to integrons and the program?
+     click :ref:`here <introduction>`
 
 .. _`IntegronFinder on github`: https://github.com/gem-pasteur/Integron_Finder
 
+User Guide
+==========
 
 .. toctree::
    :maxdepth: 2
@@ -19,15 +23,39 @@ The program is available on a webserver :ref:`Mobyle <mobyle>` (closing end of 2
    introduction
    installation
    tutorial
-   mobyle
-   galaxy
-   dev_guide
+   webserver
    references
 
-..
-  Indices and tables
-  ==================
 
-  * :ref:`genindex`
-  * :ref:`modindex`
-  * :ref:`search`
+Developer Guide
+===============
+
+.. toctree::
+   :maxdepth: 2
+
+   dev_guide
+   overview
+
+Integron_finder API documentation
+=================================
+.. toctree::
+   :maxdepth: 2
+
+   annotation
+   attc
+   config
+   genbank
+   hmm
+   infernal
+   integrase
+   integron
+   topology
+   utils
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
