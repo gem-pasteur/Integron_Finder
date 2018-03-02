@@ -43,8 +43,30 @@ from .hmm import read_hmm
 
 def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', evalue=10, coverage=0.5):
     """
-    Call hmmmer to annotate CDS associated with the integron. Use Resfams per default (Gibson et al, ISME J.,  2014)
+    | Call hmmmer to annotate CDS associated with the integron.
+    | Use Resfams per default (Gibson et al, ISME J.,  2014)
+
+    :param integrons: integrons list to annotate
+    :type integrons: list of :class:`integron_finder.integron.Integron` objects.
+    :param replicon: replicon where the integrons were found (genomic fasta file)
+    :type replicon: :class:Bio.Seq.SeqRecord` object
+    :param str prot_file: the path to a fasta file containing the sequence proteins of the replicon
+                          these proteins constitute the bank scanned by hmmsearch
+    :param str hmm_files: list of path of hmm profiles to use to scan the prot_file
+    :param cfg: the configuration for this analyse
+    :type cfg: :class:`integron_finder.config.Config`
+    :param str out_dir: the path of the directory wher to store the results
+    :param float evalue:
+    :param float coverage:
+    :return: None.
+             | But several files per hmm file are produced.
+
+             * subseqprot.tmp: fasta file containing a subset of protfile (the proteins belonging to the integron)
+             * <hmm>_fa.res: an output of the hmm search.
+             * <hmm>_fa_table.res: an output of the hmm search in tabulated format.
+
     """
+
     print "# Start Functional annotation... : "
     prot_tmp = os.path.join(out_dir, replicon.name + "_subseqprot.tmp")
 
