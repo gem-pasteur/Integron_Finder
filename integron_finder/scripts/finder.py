@@ -270,7 +270,9 @@ def find_integron_in_one_replicon(replicon, topology, config):
         print "\n>>>>>> Starting search with local_max...:"
         if not os.path.isfile(os.path.join(result_dir_other, "integron_max.pickle")):
 
-            integron_max = find_attc_max(integrons, circular=circular)
+            integron_max = find_attc_max(integrons, replicon, config.distance_threshold,
+                                         config.max_attc_size,
+                                         circular=topology, out_dir=result_dir_other)
             integron_max.to_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
             print ">>>>>> Search with local_max done... : \n"
 
