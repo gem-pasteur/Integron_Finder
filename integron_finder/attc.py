@@ -34,16 +34,19 @@ import pandas as pd
 
 from .infernal import local_max, expand
 
+
 def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     """
-    Parse the attc dataset (sorted along start site) for the given replicon and return list of arrays.
+    Parse the attc data set (sorted along start site) for the given replicon and return list of arrays.
     One array is composed of attC sites on the same strand and separated by a distance less than 5kb.
 
     :param attc_df:
-    :param bool keep_palindromes:
-    :param dist_threshold:
-    :param int replicon_size:
-    :return:
+    :type attc_df: :class:`pandas.DataFrame`
+    :param bool keep_palindromes: True if the palindromes must be kept in attc result, False otherwise
+    :param int dist_threshold: the maximal distance between 2 elements to aggregate them
+    :param int replicon_size: the replicon number of base pair
+    :return: a list attC sites found on replicon
+    :rtype: list of :class:`pandas.DataFrame` objects
     """
 
     ok = False
@@ -115,11 +118,11 @@ def find_attc(replicon_path, replicon_name, cmsearch_path, out_dir, model_attc, 
     """
     Call cmsearch to find attC sites in a single replicon.
 
-    :param str replicon_path: the path of the replicon to analyse
+    :param str replicon_path: the path of the fasta file representing the replicon to analyse
     :param str replicon_name: the name of the replicon to analyse
     :param str cmsearch_path: the path to the cmsearch executable
     :param str out_dir: the path to the directory where cmsearch outputs will be stored
-    :param str model_attc: 
+    :param str model_attc: path to the attc model (Covariance Matrix)
     :param int cpu: the number of cpu used by cmsearch
     :returns: None, the results are written on the disk
     :raises RuntimeError: when cmsearch run failed
@@ -142,7 +145,7 @@ def find_attc(replicon_path, replicon_name, cmsearch_path, out_dir, model_attc, 
 def find_attc_max(integrons, replicon, distance_threshold,
                   model_attc_path, max_attc_size, circular=True, outfile="attC_max_1.res", out_dir='.'):
     """
-    Look for attC site with cmsearch --max option wich remove all heuristic filters.
+    Look for attC site with cmsearch --max option which remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
     hit. We call it local_max or eagle_eyes.
 
@@ -166,9 +169,13 @@ def find_attc_max(integrons, replicon, distance_threshold,
 
     :param integrons: the integrons may contain or not attC or intI.
     :type integrons: list of :class:`Integron` objects.
+    :param replicon: replicon where the integrons were found (genomic fasta file)
+    :type replicon: :class:Bio.Seq.SeqRecord` object
+    :param int distance_threshold: the maximal distance between 2 elements to aggregate them
+    :param str model_attc_path: path to the attc model (Covariance Matrix)
+    :param int max_attc_size: maximum value fot the attC size
     :param bool circular: True if replicon is circular, False otherwise.
-    :param outfile: the name of cmsearch result file
-    :type outfile: string
+    :param str outfile: the name of cmsearch result file
     :return:
     :rtype: :class:`pd.DataFrame`
     """
