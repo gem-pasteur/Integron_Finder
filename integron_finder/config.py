@@ -30,7 +30,11 @@ import os
 
 from . import utils
 
+
 class Config(object):
+    """
+    Config object hold values issue from command lines
+    """
 
     def __init__(self, args):
         self._model_len = None  # model_len cache, because it's computation is "heavy" (open file)
@@ -52,19 +56,24 @@ class Config(object):
 
     @property
     def replicon_path(self):
+        """The absolute path to the replicon"""
         return os.path.abspath(self._args.replicon)
 
     @property
     def input_dir(self):
+        """The absloute path to the directory where is located the replicon"""
         in_dir, sequence_file = os.path.split(self.replicon_path)
         return in_dir
 
     @property
     def outdir(self):
+        """The absolute path wher to write the results"""
         return os.path.abspath(self._args.outdir)
 
     @property
     def default_topology(self):
+        """The default topology
+           available values are: 'circ' for circular or 'lin' for linear."""
         if self._args.circular:
             return 'circ'
         elif self._args.linear:
@@ -74,10 +83,12 @@ class Config(object):
 
     @property
     def model_dir(self):
+        """The absolute path to the directory containing the models"""
         return os.path.join(self._prefix_data, "Models")
 
     @property
     def model_integrase(self):
+        """The absolute path to the integrase model file"""
         return os.path.join(self.model_dir, "integron_integrase.hmm")
 
     @property
@@ -86,6 +97,7 @@ class Config(object):
 
     @property
     def model_attc_path(self):
+        """The absolute path to the attC model file"""
         try:
             self._args.attc_model
         except AttributeError:
@@ -98,6 +110,7 @@ class Config(object):
 
     @property
     def model_attc_name(self):
+        "The name of the attc model"
         try:
             self._args.attc_model
         except AttributeError:
@@ -108,8 +121,8 @@ class Config(object):
     def model_len(self):
         """
         :return: The length of the attc model (corresponding to CLEN field).
-        :raises: IOError if model_attc_path does moetch an existing file
-                 RuntimeError if the file doe not content CLEN flield.
+        :raises: IOError if model_attc_path does match an existing file
+                 RuntimeError if the file doe not content CLEN field.
         """
         try:
             self._args.attc_model
@@ -124,4 +137,5 @@ class Config(object):
 
     @property
     def func_annot_path(self):
+        """The absolute path to the directory containing file needed for the functional annotation"""
         return os.path.join(self._prefix_data, "Functional_annotation")
