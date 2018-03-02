@@ -52,6 +52,12 @@ read_single_prot_fasta = make_single_fasta_reader(Seq.IUPAC.protein)
 
 
 def make_multi_fasta_reader(alphabet):
+    """
+    fasta generator maker
+
+    :param alphabet: the alphabet store in the fasta generator closure
+    :return: generator to iterate on the fasta file in the same order as in fasta file
+    """
 
     def fasta_iterator(path):
         """
@@ -73,16 +79,35 @@ read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.protein)
 
 class FastaIterator(object):
     """
-    :param path:the path to the fasta file
-    :return: the sequence parsed
-    :rtype: :class:`Bio.SeqRecord.SeqRecord` object
+    Allow to parse over a multi fasta file, and iterate over it
+    to use it  create a reader with an alphabet, then iterate over it::
+
+        read_multi_dna_fasta = FastaIterator(Seq.IUPAC.unambiguous_dna)
+        sequences_db = read_multi_dna_fasta(fasta_file)
+        print len(sequences_db)
+        for seq in sequence_db:
+            print seq.id
+
+    .. warning:
+
+        The order of sequences is not guarantee
+
     """
+
     def __init__(self, alphabet):
+        """
+        :param alphabet: The authorized alphabet
+        :type alpahbet: Bio.SeqIUPAC member
+        """
         self.alphabet = alphabet
         self.replicon_name = None
         self.seq_index = None
 
     def __iter__(self):
+        """
+        allow to iterate over the sequences
+        :return: a generator at each iteration returns a :class:`Bio.Seq.SeqRecord` object
+        """
         for id_ in self.seq_index.keys():
             seq = self.seq_index[id_]
             if self.replicon_name is not None:
@@ -90,9 +115,17 @@ class FastaIterator(object):
             yield seq
 
     def __len__(self):
+        """:returns: The nuber of sequence in the file"""
         return len(self.seq_index)
 
     def __call__(self, path, replicon_name=None):
+        """
+        :param path:the path to the fasta file
+        :param replicon_name: the name to inject in each SeqRecord.name (by default is the same a SeqRecord.id)
+        :return: the sequence parsed
+        :rtype: :class:`Bio.SeqRecord.SeqRecord` object
+        """
+
         if replicon_name is not None:
             self.replicon_name = replicon_name
         self.seq_index = SeqIO.index(path, "fasta", alphabet=self.alphabet)
@@ -103,6 +136,12 @@ read_multi_dna_fasta = FastaIterator(Seq.IUPAC.unambiguous_dna)
 
 
 def model_len(path):
+    """
+
+    :param str path: the path to the covariance model file
+    :return: the length of the model
+    :rtype: int
+    """
     if not os.path.exists(path):
         raise IOError("Path to model_attc '{}' does not exists".format(path))
     with open(path) as model_file:
@@ -114,13 +153,22 @@ def model_len(path):
 
 
 def get_name_from_path(path):
+    """
+    :param path: The path to extract name for instance the fasta file to the replicon
+    :return: the name of replicon for instance
+             if path = /path/to/replicon.fasta name = repliocn
+    """
     return os.path.splitext(os.path.split(path)[1])[0]
 
-
-SeqDesc = namedtuple('ProtDesc', ('id', 'strand', 'start', 'stop'))
+"""Sequence description with fields: id strand start stop"""
+SeqDesc = namedtuple('SeqDesc', ('id', 'strand', 'start', 'stop'))
 
 
 def gembase_parser(description):
+    """"
+    :param description: description (1rst line without id) of sequence from gembase fasta file
+    :return: SeqDesc
+    """
     desc = description.split(" ")
     id_, strand, start, stop = desc[:2] + desc[4:6]
     strand = 1 if desc[1] == "D" else -1
@@ -130,6 +178,10 @@ def gembase_parser(description):
 
 
 def non_gembase_parser(description):
+    """
+    :param description: description (1rst line without id) of sequence from fasta file not coming a gemabse
+    :return: SeqDesc
+    """
     id_, start, stop, strand, _ = description.split(" # ")
     start = int(start)
     stop = int(stop)
