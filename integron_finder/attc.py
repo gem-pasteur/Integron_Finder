@@ -62,44 +62,41 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
 
     # can be reordered
     if (attc_plus.pos_beg.diff() > dist_threshold).any() or (attc_minus.pos_beg.diff() > dist_threshold).any():
-        if len(attc_plus) > 0:
-            bkp_plus = attc_plus[(attc_plus.pos_beg.diff() > dist_threshold)].index
+        if not attc_plus.empty:
+            bkp_plus = attc_plus[attc_plus.pos_beg.diff() > dist_threshold].index
             position_bkp_plus = [attc_plus.index.get_loc(i) for i in bkp_plus]
-        if len(attc_minus) > 0:
+        if not attc_minus.empty:
             bkp_minus = attc_minus[(attc_minus.pos_beg.diff() > dist_threshold)].index
             position_bkp_minus = [attc_minus.index.get_loc(i) for i in bkp_minus]
         ok = True
-
-    if len(attc_plus) > 0 and len(attc_minus) > 0:
+    if not attc_plus.empty and not attc_minus.empty:
         ok = True
 
     if not ok:
-        if len(attc_df) == 0:
+        if attc_df.empty:
             return []
         else:
             return [attc_df]
     else:
-        if len(attc_plus) > 0:
+        if attc_plus.empty:
+            array_plus = []
+        else:
             array_plus = np.split(attc_plus.values, position_bkp_plus)
-            if (array_plus[0][0][4] - array_plus[-1][-1][4]) % replicon_size < dist_threshold and len(array_plus) > 1:
+            # array_plus is a list of np.array
+            if len(array_plus) > 1 and (array_plus[0][0][4] - array_plus[-1][-1][4]) % replicon_size < dist_threshold:
                 array_plus[0] = np.concatenate((array_plus[-1], array_plus[0]))
                 del array_plus[-1]
+
+        if attc_minus.empty:
+            array_minus = []
         else:
-            array_plus = np.array([])
-        if len(attc_minus) > 0:
             array_minus = np.split(attc_minus.values, position_bkp_minus)
-            if (array_minus[0][0][4]-array_minus[-1][-1][4]) % replicon_size < dist_threshold and len(array_minus) > 1:
+            # array_minus is a list of np.array
+            if len(array_minus) > 1 and (array_minus[0][0][4] - array_minus[-1][-1][4]) % replicon_size < dist_threshold:
                 array_minus[0] = np.concatenate((array_minus[-1], array_minus[0]))
                 del array_minus[-1]
-        else:
-            array_minus = np.array([])
 
-        if len(array_minus) > 0 and len(array_plus) > 0:
-            tmp = array_plus + array_minus
-        elif len(array_minus) == 0:
-            tmp = array_plus
-        elif len(array_plus) == 0:
-            tmp = array_minus
+        tmp = array_plus + array_minus
 
         attc_array = [pd.DataFrame(i, columns=["Accession_number", "cm_attC", "cm_debut",
                                                "cm_fin", "pos_beg", "pos_end", "sens", "evalue"]) for i in tmp]
@@ -230,7 +227,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                              search_left=go_left, search_right=go_right)
 
         elif all(full_element.type == "CALIN"):
-            if len(full_element[full_element.pos_beg.isin(max_final.pos_beg)]) == 0:
+            if full_element[full_element.pos_beg.isin(max_final.pos_beg)].empty:
                 # if cluster don't overlap already max-searched region
                 window_beg = full_element[full_element.type_elt == "attC"].pos_beg.values[0]
                 window_end = full_element[full_element.type_elt == "attC"].pos_end.values[-1]
@@ -247,7 +244,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                    out_dir=out_dir)
                 max_elt = pd.concat([max_elt, df_max])
 
-                if len(df_max) > 0:  # Max can sometimes find bigger attC than permitted
+                if not df_max.empty:  # Max can sometimes find bigger attC than permitted
                     go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - df_max.pos_end.values[0]
                                ) % size_replicon < distance_threshold
                     go_right = (df_max.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
@@ -274,7 +271,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                    strand_search=strand,
                                    out_dir=out_dir)
                 max_elt = pd.concat([max_elt, df_max])
-                if len(max_elt) > 0:
+                if not max_elt.empty:
                     max_elt = expand(replicon,
                                      window_beg, window_end, max_elt, df_max,
                                      circular, distance_threshold, max_attc_size,
