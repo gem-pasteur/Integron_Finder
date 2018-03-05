@@ -65,8 +65,8 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
 
     :param replicon: the name of the replicon
     :type replicon:
-    :param attc_file: the output of cmsearch or the parsing of this file by read_infernal
-    :type attc_file: file object or :class:`pd.Dataframe`
+    :param attc_file: the output of cmsearch or the result of parsing of this file by read_infernal
+    :type attc_file: path to cmsearch output or :class:`pd.Dataframe`
     :param str intI_file: the output of hmmsearch with the integrase model
     :param str phageI_file: the output of hmmsearch with the phage model
     :param cfg: configuration
