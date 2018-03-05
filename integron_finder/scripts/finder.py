@@ -280,7 +280,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
             integron_max = pd.read_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
             print ">>>>>> Search with local_max was already done, continue... : \n"
 
-        integrons = find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
+        integrons = find_integron(replicon, integron_max, intI_file, phageI_file, config)
 
     ##########################
     # Add promoters and attI #
