@@ -30,6 +30,12 @@ import os
 import shutil
 import tempfile
 
+from Bio import BiopythonExperimentalWarning
+import warnings
+warnings.simplefilter('ignore', FutureWarning)
+warnings.simplefilter('ignore', BiopythonExperimentalWarning)
+from Bio import SeqIO
+
 try:
     from tests import IntegronTest
 except ImportError as err:
@@ -40,6 +46,7 @@ from integron_finder import integrase
 from integron_finder.scripts.finder import main
 
 _prodigal_call = integrase.call
+
 
 class TestAcba(IntegronTest):
 
@@ -64,22 +71,32 @@ class TestAcba(IntegronTest):
 
 
     def test_acba_simple(self):
-        output_filename = 'Results_Integron_Finder_acba.007.p01.13'
+        replicon_name = 'acba.007.p01.13'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_name)
         test_result_dir = os.path.join(self.out_dir, output_filename)
         command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
                                                                          replicon=self.find_data(
                                                                              os.path.join('Replicons',
-                                                                                          'acba.007.p01.13.fst')
+                                                                                          '{}.fst'.format(replicon_name))
                                                                          )
                                                                          )
         with self.catch_io(out=True, err=True):
             main(command.split()[1:])
-        results_file_to_test = ('acba.007.p01.13.gbk', 'acba.007.p01.13.integrons')
-        for output_filename in results_file_to_test:
-            expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
-                                                               output_filename))
-            test_result_path = os.path.join(test_result_dir, output_filename)
-            self.assertFileEqual(expected_result_path, test_result_path)
+
+        result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
+
+        gbk = '{}.gbk'.format(replicon_name)
+        expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name), gbk))
+        gbk_test = os.path.join(result_dir, gbk)
+        expected_gbk = SeqIO.read(expected_gbk, 'gb')
+        gbk_test = SeqIO.read(gbk_test, 'gb')
+        self.assertSeqRecordEqual(expected_gbk, gbk_test)
+
+        output_filename = 'acba.007.p01.13.integrons'
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertFileEqual(expected_result_path, test_result_path)
 
 
     def test_acba_annot(self):
@@ -91,13 +108,21 @@ class TestAcba(IntegronTest):
         )
         with self.catch_io(out=True, err=True):
             main(command.split()[1:])
-        results_file_to_test = ('{}.gbk'.format(replicon_name), '{}.integrons'.format(replicon_name))
+
         result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
-        for output_filename in results_file_to_test:
-            expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_name),
-                                                               output_filename))
-            test_result_path = os.path.join(result_dir, output_filename)
-            self.assertFileEqual(expected_result_path, test_result_path)
+
+        gbk = '{}.gbk'.format(replicon_name)
+        expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_name), gbk))
+        gbk_test = os.path.join(result_dir, gbk)
+        expected_gbk = SeqIO.read(expected_gbk, 'gb')
+        gbk_test = SeqIO.read(gbk_test, 'gb')
+        self.assertSeqRecordEqual(expected_gbk, gbk_test)
+
+        output_filename = '{}.integrons'.format(replicon_name)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_name),
+                                                           output_filename))
+        test_result_path = os.path.join(result_dir, output_filename)
+        self.assertFileEqual(expected_result_path, test_result_path)
 
         output_filename = os.path.join('other', replicon_name + '_Resfams_fa_table.res')
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_name),
@@ -120,15 +145,22 @@ class TestAcba(IntegronTest):
                                      )
         with self.catch_io(out=True, err=True):
             main(command.split()[1:])
-        results_file_to_test = ('{}.gbk'.format(replicon_name), '{}.integrons'.format(replicon_name))
+
         result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
-        for output_filename in results_file_to_test:
-            expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
-                                                               output_filename))
-            test_result_path = os.path.join(result_dir, output_filename)
-            shutil.copy(test_result_path, os.path.join('/tmp', output_filename))
-            self.assertFileEqual(expected_result_path, test_result_path,
-                                 msg="{} and {} differ".format(expected_result_path, test_result_path))
+
+        gbk = '{}.gbk'.format(replicon_name)
+        expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name), gbk))
+        gbk_test = os.path.join(result_dir, gbk)
+        expected_gbk = SeqIO.read(expected_gbk, 'gb')
+        gbk_test = SeqIO.read(gbk_test, 'gb')
+        self.assertSeqRecordEqual(expected_gbk, gbk_test)
+
+        output_filename = '{}.integrons'.format(replicon_name)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
+                                                           output_filename))
+        test_result_path = os.path.join(result_dir, output_filename)
+        self.assertFileEqual(expected_result_path, test_result_path,
+                             msg="{} and {} differ".format(expected_result_path, test_result_path))
 
 
         for file_2_test in [f.format(replicon_name) for f in
@@ -141,7 +173,8 @@ class TestAcba(IntegronTest):
                 for expected_line, result_line in zip(expected_result_file, test_result_file):
                     if result_line.startswith('# Program: '):
                         break
-                    self.assertEqual(expected_line, result_line, msg="{} != {}".format(expected_result_path, test_result_path))
+                    self.assertEqual(expected_line, result_line, msg="{} != {}".format(expected_result_path,
+                                                                                       test_result_path))
 
 
 
