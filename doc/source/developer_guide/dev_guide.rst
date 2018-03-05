@@ -45,7 +45,7 @@ create a pull request.
 
    git push --set-upstream origin <your branch name>
 
-4. ask for pull request
+5. ask for pull request
 
     - go to your forked repository on github `https://github.com/<your_login>/Integron_Finder/pulls`
     - Click on 'New pull request'

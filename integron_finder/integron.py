@@ -53,16 +53,15 @@ from . import utils
 def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
     """
     Function that looks for integrons given rules :
-    - presence of intI
-    - presence of attC
-    - d(intI-attC) <= 4 kb
-    - d(attC-attC) <= 4 kb
+        * presence of intI
+        * presence of attC
+        * d(intI-attC) <= 4 kb
+        * d(attC-attC) <= 4 kb
+
     It returns the list of all integrons, be they complete or not.
     found in attC files + integrases file which are formatted as follow :
-    intI_file :
-        Accession_number    ID_prot    strand    pos_beg    pos_end    evalue
-    attc_file :
-        Accession_number    attC    cm_debut    cm_fin    pos_beg    pos_end    sens    evalue
+    intI_file : Accession_number    ID_prot    strand    pos_beg    pos_end    evalue
+    attc_file : Accession_number    attC    cm_debut    cm_fin    pos_beg    pos_end    sens    evalue
 
     :param replicon: the name of the replicon
     :type replicon:

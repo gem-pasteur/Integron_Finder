@@ -48,7 +48,7 @@ def read_infernal(infile, replicon_name, len_model_attc,
     :return: table with columns:
             | "Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"
             | and each row is a hit that match the attc covariance model
-    :rtype: :class:`pandas.DataFrame`
+    :rtype: :class:`pandas.DataFrame` object
     """
 
 
@@ -89,27 +89,28 @@ def local_max(replicon,
               evalue_attc=1., max_attc_size=200, min_attc_size=40,
               cmsearch_bin='cmsearch', out_dir='.', cpu_nb=1):
     """
-
     :param str replicon_name: The name of replicon (without suffix)
     :param int window_beg: start of window to search for attc (position of protein)
     :param int window_end: end of window to search for attc (position of protein)
     :param str strand_search: The strand on which to looking for attc.
-                              available values:
-                               * 'top': Only search the top (Watson) strand of target sequences.
-                               * 'bottom': Only search the bottom (Crick) strand of target sequences
-                               * 'both': search on both strands
+                              Available values:
+
+                                * 'top': Only search the top (Watson) strand of target sequences.
+                                * 'bottom': Only search the bottom (Crick) strand of target sequences
+                                * 'both': search on both strands
+
     :param float evalue_attc: evalue threshold to filter out hits above it
     :param int max_attc_size: The maximum value fot the attC size
     :param int min_attc_size: The minimum value fot the attC size
     :param str cmsearch_bin: the path to cmsearch
     :param str out_dir: the path to directory where to write results
     :param int cpu_nb: The number of cpu used by cmsearch
-    :return: DataFrame with same structure as the DataFrame returns by :function:`read_infernal`
-            | where position are converted on position on replicon and attc are filtered
-            | by evalue, min_attc_size, max_attc_size
-            | also write a file with intermediate results <replicon_name>_subseq_attc_table_end.res
-            | this file store the local_max results before filtering by max_attc_size and min_attc_size
-    :rtype: :class:`pd.DataFrame` object
+    :return: DataFrame with same structure as the DataFrame returns by :func:`read_infernal`
+             where position are converted on position on replicon and attc are filtered
+             by evalue, min_attc_size, max_attc_size
+             also write a file with intermediate results <replicon_name>_subseq_attc_table_end.res
+             this file store the local_max results before filtering by max_attc_size and min_attc_size
+    :rtype: :class:`pandas.DataFrame` object
     """
     replicon_size = len(replicon)
     if window_beg < window_end:
@@ -187,12 +188,20 @@ def expand(replicon,
     :param int window_beg: start of window to search for attc (position of protein)
     :param int window_end: end of window to search for attc (position of protein)
     :param max_elt: DataFrame with columns:
-                    | Accession_number cm_attC  cm_debut  cm_fin   pos_beg   pos_end sens   evalue
-                    | and each row is an occurrence of attc site
+        ::
+
+            Accession_number cm_attC  cm_debut  cm_fin   pos_beg   pos_end sens   evalue
+
+        and each row is an occurrence of attc site
+
     :type max_elt: :class:`pandas.DataFrame` object
-    :param df_max: DataFrame with columns:
-                  | Accession_number cm_attC  cm_debut  cm_fin   pos_beg   pos_end sens   evalue
-                  | and each row is an occurrence of attc site
+    :param df_max: DataFrame with columns
+        ::
+
+            Accession_number cm_attC  cm_debut  cm_fin   pos_beg   pos_end sens   evalue
+
+        and each row is an occurrence of attc site
+
     :type df_max: :class:`pandas.DataFrame` object
     :param bool circular: True if replicon topology is circular otherwise False.
     :param int dist_threshold: Two elements are aggregated if they are distant of dist_threshold [4kb] or less
@@ -203,6 +212,7 @@ def expand(replicon,
     :param str out_dir: The path to directory where to write results
     :return: a copy of max_elt with attC hits
     :rtype: :class:`pandas.DataFrame` object
+
     """
     replicon_size = len(replicon)
     # for a given element, we can search on the left hand side (if integrase is on the right for instance)
