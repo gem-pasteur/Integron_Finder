@@ -626,7 +626,7 @@ class Integron(object):
         full["type"] = self.type()
         full["ID_replicon"] = self.replicon.id
         full["ID_integron"] = id(self)  # uniq identifier of a given Integron
-        full["default"] = "Yes" if not (self.cfg.eagle_eyes or self.cfg.local_max) else "No"
+        full["default"] = "Yes" if not self.cfg.local_max else "No"
         full.drop_duplicates(subset=["element"], inplace=True)
         return full
 
