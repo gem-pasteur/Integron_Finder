@@ -109,3 +109,40 @@ class TestAcba(IntegronTest):
                     break
                 self.assertEqual(expected_line, result_line)
 
+
+    def test_acba_local_max(self):
+        replicon_name = 'acba.007.p01.13'
+        command = "integron_finder --outdir {out_dir} --func_annot --path_func_annot {annot_bank} --local_max " \
+                  "{replicon}".format(
+                                      out_dir=self.out_dir,
+                                      annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
+                                      replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
+                                     )
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:])
+        results_file_to_test = ('{}.gbk'.format(replicon_name), '{}.integrons'.format(replicon_name))
+        result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
+        for output_filename in results_file_to_test:
+            expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
+                                                               output_filename))
+            test_result_path = os.path.join(result_dir, output_filename)
+            shutil.copy(test_result_path, os.path.join('/tmp', output_filename))
+            self.assertFileEqual(expected_result_path, test_result_path,
+                                 msg="{} and {} differ".format(expected_result_path, test_result_path))
+
+
+        for file_2_test in [f.format(replicon_name) for f in
+                            ('{}_Resfams_fa_table.res', '{}_13825_1014_subseq_attc_table.res')]:
+            output_filename = os.path.join('other', file_2_test)
+            expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
+                                                               output_filename))
+            test_result_path = os.path.join(result_dir, output_filename)
+            with open(expected_result_path) as expected_result_file, open(test_result_path) as test_result_file:
+                for expected_line, result_line in zip(expected_result_file, test_result_file):
+                    if result_line.startswith('# Program: '):
+                        break
+                    self.assertEqual(expected_line, result_line, msg="{} != {}".format(expected_result_path, test_result_path))
+
+
+
+
