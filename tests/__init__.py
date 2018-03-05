@@ -95,6 +95,23 @@ class IntegronTest(unittest.TestCase):
         with open(f1) as fh1, open(f2) as fh2:
             self.assertMultiLineEqual(fh1.read(), fh2.read(), msg=msg)
 
+    def assertSeqRecordEqual(self, s1, s2):
+        for attr in ('id', 'name', 'seq'):
+            s1_attr = getattr(s1, attr)
+            s2_attr = getattr(s2, attr)
+            self.assertEqual(s1_attr, s2_attr, msg="{} are different: {} != {}".format(attr, s1_attr, s2_attr))
+
+        # there is a bug in some biopython version
+        self.assertEqual(s1.description.rstrip('.'), s2.description.rstrip('.'))
+        for s1_feat, s2_feat in zip(s1.features, s2.features):
+            # location cannot be directly compared
+            self.assertEqual(str(s1_feat.location), str(s2_feat.location))
+
+            for attr in ('qualifiers', 'strand', 'type'):
+                f1_attr = getattr(s1_feat, attr)
+                f2_attr = getattr(s2_feat, attr)
+                self.assertEqual(f1_attr, f2_attr, msg="{} are different: {} != {}".format(attr, f1_attr, f2_attr))
+
 
 def which(name, flags=os.X_OK):
     """
