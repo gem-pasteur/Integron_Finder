@@ -1,6 +1,7 @@
-include integron_finder
+
 include data/Functional_annotation/*
 include data/Models/*
+exclude data/Pfam-B.hmm
 
 recursive-include doc/build/html *
 include doc/build/latex/IntegronFinder.pdf
