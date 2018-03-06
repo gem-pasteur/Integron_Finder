@@ -3,8 +3,15 @@ include data/Functional_annotation/*
 include data/Models/*
 exclude data/Pfam-B.hmm
 
+recursive-include tests/ *
+recursive-exclude tests/data/Results_Integron_Finder_pssu.001.c01.13/ *
+recursive-exclude tests/data/Results_Integron_Finder_OBAL001.B.00005.C001/ *
+prune OBAL001.B.00005.C001*
+
 recursive-include doc/build/html *
 include doc/build/latex/IntegronFinder.pdf
+
+prune bank_hmm
 
 include README.md
 include COPYING
