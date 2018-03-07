@@ -58,7 +58,7 @@ create a pull request.
 Tests
 =====
 
-IntegronFinder is provided with unit tests. You can find them in ``tests`` diretory.
+IntegronFinder is provided with unit tests. You can find them in ``tests`` directory.
 You can use them to check that your changes did not break the previous features,
 and you can update them, and add your own tests for the new features.
 
@@ -70,6 +70,10 @@ Running tests
 -------------
 
 To run the tests -v option is to increase the verbosity of the output::
+
+    python setup.py test
+
+or::
 
     python tests/run_tests.py -vv
 
