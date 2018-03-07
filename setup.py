@@ -194,7 +194,7 @@ try:
 
 except ImportError:
     import sys
-    print >> sys.stder, "WARNING: pypandoc module not found.\nCould not convert Markdown to RST"
+    print >> sys.stderr, "WARNING: pypandoc module not found.\nCould not convert Markdown to RST"
 
     def read_md(f):
         return open(f, 'r').read()
