@@ -36,7 +36,7 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder.genbank import add_feature
+from integron_finder.annotation import add_feature
 from integron_finder.utils import read_single_dna_fasta
 
 class TestToGbk(IntegronTest):

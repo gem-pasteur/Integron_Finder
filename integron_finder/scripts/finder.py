@@ -56,8 +56,7 @@ from integron_finder.hmm import scan_hmm_bank
 from integron_finder.integrase import find_integrase
 from integron_finder.attc import find_attc, find_attc_max
 from integron_finder.integron import find_integron
-from integron_finder.annotation import func_annot
-from integron_finder.genbank import add_feature
+from integron_finder.annotation import func_annot, add_feature
 
 
 def parse_args(args):

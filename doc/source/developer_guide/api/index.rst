@@ -12,7 +12,6 @@ Integron_finder API Reference
    annotation
    attc
    config
-   genbank
    hmm
    infernal
    integrase
