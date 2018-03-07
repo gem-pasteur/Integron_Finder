@@ -75,8 +75,8 @@ class install_lib(_install_lib):
 class UsageDistribution(Distribution):
 
     def __init__(self, attrs=None):
-        #It's important to define options before to call __init__
-        #otherwise AttributeError: UsageDistribution instance has no attribute 'conf_files'
+        # It's important to define options before to call __init__
+        # otherwise AttributeError: UsageDistribution instance has no attribute 'conf_files'
         self.fix_prefix = None
         Distribution.__init__(self, attrs=attrs)
         self.common_usage = """\
@@ -228,7 +228,7 @@ setup(name='integron_finder',
       zip_safe=False,
       packages=find_packages(),
 
-      #file where some variable must be fix by install
+      # file where some variable must be fix by install
       fix_prefix=['integron_finder/__init__.py'],
 
       entry_points={
@@ -236,11 +236,11 @@ setup(name='integron_finder',
               'integron_finder=integron_finder.scripts.finder:main'
           ]
       },
-      #(dataprefix +'where to put the data in the install, [where to find the data in the tar ball]
+      # (dataprefix +'where to put the data in the install, [where to find the data in the tar ball]
       data_files=expand_data([('share/integron_finder/data/', ['data']),
                               ('share/integron_finder/doc/html', ['doc/build/html']),
                               ('share/integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
-                             ]),
+                              ]),
 
       cmdclass={'install_lib': install_lib},
       distclass=UsageDistribution
