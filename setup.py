@@ -177,28 +177,33 @@ def expand_data(data_to_expand):
                 data_struct.append((base_dest_dir, [one_src]))
     return data_struct
 
+#####################
+# for the pypi site #
+#####################
+
+# pypi use longdescription in rst to generate the package page
+# but github or gitlab use markdown
+# to generate the package and push it on pypi we need
+# pandoc to convert on the fly the READmE.md => rst
+
+try:
+    from pypandoc import convert
+    def read_md(f):
+        return convert(f, 'rst')
+except ImportError:
+    import sys
+    print("WARNING: pypandoc module not found.\nCould not convert Markdown to RST", file=sys.stderr)
+    def read_md(f):
+        return open(f, 'r').read()
 
 ###################################################
-#                                                 #
 # the configuration of the installer start bellow #
-#                                                 #
 ###################################################
 
 setup(name='integron_finder',
       version="1.5.1",
       description="Integron Finder aims at detecting integrons in DNA sequences",
-      long_description="""Integron Finder aims at detecting integrons in DNA sequences
-by finding particular features of the integron:
-  - the attC sites
-  - the integrase
-  - and when possible attI site and promoters.
-
-integron_finder has been describe in a paper published in Nucleic Acid Research.
-
-Identification and analysis of integrons and cassette arrays in bacterial genomes.
-Jean Cury; Thomas Jove; Marie Touchon; Bertrand Néron; Eduardo PC Rocha
-Nucleic Acids Research 2016; doi:10.1093/nar/gkw319
-""",
+      long_description=read_md('README.md'),
       author="Jean Cury",
       author_email="jean.cury@normalesup.org",
       url="https://github.com/gem-pasteur/Integron_Finder/",
