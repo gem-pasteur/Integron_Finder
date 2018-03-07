@@ -30,6 +30,9 @@ import sys
 
 __version__ = '$VERSION'
 
+__INTEGRON_DATA__ = '$INTEGRONDATA'
+
+
 class IntegronError(Exception):
     pass
 

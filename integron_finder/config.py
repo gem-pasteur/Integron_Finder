@@ -29,7 +29,7 @@
 import os
 
 from . import utils
-
+from . import __INTEGRON_DATA__
 
 class Config(object):
     """
@@ -40,12 +40,10 @@ class Config(object):
         self._model_len = None  # model_len cache, because it's computation is "heavy" (open file)
         self._args = args
 
-        _prefix_share = '$PREFIXSHARE'
-        if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
-            _prefix_share = os.environ['INTEGRON_HOME']
-        elif _prefix_share.endswith('PREFIXSHARE'):
-            _prefix_share = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        self._prefix_data = os.path.join(_prefix_share, 'data')
+        if __INTEGRON_DATA__ == '$' + 'INTEGRONDATA':
+            self._prefix_data = os.path.join(os.path.join(os.path.dirname(__file__)), '..', 'data')
+        else:
+            self._prefix_data = os.path.join(__INTEGRON_DATA__, 'data')
 
     def __getattr__(self, item):
         try:

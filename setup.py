@@ -26,10 +26,6 @@
 # If not, see <http://www.gnu.org/licenses/>.                                      #
 ####################################################################################
 
-import sys
-if sys.version_info[0] == 3:
-    sys.exit("Sorry, Python 3 is not supported yet")
-
 import os
 import sysconfig
 
@@ -41,28 +37,23 @@ except ImportError:
 from distutils.errors import DistutilsFileError
 from distutils.util import subst_vars as distutils_subst_vars
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.dist import Distribution
-from setuptools.command.install_scripts import install_scripts as _install_scripts
 from setuptools.command.install_lib import install_lib as _install_lib
 
 
-class install_scripts(_install_scripts):
+class install_lib(_install_lib):
 
     def finalize_options(self):
         inst = self.distribution.command_options.get('install', {})
-        _install_scripts.finalize_options(self)
+        _install_lib.finalize_options(self)
 
     def run(self):
-        print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-        print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-        print "@@@@@  install_scripts  @@@@@@"
-        print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-        print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         if os.path.exists(self.build_dir):
             installer = 'pip'
         else:
             installer = 'fucking_setuptools'
+        print "### installer is", installer
 
         script_tmp_dir = self.build_dir if installer != 'fucking_setuptools' else self.install_dir
 
@@ -73,61 +64,27 @@ class install_scripts(_install_scripts):
             os.unlink(input_file)
             self.move_file(output_file, input_file)
 
-        # if setup.py install is used without using setup.py build
-        # setuptools creates a directory build/bdist.linux-x86_64/egg/EGG-INFO/scripts/
-        # but not build/scripts
-        # and without attribute to grasp this directory :-(((
-        # so we need to run _install_scripts first
-        # to create build/scripts (self.build_dir)
-        # and then substitute variables in this dir
-
-        if installer == 'fucking_setuptools':
-            _install_scripts.run(self)
-
         inst = self.distribution.command_options.get('install', {})
-        if self.distribution.fix_scripts is not None:
-            vars_2_subst = {'PREFIX': inst['prefix'][1] if 'prefix' in inst else '',
-                            'PREFIXSHARE': os.path.join(get_install_data_dir(inst), 'integron_finder'),
-                            'VERSION': self.distribution.get_version(),
-                            }
-            for _file in self.distribution.fix_scripts:
-                subst_file(_file, vars_2_subst)
-                pass
-        if installer == 'pip':
-            _install_scripts.run(self)
+        _file = os.path.join('integron_finder', '__init__.py')
+        subst_file(_file, {'VERSION': self.distribution.get_version(),
+                           'INTEGRONDATA': os.path.join(get_install_data_dir(inst), 'integron_finder')})
 
+        _install_lib.run(self)
 
-def subst_file(_file, vars_2_subst):
-            input_file = os.path.join(script_tmp_dir, _file)
-            output_file = input_file + '.tmp'
-            subst_vars(input_file, output_file, vars_2_subst)
-            os.unlink(input_file)
-            self.move_file(output_file, input_file)
-
-class install_lib(_install_lib):
-
-    def run(self):
-        print "#########################################"
-        print "#########################################"
-        print "############ install_lib ################"
-        print "#########################################"
-        print "#########################################"
-        _install_lib.run()
 
 class UsageDistribution(Distribution):
 
     def __init__(self, attrs=None):
         #It's important to define options before to call __init__
         #otherwise AttributeError: UsageDistribution instance has no attribute 'conf_files'
-        #self.doc_files = None
         self.fix_prefix = None
-        self.fix_scripts = None
         Distribution.__init__(self, attrs=attrs)
         self.common_usage = """\
 Common commands: (see '--help-commands' for more)
 
   setup.py build      will build the package underneath 'build/'
   setup.py install    will install the package
+  setup.py test       run tests
 """
 
 
@@ -138,7 +95,6 @@ def get_install_data_dir(inst):
     :return: the prefix where to install data
     :rtype: string
     """
-
     if 'VIRTUAL_ENV' in os.environ:
         inst['prefix'] = ('environment', os.environ['VIRTUAL_ENV'])
     elif 'user' in inst:
@@ -257,12 +213,15 @@ Nucleic Acids Research 2016; doi:10.1093/nar/gkw319
           'Intended Audience :: Science/Research',
           'Topic :: Scientific/Engineering :: Bio-Informatics'
           ],
+
+      python_requires='>=2.7, <3.0',
       install_requires=open("requirements.txt").read().split(),
+      test_suite='tests.run_tests.discover',
+      zip_safe=False,
+      packages=find_packages(),
 
       #file where some variable must be fix by install
-      fix_scripts=['integron_finder'],
-
-      packages=['integron_finder'],
+      fix_prefix=['integron_finder/__init__.py'],
 
       entry_points={
           'console_scripts': [
@@ -274,8 +233,7 @@ Nucleic Acids Research 2016; doi:10.1093/nar/gkw319
                               ('share/integron_finder/doc/html', ['doc/build/html']),
                               ('share/integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
                              ]),
-      cmdclass={'install_scripts': install_scripts,
-                'install_lib': install_lib
-                },
+
+      cmdclass={'install_lib': install_lib},
       distclass=UsageDistribution
       )

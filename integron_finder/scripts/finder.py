@@ -338,22 +338,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
 
 def main(args=None):
     args = sys.argv[1:] if args is None else args
-
-    _prefix_share = '$PREFIXSHARE'
-
-    # integron was not installed using the setup.py
-    # it's a development version using environment variable
-    if 'INTEGRON_HOME' in os.environ and os.environ['INTEGRON_HOME']:
-        _prefix_share = os.environ['INTEGRON_HOME']
-    else:
-        _prefix_share = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-    _prefix_data = os.path.join(_prefix_share, 'data')
-
     config = parse_args(args)
-
-    if not os.path.exists(_prefix_data):
-        raise Exception("""cannot find integron_finder data check your installation
-or define INTEGRON_HOME environment variable.""")
 
     if config.cmsearch is None:
         raise RuntimeError("""cannot find 'cmsearch' in PATH.
