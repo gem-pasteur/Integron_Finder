@@ -112,6 +112,14 @@ class IntegronTest(unittest.TestCase):
                 f2_attr = getattr(s2_feat, attr)
                 self.assertEqual(f1_attr, f2_attr, msg="{} are different: {} != {}".format(attr, f1_attr, f2_attr))
 
+    def assertHmmEqual(self, hmm1, hmm2):
+        with open(hmm1) as hmm1_file, open(hmm2) as hmm2_file:
+            for hmm1_line, hmm2_line in zip(hmm1_file, hmm2_file):
+                if hmm1_line.startswith('#') and hmm2_line.startswith('#'):
+                    continue
+                hmm1_fields = hmm1_line.split('#')[:-1]
+                hmm2_fields = hmm2_line.split('#')[:-1]
+                self.assertListEqual(hmm1_fields, hmm2_fields)
 
 def which(name, flags=os.X_OK):
     """

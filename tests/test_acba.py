@@ -128,11 +128,13 @@ class TestAcba(IntegronTest):
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_name),
                                                            output_filename))
         test_result_path = os.path.join(result_dir, output_filename)
-        with open(expected_result_path) as expected_result_file, open(test_result_path) as test_result_file :
-            for expected_line, result_line in zip(expected_result_file, test_result_file):
-                if result_line.startswith('# Program:         hmmsearch'):
-                    break
-                self.assertEqual(expected_line, result_line)
+        self.assertHmmEqual(expected_result_path, test_result_path)
+
+        # with open(expected_result_path) as expected_result_file, open(test_result_path) as test_result_file :
+        #     for expected_line, result_line in zip(expected_result_file, test_result_file):
+        #         if result_line.startswith('# Program:         hmmsearch'):
+        #             break
+        #         self.assertEqual(expected_line, result_line)
 
 
     def test_acba_local_max(self):
@@ -162,19 +164,22 @@ class TestAcba(IntegronTest):
         self.assertFileEqual(expected_result_path, test_result_path,
                              msg="{} and {} differ".format(expected_result_path, test_result_path))
 
+        output_filename = os.path.join('other', '{}_Resfams_fa_table.res'.format(replicon_name))
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
+                                                           output_filename))
 
-        for file_2_test in [f.format(replicon_name) for f in
-                            ('{}_Resfams_fa_table.res', '{}_13825_1014_subseq_attc_table.res')]:
-            output_filename = os.path.join('other', file_2_test)
-            expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
-                                                               output_filename))
-            test_result_path = os.path.join(result_dir, output_filename)
-            with open(expected_result_path) as expected_result_file, open(test_result_path) as test_result_file:
-                for expected_line, result_line in zip(expected_result_file, test_result_file):
-                    if result_line.startswith('# Program: '):
-                        break
-                    self.assertEqual(expected_line, result_line, msg="{} != {}".format(expected_result_path,
-                                                                                       test_result_path))
+        test_result_path = os.path.join(result_dir, output_filename)
+        self.assertHmmEqual(expected_result_path, test_result_path)
+
+        output_filename = os.path.join('other', '{}_13825_1014_subseq_attc_table.res'.format(replicon_name))
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
+                                                           output_filename))
+        test_result_path = os.path.join(result_dir, output_filename)
+        with open(expected_result_path) as expected_result_file, open(test_result_path) as test_result_file:
+            for expected_line, result_line in zip(expected_result_file, test_result_file):
+                if result_line.startswith('# Program: '):
+                    break
+                self.assertEqual(expected_line, result_line)
 
 
 
