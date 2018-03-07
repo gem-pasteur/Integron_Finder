@@ -188,11 +188,14 @@ def expand_data(data_to_expand):
 
 try:
     from pypandoc import convert
+
     def read_md(f):
         return convert(f, 'rst')
+
 except ImportError:
     import sys
-    print("WARNING: pypandoc module not found.\nCould not convert Markdown to RST", file=sys.stderr)
+    print >> sys.stder, "WARNING: pypandoc module not found.\nCould not convert Markdown to RST"
+
     def read_md(f):
         return open(f, 'r').read()
 
