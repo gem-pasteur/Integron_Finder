@@ -34,7 +34,7 @@ install:
 
 # test integron_finder
 script:
-  - coverage run tests/run_tests.py -vv --unit
+  - coverage run --source integron_finder tests/run_tests.py -vv
   - coverage report
 
 after_success:
