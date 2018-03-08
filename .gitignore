@@ -45,7 +45,7 @@ doc/build/
 Results_Integron_Finder*/
 !tests/data/Results_Integron_Finder*/
 
-############################################
-# workaround for integron_finder as module #
-############################################
-integron_finder.py
+######################
+# Singularity images #
+######################
+Singularity/integron_finder.simg
