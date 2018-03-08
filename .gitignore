@@ -45,3 +45,7 @@ doc/build/
 Results_Integron_Finder*/
 !tests/data/Results_Integron_Finder*/
 
+######################
+# Singularity images #
+######################
+Singularity/integron_finder.simg
