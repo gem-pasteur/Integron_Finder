@@ -271,7 +271,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
 
             integron_max = find_attc_max(integrons, replicon, config.distance_threshold,
                                          config.model_attc_path, config.max_attc_size,
-                                         circular=topology, out_dir=result_dir_other)
+                                         circular=circular, out_dir=result_dir_other)
             integron_max.to_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
             print ">>>>>> Search with local_max done... : \n"
 
@@ -285,8 +285,6 @@ def find_integron_in_one_replicon(replicon, topology, config):
     # Add promoters and attI #
     ##########################
 
-    outfile = replicon_name + ".integrons"
-    print "len(integrons)", len(integrons)
     for integron in integrons:
         integron_type = integron.type()
         if integron_type != "In0":  # complete & CALIN
@@ -325,6 +323,7 @@ def find_integron_in_one_replicon(replicon, topology, config):
     integrons_describe.index = range(len(integrons_describe))
 
     integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
+    outfile = replicon_name + ".integrons"
 
     integrons_describe.to_csv(os.path.join(result_dir, outfile), sep="\t", index=0, na_rep="NA")
     add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
@@ -351,7 +350,6 @@ Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch o
         raise RuntimeError("""cannot find 'prodigal' in PATH.
 Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
-    sequences_db = utils.read_multi_dna_fasta(config.replicon_path)
 
     ################
     # set topology #
@@ -365,6 +363,9 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     # the both options are mutually exclusive
 
     topologies = Topology(default_topology, topology_file=config.topology_file)
+
+    sequences_db = utils.read_multi_dna_fasta(config.replicon_path,
+                                              dist_threshold=config.distance_threshold, topologies=topologies)
 
     ##############
     # do the job #

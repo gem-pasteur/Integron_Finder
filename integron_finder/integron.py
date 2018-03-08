@@ -627,6 +627,7 @@ class Integron(object):
         full["ID_replicon"] = self.replicon.id
         full["ID_integron"] = id(self)  # uniq identifier of a given Integron
         full["default"] = "Yes" if not self.cfg.local_max else "No"
+        full["topology"] = self.replicon.topology
         full.drop_duplicates(subset=["element"], inplace=True)
         return full
 

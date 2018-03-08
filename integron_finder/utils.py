@@ -101,7 +101,9 @@ class FastaIterator(object):
         """
         self.alphabet = alphabet
         self.replicon_name = None
+        self.topologies = None
         self.seq_index = None
+        self.dist_threshold = 4000
 
     def __iter__(self):
         """
@@ -112,13 +114,22 @@ class FastaIterator(object):
             seq = self.seq_index[id_]
             if self.replicon_name is not None:
                 seq.name = self.replicon_name
+            if self.topologies:
+                topology = self.topologies[seq.id]
+                # If sequence is too small, it can be problematic when using circularity
+                if topology == 'circ' and len(seq) <= 4 * self.distance_threshold:
+                    topology = 'lin'
+                seq.topology = topology
+            else:
+                seq.topology = 'circ'
+
             yield seq
 
     def __len__(self):
         """:returns: The nuber of sequence in the file"""
         return len(self.seq_index)
 
-    def __call__(self, path, replicon_name=None):
+    def __call__(self, path, replicon_name=None, topologies=None, dist_threshold=4000):
         """
         :param path:the path to the fasta file
         :param replicon_name: the name to inject in each SeqRecord.name (by default is the same a SeqRecord.id)
@@ -128,6 +139,9 @@ class FastaIterator(object):
 
         if replicon_name is not None:
             self.replicon_name = replicon_name
+        if topologies is not None:
+            self.topologies = topologies
+            self.dist_threshold = dist_threshold
         self.seq_index = SeqIO.index(path, "fasta", alphabet=self.alphabet)
         return self
 
