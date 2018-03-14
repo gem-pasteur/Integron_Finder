@@ -46,7 +46,7 @@ if not integron_finder.__version__.endswith('VERSION'):
     warnings.simplefilter('ignore', FutureWarning)
     warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
-from Bio import SeqIO
+from Bio import Seq, SeqIO
 
 from integron_finder import IntegronError
 from integron_finder import utils
@@ -180,7 +180,7 @@ def parse_args(args):
     return Config(parsed_args)
 
 
-def find_integron_in_one_replicon(replicon, topology, config):
+def find_integron_in_one_replicon(replicon, config):
     in_dir, sequence_file = os.path.split(config.replicon_path)
     replicon_name = replicon.name
 
@@ -204,12 +204,6 @@ def find_integron_in_one_replicon(replicon, topology, config):
         os.mkdir(result_dir_other)
     except OSError:
         pass
-
-    # If sequence is too small, it can be problematic when using circularity
-    if topology == 'circ' and len(replicon) > 4 * config.distance_threshold:
-        circular = True
-    else:
-        circular = False
 
     if config.func_annot and not config.no_proteins and not config.path_func_annot:
         if os.path.exists('bank_hmm'):
@@ -265,10 +259,9 @@ def find_integron_in_one_replicon(replicon, topology, config):
     # Search with local_max #
     #########################
     if config.local_max:
-
         print "\n>>>>>> Starting search with local_max...:"
         if not os.path.isfile(os.path.join(result_dir_other, "integron_max.pickle")):
-
+            circular = True if replicon.topology == 'circ' else False
             integron_max = find_attc_max(integrons, replicon, config.distance_threshold,
                                          config.model_attc_path, config.max_attc_size,
                                          circular=circular, out_dir=result_dir_other)
@@ -284,7 +277,6 @@ def find_integron_in_one_replicon(replicon, topology, config):
     ##########################
     # Add promoters and attI #
     ##########################
-
     for integron in integrons:
         integron_type = integron.type()
         if integron_type != "In0":  # complete & CALIN
@@ -310,7 +302,6 @@ def find_integron_in_one_replicon(replicon, topology, config):
     #######################
     # Writing out results #
     #######################
-
     integrons_describe = pd.concat([i.describe() for i in integrons])
     dic_id = {id_: "{:02}".format(j) for j, id_ in
               enumerate(integrons_describe.sort_values("pos_beg").ID_integron.unique(), 1)}
@@ -355,26 +346,27 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     # set topology #
     ################
 
+    sequences_db = utils.FastaIterator(config.replicon_path, dist_threshold=config.distance_threshold)
+
     default_topology = 'circ' if len(sequences_db) == 1 else 'lin'
     if config.linear:
         default_topology = 'lin'
     elif config.circular:
         default_topology = 'circ'
     # the both options are mutually exclusive
-
     topologies = Topology(default_topology, topology_file=config.topology_file)
 
-    sequences_db = utils.read_multi_dna_fasta(config.replicon_path,
-                                              dist_threshold=config.distance_threshold, topologies=topologies)
+    # allow sequences_db to inject topology information
+    # in seq.topology attribute
+    sequences_db.topologies = topologies
 
     ##############
     # do the job #
     ##############
     for replicon in sequences_db:
-        topology = topologies[replicon.id]
         if len(sequences_db) == 1:
             replicon.name = utils.get_name_from_path(config.replicon_path)
-        find_integron_in_one_replicon(replicon, topology, config)
+        find_integron_in_one_replicon(replicon, config)
 
 
 if __name__ == "__main__":
