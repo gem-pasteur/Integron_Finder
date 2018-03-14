@@ -121,6 +121,7 @@ class IntegronTest(unittest.TestCase):
                 hmm2_fields = hmm2_line.split('#')[:-1]
                 self.assertListEqual(hmm1_fields, hmm2_fields)
 
+
 def which(name, flags=os.X_OK):
     """
     Search PATH for executable files with the given name.
