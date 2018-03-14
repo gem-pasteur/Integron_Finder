@@ -54,8 +54,7 @@ from integron_finder.utils import read_single_dna_fasta
 from integron_finder.attc import find_attc_max
 
 
-
-class TestFindFindAttCMax(IntegronTest):
+class TestFindAttCMax(IntegronTest):
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
