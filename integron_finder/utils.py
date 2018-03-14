@@ -109,8 +109,25 @@ class FastaIterator(object):
 
     topologies = property(fset=_set_topologies)
 
+    def _check_seq_alphabet_compliance(self, seq):
+        """
+        :param seq: the sequence to check
+        :type seq: :class:`Bio.Seq.Seq` instance
+        :return: True if sequence letters are a subset of the alphabet, False otherwise.
+        """
+        seq_letters = set(str(seq).upper())
+        alphabet = set(self.alphabet.letters.upper())
+        return seq_letters.issubset(alphabet)
+
     def next(self):
+        """
+        :return: The next sequence (the order of sequences is not guaranteed).
+        :rtype: a :class:`Bio.SeqRecord` object or None if the sequence is not compliant with the alphabet.
+        """
         seq = self.seq_gen.next()
+        if not self._check_seq_alphabet_compliance(seq.seq):
+            print "WARNING sequence {} contains invalid characters, the sequence is skipped.".format(seq.id)
+            return None
         if self.replicon_name is not None:
             seq.name = self.replicon_name
         if self._topologies:

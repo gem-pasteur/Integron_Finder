@@ -111,6 +111,18 @@ PSSU.001.C01_13 linear
         expected_seq_top = ['lin']
         self.assertListEqual(expected_seq_top, received_seq_top)
 
+        file_name = 'replicon_bad_char'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        seq_db = utils.FastaIterator(replicon_path)
+        with self.catch_io(out=True, err=False) as flow:
+            received_seq_id = sorted([seq.id for seq in seq_db if seq])
+        warning, _ = flow
+        expected_warning = """WARNING sequence seq_(4|2) contains invalid characters, the sequence is skipped.
+WARNING sequence seq_(2|4) contains invalid characters, the sequence is skipped."""
+        self.assertRegexpMatches(warning.getvalue(), expected_warning)
+        expected_seq_id = sorted(['seq_1', 'seq_3'])
+        self.assertListEqual(expected_seq_id, received_seq_id)
+
     def test_model_len(self):
         model_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
         self.assertEqual(utils.model_len(model_path), 47)
