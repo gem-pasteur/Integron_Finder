@@ -309,7 +309,7 @@ def find_integron_in_one_replicon(replicon, config):
     integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
                                              "pos_beg", "pos_end", "strand", "evalue",
                                              "type_elt", "annotation", "model",
-                                             "type", "default", "distance_2attC"]]
+                                             "type", "default", "distance_2attC", "considered_topology"]]
     integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
     integrons_describe.index = range(len(integrons_describe))
 

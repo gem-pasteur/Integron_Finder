@@ -627,7 +627,13 @@ class Integron(object):
         full["ID_replicon"] = self.replicon.id
         full["ID_integron"] = id(self)  # uniq identifier of a given Integron
         full["default"] = "Yes" if not self.cfg.local_max else "No"
-        full["topology"] = self.replicon.topology
+        try:
+            # when replicon has been got using utils.FastaIterator
+            full["considered_topology"] = self.replicon.topology
+        except AttributeError:
+            # if replicon is a bare Bio.SeqRecord
+            full["considered_topology"] = self.cfg.default_topology
+
         full.drop_duplicates(subset=["element"], inplace=True)
         return full
 

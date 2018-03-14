@@ -42,7 +42,8 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder.config import Config
-from integron_finder.utils import read_single_dna_fasta
+from integron_finder.utils import read_single_dna_fasta, FastaIterator
+from integron_finder.topology import Topology
 from integron_finder.integron import Integron
 
 
@@ -414,7 +415,12 @@ class TestIntegron(IntegronTest):
     def test_describe(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_single_dna_fasta(replicon_path)
+
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+
+        replicon = sequences_db.next()
 
         args = argparse.Namespace()
         args.eagle_eyes = False
@@ -461,6 +467,7 @@ class TestIntegron(IntegronTest):
         excp_description["ID_replicon"] = replicon.id
         excp_description["ID_integron"] = id(integron)  # uniq identifier of a given Integron
         excp_description["default"] = "Yes"
+        excp_description["considered_topology"] = replicon.topology
         excp_description.drop_duplicates(subset=["element"], inplace=True)
 
         self.cfg._args.eagle_eyes = False
