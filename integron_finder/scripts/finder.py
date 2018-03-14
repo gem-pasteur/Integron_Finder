@@ -365,7 +365,9 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     ##############
     sequences_db_len = len(sequences_db)
     for replicon in sequences_db:
-        # if replicon contains illegal characters replicon = None
+        # if replicon contains illegal characters
+        # or replicon is too short < 50 bp
+        # then replicon is None
         if replicon is not None:
             if sequences_db_len == 1:
                 replicon.name = utils.get_name_from_path(config.replicon_path)

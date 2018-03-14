@@ -123,6 +123,18 @@ WARNING sequence seq_(2|4) contains invalid characters, the sequence is skipped.
         expected_seq_id = sorted(['seq_1', 'seq_3'])
         self.assertListEqual(expected_seq_id, received_seq_id)
 
+        file_name = 'replicon_too_short'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        seq_db = utils.FastaIterator(replicon_path)
+        with self.catch_io(out=True, err=False) as flow:
+            received_seq_id = sorted([seq.id for seq in seq_db if seq])
+        warning, _ = flow
+        expected_warning = """WARNING sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\).
+WARNING sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\)."""
+        self.assertRegexpMatches(warning.getvalue(), expected_warning)
+        expected_seq_id = sorted(['seq_1', 'seq_3'])
+        self.assertListEqual(expected_seq_id, received_seq_id)
+
     def test_model_len(self):
         model_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
         self.assertEqual(utils.model_len(model_path), 47)

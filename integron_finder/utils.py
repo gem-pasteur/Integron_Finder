@@ -128,6 +128,10 @@ class FastaIterator(object):
         if not self._check_seq_alphabet_compliance(seq.seq):
             print "WARNING sequence {} contains invalid characters, the sequence is skipped.".format(seq.id)
             return None
+        if len(seq) < 50:
+            print "WARNING sequence {} is too short ({} bp), the sequence is skipped (must be > 50bp).".format(seq.id,
+                                                                                                               len(seq))
+            return None
         if self.replicon_name is not None:
             seq.name = self.replicon_name
         if self._topologies:
