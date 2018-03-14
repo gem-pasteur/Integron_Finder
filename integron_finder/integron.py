@@ -614,6 +614,8 @@ class Integron(object):
     def describe(self):
         """
         :returns: DataFrame describing the integron object
+                  The columns are:
+                  "pos_beg", "pos_end", "strand", "evalue", "type_elt", "model", "distance_2attC", "annotation", "considered_topology"
 
         """
         full = pd.concat([self.integrase, self.attC, self.promoter, self.attI, self.proteins])

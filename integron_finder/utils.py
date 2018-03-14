@@ -89,8 +89,13 @@ class FastaIterator(object):
 
     def __init__(self, path, alphabet=Seq.IUPAC.unambiguous_dna, replicon_name=None, dist_threshold=4000):
         """
+
+        :param str path: The path to the file containing the sequences.
         :param alphabet: The authorized alphabet
         :type alpahbet: Bio.SeqIUPAC member
+        :param str replicon_name: The name of the replicon, if this specify all sequence.name will have this value
+        :param int dist_threshold: the minimun length for a replicon to be considered as circular. Under this threshold
+                                   even the provided toplogy is 'circular' the computation will be done with a 'linear' topology.
         """
         self.alphabet = alphabet
         self.seq_index = SeqIO.index(path, "fasta", alphabet=self.alphabet)
