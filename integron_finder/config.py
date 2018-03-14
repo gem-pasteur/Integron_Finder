@@ -72,11 +72,14 @@ class Config(object):
     def default_topology(self):
         """The default topology
            available values are: 'circ' for circular or 'lin' for linear."""
-        if self._args.circular:
-            return 'circ'
-        elif self._args.linear:
-            return 'lin'
-        else:
+        try:
+            if self._args.circular:
+                return 'circ'
+            elif self._args.linear:
+                return 'lin'
+            else:
+                return None
+        except AttributeError:
             return None
 
     @property
