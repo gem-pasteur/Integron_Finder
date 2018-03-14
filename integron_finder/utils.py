@@ -80,13 +80,6 @@ read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.protein)
 class FastaIterator(object):
     """
     Allow to parse over a multi fasta file, and iterate over it
-    to use it  create a reader with an alphabet, then iterate over it::
-
-        read_multi_dna_fasta = FastaIterator(Seq.IUPAC.unambiguous_dna)
-        sequences_db = read_multi_dna_fasta(fasta_file)
-        print len(sequences_db)
-        for seq in sequence_db:
-            print seq.id
 
     .. warning:
 
@@ -94,59 +87,44 @@ class FastaIterator(object):
 
     """
 
-    def __init__(self, alphabet):
+    def __init__(self, path, alphabet=Seq.IUPAC.unambiguous_dna, replicon_name=None, dist_threshold=4000):
         """
         :param alphabet: The authorized alphabet
         :type alpahbet: Bio.SeqIUPAC member
         """
         self.alphabet = alphabet
-        self.replicon_name = None
-        self.topologies = None
-        self.seq_index = None
-        self.dist_threshold = 4000
+        self.seq_index = SeqIO.index(path, "fasta", alphabet=self.alphabet)
+        self.seq_gen = (self.seq_index[id_] for id_ in self.seq_index.keys())
+        self._topologies = None
+        self.replicon_name = replicon_name
+        self.dist_threshold = dist_threshold
+
+    def _set_topologies(self, topologies):
+        self._topologies = topologies
+
+    topologies = property(fset=_set_topologies)
+
+    def next(self):
+        seq = self.seq_gen.next()
+        if self.replicon_name is not None:
+            seq.name = self.replicon_name
+        if self._topologies:
+            topology = self._topologies[seq.id]
+            # If sequence is too small, it can be problematic when using circularity
+            if topology == 'circ' and len(seq) <= 4 * self.dist_threshold:
+                topology = 'lin'
+            seq.topology = topology
+        else:
+            seq.topology = 'circ' if len(self) == 1 else 'lin'
+        return seq
 
     def __iter__(self):
-        """
-        allow to iterate over the sequences
-        :return: a generator at each iteration returns a :class:`Bio.Seq.SeqRecord` object
-        """
-        for id_ in self.seq_index.keys():
-            seq = self.seq_index[id_]
-            if self.replicon_name is not None:
-                seq.name = self.replicon_name
-            if self.topologies:
-                topology = self.topologies[seq.id]
-                # If sequence is too small, it can be problematic when using circularity
-                if topology == 'circ' and len(seq) <= 4 * self.distance_threshold:
-                    topology = 'lin'
-                seq.topology = topology
-            else:
-                seq.topology = 'circ'
+        return self
 
-            yield seq
 
     def __len__(self):
         """:returns: The nuber of sequence in the file"""
         return len(self.seq_index)
-
-    def __call__(self, path, replicon_name=None, topologies=None, dist_threshold=4000):
-        """
-        :param path:the path to the fasta file
-        :param replicon_name: the name to inject in each SeqRecord.name (by default is the same a SeqRecord.id)
-        :return: the sequence parsed
-        :rtype: :class:`Bio.SeqRecord.SeqRecord` object
-        """
-
-        if replicon_name is not None:
-            self.replicon_name = replicon_name
-        if topologies is not None:
-            self.topologies = topologies
-            self.dist_threshold = dist_threshold
-        self.seq_index = SeqIO.index(path, "fasta", alphabet=self.alphabet)
-        return self
-
-
-read_multi_dna_fasta = FastaIterator(Seq.IUPAC.unambiguous_dna)
 
 
 def model_len(path):
@@ -173,6 +151,7 @@ def get_name_from_path(path):
              if path = /path/to/replicon.fasta name = repliocn
     """
     return os.path.splitext(os.path.split(path)[1])[0]
+
 
 """Sequence description with fields: id strand start stop"""
 SeqDesc = namedtuple('SeqDesc', ('id', 'strand', 'start', 'stop'))
