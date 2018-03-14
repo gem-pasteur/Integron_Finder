@@ -27,13 +27,14 @@
 ####################################################################################
 
 import os
-
+from tempfile import NamedTemporaryFile
 try:
     from tests import IntegronTest
 except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
+from integron_finder.topology import Topology
 from integron_finder import utils
 
 
@@ -57,24 +58,58 @@ class TestUtils(IntegronTest):
         received_seq_id = [seq.id for seq in replicon]
         self.assertListEqual(expected_seq_id, received_seq_id)
 
-    def test_read_multi_dna_fasta(self):
+    def test_FastaIterator(self):
         file_name = 'multi_fasta'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-        replicon = utils.read_multi_dna_fasta(replicon_path)
+        topologies = Topology('lin')
+
+        seq_db = utils.FastaIterator(replicon_path)
+        seq_db.topologies = topologies
+
         expected_seq_id = sorted(['ACBA.007.P01_13', 'LIAN.001.C02_10', 'PSSU.001.C01_13'])
-        received_seq_id = sorted([seq.id for seq in replicon])
+        received_seq_id = sorted([seq.id for seq in seq_db])
         self.assertListEqual(expected_seq_id, received_seq_id)
-        self.assertEqual(len(replicon), 3)
+        self.assertEqual(len(seq_db), 3)
+
         expected_seq_name = expected_seq_id
-        received_seq_name = sorted([seq.name for seq in replicon])
+        seq_db = utils.FastaIterator(replicon_path)
+        seq_db.topologies = topologies
+        received_seq_name = sorted([seq.name for seq in seq_db])
         self.assertListEqual(expected_seq_name, received_seq_name)
 
         replicon_name = 'foo'
-        replicon = utils.read_multi_dna_fasta(replicon_path, replicon_name=replicon_name)
+        seq_db = utils.FastaIterator(replicon_path, replicon_name=replicon_name)
+        seq_db.topologies = topologies
         expected_seq_name = set([replicon_name])
-        received_seq_id = set([seq.name for seq in replicon])
+        received_seq_id = set([seq.name for seq in seq_db])
         self.assertSetEqual(expected_seq_name, received_seq_id)
 
+        seq_db = utils.FastaIterator(replicon_path)
+        received_seq_top = [seq.topology for seq in seq_db]
+        expected_seq_top = ['lin', 'lin', 'lin']
+        self.assertListEqual(expected_seq_top, received_seq_top)
+
+        with NamedTemporaryFile(mode='w') as topology_file:
+            topology_file.write("""ACBA.007.P01_13 linear
+LIAN.001.C02_10 circular
+PSSU.001.C01_13 linear
+""")
+            topology_file.flush()
+            topologies = Topology('lin', topology_file=topology_file.name)
+            seq_db = utils.FastaIterator(replicon_path)
+            seq_db.topologies = topologies
+            received_seq_top = sorted([seq.topology for seq in seq_db])
+            expected_seq_top = sorted(['lin', 'circ', 'lin'])
+            self.assertListEqual(expected_seq_top, received_seq_top)
+
+        file_name = 'acba_short'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        topologies = Topology('circ')
+        seq_db = utils.FastaIterator(replicon_path)
+        seq_db.topologies = topologies
+        received_seq_top = [seq.topology for seq in seq_db]
+        expected_seq_top = ['lin']
+        self.assertListEqual(expected_seq_top, received_seq_top)
 
     def test_model_len(self):
         model_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
