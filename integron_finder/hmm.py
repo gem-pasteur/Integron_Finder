@@ -29,6 +29,7 @@
 import os
 import sys
 import glob
+import colorlog
 
 import numpy as np
 import pandas as pd
@@ -40,6 +41,9 @@ warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 from Bio import SearchIO
+
+
+_log = colorlog.getLogger(__name__)
 
 
 def scan_hmm_bank(path):
@@ -71,10 +75,10 @@ def scan_hmm_bank(path):
                         bank_path = os.path.normpath(os.path.join(prefix, bank_path))
                     bank_files = glob.glob(os.path.expanduser(bank_path.strip("\n").strip()))
                     if not bank_files:
-                        print >> sys.stderr, "WARNING func_annot '{}' does not match any files.".format(bank_path)
+                        _log.warning("func_annot '{}' does not match any files.".format(bank_path))
                     else:
                         for path in bank_files:
-                            print >> sys.stderr, "the hmm {} will be used for functional annotation".format(path)
+                            _log.warning("the hmm {} will be used for functional annotation".format(path))
                         files.extend(bank_files)
 
         return files

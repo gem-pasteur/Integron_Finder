@@ -28,7 +28,7 @@
 
 
 import os
-
+import colorlog
 import numpy as np
 import pandas as pd
 
@@ -48,6 +48,8 @@ from .hmm import read_hmm
 from .infernal import read_infernal
 from .attc import search_attc
 from . import utils
+
+_log = colorlog.getLogger(__name__)
 
 
 def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
@@ -211,16 +213,16 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                                         intI_ac.evalue.values[i],
                                         intI_ac.query_name.values[i])
 
-    print "In replicon {}, there are:".format(replicon.name)
-    print "- {} complete integron(s) found with a total {} attC site(s)".format(sum(
+    _log.info("In replicon {}, there are:".format(replicon.name))
+    _log.info("- {} complete integron(s) found with a total {} attC site(s)".format(sum(
         [1 if i.type() == "complete" else 0 for i in integrons]),
-        sum([len(i.attC) if i.type() == "complete" else 0 for i in integrons]))
-    print "- {} CALIN element(s) found with a total of {} attC site(s)".format(sum(
+        sum([len(i.attC) if i.type() == "complete" else 0 for i in integrons])))
+    _log.info("- {} CALIN element(s) found with a total of {} attC site(s)".format(sum(
         [1 if i.type() == "CALIN" else 0 for i in integrons]),
-        sum([len(i.attC) if i.type() == "CALIN" else 0 for i in integrons]))
-    print "- {} In0 element(s) found with a total of {} attC site".format(sum(
+        sum([len(i.attC) if i.type() == "CALIN" else 0 for i in integrons])))
+    _log.info("- {} In0 element(s) found with a total of {} attC site".format(sum(
         [1 if i.type() == "In0" else 0 for i in integrons]),
-        sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons]))
+        sum([len(i.attC) if i.type() == "In0" else 0 for i in integrons])))
 
     return integrons
 

@@ -27,9 +27,13 @@
 ####################################################################################
 
 import os
+import colorlog
+
 from collections import namedtuple
 from Bio import Seq
 from Bio import SeqIO
+
+_log = colorlog.getLogger(__name__)
 
 
 def make_single_fasta_reader(alphabet):
@@ -126,11 +130,11 @@ class FastaIterator(object):
         """
         seq = self.seq_gen.next()
         if not self._check_seq_alphabet_compliance(seq.seq):
-            print "WARNING sequence {} contains invalid characters, the sequence is skipped.".format(seq.id)
+            _log.warning("sequence {} contains invalid characters, the sequence is skipped.".format(seq.id))
             return None
         if len(seq) < 50:
-            print "WARNING sequence {} is too short ({} bp), the sequence is skipped (must be > 50bp).".format(seq.id,
-                                                                                                               len(seq))
+            _log.warning("sequence {} is too short ({} bp), the sequence is skipped (must be > 50bp).".format(seq.id,
+                                                                                                              len(seq)))
             return None
         if self.replicon_name is not None:
             seq.name = self.replicon_name
@@ -161,13 +165,17 @@ def model_len(path):
     :rtype: int
     """
     if not os.path.exists(path):
-        raise IOError("Path to model_attc '{}' does not exists".format(path))
+        msg = "Path to model_attc '{}' does not exists".format(path)
+        _log.critical(msg)
+        raise IOError(msg)
     with open(path) as model_file:
         for line in model_file:
             if line.startswith('CLEN'):
                 model_length = int(line.split()[1])
                 return model_length
-        raise RuntimeError("CLEN not found in '{}', maybe it's not infernal model file".format(path))
+        msg = "CLEN not found in '{}', maybe it's not infernal model file".format(path)
+        _log.critical(msg)
+        raise RuntimeError(msg)
 
 
 def get_name_from_path(path):

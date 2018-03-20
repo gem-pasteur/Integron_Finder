@@ -27,6 +27,7 @@
 ####################################################################################
 
 import os
+import colorlog
 from subprocess import call
 
 from Bio import BiopythonExperimentalWarning
@@ -41,6 +42,8 @@ from Bio import SeqIO
 
 from .utils import get_name_from_path, read_multi_prot_fasta
 from .hmm import read_hmm
+
+_log = colorlog.getLogger(__name__)
 
 
 def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', evalue=10, coverage=0.5):
@@ -69,7 +72,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
 
     """
 
-    print "# Start Functional annotation... : "
+    _log.info("Start Functional annotation... :")
     prot_tmp = os.path.join(out_dir, replicon.name + "_subseqprot.tmp")
 
     for integron in integrons:
