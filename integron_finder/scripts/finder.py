@@ -302,26 +302,24 @@ def find_integron_in_one_replicon(replicon, config):
     #######################
     # Writing out results #
     #######################
-    integrons_describe = pd.concat([i.describe() for i in integrons])
-    dic_id = {id_: "{:02}".format(j) for j, id_ in
-              enumerate(integrons_describe.sort_values("pos_beg").ID_integron.unique(), 1)}
-    integrons_describe.ID_integron = ["integron_" + dic_id[id_] for id_ in integrons_describe.ID_integron]
-    integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
-                                             "pos_beg", "pos_end", "strand", "evalue",
-                                             "type_elt", "annotation", "model",
-                                             "type", "default", "distance_2attC", "considered_topology"]]
-    integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
-    integrons_describe.index = range(len(integrons_describe))
-
-    integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
-    outfile = replicon_name + ".integrons"
-
-    integrons_describe.to_csv(os.path.join(result_dir, outfile), sep="\t", index=0, na_rep="NA")
-    add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
-    SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
-
-    if not integrons:
-        with open(os.path.join(result_dir, outfile), "w") as out_f:
+    outfile = os.path.join(result_dir, replicon_name + ".integrons")
+    if integrons:
+        integrons_describe = pd.concat([i.describe() for i in integrons])
+        dic_id = {id_: "{:02}".format(j) for j, id_ in
+                  enumerate(integrons_describe.sort_values("pos_beg").ID_integron.unique(), 1)}
+        integrons_describe.ID_integron = ["integron_" + dic_id[id_] for id_ in integrons_describe.ID_integron]
+        integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
+                                                 "pos_beg", "pos_end", "strand", "evalue",
+                                                 "type_elt", "annotation", "model",
+                                                 "type", "default", "distance_2attC", "considered_topology"]]
+        integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
+        integrons_describe.index = range(len(integrons_describe))
+        integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
+        integrons_describe.to_csv(outfile, sep="\t", index=0, na_rep="NA")
+        add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
+        SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
+    else:
+        with open(outfile, "w") as out_f:
             out_f.write("# No Integron found\n")
 
 
