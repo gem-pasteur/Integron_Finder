@@ -27,6 +27,7 @@
 ####################################################################################
 
 import sys
+import colorlog
 
 __version__ = '$VERSION'
 
@@ -57,3 +58,49 @@ Python {1}
  Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
  """.format(version, sys.version)
     return version_text
+
+
+def init_logger(out=sys.stderr):
+    handler = colorlog.StreamHandler(out)
+    formatter = colorlog.ColoredFormatter("%(log_color)s%(levelname)-8s : %(reset)s %(message)s",
+                                          datefmt=None,
+                                          reset=True,
+                                          log_colors={
+                                              'DEBUG':    'cyan',
+                                              'INFO':     'green',
+                                              'WARNING':  'yellow',
+                                              'ERROR':    'red',
+                                              'CRITICAL': 'bold_red',
+                                          },
+                                          secondary_log_colors={},
+                                          style='%'
+                                          )
+    handler.setFormatter(formatter)
+    logger = colorlog.getLogger('integron_finder')
+    logger.addHandler(handler)
+    logger.setLevel(colorlog.logging.logging.WARNING)
+
+init_logger()
+
+
+def logger_set_level(level=colorlog.logging.logging.WARNING):
+    logger = colorlog.getLogger('integron_finder')
+    if level <= colorlog.logging.logging.DEBUG:
+        formatter = colorlog.ColoredFormatter(
+            "%(log_color)s%(levelname)-8s : %(module)s: L %(lineno)d :%(reset)s %(message)s",
+            datefmt=None,
+            reset=True,
+            log_colors={
+                'DEBUG': 'cyan',
+                'INFO': 'green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'bold_red',
+            },
+            secondary_log_colors={},
+            style='%'
+            )
+        handler = logger.handlers[0]
+        handler.setFormatter(formatter)
+
+    logger.setLevel(level)
