@@ -181,6 +181,28 @@ class TestAcba(IntegronTest):
                 self.assertEqual(expected_line, result_line)
 
 
+    def test_no_integron(self):
+        replicon_name = 'fake_seq'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_name)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
+                                                                         replicon=self.find_data(
+                                                                             os.path.join('Replicons',
+                                                                                          '{}.fst'.format(replicon_name))
+                                                                         )
+                                                                         )
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:])
+
+        result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
+
+        output_filename = 'fake_seq.integrons'
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_fake_seq',
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertFileEqual(expected_result_path, test_result_path)
+
+
     def test_acba_no_hmm(self):
         replicon_name = 'acba.007.p01.13'
         decorator = hide_executable('hmmsearch')
