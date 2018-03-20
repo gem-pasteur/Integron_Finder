@@ -29,6 +29,7 @@
 import os
 import shutil
 import tempfile
+import functools
 
 from Bio import BiopythonExperimentalWarning
 import warnings
@@ -44,6 +45,7 @@ except ImportError as err:
 
 from integron_finder import integrase
 from integron_finder.scripts.finder import main
+import integron_finder.scripts.finder as finder
 
 _prodigal_call = integrase.call
 
@@ -62,12 +64,14 @@ class TestAcba(IntegronTest):
         self.out_dir = os.path.join(self.tmp_dir, 'integron_acba_test')
         os.makedirs(self.out_dir)
         integrase.call = self.call_wrapper(_prodigal_call)
+        self.find_executable_ori = finder.distutils.spawn.find_executable
 
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
             pass
         integrase.call = _prodigal_call
+        finder.distutils.spawn.find_executable = self.find_executable_ori
 
 
     def test_acba_simple(self):
@@ -177,5 +181,76 @@ class TestAcba(IntegronTest):
                 self.assertEqual(expected_line, result_line)
 
 
+    def test_acba_no_hmm(self):
+        replicon_name = 'acba.007.p01.13'
+        decorator = hide_executable('hmmsearch')
+        finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
+        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
+                                                                         replicon=self.find_data(
+                                                                             os.path.join('Replicons',
+                                                                                          '{}.fst'.format(replicon_name))
+                                                                         )
+                                                                         )
+        with self.assertRaises(RuntimeError) as ctx:
+            main(command.split()[1:])
+
+        err_msg = "cannot find 'hmmsearch' in PATH.\n" \
+                  "Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option"
+        self.assertEqual(err_msg, str(ctx.exception))
 
 
+    def test_acba_no_prodigal(self):
+        replicon_name = 'acba.007.p01.13'
+        decorator = hide_executable('prodigal')
+        finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
+        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
+                                                                         replicon=self.find_data(
+                                                                             os.path.join('Replicons',
+                                                                                          '{}.fst'.format(replicon_name))
+                                                                         )
+                                                                         )
+        with self.assertRaises(RuntimeError) as ctx:
+            main(command.split()[1:])
+
+        err_msg = "cannot find 'prodigal' in PATH.\n" \
+                  "Please install prodigal package or setup 'prodigal' binary path with --prodigal option"
+        self.assertEqual(err_msg, str(ctx.exception))
+
+
+    def test_acba_no_cmsearch(self):
+        replicon_name = 'acba.007.p01.13'
+        decorator = hide_executable('cmsearch')
+        finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
+        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
+                                                                         replicon=self.find_data(
+                                                                             os.path.join('Replicons',
+                                                                                          '{}.fst'.format(replicon_name))
+                                                                         )
+                                                                         )
+        with self.assertRaises(RuntimeError) as ctx:
+            main(command.split()[1:])
+
+        err_msg = "cannot find 'cmsearch' in PATH.\n" \
+                  "Please install infernal package or setup 'cmsearch' binary path with --cmsearch option"
+
+        self.assertEqual(err_msg, str(ctx.exception))
+
+
+def hide_executable(bin_2_hide):
+    """
+    This a decorator maker, it return a decorator which can be used to decorate a "which" like function
+    the decorator call the "which" like function except for value of bin_2_hide in this case it return None
+    to simulate that the "which" like function does not find any corresponding executable.
+
+    :param bin_2_hide: the name of the binary to hide
+    :return: a decorator
+    """
+    def find_executable(func):
+        @functools.wraps(func)
+        def wrapper(bin):
+            if bin == bin_2_hide:
+                return None
+            else:
+                return func(bin)
+        return wrapper
+    return find_executable
