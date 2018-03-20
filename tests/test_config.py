@@ -121,20 +121,23 @@ class TestConfig(IntegronTest):
     def test_model_len(self):
         cf = config.Config(self.args)
         with self.assertRaises(RuntimeError) as ctx:
-            cf.model_len
+            with self.catch_log():
+                cf.model_len
         self.assertEqual(str(ctx.exception), "'model_attc' is not define.")
 
         self.args.attc_model = 'foo'
         cf = config.Config(self.args)
         with self.assertRaises(IOError) as ctx:
-            cf.model_len
+            with self.catch_log():
+                cf.model_len
         self.assertEqual(str(ctx.exception), "Path to model_attc '{}' does not exists".format(cf.model_attc_path))
 
         model_path = os.path.join(os.path.dirname(__file__), 'data', 'Replicons', 'acba.007.p01.13.fst')
         self.args.attc_model = model_path
         cf = config.Config(self.args)
         with self.assertRaises(RuntimeError) as ctx:
-            cf.model_len
+            with self.catch_log():
+                cf.model_len
         self.assertEqual(str(ctx.exception), "CLEN not found in '{}', maybe it's not infernal model file".format(model_path))
 
         self.args.attc_model = 'attc_4.cm'
