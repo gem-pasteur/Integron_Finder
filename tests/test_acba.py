@@ -87,11 +87,9 @@ class TestAcba(IntegronTest):
         with self.catch_io(out=True, err=True):
             main(command.split()[1:])
 
-        result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
-
         gbk = '{}.gbk'.format(replicon_name)
         expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name), gbk))
-        gbk_test = os.path.join(result_dir, gbk)
+        gbk_test = os.path.join(test_result_dir, gbk)
         expected_gbk = SeqIO.read(expected_gbk, 'gb')
         gbk_test = SeqIO.read(gbk_test, 'gb')
         self.assertSeqRecordEqual(expected_gbk, gbk_test)
@@ -193,8 +191,6 @@ class TestAcba(IntegronTest):
                                                                          )
         with self.catch_io(out=True, err=True):
             main(command.split()[1:])
-
-        result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
 
         output_filename = 'fake_seq.integrons'
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_fake_seq',
