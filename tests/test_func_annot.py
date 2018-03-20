@@ -102,7 +102,7 @@ class TestFuncAnnot(IntegronTest):
 
         # Run prodigal to find CDS on replicon (and run hmmsearch on integrase (2 profiles))
         self.integrases = find_integrase(self.replicon_path, self.replicon, self.prot_file, self.tmp_dir, self.cfg)
-        annotation.call = self.call_wrapper(_annot_call_ori)
+        annotation.call = self.mute_call(_annot_call_ori)
 
     def tearDown(self):
         """

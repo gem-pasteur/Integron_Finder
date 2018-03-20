@@ -65,7 +65,7 @@ class TestFindAttc(IntegronTest):
         self.model_attc = self.find_data(os.path.join('Models', 'attc_4.cm'))
         self.replicon_name = 'acba.007.p01.13'
         self.replicon_path = self.find_data(os.path.join('Replicons', self.replicon_name + '.fst'))
-        attc.call = self.call_wrapper(_call_ori)
+        attc.call = self.mute_call(_call_ori)
 
     def tearDown(self):
         try:

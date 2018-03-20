@@ -114,24 +114,26 @@ PSSU.001.C01_13 linear
         file_name = 'replicon_bad_char'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         seq_db = utils.FastaIterator(replicon_path)
-        with self.catch_io(out=True, err=False) as flow:
+
+        # 2 sequences are rejected so 2 message are produced (for seq 2 and 4)
+        expected_warning = """sequence seq_(4|2) contains invalid characters, the sequence is skipped.
+sequence seq_(2|4) contains invalid characters, the sequence is skipped."""
+        with self.catch_log() as log:
             received_seq_id = sorted([seq.id for seq in seq_db if seq])
-        warning, _ = flow
-        expected_warning = """WARNING sequence seq_(4|2) contains invalid characters, the sequence is skipped.
-WARNING sequence seq_(2|4) contains invalid characters, the sequence is skipped."""
-        self.assertRegexpMatches(warning.getvalue(), expected_warning)
+            got_warning = log.handlers[0].stream.getvalue().strip()
+        self.assertRegexpMatches(got_warning, expected_warning)
         expected_seq_id = sorted(['seq_1', 'seq_3'])
         self.assertListEqual(expected_seq_id, received_seq_id)
 
         file_name = 'replicon_too_short'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         seq_db = utils.FastaIterator(replicon_path)
-        with self.catch_io(out=True, err=False) as flow:
+        expected_warning = """sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\).
+sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\)."""
+        with self.catch_log() as log:
             received_seq_id = sorted([seq.id for seq in seq_db if seq])
-        warning, _ = flow
-        expected_warning = """WARNING sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\).
-WARNING sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\)."""
-        self.assertRegexpMatches(warning.getvalue(), expected_warning)
+            got_warning = log.handlers[0].stream.getvalue().strip()
+        self.assertRegexpMatches(got_warning, expected_warning)
         expected_seq_id = sorted(['seq_1', 'seq_3'])
         self.assertListEqual(expected_seq_id, received_seq_id)
 
@@ -140,12 +142,14 @@ WARNING sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(mus
         self.assertEqual(utils.model_len(model_path), 47)
         bad_path = 'nimportnaoik'
         with self.assertRaises(IOError) as ctx:
-            utils.model_len(bad_path)
+            with self.catch_log():
+                utils.model_len(bad_path)
         self.assertEqual(str(ctx.exception),
                          "Path to model_attc '{}' does not exists".format(bad_path))
         bad_path = self.find_data(os.path.join('Models', 'phage-int.hmm'))
         with self.assertRaises(RuntimeError) as ctx:
-            utils.model_len(bad_path)
+            with self.catch_log():
+                utils.model_len(bad_path)
         self.assertEqual(str(ctx.exception),
                          "CLEN not found in '{}', maybe it's not infernal model file".format(bad_path))
 

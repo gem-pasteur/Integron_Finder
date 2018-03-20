@@ -30,6 +30,7 @@ import os
 import sys
 import unittest
 import platform
+import colorlog
 from StringIO import StringIO
 from contextlib import contextmanager
 
@@ -65,13 +66,24 @@ class IntegronTest(unittest.TestCase):
         finally:
             sys.stdout, sys.stderr = old_out, old_err
 
+    @contextmanager
+    def catch_log(self):
+        logger = colorlog.getLogger('integron_finder')
+        handlers_ori = logger.handlers
+        fake_handler = colorlog.StreamHandler(StringIO())
+        try:
+            logger.handlers = [fake_handler]
+            yield logger
+        finally:
+            logger.handlers = handlers_ori
+
     @staticmethod
     def fake_exit(*args, **kwargs):
         returncode = args[0]
         raise TypeError(returncode)
 
     @staticmethod
-    def call_wrapper(call_ori):
+    def mute_call(call_ori):
         """
         hmmsearch or prodigal write lot of things on stderr or stdout
         which noise the unit test output

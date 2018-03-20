@@ -64,7 +64,7 @@ class TestFindIntegrase(IntegronTest):
         self.args.cpu = 1
         self.args.hmmsearch = distutils.spawn.find_executable('hmmsearch')
         self.args.prodigal = distutils.spawn.find_executable("prodigal")
-        integrase.call = self.call_wrapper(_call_ori)
+        integrase.call = self.mute_call(_call_ori)
 
     def tearDown(self):
         integrase.call = _call_ori

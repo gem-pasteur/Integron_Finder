@@ -39,21 +39,8 @@ except ImportError as err:
 
 from integron_finder.hmm import scan_hmm_bank
 
-class TestScanHmmBank(IntegronTest):
 
-    @contextmanager
-    def catch_output(self):
-        """
-        Catch stderr and stdout of the code running with this function.
-        They can, then, be compared to expected outputs.
-        """
-        new_out, new_err = StringIO(), StringIO()
-        old_out, old_err = sys.stdout, sys.stderr
-        try:
-            sys.stdout, sys.stderr = new_out, new_err
-            yield sys.stdout, sys.stderr
-        finally:
-            sys.stdout, sys.stderr = old_out, old_err
+class TestScanHmmBank(IntegronTest):
 
     def test_wrong_path(self):
         """
@@ -81,11 +68,11 @@ class TestScanHmmBank(IntegronTest):
         exist, it returns a warning in stderr
         """
         mypath = os.path.join("tests", "data", "hmm_files", "list_hmm.txt")
-        with self.catch_output() as (out, err):
+        exp_msg = "func_annot '/my_hmms' does not match any files."
+        with self.catch_log() as log:
             files = scan_hmm_bank(mypath)
-        self.assertEqual(out.getvalue().strip(), "")
-        self.assertEqual(err.getvalue().strip(), "WARNING func_annot '/my_hmms' does not " +
-                                                  "match any files.")
+            catch_msg = log.handlers[0].stream.getvalue().strip()
+        self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(files, [])
 
     def test_scan_file_names(self):
@@ -113,8 +100,9 @@ class TestScanHmmBank(IntegronTest):
             lhmm.write("# A relative path to hmm file:\n")
             lhmm.write("# " + hmm_paths[2] + ".hmm\n")
         # Read hmm_bank file and get list of all files found
-        with self.catch_output() as (out, err):
+        with self.catch_log() as log:
             files = scan_hmm_bank("list_hmm2.txt")
+            catch_msg = log.handlers[0].stream.getvalue().strip()
         # Write expected list of hmm files
         exp_files1 = ["Resfam.hmm", "integrase.hmm", "phage_int.hmm"]
         exp_files1 = [os.path.abspath(os.path.join(path1, myfile)) for myfile in exp_files1]
@@ -125,7 +113,6 @@ class TestScanHmmBank(IntegronTest):
         self.assertEqual(set(exp_files), set(files))
         out_stderr = ["the hmm {} will be used for functional annotation".format(path)
                       for path in exp_files]
-        self.assertEqual(out.getvalue().strip(), "")
-        self.assertEqual(set(err.getvalue().strip().split("\n")), set(out_stderr))
+        self.assertEqual(set(catch_msg.split("\n")), set(out_stderr))
         # Remove hmm_bank file
         os.remove("list_hmm2.txt")

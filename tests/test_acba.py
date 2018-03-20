@@ -43,6 +43,8 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
+import colorlog
+from integron_finder import logger_set_level
 from integron_finder import integrase
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
@@ -51,6 +53,15 @@ _prodigal_call = integrase.call
 
 
 class TestAcba(IntegronTest):
+
+    @classmethod
+    def setUpClass(cls):
+        logger_set_level(colorlog.logging.logging.WARNING)
+
+    @classmethod
+    def tearDownClass(cls):
+        logger_set_level(colorlog.logging.logging.INFO)
+
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
@@ -63,7 +74,7 @@ class TestAcba(IntegronTest):
         self.tmp_dir = tempfile.gettempdir()
         self.out_dir = os.path.join(self.tmp_dir, 'integron_acba_test')
         os.makedirs(self.out_dir)
-        integrase.call = self.call_wrapper(_prodigal_call)
+        integrase.call = self.mute_call(_prodigal_call)
         self.find_executable_ori = finder.distutils.spawn.find_executable
 
     def tearDown(self):
@@ -84,6 +95,7 @@ class TestAcba(IntegronTest):
                                                                                           '{}.fst'.format(replicon_name))
                                                                          )
                                                                          )
+
         with self.catch_io(out=True, err=True):
             main(command.split()[1:])
 
@@ -137,10 +149,10 @@ class TestAcba(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         command = "integron_finder --outdir {out_dir} --func_annot --path_func_annot {annot_bank} --local_max " \
                   "{replicon}".format(
-                                      out_dir=self.out_dir,
-                                      annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
-                                      replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
-                                     )
+            out_dir=self.out_dir,
+            annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
+            replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
+        )
         with self.catch_io(out=True, err=True):
             main(command.split()[1:])
 
@@ -159,7 +171,7 @@ class TestAcba(IntegronTest):
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertFileEqual(expected_result_path, test_result_path,
                              msg=None)
-                             #msg="{} and {} differ".format(expected_result_path, test_result_path))
+        #msg="{} and {} differ".format(expected_result_path, test_result_path))
 
         output_filename = os.path.join('other', '{}_Resfams_fa_table.res'.format(replicon_name))
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
