@@ -140,3 +140,16 @@ class Config(object):
     def func_annot_path(self):
         """The absolute path to the directory containing file needed for the functional annotation"""
         return os.path.join(self._prefix_data, "Functional_annotation")
+
+
+    @property
+    def log_level(self):
+        """
+        :return: the level to apply to loggers. 0 <= level <=50
+        :rtype: int
+        """
+        default = 20  # info
+        level = default - (10 * self._args.verbose) + (10 * self._args.quiet)
+        level = max(0, level)
+        level = min(50, level)
+        return level
