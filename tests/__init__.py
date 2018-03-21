@@ -34,6 +34,8 @@ import colorlog
 from StringIO import StringIO
 from contextlib import contextmanager
 
+from integron_finder import IntegronError, logger_set_level
+
 class IntegronTest(unittest.TestCase):
 
     _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "data"))
@@ -73,9 +75,28 @@ class IntegronTest(unittest.TestCase):
         fake_handler = colorlog.StreamHandler(StringIO())
         try:
             logger.handlers = [fake_handler]
-            yield logger
+            yield LoggerWrapper(logger)
         finally:
             logger.handlers = handlers_ori
+
+    @classmethod
+    def set_log_level(cls, level):
+        levels = {'NOTSET': colorlog.logging.logging.NOTSET,
+                  'DEBUG': colorlog.logging.logging.DEBUG,
+                  'INFO': colorlog.logging.logging.INFO,
+                  'WARNING': colorlog.logging.logging.WARNING,
+                  'ERROR': colorlog.logging.logging.ERROR,
+                  'CRITICAL': colorlog.logging.logging.CRITICAL,
+        }
+        if level in levels:
+            level = levels[level]
+        elif not isinstance(level, int):
+            raise IntegronError("Level must be {} or a positive integer")
+        elif level < 0:
+            raise IntegronError("Level must be {} or a positive integer")
+
+        logger_set_level(level)
+
 
     @staticmethod
     def fake_exit(*args, **kwargs):
@@ -132,6 +153,18 @@ class IntegronTest(unittest.TestCase):
                 hmm1_fields = hmm1_line.split('#')[:-1]
                 hmm2_fields = hmm2_line.split('#')[:-1]
                 self.assertListEqual(hmm1_fields, hmm2_fields)
+
+
+class LoggerWrapper(object):
+
+    def __init__(self, logger):
+        self.logger = logger
+
+    def __getattr__(self, item):
+        return getattr(self.logger, item)
+
+    def get_value(self):
+        return self.logger.handlers[0].stream.getvalue()
 
 
 def which(name, flags=os.X_OK):
