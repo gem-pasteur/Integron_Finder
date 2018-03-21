@@ -52,7 +52,6 @@ _prodigal_call = integrase.call
 
 class TestAcba(IntegronTest):
 
-
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
             self.integron_home = os.environ['INTEGRON_HOME']
@@ -148,16 +147,16 @@ class TestAcba(IntegronTest):
         pdf = '{}_1.pdf'.format(replicon_name)
         pdf_test = os.path.join(test_result_dir, pdf)
         self.assertTrue(os.path.exists(pdf_test))
-        
+
 
     def test_acba_annot(self):
         replicon_name = 'acba.007.p01.13'
         command = "integron_finder --outdir {out_dir} --func_annot --path_func_annot {annot_bank} --gbk " \
-                  "{replicon}".format(
-            out_dir=self.out_dir,
-            annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
-            replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
-        )
+                  "{replicon}".format(out_dir=self.out_dir,
+                                      annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
+                                      replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
+                                      )
+
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
@@ -187,10 +186,10 @@ class TestAcba(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         command = "integron_finder --outdir {out_dir} --func_annot --path_func_annot {annot_bank} --local_max --gbk " \
                   "{replicon}".format(
-            out_dir=self.out_dir,
-            annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
-            replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
-        )
+                                    out_dir=self.out_dir,
+                                    annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
+                                    replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
+                                )
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
@@ -315,10 +314,10 @@ def hide_executable(bin_2_hide):
     """
     def find_executable(func):
         @functools.wraps(func)
-        def wrapper(bin):
+        def wrapper(exe):
             if bin == bin_2_hide:
                 return None
             else:
-                return func(bin)
+                return func(exe)
         return wrapper
     return find_executable
