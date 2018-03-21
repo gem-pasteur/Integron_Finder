@@ -116,6 +116,27 @@ class TestFindIntegrase(IntegronTest):
         replicon.__class__.__len__ = len_ori
 
 
+    def test_find_integrase_no_gembase_with_protfile_empty(self):
+        cfg = Config(self.args)
+        self.args.gembase = False
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+
+        replicon_name = 'acba.007.p01.13'
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_single_dna_fasta(replicon_path)
+
+        len_ori = replicon.__class__.__len__
+        replicon.__class__.__len__ = lambda x: 200
+
+        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        open(prot_file, 'w').close()
+        with self.assertRaises(RuntimeError) as ctx:
+            with self.catch_log():
+                integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+        self.assertTrue(re.match("^The protein file: '.*' is empty cannot perform hmmsearch on it.$",
+                                 str(ctx.exception)))
+        replicon.__class__.__len__ = len_ori
+
     def test_find_integrase_no_gembase_no_protfile_short_seq(self):
         cfg = Config(self.args)
         self.args.gembase = False
