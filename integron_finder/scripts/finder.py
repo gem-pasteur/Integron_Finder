@@ -177,6 +177,16 @@ def parse_args(args):
                         action="version",
                         version=integron_finder.get_version_message())
 
+    verbosity_grp = parser.add_mutually_exclusive_group()
+    verbosity_grp.add_argument('-v', '--verbose',
+                               action='count',
+                               default=0,
+                               help='Increase verbosity of output (can be cumulative : -vv)')
+    verbosity_grp.add_argument('-q', '--quiet',
+                               action='count',
+                               default=0,
+                               help='Decrease verbosity of output (can be cumulative : -qq)'
+                               )
     parsed_args = parser.parse_args(args)
 
     # eagle_eyes is just an alias to local_max in whole program use local_max
@@ -329,11 +339,16 @@ def find_integron_in_one_replicon(replicon, config):
             out_f.write("# No Integron found\n")
 
 
-def main(args=None, loglevel='INFO'):
+def main(args=None, loglevel=None):
     args = sys.argv[1:] if args is None else args
     config = parse_args(args)
 
-    logger_set_level(loglevel)
+    if not loglevel:
+        # logs are specify from args options
+        logger_set_level(config.log_level)
+    else:
+        # used by unit tests to mute or unmute logs
+        logger_set_level(loglevel)
 
     if config.cmsearch is None:
         raise RuntimeError("""cannot find 'cmsearch' in PATH.
@@ -378,11 +393,13 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
             if sequences_db_len == 1:
                 replicon.name = utils.get_name_from_path(config.replicon_path)
             _log.info("############ Processing replicon {} ({}/{}) ############".format(replicon.name,
-                                                                                     rep_no,
-                                                                                     sequences_db_len))
+                                                                                        rep_no,
+                                                                                        sequences_db_len))
             find_integron_in_one_replicon(replicon, config)
         else:
-            _log.warning("Skipping replicon {}".format(replicon.name))
+            _log.warning("############ Skipping replicon {} ({}/{}) ############".format(replicon.name,
+                                                                                         rep_no,
+                                                                                         sequences_db_len))
 
 
 if __name__ == "__main__":

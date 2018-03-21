@@ -218,6 +218,23 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['--topology_file', topo, 'replicon'])
         self.assertEqual(cfg.topology_file, topo)
 
+    def test_verbose(self):
+        cfg = parse_args(['replicon'])
+        self.assertEqual(cfg.verbose, 0)
+        cfg = parse_args(['--verbose', 'replicon'])
+        self.assertEqual(cfg.verbose, 1)
+        cfg = parse_args(['-vv', 'replicon'])
+        self.assertEqual(cfg.verbose, 2)
+
+    def test_quiet(self):
+        cfg = parse_args(['replicon'])
+        self.assertEqual(cfg.quiet, 0)
+        cfg = parse_args(['--quiet', 'replicon'])
+        self.assertEqual(cfg.quiet, 1)
+        cfg = parse_args(['-qq', 'replicon'])
+        self.assertEqual(cfg.quiet, 2)
+
+
     def test_version(self):
         real_exit = sys.exit
 
