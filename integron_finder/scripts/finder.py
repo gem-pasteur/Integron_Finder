@@ -370,14 +370,19 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     # do the job #
     ##############
     sequences_db_len = len(sequences_db)
-    for replicon in sequences_db:
+    for rep_no, replicon in enumerate(sequences_db, 1):
         # if replicon contains illegal characters
         # or replicon is too short < 50 bp
         # then replicon is None
         if replicon is not None:
             if sequences_db_len == 1:
                 replicon.name = utils.get_name_from_path(config.replicon_path)
+            _log.info("############ Processing replicon {} ({}/{}) ############".format(replicon.name,
+                                                                                     rep_no,
+                                                                                     sequences_db_len))
             find_integron_in_one_replicon(replicon, config)
+        else:
+            _log.warning("Skipping replicon {}".format(replicon.name))
 
 
 if __name__ == "__main__":
