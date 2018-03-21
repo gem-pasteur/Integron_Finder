@@ -151,3 +151,12 @@ class TestConfig(IntegronTest):
         cf = config.Config(self.args)
         cf._prefix_data = 'foo'
         self.assertEqual(cf.func_annot_path, os.path.join('foo', 'Functional_annotation'))
+
+
+    def test_log_level(self):
+        for v, q, l in [(0, 0, 20), (0, 2, 40), (0, 5, 50), (1, 0, 10), (3, 0, 0), (2, 2, 20)]:
+            self.args.verbose = v
+            self.args.quiet = q
+            cf = config.Config(self.args)
+            self.assertEqual(cf.log_level, l)
+        
