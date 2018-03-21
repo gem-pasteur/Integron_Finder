@@ -248,7 +248,7 @@ class TestAcba(IntegronTest):
         self.assertFileEqual(expected_result_path, test_result_path)
 
 
-    def test_acba_no_hmm(self):
+    def test_acba_no_hmmer(self):
         replicon_name = 'acba.007.p01.13'
         decorator = hide_executable('hmmsearch')
         finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
@@ -259,7 +259,10 @@ class TestAcba(IntegronTest):
                                                                          )
                                                                          )
         with self.assertRaises(RuntimeError) as ctx:
-            main(command.split()[1:])
+            with self.catch_log():
+                # in case the error is not raised
+                # anyway do not want to mess up the test output
+                main(command.split()[1:])
 
         err_msg = "cannot find 'hmmsearch' in PATH.\n" \
                   "Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option"
@@ -277,7 +280,10 @@ class TestAcba(IntegronTest):
                                                                          )
                                                                          )
         with self.assertRaises(RuntimeError) as ctx:
-            main(command.split()[1:])
+            with self.catch_log():
+                # in case the error is not raised
+                # anyway do not want to mess up the test output
+                main(command.split()[1:])
 
         err_msg = "cannot find 'prodigal' in PATH.\n" \
                   "Please install prodigal package or setup 'prodigal' binary path with --prodigal option"
@@ -295,7 +301,10 @@ class TestAcba(IntegronTest):
                                                                          )
                                                                          )
         with self.assertRaises(RuntimeError) as ctx:
-            main(command.split()[1:])
+            with self.catch_log():
+                # in case the error is not raised
+                # anyway do not want to mess up the test output
+                main(command.split()[1:])
 
         err_msg = "cannot find 'cmsearch' in PATH.\n" \
                   "Please install infernal package or setup 'cmsearch' binary path with --cmsearch option"
@@ -315,7 +324,7 @@ def hide_executable(bin_2_hide):
     def find_executable(func):
         @functools.wraps(func)
         def wrapper(exe):
-            if bin == bin_2_hide:
+            if exe == bin_2_hide:
                 return None
             else:
                 return func(exe)
