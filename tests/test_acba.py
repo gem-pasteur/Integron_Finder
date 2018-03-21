@@ -52,13 +52,6 @@ _prodigal_call = integrase.call
 
 class TestAcba(IntegronTest):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.set_log_level('WARNING')
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.set_log_level('INFO')
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
