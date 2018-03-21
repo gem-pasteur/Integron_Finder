@@ -46,9 +46,13 @@ if not integron_finder.__version__.endswith('VERSION'):
     warnings.simplefilter('ignore', FutureWarning)
     warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
-from Bio import Seq, SeqIO
+# must be done after import 'integron_finder'
+import colorlog
+_log = colorlog.getLogger('integron_finder')
 
-from integron_finder import IntegronError
+from Bio import SeqIO
+
+from integron_finder import IntegronError, logger_set_level
 from integron_finder import utils
 from integron_finder.topology import Topology
 from integron_finder.config import Config
@@ -222,8 +226,7 @@ def find_integron_in_one_replicon(replicon, config):
         is_func_annot = False
 
     if is_func_annot and not fa_hmm:
-        print >> sys.stderr, "WARNING: No hmm profiles for functional annotation detected, " \
-                             "skip functional annotation step."
+        _log.warning("No hmm profiles for functional annotation detected, skip functional annotation step.")
 
     model_attc_name = config.model_attc_name
     model_len = config.model_len
@@ -247,36 +250,37 @@ def find_integron_in_one_replicon(replicon, config):
         if not os.path.isfile(intI_file) or not os.path.isfile(phageI_file):
             find_integrase(config.replicon_path, replicon, prot_file, result_dir_other, config)
 
-    print "\n>>> Starting Default search ... :"
+    _log.info("Starting Default search ... :")
     if not os.path.isfile(attC_default_file):
         find_attc(config.replicon_path, replicon.name, config.cmsearch, result_dir_other, config.model_attc_path,
                   cpu=config.cpu)
 
-    print ">>> Default search done... : \n"
+    _log.info("Default search done... : ")
     integrons = find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
 
     #########################
     # Search with local_max #
     #########################
     if config.local_max:
-        print "\n>>>>>> Starting search with local_max...:"
+        _log.info("Starting search with local_max...:")
         if not os.path.isfile(os.path.join(result_dir_other, "integron_max.pickle")):
             circular = True if replicon.topology == 'circ' else False
             integron_max = find_attc_max(integrons, replicon, config.distance_threshold,
                                          config.model_attc_path, config.max_attc_size,
                                          circular=circular, out_dir=result_dir_other)
             integron_max.to_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
-            print ">>>>>> Search with local_max done... : \n"
+            _log.info("Search with local_max done... :")
 
         else:
             integron_max = pd.read_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
-            print ">>>>>> Search with local_max was already done, continue... : \n"
+            _log.info("Search with local_max was already done, continue... :")
 
         integrons = find_integron(replicon, integron_max, intI_file, phageI_file, config)
 
     ##########################
     # Add promoters and attI #
     ##########################
+    _log.info("Adding promoters and attI ... :")
     for integron in integrons:
         integron_type = integron.type()
         if integron_type != "In0":  # complete & CALIN
@@ -293,6 +297,7 @@ def find_integron_in_one_replicon(replicon, config):
     # Functional annotation #
     #########################
     if is_func_annot and fa_hmm:
+        _log.info("Starting functional annotation ...:")
         func_annot(integrons, replicon, prot_file, fa_hmm, config, result_dir_other)
 
     for j, integron in enumerate(integrons, 1):
@@ -302,6 +307,7 @@ def find_integron_in_one_replicon(replicon, config):
     #######################
     # Writing out results #
     #######################
+    _log.info("Writing out results")
     outfile = os.path.join(result_dir, replicon_name + ".integrons")
     if integrons:
         integrons_describe = pd.concat([i.describe() for i in integrons])
@@ -323,9 +329,11 @@ def find_integron_in_one_replicon(replicon, config):
             out_f.write("# No Integron found\n")
 
 
-def main(args=None):
+def main(args=None, loglevel='INFO'):
     args = sys.argv[1:] if args is None else args
     config = parse_args(args)
+
+    logger_set_level(loglevel)
 
     if config.cmsearch is None:
         raise RuntimeError("""cannot find 'cmsearch' in PATH.

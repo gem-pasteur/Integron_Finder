@@ -27,12 +27,15 @@
 ####################################################################################
 
 import os
+import colorlog
 from subprocess import call
 
 import numpy as np
 import pandas as pd
 
 from .infernal import local_max, expand
+
+_log = colorlog.getLogger(__name__)
 
 
 def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):

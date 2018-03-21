@@ -42,7 +42,6 @@ warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 from Bio import SearchIO
 
-
 _log = colorlog.getLogger(__name__)
 
 

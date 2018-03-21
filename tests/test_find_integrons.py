@@ -27,11 +27,9 @@
 ####################################################################################
 
 import os
-import sys
 import tempfile
 import shutil
 import argparse
-import colorlog
 
 import numpy as np
 import pandas as pd
@@ -49,7 +47,6 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder import logger_set_level
 from integron_finder.integron import Integron, find_integron
 from integron_finder.config import Config
 from integron_finder.utils import read_single_dna_fasta
@@ -66,7 +63,6 @@ class TestFindIntegons(IntegronTest):
         else:
             self.local_install = False
             self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         os.makedirs(self.tmp_dir)
@@ -86,8 +82,11 @@ class TestFindIntegons(IntegronTest):
                       "annotation": 'str',
                       "model": 'str',
                       "distance_2attC": 'float'}
+        self.set_log_level('INFO')
+
 
     def tearDown(self):
+        self.set_log_level('WARNING')
         try:
             shutil.rmtree(self.tmp_dir)
             pass
@@ -116,16 +115,15 @@ class TestFindIntegons(IntegronTest):
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        logger_set_level(colorlog.logging.logging.INFO)
         exp_msg = """In replicon acba.007.p01.13, there are:
 - 0 complete integron(s) found with a total 0 attC site(s)
 - 1 CALIN element(s) found with a total of 3 attC site(s)
 - 0 In0 element(s) found with a total of 0 attC site"""
         with self.catch_log() as log:
             integrons = find_integron(replicon, attc_file, intI_file, phageI_file, cfg)
-            catch_msg = log.handlers[0].stream.getvalue().strip()
-        self.assertEqual(catch_msg, exp_msg)
+            catch_msg = log.get_value().strip()
 
+        self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
         self.assertEqual(integron.replicon.id, replicon.id)
@@ -143,7 +141,6 @@ class TestFindIntegons(IntegronTest):
         pdt.assert_frame_equal(integron.attC, exp)
 
         exp = pd.DataFrame(columns=self.columns,)
-
         exp = exp.astype(dtype=self.dtype)
 
         pdt.assert_frame_equal(integron.integrase, exp)
@@ -164,13 +161,6 @@ class TestFindIntegons(IntegronTest):
         phageI_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
                                                   'other', '{}_phage_int.res'.format(replicon_name)))
 
-        # integron_finder.replicon_name = replicon_name
-        # integron_finder.SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        # integron_finder.SIZE_REPLICON = len(integron_finder.SEQUENCE)
-        # integron_finder.args = args
-        # integron_finder.DISTANCE_THRESHOLD = 4000  # (4kb at least between 2 different arrays)
-        # integron_finder.model_attc_name = integron_finder.MODEL_attc.split("/")[-1].split(".cm")[0]
-
         args = argparse.Namespace()
         args.no_proteins = True
         args.keep_palindromes = True
@@ -189,7 +179,6 @@ class TestFindIntegons(IntegronTest):
                                   size_max_attc=cfg.max_attc_size,
                                   size_min_attc=cfg.min_attc_size)
 
-        logger_set_level(colorlog.logging.logging.INFO)
         exp_msg = """In replicon acba.007.p01.13, there are:
 - 0 complete integron(s) found with a total 0 attC site(s)
 - 1 CALIN element(s) found with a total of 3 attC site(s)
@@ -200,7 +189,7 @@ class TestFindIntegons(IntegronTest):
                                       intI_file,
                                       phageI_file,
                                       cfg)
-            catch_msg = log.handlers[0].stream.getvalue().strip()
+            catch_msg = log.get_value().strip()
         self.assertEqual(catch_msg, exp_msg)
 
         self.assertEqual(len(integrons), 1)
@@ -220,7 +209,6 @@ class TestFindIntegons(IntegronTest):
         pdt.assert_frame_equal(integron.attC, exp)
 
         exp = pd.DataFrame(columns=self.columns)
-
         exp = exp.astype(dtype=self.dtype)
 
         pdt.assert_frame_equal(integron.integrase, exp)
@@ -259,7 +247,6 @@ class TestFindIntegons(IntegronTest):
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        logger_set_level(colorlog.logging.logging.INFO)
         exp_msg = """In replicon acba.007.p01.13, there are:
 - 1 complete integron(s) found with a total 3 attC site(s)
 - 0 CALIN element(s) found with a total of 0 attC site(s)
@@ -270,9 +257,8 @@ class TestFindIntegons(IntegronTest):
                                       intI_file,
                                       phageI_file,
                                       cfg)
-            catch_msg = log.handlers[0].stream.getvalue().strip()
+            catch_msg = log.get_value().strip()
         self.assertEqual(catch_msg, exp_msg)
-
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
         self.assertEqual(integron.replicon.name, replicon_name)
@@ -341,7 +327,6 @@ class TestFindIntegons(IntegronTest):
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        logger_set_level(colorlog.logging.logging.INFO)
         exp_msg = """In replicon acba.007.p01.13, there are:
 - 1 complete integron(s) found with a total 3 attC site(s)
 - 0 CALIN element(s) found with a total of 0 attC site(s)
@@ -352,9 +337,8 @@ class TestFindIntegons(IntegronTest):
                                       intI_file,
                                       phageI_file,
                                       cfg)
-            catch_msg = log.handlers[0].stream.getvalue().strip()
+            catch_msg = log.get_value().strip()
         self.assertEqual(catch_msg, exp_msg)
-
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
         self.assertEqual(integron.replicon.name, replicon_name)
@@ -387,7 +371,6 @@ class TestFindIntegons(IntegronTest):
         pdt.assert_frame_equal(integron.attC, exp)
 
         exp = pd.DataFrame(columns=self.columns)
-
         exp = exp.astype(dtype=self.dtype)
 
         pdt.assert_frame_equal(integron.promoter, exp)

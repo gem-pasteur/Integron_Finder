@@ -27,7 +27,6 @@
 ####################################################################################
 
 import os
-import colorlog
 from subprocess import call
 
 from Bio import BiopythonExperimentalWarning
@@ -42,8 +41,6 @@ from Bio import SeqIO
 
 from .utils import get_name_from_path, read_multi_prot_fasta
 from .hmm import read_hmm
-
-_log = colorlog.getLogger(__name__)
 
 
 def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', evalue=10, coverage=0.5):
@@ -72,7 +69,6 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
 
     """
 
-    _log.info("Start Functional annotation... :")
     prot_tmp = os.path.join(out_dir, replicon.name + "_subseqprot.tmp")
 
     for integron in integrons:
@@ -132,7 +128,7 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
     :type replicon: a :class:`Bio.Seq.SeqRecord` object.
     :param integron_desc:
     :type integron_desc: a :class:`pandas.DataFrame`
-    :param prot_file: the path to the fasta file containing the traduction of the replicon.
+    :param prot_file: the path to the fasta file containing the translation of the replicon.
     :param int dist_threshold: Two elements are aggregated if they are distant of dist_threshold or less.
     """
 

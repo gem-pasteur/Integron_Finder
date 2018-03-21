@@ -27,9 +27,6 @@
 ####################################################################################
 
 import os
-import sys
-from contextlib import contextmanager
-from StringIO import StringIO
 
 try:
     from tests import IntegronTest
@@ -71,7 +68,8 @@ class TestScanHmmBank(IntegronTest):
         exp_msg = "func_annot '/my_hmms' does not match any files."
         with self.catch_log() as log:
             files = scan_hmm_bank(mypath)
-            catch_msg = log.handlers[0].stream.getvalue().strip()
+            catch_msg = log.get_value().strip()
+
         self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(files, [])
 
@@ -102,7 +100,7 @@ class TestScanHmmBank(IntegronTest):
         # Read hmm_bank file and get list of all files found
         with self.catch_log() as log:
             files = scan_hmm_bank("list_hmm2.txt")
-            catch_msg = log.handlers[0].stream.getvalue().strip()
+            catch_msg = log.get_value().strip()
         # Write expected list of hmm files
         exp_files1 = ["Resfam.hmm", "integrase.hmm", "phage_int.hmm"]
         exp_files1 = [os.path.abspath(os.path.join(path1, myfile)) for myfile in exp_files1]

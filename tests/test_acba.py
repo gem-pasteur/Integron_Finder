@@ -43,8 +43,6 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-import colorlog
-from integron_finder import logger_set_level
 from integron_finder import integrase
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
@@ -56,12 +54,11 @@ class TestAcba(IntegronTest):
 
     @classmethod
     def setUpClass(cls):
-        logger_set_level(colorlog.logging.logging.WARNING)
+        cls.set_log_level('WARNING')
 
     @classmethod
     def tearDownClass(cls):
-        logger_set_level(colorlog.logging.logging.INFO)
-
+        cls.set_log_level('INFO')
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
@@ -97,7 +94,7 @@ class TestAcba(IntegronTest):
                                                                          )
 
         with self.catch_io(out=True, err=True):
-            main(command.split()[1:])
+            main(command.split()[1:], loglevel='WARNING')
 
         gbk = '{}.gbk'.format(replicon_name)
         expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name), gbk))
@@ -121,7 +118,7 @@ class TestAcba(IntegronTest):
             replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
         )
         with self.catch_io(out=True, err=True):
-            main(command.split()[1:])
+            main(command.split()[1:], loglevel='WARNING')
 
         result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
 
@@ -154,7 +151,7 @@ class TestAcba(IntegronTest):
             replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
         )
         with self.catch_io(out=True, err=True):
-            main(command.split()[1:])
+            main(command.split()[1:], loglevel='WARNING')
 
         result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
 
@@ -202,7 +199,7 @@ class TestAcba(IntegronTest):
                                                                          )
                                                                          )
         with self.catch_io(out=True, err=True):
-            main(command.split()[1:])
+            main(command.split()[1:], loglevel='WARNING')
 
         output_filename = 'fake_seq.integrons'
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_fake_seq',

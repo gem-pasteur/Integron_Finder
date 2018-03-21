@@ -256,7 +256,6 @@ def expand(replicon,
         window_end = we
 
     if search_left:
-
         if circular:
             window_end = (window_beg + 200) % replicon_size
             window_beg = (window_beg - dist_threshold) % replicon_size
