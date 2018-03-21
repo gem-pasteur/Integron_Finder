@@ -32,6 +32,7 @@ import colorlog
 
 _log = colorlog.getLogger(__name__)
 
+
 def find_integrase(replicon_path, replicon, prot_file, out_dir, cfg):
     """
     Call Prodigal for Gene annotation and hmmer to find integrase, either with phage_int

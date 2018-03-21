@@ -159,6 +159,17 @@ def parse_args(args):
                         help="Synonym of --local_max. Like a soaring eagle in the sky,"
                              " catching rabbits(or attC sites) by surprise.",
                         action="store_true")
+    output_options = parser.add_argument_group("Output options")
+    output_options.add_argument('--pdf',
+                                action='store_true',
+                                default=False,
+                                help='For each complete integron, a simple graphic of the region is depicted '
+                                     '(in pdf format)'),
+    output_options.add_argument('--gbk',
+                                action='store_true',
+                                default=False,
+                                help='generate a GenBank file with the sequence annotated with the same annotations '
+                                     'than .integrons file.')
 
     topology_grp = parser.add_mutually_exclusive_group()
     topology_grp.add_argument("--circ",
@@ -310,14 +321,16 @@ def find_integron_in_one_replicon(replicon, config):
         _log.info("Starting functional annotation ...:")
         func_annot(integrons, replicon, prot_file, fa_hmm, config, result_dir_other)
 
-    for j, integron in enumerate(integrons, 1):
-        if integron.type() == "complete":
-            integron.draw_integron(file=os.path.join(result_dir, "{}_{}.pdf".format(replicon.name, j)))
-
     #######################
     # Writing out results #
     #######################
     _log.info("Writing out results")
+
+    if config.pdf:
+        for j, integron in enumerate(integrons, 1):
+            if integron.type() == "complete":
+                integron.draw_integron(file=os.path.join(result_dir, "{}_{}.pdf".format(replicon.name, j)))
+
     outfile = os.path.join(result_dir, replicon_name + ".integrons")
     if integrons:
         integrons_describe = pd.concat([i.describe() for i in integrons])
@@ -332,8 +345,10 @@ def find_integron_in_one_replicon(replicon, config):
         integrons_describe.index = range(len(integrons_describe))
         integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
         integrons_describe.to_csv(outfile, sep="\t", index=0, na_rep="NA")
-        add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
-        SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
+
+        if config.gbk:
+            add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
+            SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
     else:
         with open(outfile, "w") as out_f:
             out_f.write("# No Integron found\n")

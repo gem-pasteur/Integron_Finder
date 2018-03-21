@@ -234,6 +234,17 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['-qq', 'replicon'])
         self.assertEqual(cfg.quiet, 2)
 
+    def test_pdf(self):
+        cfg = parse_args(['replicon'])
+        self.assertFalse(cfg.pdf)
+        cfg = parse_args(['--pdf', 'replicon'])
+        self.assertTrue(cfg.pdf)
+
+    def test_gbk(self):
+        cfg = parse_args(['replicon'])
+        self.assertFalse(cfg.gbk)
+        cfg = parse_args(['--gbk', 'replicon'])
+        self.assertTrue(cfg.gbk)
 
     def test_version(self):
         real_exit = sys.exit
