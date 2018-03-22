@@ -40,8 +40,8 @@ def make_single_fasta_reader(alphabet):
 
     def read_fasta(path):
         """
-        :param path:the path to the fasta file
-        :return: the sequence parsed
+        :param path: The path to the fasta file.
+        :return: The sequence parsed.
         :rtype: :class:`Bio.SeqRecord.SeqRecord` object
         """
         seq = SeqIO.read(path, "fasta",  alphabet=alphabet)
@@ -65,9 +65,9 @@ def make_multi_fasta_reader(alphabet):
 
     def fasta_iterator(path):
         """
-        :param path:the path to the fasta file
-        :return: the sequence parsed
-        :rtype: :class:`Bio.SeqRecord.SeqRecord` object
+        :param path: The path to the fasta file.
+        :return: The sequence parsed.
+        :rtype: :class:`Bio.SeqRecord.SeqRecord` object.
         """
         name = get_name_from_path(path)
         seq_it = SeqIO.parse(path, "fasta",  alphabet=alphabet)
@@ -85,9 +85,9 @@ class FastaIterator(object):
     """
     Allow to parse over a multi fasta file, and iterate over it
 
-    .. warning:
+    .. warning::
 
-        The order of sequences is not guarantee
+        The sequences order is not guarantee.
 
     """
 
@@ -98,8 +98,9 @@ class FastaIterator(object):
         :param alphabet: The authorized alphabet
         :type alpahbet: Bio.SeqIUPAC member
         :param str replicon_name: The name of the replicon, if this specify all sequence.name will have this value
-        :param int dist_threshold: the minimun length for a replicon to be considered as circular. Under this threshold
-                                   even the provided toplogy is 'circular' the computation will be done with a 'linear' topology.
+        :param int dist_threshold: The minimum length for a replicon to be considered as circular.
+                                   Under this threshold even the provided topology is 'circular'
+                                   the computation will be done with a 'linear' topology.
         """
         self.alphabet = alphabet
         self.seq_index = SeqIO.index(path, "fasta", alphabet=self.alphabet)
@@ -153,7 +154,7 @@ class FastaIterator(object):
 
 
     def __len__(self):
-        """:returns: The nuber of sequence in the file"""
+        """:returns: The number of sequence in the file"""
         return len(self.seq_index)
 
 
@@ -182,7 +183,7 @@ def get_name_from_path(path):
     """
     :param path: The path to extract name for instance the fasta file to the replicon
     :return: the name of replicon for instance
-             if path = /path/to/replicon.fasta name = repliocn
+             if path = /path/to/replicon.fasta name = replicon
     """
     return os.path.splitext(os.path.split(path)[1])[0]
 
@@ -192,9 +193,9 @@ SeqDesc = namedtuple('SeqDesc', ('id', 'strand', 'start', 'stop'))
 
 
 def gembase_parser(description):
-    """"
+    """
     :param description: description (1rst line without id) of sequence from gembase fasta file
-    :return: SeqDesc
+    :return: :class:`SeqDesc` object
     """
     desc = description.split(" ")
     id_, strand, start, stop = desc[:2] + desc[4:6]
@@ -207,7 +208,7 @@ def gembase_parser(description):
 def non_gembase_parser(description):
     """
     :param description: description (1rst line without id) of sequence from fasta file not coming a gemabse
-    :return: SeqDesc
+    :return: :class:`SeqDesc` object
     """
     id_, start, stop, strand, _ = description.split(" # ")
     start = int(start)
