@@ -171,13 +171,13 @@ def find_attc_max(integrons, replicon, distance_threshold,
 
     :param integrons: the integrons may contain or not attC or intI.
     :type integrons: list of :class:`Integron` objects.
-    :param replicon: replicon where the integrons were found (genomic fasta file)
-    :type replicon: :class:Bio.Seq.SeqRecord` object
-    :param int distance_threshold: the maximal distance between 2 elements to aggregate them
-    :param str model_attc_path: path to the attc model (Covariance Matrix)
-    :param int max_attc_size: maximum value fot the attC size
+    :param replicon: replicon where the integrons were found (genomic fasta file).
+    :type replicon: :class:`Bio.Seq.SeqRecord` object.
+    :param int distance_threshold: the maximal distance between 2 elements to aggregate them.
+    :param str model_attc_path: path to the attc model (Covariance Matrix).
+    :param int max_attc_size: maximum value fot the attC size.
     :param bool circular: True if replicon is circular, False otherwise.
-    :param str outfile: the name of cmsearch result file
+    :param str outfile: the name of cmsearch result file.
     :return:
     :rtype: :class:`pd.DataFrame` object
 

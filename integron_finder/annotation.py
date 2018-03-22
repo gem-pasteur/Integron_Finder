@@ -51,7 +51,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
     :param integrons: integrons list to annotate
     :type integrons: list of :class:`integron_finder.integron.Integron` objects.
     :param replicon: replicon where the integrons were found (genomic fasta file)
-    :type replicon: :class:Bio.Seq.SeqRecord` object
+    :type replicon: :class:`Bio.Seq.SeqRecord` object
     :param str prot_file: the path to a fasta file containing the sequence proteins of the replicon
                           these proteins constitute the bank scanned by hmmsearch
     :param str hmm_files: list of path of hmm profiles to use to scan the prot_file
@@ -61,7 +61,8 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
     :param float evalue:
     :param float coverage:
     :return: None.
-             | But several files per hmm file are produced.
+
+             But several files per hmm file are produced.
 
              * subseqprot.tmp: fasta file containing a subset of protfile (the proteins belonging to the integron)
              * <hmm>_fa.res: an output of the hmm search.
@@ -126,9 +127,9 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
 
     :param replicon: The Replicon to annotate
     :type replicon: a :class:`Bio.Seq.SeqRecord` object.
-    :param integron_desc:
+    :param integron_desc: integron description
     :type integron_desc: a :class:`pandas.DataFrame`
-    :param prot_file: the path to the fasta file containing the translation of the replicon.
+    :param str prot_file: the path to the fasta file containing the translation of the replicon.
     :param int dist_threshold: Two elements are aggregated if they are distant of dist_threshold or less.
     """
 

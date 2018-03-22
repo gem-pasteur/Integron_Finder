@@ -46,8 +46,9 @@ def read_infernal(infile, replicon_name, len_model_attc,
     :param int size_max_attc: The maximum value fot the attC size
     :param int size_min_attc: The minimum value fot the attC size
     :return: table with columns:
+
             | "Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"
-            | and each row is a hit that match the attc covariance model
+            | and each row is a hit that match the attc covariance model.
     :rtype: :class:`pandas.DataFrame` object
     """
 

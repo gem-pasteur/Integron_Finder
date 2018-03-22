@@ -97,8 +97,10 @@ def read_hmm(replicon_name, infile, cfg, evalue=1., coverage=0.5):
     :param float evalue: filter out hitst with evalue greater tha evalue.
     :param float coverage: filter out hits with coverage under coverage (% of the profile aligned)
     :returns: data Frame with columns:
+
               | "Accession_number", "query_name", "ID_query", "ID_prot", "strand", "pos_beg", "pos_end", "evalue"
               | each row correspond to a hit.
+
     :rtype: a :class:`pandas.DataFrame`
     """
 

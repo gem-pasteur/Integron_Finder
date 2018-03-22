@@ -65,11 +65,13 @@ class Topology(object):
         """
         Parse a topology file where topology is specified for replicons
         on each line a topology is specified for a replicon
-        the syntax of each line is
-        replicon_id topology
+        the syntax of each line is ::
+
+            replicon_id topology
 
         the allowed value for toplogy are  'circ', 'circular', 'lin', 'linear'
-        :param topology_file: The path to the toplogy file
+
+        :param str topology_file: The path to the topology file
         """
         with open(topology_file) as topo_f:
             for entry in topo_f:
@@ -80,6 +82,9 @@ class Topology(object):
 
 
     def __getitem__(self, replicon_id):
-        """:returns: the topology for the replicon corresponding to the replicon_id"""
+        """
+        :param str replicon_id: The id of the replicon.
+        :returns: the topology for the replicon corresponding to the replicon_id
+        """
         return self._topology[replicon_id]
 

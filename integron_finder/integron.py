@@ -335,6 +335,7 @@ class Integron(object):
     def type(self):
         """
         :returns: The type of the integrons:
+
                     - 'complete' : Have one integrase and at least one attC
                     - 'CALIN' : Have at least one attC
                     - 'In0' : Just an integrase intI
@@ -562,9 +563,7 @@ class Integron(object):
 
     def add_proteins(self, prot_file):
         """
-
-        :param prot_file:
-        :return:
+        :param str prot_file: The path to the protein file in fasta format.
         """
         attc_start = self.attC.pos_beg.values[0]
         attc_end = self.attC.pos_end.values[-1]
@@ -617,6 +616,7 @@ class Integron(object):
         """
         :returns: DataFrame describing the integron object
                   The columns are:
+
                   "pos_beg", "pos_end", "strand", "evalue", "type_elt", "model", "distance_2attC", "annotation", "considered_topology"
 
         """
