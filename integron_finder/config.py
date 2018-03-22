@@ -65,8 +65,15 @@ class Config(object):
 
     @property
     def outdir(self):
-        """The absolute path where to write the results"""
+        """The absolute path where to write the results directory"""
         return os.path.abspath(self._args.outdir)
+
+    @property
+    def result_dir(self):
+        """The absolute path to results directory"""
+        file_name = utils.get_name_from_path(self.replicon_path)
+        result_dir = os.path.join(self.outdir, "Results_Integron_Finder_" + file_name)
+        return result_dir
 
     @property
     def default_topology(self):
