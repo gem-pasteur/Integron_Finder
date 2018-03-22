@@ -35,6 +35,7 @@ import os
 import sys
 import argparse
 import distutils.spawn
+import shutil
 
 import pandas as pd
 
@@ -209,22 +210,7 @@ def find_integron_in_one_replicon(replicon, config):
     in_dir, sequence_file = os.path.split(config.replicon_path)
     replicon_name = replicon.name
 
-    ###################################
-    # Prepare directories for results #
-    ###################################
-    if not os.path.exists(config.outdir):
-        os.mkdir(config.outdir)
-    else:
-        if not os.path.isdir(config.outdir):
-            raise IOError("outdir '{}' already exists and is not a directory".format(config.outdir))
-
-    result_dir = os.path.join(config.outdir, "Results_Integron_Finder_" + replicon_name)
-    try:
-        os.mkdir(result_dir)
-    except OSError:
-        pass
-
-    result_dir_other = os.path.join(config.outdir, "Results_Integron_Finder_" + replicon_name, "other")
+    result_dir_other = os.path.join(config.result_dir, "other_{}".format(replicon.id))
     try:
         os.mkdir(result_dir_other)
     except OSError:
@@ -323,9 +309,9 @@ def find_integron_in_one_replicon(replicon, config):
     if config.pdf:
         for j, integron in enumerate(integrons, 1):
             if integron.type() == "complete":
-                integron.draw_integron(file=os.path.join(result_dir, "{}_{}.pdf".format(replicon.name, j)))
+                integron.draw_integron(file=os.path.join(config.result_dir, "{}_{}.pdf".format(replicon.id, j)))
 
-    outfile = os.path.join(result_dir, replicon_name + ".integrons")
+    outfile = os.path.join(config.result_dir, replicon_name + ".integrons")
     if integrons:
         integrons_describe = pd.concat([i.describe() for i in integrons])
         dic_id = {id_: "{:02}".format(j) for j, id_ in
@@ -342,13 +328,30 @@ def find_integron_in_one_replicon(replicon, config):
 
         if config.gbk:
             add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
-            SeqIO.write(replicon, os.path.join(result_dir, replicon_name + ".gbk"), "genbank")
+            SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
     else:
         with open(outfile, "w") as out_f:
             out_f.write("# No Integron found\n")
 
+    #########################
+    # clean temporary files #
+    #########################
+
+    if False:
+        try:
+            shutil.rmtree(result_dir_other)
+        except:
+            pass
+
 
 def header(args):
+    """
+
+    :param args: the arguments passed on command line. for instance: ['--pdf' '/path/to/replicon']
+    :type args: list of strings
+    :return: a header containing the name of the program, information about version and licensing.
+    :rtype: string
+    """
     tpl = """
 **************************************************************************    
  ___       _                               _____ _           _           
@@ -422,12 +425,25 @@ Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch o
         raise RuntimeError("""cannot find 'prodigal' in PATH.
 Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
 
+    ###################################
+    # Prepare directories for results #
+    ###################################
+    if not os.path.exists(config.outdir):
+        os.mkdir(config.outdir)
+    else:
+        if not os.path.isdir(config.outdir):
+            raise IOError("outdir '{}' already exists and is not a directory".format(config.outdir))
+
+    try:
+        os.mkdir(config.result_dir)
+    except OSError:
+        pass
+
     ################
     # print Header #
     ################
 
     print header(args)
-
 
     ################
     # set topology #
