@@ -354,7 +354,58 @@ def find_integron_in_one_replicon(replicon, config):
             out_f.write("# No Integron found\n")
 
 
+def header(args):
+    tpl = """
+**************************************************************************    
+ ___       _                               _____ _           _           
+|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __ 
+ | || '_ \| __/ _ \/ _` | '__/ _ \| '_ \  | |_  | | '_ \ / _` |/ _ \ '__|
+ | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |   
+|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|   
+                   |___/                                                 
+   
+**************************************************************************    
+
+{version}
+
+                     =======================
+
+integron_finder is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+integron_finder is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program (COPYING file).
+If not, see <http://www.gnu.org/licenses/>.     
+
+                     =======================
+                     
+command used: integron_finder {cmd}  
+  
+                     =======================
+                     
+"""
+    header = tpl.format(version=integron_finder.get_version_message(),
+                        cmd=' '.join(args)
+                        )
+    return header
+
+
 def main(args=None, loglevel=None):
+    """
+    main entry point to integron_finder
+
+    :param str args: the arguments passed on the command line
+    :param loglevel: the output verbosity
+    :type loglevel: a positive int or a string among 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
+    """
+
     args = sys.argv[1:] if args is None else args
     config = parse_args(args)
 
@@ -376,6 +427,12 @@ Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch o
     if config.prodigal is None:
         raise RuntimeError("""cannot find 'prodigal' in PATH.
 Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
+
+    ################
+    # print Header #
+    ################
+
+    print header(args)
 
 
     ################
