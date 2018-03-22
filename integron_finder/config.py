@@ -59,13 +59,13 @@ class Config(object):
 
     @property
     def input_dir(self):
-        """The absloute path to the directory where is located the replicon"""
+        """The absolute path to the directory where is located the replicon"""
         in_dir, sequence_file = os.path.split(self.replicon_path)
         return in_dir
 
     @property
     def outdir(self):
-        """The absolute path wher to write the results"""
+        """The absolute path where to write the results"""
         return os.path.abspath(self._args.outdir)
 
     @property
@@ -111,7 +111,7 @@ class Config(object):
 
     @property
     def model_attc_name(self):
-        "The name of the attc model"
+        """The name of the attc model"""
         try:
             self._args.attc_model
         except AttributeError:
