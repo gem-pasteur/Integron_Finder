@@ -249,12 +249,6 @@ def find_integron_in_one_replicon(replicon, config):
     if is_func_annot and not fa_hmm:
         _log.warning("No hmm profiles for functional annotation detected, skip functional annotation step.")
 
-    model_attc_name = config.model_attc_name
-    model_len = config.model_len
-
-    max_attc_size = config.max_attc_size
-    min_attc_size = config.min_attc_size
-
     if config.gembase:
         prot_file = os.path.join(in_dir, "..", "Proteins", replicon_name + ".prt")
     else:
