@@ -103,7 +103,8 @@ def main(args=None):
     old_path = sys.path
 
     if INTEGRON_HOME not in sys.path:
-        # need to add
+        # need to add tests in path
+        # tests inherits from IntegronTest which is located in tests/__init__.py
         sys.path.insert(0, INTEGRON_HOME)
 
     test_runner = run_tests(args.tests, verbosity=args.verbosity)
