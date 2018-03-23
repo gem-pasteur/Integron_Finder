@@ -26,6 +26,8 @@
 # If not, see <http://www.gnu.org/licenses/>.                                      #
 ####################################################################################
 
+from __future__ import print_function
+
 import os
 import sysconfig
 
@@ -53,8 +55,6 @@ class install_lib(_install_lib):
             installer = 'pip'
         else:
             installer = 'fucking_setuptools'
-        print "### installer is", installer
-
         script_tmp_dir = self.build_dir if installer != 'fucking_setuptools' else self.install_dir
 
         def subst_file(_file, vars_2_subst):
@@ -194,7 +194,7 @@ try:
 
 except ImportError:
     import sys
-    print >> sys.stderr, "WARNING: pypandoc module not found.\nCould not convert Markdown to RST"
+    print("WARNING: pypandoc module not found.\nCould not convert Markdown to RST", file=sys.stderr)
 
     def read_md(f):
         return open(f, 'r').read()
