@@ -41,7 +41,7 @@ class Config(object):
         self._args = args
 
         if __INTEGRON_DATA__ == '$' + 'INTEGRONDATA':
-            self._prefix_data = os.path.join(os.path.join(os.path.dirname(__file__)), '..', 'data')
+            self._prefix_data = os.path.normpath(os.path.join(os.path.join(os.path.dirname(__file__)), '..', 'data'))
         else:
             self._prefix_data = os.path.join(__INTEGRON_DATA__, 'data')
 
