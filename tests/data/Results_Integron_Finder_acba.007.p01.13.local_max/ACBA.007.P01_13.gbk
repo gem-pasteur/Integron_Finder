@@ -1,4 +1,4 @@
-LOCUS       acba.007.p01.13        20301 bp    DNA              UNK 01-JAN-1980
+LOCUS       ACBA.007.P01_13        20301 bp    DNA              UNK 01-JAN-1980
 DEFINITION  ACBA.007.P01_13 08-JUN-2013 20301 bp Acinetobacter baumannii
             MDR-ZJ06 plasmid pMDR-ZJ06, complete.
 ACCESSION   ACBA.007.P01_13
@@ -43,9 +43,12 @@ FEATURES             Location/Qualifiers
                      ETLTLWNSPPDWAGDERNVVLTLSRIWYSAVTGKIAPKDVAADWAMERLPAQYQPVILE
                      ARQAYLGQEEDRLASRADQLEEFVHYVKGEITKVVGK*"
                      /protein_id="ACBA.007.P01_13_21"
-     attC            complement(19080..19149)
+     attC            complement(18681..18749)
                      /model="attc_4"
                      /attC="attc_002"
+     attC            complement(19079..19149)
+                     /model="attc_4"
+                     /attC="attc_003"
      CDS             complement(19090..19749)
                      /model="NA"
                      /gene="protein"
@@ -56,7 +59,7 @@ FEATURES             Location/Qualifiers
                      /protein_id="ACBA.007.P01_13_22"
      attC            complement(19618..19726)
                      /model="attc_4"
-                     /attC="attc_003"
+                     /attC="attc_004"
      CDS             complement(19721..20254)
                      /model="RF0003"
                      /gene="AAC3-I"
