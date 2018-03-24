@@ -117,12 +117,12 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
         return attc_array
 
 
-def find_attc(replicon_path, replicon_name, cmsearch_path, out_dir, model_attc, cpu=1):
+def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cpu=1):
     """
     Call cmsearch to find attC sites in a single replicon.
 
     :param str replicon_path: the path of the fasta file representing the replicon to analyse
-    :param str replicon_name: the name of the replicon to analyse
+    :param str replicon_id: the id of the replicon to analyse
     :param str cmsearch_path: the path to the cmsearch executable
     :param str out_dir: the path to the directory where cmsearch outputs will be stored
     :param str model_attc: path to the attc model (Covariance Matrix)
@@ -132,8 +132,8 @@ def find_attc(replicon_path, replicon_name, cmsearch_path, out_dir, model_attc, 
     """
     cmsearch_cmd = [cmsearch_path,
                     "--cpu", str(cpu),
-                    "-o", os.path.join(out_dir, replicon_name + "_attc.res"),
-                    "--tblout", os.path.join(out_dir, replicon_name + "_attc_table.res"),
+                    "-o", os.path.join(out_dir, replicon_id + "_attc.res"),
+                    "--tblout", os.path.join(out_dir, replicon_id + "_attc_table.res"),
                     "-E", "10",
                     model_attc,
                     replicon_path]
@@ -195,7 +195,6 @@ def find_attc_max(integrons, replicon, distance_threshold,
         full_element = i.describe()
 
         if all(full_element.type == "complete"):
-
             # Where is the integrase compared to the attc sites (no matter the strand) :
             integrase_is_left = ((full_element[full_element.type_elt == "attC"].pos_beg.values[0] -
                                   full_element[full_element.annotation == "intI"].pos_end.values[0]) % size_replicon <

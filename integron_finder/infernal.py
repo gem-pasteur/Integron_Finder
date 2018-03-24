@@ -34,14 +34,14 @@ from Bio import SeqIO
 from .utils import model_len
 
 
-def read_infernal(infile, replicon_name, len_model_attc,
+def read_infernal(infile, replicon_id, len_model_attc,
                   evalue=1, size_max_attc=200, size_min_attc=40):
     """
     Function that parse cmsearch --tblout output and returns a pandas DataFrame
 
     :param str infile: the path to the output of cmsearch in tabulated format (--tblout)
-    :param str replicon_name: the name of the replicon are the integrons were found.
-    :param int len_model_attc: the lenght of the attc model
+    :param str replicon_id: the id of the replicon are the integrons were found.
+    :param int len_model_attc: the length of the attc model
     :param float evalue: evalue threshold to filter out hits above it
     :param int size_max_attc: The maximum value fot the attC size
     :param int size_min_attc: The minimum value fot the attC size
@@ -51,7 +51,6 @@ def read_infernal(infile, replicon_name, len_model_attc,
             | and each row is a hit that match the attc covariance model.
     :rtype: :class:`pandas.DataFrame` object
     """
-
 
     try:
         _ = pd.read_table(infile, comment="#")
@@ -64,7 +63,7 @@ def read_infernal(infile, replicon_name, len_model_attc,
     # seq to(8), strand(9), E-value(15)
     df = df[[2, 5, 6, 7, 8, 9, 15]]
     df.columns = ["cm_attC", "cm_debut", "cm_fin", "pos_beg_tmp", "pos_end_tmp", "sens", "evalue"]
-    df["Accession_number"] = replicon_name
+    df["Accession_number"] = replicon_id
     df = df[df.evalue < evalue]  # filter on evalue
     df = df[(abs(df.pos_end_tmp - df.pos_beg_tmp) < size_max_attc) & (size_min_attc < abs(df.pos_end_tmp - df.pos_beg_tmp))]
     if not df.empty:
@@ -90,7 +89,8 @@ def local_max(replicon,
               evalue_attc=1., max_attc_size=200, min_attc_size=40,
               cmsearch_bin='cmsearch', out_dir='.', cpu_nb=1):
     """
-    :param str replicon_name: The name of replicon (without suffix)
+    :param replicon: The name of replicon (without suffix)
+    :type replicon: :class:`Bio.Seq.SeqRecord` object.
     :param int window_beg: start of window to search for attc (position of protein)
     :param int window_end: end of window to search for attc (position of protein)
     :param str strand_search: The strand on which to looking for attc.
@@ -109,7 +109,7 @@ def local_max(replicon,
     :return: DataFrame with same structure as the DataFrame returns by :func:`read_infernal`
              where position are converted on position on replicon and attc are filtered
              by evalue, min_attc_size, max_attc_size
-             also write a file with intermediate results <replicon_name>_subseq_attc_table_end.res
+             also write a file with intermediate results <replicon_id>_subseq_attc_table_end.res
              this file store the local_max results before filtering by max_attc_size and min_attc_size
     :rtype: :class:`pandas.DataFrame` object
     """
@@ -122,14 +122,14 @@ def local_max(replicon,
         subseq2 = replicon[:window_end]
         subseq = subseq1 + subseq2
 
-    infile_path = os.path.join(out_dir, replicon.name + "_subseq.fst")
+    infile_path = os.path.join(out_dir, replicon.id + "_subseq.fst")
     with open(infile_path, "w") as f:
         SeqIO.write(subseq, f, "fasta")
 
-    output_path = os.path.join(out_dir, "{name}_{win_beg}_{win_end}_subseq_attc.res".format(name=replicon.name,
+    output_path = os.path.join(out_dir, "{name}_{win_beg}_{win_end}_subseq_attc.res".format(name=replicon.id,
                                                                                             win_beg=window_beg,
                                                                                             win_end=window_end))
-    tblout_path = os.path.join(out_dir, "{name}_{win_beg}_{win_end}_subseq_attc_table.res".format(name=replicon.name,
+    tblout_path = os.path.join(out_dir, "{name}_{win_beg}_{win_end}_subseq_attc_table.res".format(name=replicon.id,
                                                                                                   win_beg=window_beg,
                                                                                                   win_end=window_end))
 
@@ -151,7 +151,7 @@ def local_max(replicon,
         raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd, returncode))
 
     df_max = read_infernal(tblout_path,
-                           replicon.name, model_len(model_attc_path),
+                           replicon.id, model_len(model_attc_path),
                            evalue=evalue_attc,
                            size_max_attc=max_attc_size,
                            size_min_attc=min_attc_size)
@@ -166,7 +166,7 @@ def local_max(replicon,
     # 100 % 90 = 10
     df_max.pos_beg = (df_max.pos_beg + window_beg) % replicon_size
     df_max.pos_end = (df_max.pos_end + window_beg) % replicon_size
-    df_max.to_csv(os.path.join(out_dir, replicon.name + "_subseq_attc_table_end.res"),
+    df_max.to_csv(os.path.join(out_dir, replicon.id + "_subseq_attc_table_end.res"),
                   sep="\t", index=0, mode="a", header=0)
     # filter on size
     df_max = df_max[(abs(df_max.pos_end - df_max.pos_beg) > min_attc_size) &

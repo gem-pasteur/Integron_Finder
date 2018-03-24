@@ -70,7 +70,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
 
     """
 
-    prot_tmp = os.path.join(out_dir, replicon.name + "_subseqprot.tmp")
+    prot_tmp = os.path.join(out_dir, replicon.id + "_subseqprot.tmp")
 
     for integron in integrons:
         if os.path.isfile(prot_tmp):
@@ -93,7 +93,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
 
             SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
             for hmm in hmm_files:
-                name_wo_ext = "{}_{}".format(replicon.name, get_name_from_path(hmm))
+                name_wo_ext = "{}_{}".format(replicon.id, get_name_from_path(hmm))
                 hmm_out = os.path.join(out_dir, "{}_fa.res".format(name_wo_ext))
                 hmm_tableout = os.path.join(out_dir, "{}_fa_table.res".format(name_wo_ext))
                 hmm_cmd = [cfg.hmmsearch,
@@ -110,7 +110,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
                     raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
                 if returncode != 0:
                     raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
-                hmm_in = read_hmm(replicon.name, hmm_out, cfg, evalue=evalue, coverage=coverage
+                hmm_in = read_hmm(replicon.id, hmm_out, cfg, evalue=evalue, coverage=coverage
                                   ).sort_values("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
             func_annotate_res = func_annotate_res.sort_values("evalue").drop_duplicates(subset="ID_prot")
@@ -132,7 +132,6 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
     :param str prot_file: the path to the fasta file containing the translation of the replicon.
     :param int dist_threshold: Two elements are aggregated if they are distant of dist_threshold or less.
     """
-
     integron_desc = integron_desc.set_index("ID_integron").copy()
     for i in integron_desc.index.unique():
 

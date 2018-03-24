@@ -85,12 +85,12 @@ def scan_hmm_bank(path):
         raise IOError("{} no such file or directory".format(path))
 
 
-def read_hmm(replicon_name, infile, cfg, evalue=1., coverage=0.5):
+def read_hmm(replicon_id, infile, cfg, evalue=1., coverage=0.5):
     """
     Function that parse hmmer --out output and returns a pandas DataFrame
     filter output by evalue and coverage. (Being % of the profile aligned)
 
-    :param str replicon_name: the name of the replicon
+    :param str replicon_id: the id of the replicon
     :param str infile: the hmm output (in tabulated format) to parse
     :param cfg: the config
     :type cfg: :class:`integron_finder.config.Config` object.
@@ -103,7 +103,6 @@ def read_hmm(replicon_name, infile, cfg, evalue=1., coverage=0.5):
 
     :rtype: a :class:`pandas.DataFrame`
     """
-
     df = pd.DataFrame(columns=["Accession_number", "query_name", "ID_query",
                                "ID_prot", "strand", "pos_beg", "pos_end",
                                "evalue", "hmmfrom", "hmmto", "alifrom",
@@ -154,7 +153,7 @@ def read_hmm(replicon_name, infile, cfg, evalue=1., coverage=0.5):
             df.loc[idx+idx2, "alifrom"] = alifrom[best_evalue]   # alifrom
             df.loc[idx+idx2, "alito"] = alito [best_evalue]  # ali to
             df.loc[idx+idx2, "len_profile"] = float(len_profile)
-            df.loc[idx+idx2, "Accession_number"] = replicon_name
+            df.loc[idx+idx2, "Accession_number"] = replicon_id
             df.loc[idx+idx2, "query_name"] = query
 
     intcols = ["pos_beg", "pos_end", "strand"]

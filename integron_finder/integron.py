@@ -77,10 +77,10 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
     :retype: list of :class:`Integron` object
     """
     if not cfg.no_proteins:
-        intI = read_hmm(replicon.name, intI_file, cfg)
+        intI = read_hmm(replicon.id, intI_file, cfg)
         intI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-        phageI = read_hmm(replicon.name, phageI_file, cfg)
+        phageI = read_hmm(replicon.id, phageI_file, cfg)
         phageI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
         tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
@@ -104,7 +104,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     else:
-        attc = read_infernal(attc_file, replicon.name, cfg.model_len,
+        attc = read_infernal(attc_file, replicon.id, cfg.model_len,
                              evalue=cfg.evalue_attc,
                              size_max_attc=cfg.max_attc_size,
                              size_min_attc=cfg.min_attc_size)
@@ -213,7 +213,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                                         intI_ac.evalue.values[i],
                                         intI_ac.query_name.values[i])
 
-    _log.info("In replicon {}, there are:".format(replicon.name))
+    _log.info("In replicon {}, there are:".format(replicon.id))
     _log.info("- {} complete integron(s) found with a total {} attC site(s)".format(sum(
         [1 if i.type() == "complete" else 0 for i in integrons]),
         sum([len(i.attC) if i.type() == "complete" else 0 for i in integrons])))

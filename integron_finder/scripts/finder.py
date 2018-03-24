@@ -239,14 +239,14 @@ def find_integron_in_one_replicon(replicon, config):
     if config.gembase:
         prot_file = os.path.join(in_dir, "..", "Proteins", replicon_name + ".prt")
     else:
-        prot_file = os.path.join(result_dir_other, replicon_name + ".prt")
+        prot_file = os.path.join(result_dir_other, replicon.id + ".prt")
 
     ##################
     # Default search #
     ##################
-    intI_file = os.path.join(result_dir_other, replicon_name + "_intI.res")
-    phageI_file = os.path.join(result_dir_other, replicon_name + "_phage_int.res")
-    attC_default_file = os.path.join(result_dir_other, replicon_name + "_attc_table.res")
+    intI_file = os.path.join(result_dir_other, replicon.id + "_intI.res")
+    phageI_file = os.path.join(result_dir_other, replicon.id + "_phage_int.res")
+    attC_default_file = os.path.join(result_dir_other, replicon.id + "_attc_table.res")
 
     if not config.no_proteins:
         if not os.path.isfile(intI_file) or not os.path.isfile(phageI_file):
@@ -473,8 +473,9 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         # or replicon is too short < 50 bp
         # then replicon is None
         if replicon is not None:
-            if sequences_db_len == 1:
-                replicon.name = utils.get_name_from_path(config.replicon_path)
+            # to mimic integron_finder 1.5 behavior
+            # if sequences_db_len == 1:
+            #    replicon.name = utils.get_name_from_path(config.replicon_path)
             _log.info("############ Processing replicon {} ({}/{}) ############".format(replicon.name,
                                                                                         rep_no,
                                                                                         sequences_db_len))
