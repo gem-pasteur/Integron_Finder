@@ -50,22 +50,24 @@ def find_integrase(replicon_path, replicon, prot_file, out_dir, cfg):
     """
     if not cfg.gembase:
         # Test whether the protein file exist to avoid new annotation for each run on the same replicon
-        prot_tr_path = os.path.join(out_dir, replicon.name + ".prt")
+        prot_tr_path = os.path.join(out_dir, replicon.id + ".prt")
         if not os.path.isfile(prot_tr_path):
-            prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out}".format(
+            prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q ".format(
                 prodigal=cfg.prodigal,
                 meta='' if len(replicon) > 200000 else '-p meta',
                 replicon=replicon_path,
                 prot=prot_tr_path,
-                out=os.devnull)
+                out=os.devnull,
+            )
             try:
+                _log.debug("run prodigal: {}".format(prodigal_cmd))
                 returncode = call(prodigal_cmd.split())
             except Exception as err:
                 raise RuntimeError("{0} failed : {1}".format(prodigal_cmd, err))
             if returncode != 0:
                 raise RuntimeError("{0} failed returncode = {1}".format(prodigal_cmd, returncode))
 
-    intI_hmm_out = os.path.join(out_dir, replicon.name + "_intI.res")
+    intI_hmm_out = os.path.join(out_dir, replicon.id + "_intI.res")
     hmm_cmd = []
     if os.path.exists(prot_file) and os.path.getsize(prot_file) == 0:
         msg = "The protein file: '{}' is empty cannot perform hmmsearch on it.".format(prot_file)
@@ -74,22 +76,23 @@ def find_integrase(replicon_path, replicon, prot_file, out_dir, cfg):
     if not os.path.isfile(intI_hmm_out):
         hmm_cmd.append([cfg.hmmsearch,
                         "--cpu", str(cfg.cpu),
-                        "--tblout", os.path.join(out_dir, replicon.name + "_intI_table.res"),
+                        "--tblout", os.path.join(out_dir, replicon.id + "_intI_table.res"),
                         "-o", intI_hmm_out,
                         cfg.model_integrase,
                         prot_file])
 
-    phage_hmm_out = os.path.join(out_dir, replicon.name + "_phage_int.res")
+    phage_hmm_out = os.path.join(out_dir, replicon.id + "_phage_int.res")
     if not os.path.isfile(phage_hmm_out):
         hmm_cmd.append([cfg.hmmsearch,
                         "--cpu", str(cfg.cpu),
-                        "--tblout", os.path.join(out_dir, replicon.name + "_phage_int_table.res"),
+                        "--tblout", os.path.join(out_dir, replicon.id + "_phage_int_table.res"),
                         "-o", phage_hmm_out,
                         cfg.model_phage_int,
                         prot_file])
 
     for cmd in hmm_cmd:
         try:
+            _log.debug("run hmmsearch: {}".format(' '.join(cmd)))
             returncode = call(cmd)
         except Exception as err:
             raise RuntimeError("{0} failed : {1}".format(' '.join(cmd), err))
