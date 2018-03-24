@@ -246,6 +246,12 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['--gbk', 'replicon'])
         self.assertTrue(cfg.gbk)
 
+    def test_keep_tmp(self):
+        cfg = parse_args(['replicon'])
+        self.assertFalse(cfg.keep_tmp)
+        cfg = parse_args(['--keep-tmp', 'replicon'])
+        self.assertTrue(cfg.keep_tmp)
+
     def test_version(self):
         real_exit = sys.exit
 

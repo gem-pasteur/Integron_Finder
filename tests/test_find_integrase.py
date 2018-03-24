@@ -85,12 +85,12 @@ class TestFindIntegrase(IntegronTest):
         replicon = read_single_dna_fasta(replicon_path)
         prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
 
-        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon_name + ".prt")), prot_file)
+        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
         integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
 
         for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
-            res = os.path.join(self.tmp_dir, replicon_name + suffix)
+            res = os.path.join(self.tmp_dir, replicon.id + suffix)
             self.assertTrue(os.path.exists(res))
 
 
@@ -106,12 +106,12 @@ class TestFindIntegrase(IntegronTest):
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 200
 
-        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon_name + ".prt")), prot_file)
+        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
+        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
         integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
         for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
-            res = os.path.join(self.tmp_dir, replicon_name + suffix)
+            res = os.path.join(self.tmp_dir, replicon.id + suffix)
             self.assertTrue(os.path.exists(res))
         replicon.__class__.__len__ = len_ori
 
@@ -128,7 +128,7 @@ class TestFindIntegrase(IntegronTest):
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 200
 
-        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
         open(prot_file, 'w').close()
         with self.assertRaises(RuntimeError) as ctx:
             with self.catch_log():
@@ -136,6 +136,7 @@ class TestFindIntegrase(IntegronTest):
         self.assertTrue(re.match("^The protein file: '.*' is empty cannot perform hmmsearch on it.$",
                                  str(ctx.exception)))
         replicon.__class__.__len__ = len_ori
+
 
     def test_find_integrase_no_gembase_no_protfile_short_seq(self):
         cfg = Config(self.args)
@@ -149,11 +150,11 @@ class TestFindIntegrase(IntegronTest):
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 200
 
-        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
         integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
         for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
-            res = os.path.join(self.tmp_dir, replicon_name + suffix)
+            res = os.path.join(self.tmp_dir, replicon.id + suffix)
             self.assertTrue(os.path.exists(res))
         replicon.__class__.__len__ = len_ori
 
@@ -170,13 +171,13 @@ class TestFindIntegrase(IntegronTest):
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 500000
 
-        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
-        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon_name + ".prt")), prot_file)
+        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
         integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
         for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
-            res = os.path.join(self.tmp_dir, replicon_name + suffix)
+            res = os.path.join(self.tmp_dir, replicon.id + suffix)
             self.assertTrue(os.path.exists(res))
         replicon.__class__.__len__ = len_ori
 
@@ -194,9 +195,9 @@ class TestFindIntegrase(IntegronTest):
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 500000
 
-        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
-        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon_name + ".prt")), prot_file)
+        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
         with self.assertRaises(RuntimeError) as ctx:
             integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
@@ -216,7 +217,7 @@ class TestFindIntegrase(IntegronTest):
 
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 500000
-        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
         with self.assertRaises(RuntimeError) as ctx:
             integrase.find_integrase('foo', replicon,  prot_file, self.tmp_dir, cfg)
@@ -235,7 +236,7 @@ class TestFindIntegrase(IntegronTest):
         replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         replicon = read_single_dna_fasta(replicon_path)
 
-        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
+        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
         with self.assertRaises(RuntimeError) as ctx:
             integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
@@ -253,8 +254,8 @@ class TestFindIntegrase(IntegronTest):
         replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         replicon = read_single_dna_fasta(replicon_path)
 
-        prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
-        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon_name + ".prt"),
+        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
+        shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon.id + ".prt"),
                         prot_file)
         with self.assertRaises(RuntimeError) as ctx:
             integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)

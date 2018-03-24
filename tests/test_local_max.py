@@ -79,19 +79,19 @@ def read_infernal_mock(tmp_dir):
     of local_max and replace the function by this mock
     """
     _cache = {
-        (os.path.join(tmp_dir, 'lian.001.c02.10_942899_947099_subseq_attc_table.res'),
-         'lian.001.c02.10', 47, 1.0, 200, 40):
-            pd.DataFrame([['lian.001.c02.10', 'attC_4', 1, 47, 371, 496, '+', 0.130000],
-                          ['lian.001.c02.10', 'attC_4', 1, 47, 1109, 1234, '+', 0.049000],
-                          ['lian.001.c02.10', 'attC_4', 1, 47, 1573, 1699, '+', 0.000005]],
+        (os.path.join(tmp_dir, 'LIAN.001.C02_10_942899_947099_subseq_attc_table.res'),
+         'LIAN.001.C02_10', 47, 1.0, 200, 40):
+            pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 371, 496, '+', 0.130000],
+                          ['LIAN.001.C02_10', 'attC_4', 1, 47, 1109, 1234, '+', 0.049000],
+                          ['LIAN.001.C02_10', 'attC_4', 1, 47, 1573, 1699, '+', 0.000005]],
                          columns=['Accession_number', 'cm_attC', 'cm_debut',
                                   'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']),
-        (os.path.join(tmp_dir, 'lian.001.c02.10_946899_951099_subseq_attc_table.res'),
-         'lian.001.c02.10', 47, 1.0, 200, 40):
+        (os.path.join(tmp_dir, 'LIAN.001.C02_10_946899_951099_subseq_attc_table.res'),
+         'LIAN.001.C02_10', 47, 1.0, 200, 40):
             pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut',
                          'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']),
-        (os.path.join(tmp_dir, 'lian.001.c02.10_930689_934889_subseq_attc_table.res'),
-         'lian.001.c02.10', 47, 1.0, 200, 40):
+        (os.path.join(tmp_dir, 'LIAN.001.C02_10_930689_934889_subseq_attc_table.res'),
+         'LIAN.001.C02_10', 47, 1.0, 200, 40):
             pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut',
                          'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']),
               }
@@ -151,9 +151,9 @@ class TestLocalMax(IntegronTest):
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                                 cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
                                                 )
-        local_max_expected = pd.DataFrame([['lian.001.c02.10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
-                                           ['lian.001.c02.10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
-                                           ['lian.001.c02.10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
+        local_max_expected = pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
+                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
+                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
                                           columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg',
                                                    'pos_end', 'sens', 'evalue'])
         pdt.assert_frame_equal(local_max_expected, local_max_received)
@@ -206,9 +206,9 @@ class TestLocalMax(IntegronTest):
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                                 cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
                                                 )
-        local_max_expected = pd.DataFrame([['lian.001.c02.10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
-                                           ['lian.001.c02.10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
-                                           ['lian.001.c02.10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
+        local_max_expected = pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
+                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
+                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
                                           columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg',
                                                    'pos_end', 'sens', 'evalue'])
         pdt.assert_frame_equal(local_max_expected, local_max_received)
@@ -226,9 +226,9 @@ class TestLocalMax(IntegronTest):
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                                 cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
                                                 )
-        local_max_expected = pd.DataFrame([['lian.001.c02.10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
-                                           ['lian.001.c02.10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
-                                           ['lian.001.c02.10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
+        local_max_expected = pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
+                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
+                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
                                           columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg',
                                                    'pos_end', 'sens', 'evalue'])
         pdt.assert_frame_equal(local_max_expected, local_max_received)

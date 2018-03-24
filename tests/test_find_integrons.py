@@ -97,12 +97,13 @@ class TestFindIntegons(IntegronTest):
     def test_find_integron(self):
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon_results_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name), 'other'))
-        attc_file = os.path.join(replicon_results_path, '{}_attc_table.res'.format(replicon_name))
-        intI_file = os.path.join(replicon_results_path, '{}_intI.res'.format(replicon_name))
-        phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon_name))
-
         replicon = read_single_dna_fasta(replicon_path)
+        replicon_results_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
+                                                            'other_{}'.format(replicon.id)))
+        attc_file = os.path.join(replicon_results_path, '{}_attc_table.res'.format(replicon.id))
+        intI_file = os.path.join(replicon_results_path, '{}_intI.res'.format(replicon.id))
+        phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon.id))
+
 
         args = argparse.Namespace()
         args.no_proteins = True
@@ -115,10 +116,10 @@ class TestFindIntegons(IntegronTest):
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        exp_msg = """In replicon acba.007.p01.13, there are:
+        exp_msg = """In replicon {}, there are:
 - 0 complete integron(s) found with a total 0 attC site(s)
 - 1 CALIN element(s) found with a total of 3 attC site(s)
-- 0 In0 element(s) found with a total of 0 attC site"""
+- 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
             integrons = find_integron(replicon, attc_file, intI_file, phageI_file, cfg)
             catch_msg = log.get_value().strip()
@@ -154,12 +155,15 @@ class TestFindIntegons(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         replicon = read_single_dna_fasta(replicon_path)
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
-                                                'other', '{}_attc_table.res'.format(replicon_name)))
+                                                'other_{}'.format(replicon.id),
+                                                '{}_attc_table.res'.format(replicon.id)))
 
         intI_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
-                                                'other', '{}_intI.res'.format(replicon_name)))
+                                                'other_{}'.format(replicon.id),
+                                                '{}_intI.res'.format(replicon.id)))
         phageI_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
-                                                  'other', '{}_phage_int.res'.format(replicon_name)))
+                                                  'other_{}'.format(replicon.id),
+                                                  '{}_phage_int.res'.format(replicon.id)))
 
         args = argparse.Namespace()
         args.no_proteins = True
@@ -179,10 +183,10 @@ class TestFindIntegons(IntegronTest):
                                   size_max_attc=cfg.max_attc_size,
                                   size_min_attc=cfg.min_attc_size)
 
-        exp_msg = """In replicon acba.007.p01.13, there are:
+        exp_msg = """In replicon {}, there are:
 - 0 complete integron(s) found with a total 0 attC site(s)
 - 1 CALIN element(s) found with a total of 3 attC site(s)
-- 0 In0 element(s) found with a total of 0 attC site"""
+- 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
             integrons = find_integron(replicon,
                                       attc_file,
@@ -221,12 +225,15 @@ class TestFindIntegons(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         replicon = read_single_dna_fasta(replicon_path)
-        attc_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13', 'other', 'acba.007.p01.13_attc_table.res')
-        intI_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13', 'other', 'acba.007.p01.13_intI.res')
-        phageI_file = os.path.join(self._data_dir,
-                                   'Results_Integron_Finder_acba.007.p01.13', 'other', 'acba.007.p01.13_phage_int.res')
+        attc_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
+                                                'other_{}'.format(replicon.id),
+                                                '{}_attc_table.res'.format(replicon.id)))
+        intI_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
+                                                'other_{}'.format(replicon.id),
+                                                '{}_intI.res'.format(replicon.id)))
+        phageI_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
+                                                  'other_{}'.format(replicon.id),
+                                                  '{}_phage_int.res'.format(replicon.id)))
         args = argparse.Namespace()
         args.no_proteins = False
         args.keep_palindromes = True
@@ -247,10 +254,10 @@ class TestFindIntegons(IntegronTest):
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        exp_msg = """In replicon acba.007.p01.13, there are:
+        exp_msg = """In replicon {}, there are:
 - 1 complete integron(s) found with a total 3 attC site(s)
 - 0 CALIN element(s) found with a total of 0 attC site(s)
-- 0 In0 element(s) found with a total of 0 attC site"""
+- 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
             integrons = find_integron(replicon,
                                       attc_file,
@@ -299,20 +306,23 @@ class TestFindIntegons(IntegronTest):
 
     def test_find_integron_proteins_n_union_integrase(self):
         replicon_name = 'acba.007.p01.13'
-        replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-        attc_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc_table.res')
-        intI_file = os.path.join(self._data_dir,
-                                 'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_intI.res')
-        phageI_file = os.path.join(self._data_dir,
-                                   'Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_phage_int.res')
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        replicon = read_single_dna_fasta(replicon_path)
+        attc_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
+                                                'other_{}'.format(replicon.id),
+                                                '{}_attc_table.res'.format(replicon.id)))
+        intI_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
+                                                'other_{}'.format(replicon.id),
+                                                '{}_intI.res'.format(replicon.id)))
+        phageI_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
+                                                  'other_{}'.format(replicon.id),
+                                                  '{}_phage_int.res'.format(replicon.id)))
         args = argparse.Namespace()
         args.no_proteins = False
         args.keep_palindromes = True
         args.union_integrases = True
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
 
-        replicon = read_single_dna_fasta(replicon_path)
 
         args = argparse.Namespace()
         args.evalue_attc = 1.
@@ -327,10 +337,10 @@ class TestFindIntegons(IntegronTest):
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        exp_msg = """In replicon acba.007.p01.13, there are:
+        exp_msg = """In replicon {}, there are:
 - 1 complete integron(s) found with a total 3 attC site(s)
 - 0 CALIN element(s) found with a total of 0 attC site(s)
-- 0 In0 element(s) found with a total of 0 attC site"""
+- 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
             integrons = find_integron(replicon,
                                       attc_file,

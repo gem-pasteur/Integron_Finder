@@ -44,7 +44,8 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder.config import Config
-from integron_finder.utils import read_single_dna_fasta
+from integron_finder.topology import Topology
+from integron_finder.utils import FastaIterator
 from integron_finder.integrase import find_integrase
 from integron_finder.integron import Integron
 from integron_finder.annotation import func_annot
@@ -71,8 +72,14 @@ class TestFuncAnnot(IntegronTest):
         """
         replicon_name = "acba.007.p01.13"
         self.replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        self.replicon = read_single_dna_fasta(self.replicon_path)
+        sequences_db = FastaIterator(self.replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        self.replicon = sequences_db.next()
+
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        if os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
 
         self.hmm_files = [self.find_data(os.path.join("Functional_annotation", "Resfams.hmm"))]
@@ -81,25 +88,25 @@ class TestFuncAnnot(IntegronTest):
         args = argparse.Namespace()
         args.gembase = False
         args.hmmsearch = distutils.spawn.find_executable("hmmsearch")
+        args.prodigal = distutils.spawn.find_executable("prodigal")
         args.cpu = 1
         args.out_dir = self.tmp_dir
         self.cfg = Config(args)
         self.cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        # integron_finder.args = args
-        # integron_finder.SIZE_REPLICON = 20301  # size of acba.007.p01.13
-        # integron_finder.N_CPU = "1"
-        # integron_finder.PRODIGAL = distutils.spawn.find_executable("prodigal")
-        # integron_finder.MODEL_integrase = os.path.join("data", "Models", "integron_integrase.hmm")
-        # integron_finder.MODEL_phage_int = os.path.join("data", "Models", "phage-int.hmm")
+        prot_dir = os.path.join(self.tmp_dir, 'Proteins')
+        os.makedirs(prot_dir)
+        self.prot_file = os.path.join(prot_dir, self.replicon.name + ".prt")
+        shutil.copyfile(self.find_data(os.path.join('Proteins', self.replicon.id + ".prt")), self.prot_file)
 
-        self.prot_file = os.path.join(self.tmp_dir, self.replicon.name + ".prt")
-        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon_name + ".prt")), self.prot_file)
-
-        self.exp_files = ["acba.007.p01.13.prt", "acba.007.p01.13_Resfams_fa_table.res",
-                          "acba.007.p01.13_intI_table.res", "acba.007.p01.13_phage_int_table.res",
-                          "acba.007.p01.13_Resfams_fa.res", "acba.007.p01.13_intI.res",
-                          "acba.007.p01.13_phage_int.res", "acba.007.p01.13_subseqprot.tmp"]
+        self.exp_files = ["{}{}".format(self.replicon.id, suffix) for suffix in (".prt",
+                                                                                 "_Resfams_fa_table.res",
+                                                                                 "_intI_table.res",
+                                                                                 "_phage_int_table.res",
+                                                                                 "_Resfams_fa.res",
+                                                                                 "_intI.res",
+                                                                                 "_phage_int.res",
+                                                                                 "_subseqprot.tmp")]
         self.exp_files = [os.path.join(self.tmp_dir, file) for file in self.exp_files]
 
         self.prot_dtype = {"pos_beg": 'int',
@@ -121,6 +128,7 @@ class TestFuncAnnot(IntegronTest):
         """
         if os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
+            pass
         annotation.call = _annot_call_ori
 
     def test_annot_calin(self):
@@ -157,7 +165,7 @@ class TestFuncAnnot(IntegronTest):
         func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
 
         # Check that all files generated are as expected
-        files_created = glob.glob(os.path.join(self.tmp_dir, "*"))
+        files_created = [f for f in glob.glob(os.path.join(self.tmp_dir, "*")) if os.path.isfile(f)]
         self.assertEqual(set(self.exp_files), set(files_created))
 
         # Check that annotated proteins are as expected
@@ -193,10 +201,12 @@ class TestFuncAnnot(IntegronTest):
         func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
 
         # Check that all files generated are as expected
-        files_created = glob.glob(os.path.join(self.tmp_dir, "*"))
-        exp_files = ["acba.007.p01.13.prt", "acba.007.p01.13_intI_table.res",
-                     "acba.007.p01.13_phage_int_table.res", "acba.007.p01.13_intI.res",
-                     "acba.007.p01.13_phage_int.res"]
+        files_created = [f for f in glob.glob(os.path.join(self.tmp_dir, "*")) if os.path.isfile(f)]
+        exp_files = ["{}{}".format(self.replicon.id, suffix) for suffix in (".prt",
+                                                                            "_intI_table.res",
+                                                                            "_phage_int_table.res",
+                                                                            "_intI.res",
+                                                                            "_phage_int.res")]
         exp_files = [os.path.join(self.tmp_dir, file) for file in exp_files]
         self.assertEqual(set(exp_files), set(files_created))
 
@@ -211,7 +221,7 @@ class TestFuncAnnot(IntegronTest):
         for example...)
         """
         # create empty _subseqprot.tmp file (must be deleted by func_annot)
-        open(os.path.join(self.tmp_dir, "acba.007.p01.13_subseqprot.tmp"), "w").close()
+        open(os.path.join(self.tmp_dir, "{}_subseqprot.tmp".format(self.replicon.id)), "w").close()
         # Create integron
         integron1 = Integron(self.replicon, self.cfg)
         integrons = [integron1]
@@ -229,10 +239,12 @@ class TestFuncAnnot(IntegronTest):
         # Annotate proteins
         func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
         # Check that all files generated are as expected
-        files_created = glob.glob(os.path.join(self.tmp_dir, "*"))
-        exp_files = ["acba.007.p01.13.prt", "acba.007.p01.13_intI_table.res",
-                     "acba.007.p01.13_phage_int_table.res", "acba.007.p01.13_intI.res",
-                     "acba.007.p01.13_phage_int.res"]
+        files_created = [f for f in glob.glob(os.path.join(self.tmp_dir, "*")) if os.path.isfile(f)]
+        exp_files = ["{}{}".format(self.replicon.id, suffix) for suffix in (".prt",
+                                                                            "_intI_table.res",
+                                                                            "_phage_int_table.res",
+                                                                            "_intI.res",
+                                                                            "_phage_int.res")]
         exp_files = [os.path.join(self.tmp_dir, file) for file in exp_files]
         self.assertEqual(set(exp_files), set(files_created))
         # check proteins after annotation
@@ -337,7 +349,7 @@ class TestFuncAnnot(IntegronTest):
         func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir, evalue=1e-32)
 
         # Check that all files generated are as expected
-        files_created = glob.glob(os.path.join(self.tmp_dir, "*"))
+        files_created = [f for f in glob.glob(os.path.join(self.tmp_dir, "*")) if os.path.isfile(f)]
         self.assertEqual(set(self.exp_files), set(files_created))
 
         # Check that annotated proteins are as expected

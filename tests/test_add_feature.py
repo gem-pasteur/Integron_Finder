@@ -37,17 +37,25 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder.annotation import add_feature
-from integron_finder.utils import read_single_dna_fasta
+from integron_finder.utils import FastaIterator
+from integron_finder.topology import Topology
 
-class TestToGbk(IntegronTest):
+class TestAddFeature(IntegronTest):
 
     def setUp(self):
         """
         Define variables common to all tests
         """
         self.replicon_path = self.find_data(os.path.join('Replicons', "acba.007.p01.13.fst"))
-        self.seq = read_single_dna_fasta(self.replicon_path)
-        self.prot_file = self.find_data(os.path.join("Results_Integron_Finder_acba.007.p01.13", "other", "acba.007.p01.13.prt"))
+        self.replicon_id = 'ACBA.007.P01_13'
+        sequences_db = FastaIterator(self.replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        self.seq = sequences_db.next()
+
+        self.prot_file = self.find_data(os.path.join("Results_Integron_Finder_acba.007.p01.13",
+                                                     "other_{}".format(self.replicon_id),
+                                                     "{}.prt".format(self.replicon_id)))
         self.dist_threshold = 4000
 
 
@@ -75,7 +83,7 @@ class TestToGbk(IntegronTest):
         Test add_feature when the only element is an integron composed of 1 protein only.
 
         """
-        infos = {"ID_replicon": "acba.007.p01.13",
+        infos = {"ID_replicon": self.replicon_id,
                  "ID_integron": "integron_01",
                  "element": "ACBA.007.P01_13_20",
                  "pos_beg": 17375,
@@ -130,7 +138,7 @@ class TestToGbk(IntegronTest):
         Test add_feature when the only element is an integron composed of 1 integrase only.
 
         """
-        infos = {"ID_replicon": "acba.007.p01.13",
+        infos = {"ID_replicon": self.replicon_id,
                  "ID_integron": "integron_01",
                  "element": "ACBA.007.P01_13_1",
                  "pos_beg": 55,
@@ -189,7 +197,7 @@ class TestToGbk(IntegronTest):
         Test add_feature when the only element is an integron composed of 1 promoter only.
 
         """
-        infos = {"ID_replicon": "acba.007.p01.13",
+        infos = {"ID_replicon": self.replicon_id,
                  "ID_integron": "integron_01",
                  "element": "Pc_int1",
                  "pos_beg": 25,
@@ -242,9 +250,8 @@ class TestToGbk(IntegronTest):
         # promoter and integrase are at the begining of the genome
         # others are at the end
         int_id = "integron_01"
-        rep_id = "acba.007.p01.13"
         int_type = "complete"
-        infos_prom = {"ID_replicon": rep_id,
+        infos_prom = {"ID_replicon": self.replicon_id,
                       "ID_integron": int_id,
                       "element": "Pc_int1",
                       "pos_beg": 25,
@@ -258,7 +265,7 @@ class TestToGbk(IntegronTest):
                       "default": "Yes",
                       "distance_2attC": np.nan
                       }
-        infos_int = {"ID_replicon": rep_id,
+        infos_int = {"ID_replicon": self.replicon_id,
                      "ID_integron": int_id,
                      "element": "ACBA.007.P01_13_1",
                      "pos_beg": 55,
@@ -272,7 +279,7 @@ class TestToGbk(IntegronTest):
                      "default": "Yes",
                      "distance_2attC": np.nan
                      }
-        infos_prot = {"ID_replicon": rep_id,
+        infos_prot = {"ID_replicon": self.replicon_id,
                       "ID_integron": int_id,
                       "element": "ACBA.007.P01_13_20",
                       "pos_beg": 17375,
@@ -286,7 +293,7 @@ class TestToGbk(IntegronTest):
                       "default": "Yes",
                       "distance_2attC": np.nan
                       }
-        infos_attC = {"ID_replicon": rep_id,
+        infos_attC = {"ID_replicon": self.replicon_id,
                       "ID_integron": int_id,
                       "element": "attc_001",
                       "pos_beg": 17825,
@@ -380,9 +387,8 @@ class TestToGbk(IntegronTest):
         """
         # integron 1
         int_id = "integron_01"
-        rep_id = "acba.007.p01.13"
         int_type = "complete"
-        infos_prom = {"ID_replicon": rep_id,
+        infos_prom = {"ID_replicon": self.replicon_id,
                       "ID_integron": int_id,
                       "element": "Pc_int1",
                       "pos_beg": 25,
@@ -396,7 +402,7 @@ class TestToGbk(IntegronTest):
                       "default": "Yes",
                       "distance_2attC": np.nan
                       }
-        infos_int = {"ID_replicon": rep_id,
+        infos_int = {"ID_replicon": self.replicon_id,
                      "ID_integron": int_id,
                      "element": "ACBA.007.P01_13_1",
                      "pos_beg": 55,
@@ -410,7 +416,7 @@ class TestToGbk(IntegronTest):
                      "default": "Yes",
                      "distance_2attC": np.nan
                      }
-        infos_prot = {"ID_replicon": rep_id,
+        infos_prot = {"ID_replicon": self.replicon_id,
                       "ID_integron": int_id,
                       "element": "ACBA.007.P01_13_20",
                       "pos_beg": 2000,
@@ -425,7 +431,7 @@ class TestToGbk(IntegronTest):
                       "distance_2attC": np.nan
                       }
         # integron 2
-        infos_attC = {"ID_replicon": rep_id,
+        infos_attC = {"ID_replicon": self.replicon_id,
                       "ID_integron": "integron_02",
                       "element": "attc_001",
                       "pos_beg": 17825,
@@ -520,7 +526,7 @@ class TestToGbk(IntegronTest):
         Test add_feature when the only element is an integron composed of 1 protein only.
 
         """
-        infos = {"ID_replicon": "acba.007.p01.13",
+        infos = {"ID_replicon": self.replicon_id,
                  "ID_integron": "integron_01",
                  "element": "ACBA.007.P01_13_20",
                  "pos_beg": 17375,
@@ -540,8 +546,6 @@ class TestToGbk(IntegronTest):
         start_seq = self.seq.seq
         start_id = self.seq.id
         seq_name = self.seq.name
-
-
         self.seq.name = "abcdefgh" + seq_name
 
         add_feature(self.seq, df, self.prot_file, self.dist_threshold)

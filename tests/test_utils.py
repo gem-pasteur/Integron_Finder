@@ -51,10 +51,10 @@ class TestUtils(IntegronTest):
         self.assertTrue(replicon.seq.endswith('CGACCCACGGCGTAACGCGCT'))
 
     def test_read_multi_prot_fasta(self):
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = self.find_data(os.path.join('Proteins', replicon_name + '.prt'))
+        replicon_id = 'ACBA.007.P01_13'
+        replicon_path = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
         replicon = utils.read_multi_prot_fasta(replicon_path)
-        expected_seq_id = ['ACBA.007.P01_13_{}'.format(i) for i in range(1, 24)]
+        expected_seq_id = ['{}_{}'.format(replicon_id, i) for i in range(1, 24)]
         received_seq_id = [seq.id for seq in replicon]
         self.assertListEqual(expected_seq_id, received_seq_id)
 

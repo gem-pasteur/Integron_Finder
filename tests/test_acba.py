@@ -75,150 +75,154 @@ class TestAcba(IntegronTest):
 
 
     def test_acba_simple_no_gbk_no_pdf(self):
-        replicon_name = 'acba.007.p01.13'
-        output_filename = 'Results_Integron_Finder_{}'.format(replicon_name)
+        replicon_filename = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
         command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
                                                                          replicon=self.find_data(
                                                                              os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_name))
+                                                                                          '{}.fst'.format(replicon_filename))
                                                                          )
                                                                          )
 
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
-        output_filename = 'acba.007.p01.13.integrons'
+        output_filename = '{}.integrons'.format(replicon_id)
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
                                                            output_filename))
         test_result_path = os.path.join(test_result_dir, output_filename)
         self.assertFileEqual(expected_result_path, test_result_path)
 
-        gbk = '{}.gbk'.format(replicon_name)
+        gbk = '{}.gbk'.format(replicon_filename)
         gbk_test = os.path.join(test_result_dir, gbk)
         self.assertFalse(os.path.exists(gbk_test))
 
-        pdf = '{}_1.pdf'.format(replicon_name)
+        pdf = '{}_1.pdf'.format(replicon_filename)
         pdf_test = os.path.join(test_result_dir, pdf)
         self.assertFalse(os.path.exists(pdf_test))
 
 
     def test_acba_simple_with_gbk(self):
-        replicon_name = 'acba.007.p01.13'
-        output_filename = 'Results_Integron_Finder_{}'.format(replicon_name)
-        test_result_dir = os.path.join(self.out_dir, output_filename)
+        replicon_filename = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
+        output_dirname = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_dirname)
         command = "integron_finder --outdir {out_dir} --gbk {replicon}".format(out_dir=self.out_dir,
                                                                                replicon=self.find_data(
                                                                                    os.path.join('Replicons',
-                                                                                                '{}.fst'.format(replicon_name))
+                                                                                                '{}.fst'.format(replicon_filename))
                                                                                 )
                                                                                )
 
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
-        gbk = '{}.gbk'.format(replicon_name)
-        expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name), gbk))
+        gbk = '{}.gbk'.format(replicon_id)
+        expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_filename), gbk))
         gbk_test = os.path.join(test_result_dir, gbk)
         expected_gbk = SeqIO.read(expected_gbk, 'gb')
         gbk_test = SeqIO.read(gbk_test, 'gb')
         self.assertSeqRecordEqual(expected_gbk, gbk_test)
 
-        output_filename = 'acba.007.p01.13.integrons'
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
-                                                           output_filename))
+        output_filename = '{}.integrons'.format(replicon_id)
+        expected_result_path = self.find_data(os.path.join(output_dirname, output_filename))
         test_result_path = os.path.join(test_result_dir, output_filename)
         self.assertFileEqual(expected_result_path, test_result_path)
 
 
     def test_acba_simple_with_pdf(self):
-        replicon_name = 'acba.007.p01.13'
-        output_filename = 'Results_Integron_Finder_{}'.format(replicon_name)
-        test_result_dir = os.path.join(self.out_dir, output_filename)
+        replicon_filename = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
+        output_dirname = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_dirname)
         command = "integron_finder --outdir {out_dir} --pdf {replicon}".format(out_dir=self.out_dir,
                                                                                replicon=self.find_data(
                                                                                    os.path.join('Replicons',
-                                                                                                '{}.fst'.format(replicon_name))
+                                                                                                '{}.fst'.format(replicon_filename))
                                                                                 )
                                                                                )
 
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
-        pdf = '{}_1.pdf'.format(replicon_name)
+        pdf = '{}_1.pdf'.format(replicon_id)
         pdf_test = os.path.join(test_result_dir, pdf)
         self.assertTrue(os.path.exists(pdf_test))
 
 
     def test_acba_annot(self):
-        replicon_name = 'acba.007.p01.13'
-        command = "integron_finder --outdir {out_dir} --func_annot --path_func_annot {annot_bank} --gbk " \
+        replicon_filename = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
+        command = "integron_finder --outdir {out_dir} --func_annot --path_func_annot {annot_bank} --gbk --keep-tmp " \
                   "{replicon}".format(out_dir=self.out_dir,
                                       annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
-                                      replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
+                                      replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
                                       )
 
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
-        result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
+        result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_filename))
 
-        gbk = '{}.gbk'.format(replicon_name)
-        expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_name), gbk))
+        gbk = '{}.gbk'.format(replicon_id)
+        expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_filename), gbk))
         gbk_test = os.path.join(result_dir, gbk)
         expected_gbk = SeqIO.read(expected_gbk, 'gb')
         gbk_test = SeqIO.read(gbk_test, 'gb')
         self.assertSeqRecordEqual(expected_gbk, gbk_test)
 
-        output_filename = '{}.integrons'.format(replicon_name)
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_name),
+        output_filename = '{}.integrons'.format(replicon_id)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_filename),
                                                            output_filename))
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertFileEqual(expected_result_path, test_result_path)
 
-        output_filename = os.path.join('other', replicon_name + '_Resfams_fa_table.res')
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_name),
+        output_filename = os.path.join('other_{}'.format(replicon_id), replicon_id + '_Resfams_fa_table.res')
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_filename),
                                                            output_filename))
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertHmmEqual(expected_result_path, test_result_path)
 
 
     def test_acba_local_max(self):
-        replicon_name = 'acba.007.p01.13'
+        replicon_filename = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
         command = "integron_finder --outdir {out_dir} --func_annot --path_func_annot {annot_bank} --local_max --gbk " \
-                  "{replicon}".format(
+                  "--keep-tmp {replicon}".format(
                                     out_dir=self.out_dir,
                                     annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
-                                    replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_name)))
+                                    replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
                                 )
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
-        result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_name))
+        result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_filename))
 
-        gbk = '{}.gbk'.format(replicon_name)
-        expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name), gbk))
+        gbk = '{}.gbk'.format(replicon_id)
+        expected_gbk = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_filename), gbk))
         gbk_test = os.path.join(result_dir, gbk)
         expected_gbk = SeqIO.read(expected_gbk, 'gb')
         gbk_test = SeqIO.read(gbk_test, 'gb')
         self.assertSeqRecordEqual(expected_gbk, gbk_test)
 
-        output_filename = '{}.integrons'.format(replicon_name)
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
+        output_filename = '{}.integrons'.format(replicon_id)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_filename),
                                                            output_filename))
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertFileEqual(expected_result_path, test_result_path,
                              msg=None)
         #msg="{} and {} differ".format(expected_result_path, test_result_path))
 
-        output_filename = os.path.join('other', '{}_Resfams_fa_table.res'.format(replicon_name))
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
+        output_filename = os.path.join('other_{}'.format(replicon_id), '{}_Resfams_fa_table.res'.format(replicon_id))
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_filename),
                                                            output_filename))
 
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertHmmEqual(expected_result_path, test_result_path)
 
-        output_filename = os.path.join('other', '{}_13825_1014_subseq_attc_table.res'.format(replicon_name))
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_name),
+        output_filename = os.path.join('other_{}'.format(replicon_id), '{}_13825_1014_subseq_attc_table.res'.format(replicon_id))
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_filename),
                                                            output_filename))
         test_result_path = os.path.join(result_dir, output_filename)
         with open(expected_result_path) as expected_result_file, open(test_result_path) as test_result_file:
@@ -229,13 +233,14 @@ class TestAcba(IntegronTest):
 
 
     def test_no_integron(self):
-        replicon_name = 'fake_seq'
-        output_filename = 'Results_Integron_Finder_{}'.format(replicon_name)
+        replicon_filename = 'fake_seq'
+        replicon_id = 'fake_seq'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
         command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
                                                                          replicon=self.find_data(
                                                                              os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_name))
+                                                                                          '{}.fst'.format(replicon_filename))
                                                                          )
                                                                          )
         with self.catch_io(out=True, err=True):
@@ -249,13 +254,13 @@ class TestAcba(IntegronTest):
 
 
     def test_acba_no_hmmer(self):
-        replicon_name = 'acba.007.p01.13'
+        replicon_filename = 'acba.007.p01.13'
         decorator = hide_executable('hmmsearch')
         finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
         command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
                                                                          replicon=self.find_data(
                                                                              os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_name))
+                                                                                          '{}.fst'.format(replicon_filename))
                                                                          )
                                                                          )
         with self.assertRaises(RuntimeError) as ctx:
@@ -270,13 +275,13 @@ class TestAcba(IntegronTest):
 
 
     def test_acba_no_prodigal(self):
-        replicon_name = 'acba.007.p01.13'
+        replicon_filename = 'acba.007.p01.13'
         decorator = hide_executable('prodigal')
         finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
         command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
                                                                          replicon=self.find_data(
                                                                              os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_name))
+                                                                                          '{}.fst'.format(replicon_filename))
                                                                          )
                                                                          )
         with self.assertRaises(RuntimeError) as ctx:
@@ -291,13 +296,13 @@ class TestAcba(IntegronTest):
 
 
     def test_acba_no_cmsearch(self):
-        replicon_name = 'acba.007.p01.13'
+        replicon_filename = 'acba.007.p01.13'
         decorator = hide_executable('cmsearch')
         finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
         command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
                                                                          replicon=self.find_data(
                                                                              os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_name))
+                                                                                          '{}.fst'.format(replicon_filename))
                                                                          )
                                                                          )
         with self.assertRaises(RuntimeError) as ctx:
