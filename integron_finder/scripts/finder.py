@@ -172,6 +172,11 @@ def parse_args(args):
                                 default=False,
                                 help='generate a GenBank file with the sequence annotated with the same annotations '
                                      'than .integrons file.')
+    output_options.add_argument('--keep-tmp',
+                                action='store_true',
+                                default=False,
+                                help='keep intermediate results. '
+                                     'This results are stored in directory named other_<replicon id>')
 
     topology_grp = parser.add_mutually_exclusive_group()
     topology_grp.add_argument("--circ",
@@ -338,7 +343,7 @@ def find_integron_in_one_replicon(replicon, config):
     # clean temporary files #
     #########################
 
-    if False:
+    if not config.keep_tmp:
         try:
             shutil.rmtree(result_dir_other)
         except:
