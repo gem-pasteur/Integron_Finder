@@ -96,7 +96,7 @@ class FastaIterator(object):
 
         :param str path: The path to the file containing the sequences.
         :param alphabet: The authorized alphabet
-        :type alpahbet: Bio.SeqIUPAC member
+        :type alphabet: Bio.SeqIUPAC member
         :param str replicon_name: The name of the replicon, if this specify all sequence.name will have this value
         :param int dist_threshold: The minimum length for a replicon to be considered as circular.
                                    Under this threshold even the provided topology is 'circular'
