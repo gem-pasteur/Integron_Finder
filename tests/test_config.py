@@ -154,7 +154,7 @@ class TestConfig(IntegronTest):
 
 
     def test_log_level(self):
-        for v, q, l in [(0, 0, 20), (0, 2, 40), (0, 5, 50), (1, 0, 10), (3, 0, 0), (2, 2, 20)]:
+        for v, q, l in [(0, 0, 20), (0, 2, 40), (0, 5, 50), (1, 0, 10), (3, 0, 10), (2, 2, 20)]:
             self.args.verbose = v
             self.args.quiet = q
             cf = config.Config(self.args)

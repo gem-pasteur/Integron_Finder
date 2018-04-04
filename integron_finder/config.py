@@ -157,6 +157,6 @@ class Config(object):
         """
         default = 20  # info
         level = default - (10 * self._args.verbose) + (10 * self._args.quiet)
-        level = max(0, level)
+        level = max(10, level)
         level = min(50, level)
         return level

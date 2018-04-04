@@ -195,7 +195,7 @@ def parse_args(args):
                         action="version",
                         version=integron_finder.get_version_message())
 
-    verbosity_grp = parser.add_mutually_exclusive_group()
+    verbosity_grp = parser.add_argument_group()
     verbosity_grp.add_argument('-v', '--verbose',
                                action='count',
                                default=0,
