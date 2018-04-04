@@ -668,7 +668,7 @@ class Integron(object):
                   "#d3d3d3" for (i, j) in zip(full.annotation,
                                               full.type_elt)]
 
-        colors_alpha = [j+[i] for j, i in zip([[ord(c)/255. for c in i[1:].decode("hex")] for i in colors],
+        colors_alpha = [j+[i] for j, i in zip([[ord(c) / 255. for c in i[1:].decode("hex")] for i in colors],
                                               alpha)]
 
         #ec = ["red" if i =="attC" else
