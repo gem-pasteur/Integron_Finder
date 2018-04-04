@@ -62,6 +62,8 @@ class TestAcba(IntegronTest):
 
         self.tmp_dir = tempfile.gettempdir()
         self.out_dir = os.path.join(self.tmp_dir, 'integron_acba_test')
+        if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
+            shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
         integrase.call = self.mute_call(_prodigal_call)
         self.find_executable_ori = finder.distutils.spawn.find_executable
@@ -154,7 +156,7 @@ class TestAcba(IntegronTest):
     def test_acba_annot(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
-        command = "integron_finder --outdir {out_dir} --func_annot --path_func_annot {annot_bank} --gbk --keep-tmp " \
+        command = "integron_finder --outdir {out_dir} --func-annot --path-func-annot {annot_bank} --gbk --keep-tmp " \
                   "{replicon}".format(out_dir=self.out_dir,
                                       annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
                                       replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
@@ -188,7 +190,7 @@ class TestAcba(IntegronTest):
     def test_acba_local_max(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
-        command = "integron_finder --outdir {out_dir} --func_annot --path_func_annot {annot_bank} --local_max --gbk " \
+        command = "integron_finder --outdir {out_dir} --func-annot --path-func-annot {annot_bank} --local-max --gbk " \
                   "--keep-tmp {replicon}".format(
                                     out_dir=self.out_dir,
                                     annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
@@ -212,7 +214,7 @@ class TestAcba(IntegronTest):
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertFileEqual(expected_result_path, test_result_path,
                              msg=None)
-        #msg="{} and {} differ".format(expected_result_path, test_result_path))
+        # msg="{} and {} differ".format(expected_result_path, test_result_path))
 
         output_filename = os.path.join('other_{}'.format(replicon_id), '{}_Resfams_fa_table.res'.format(replicon_id))
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_filename),

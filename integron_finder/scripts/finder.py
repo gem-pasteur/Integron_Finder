@@ -70,13 +70,13 @@ def parse_args(args):
     parser.add_argument("replicon",
                         help="Path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst")
 
-    parser.add_argument("--local_max",
+    parser.add_argument("--local-max",
                         default=False,
                         help="Allows thorough local detection "
                              "(slower but more sensitive and do not increase false positive rate).",
                         action="store_true")
 
-    parser.add_argument("--func_annot",
+    parser.add_argument("--func-annot",
                         help="Functional annotation of CDS associated "
                              "with integrons HMM files are needed in Func_annot folder.",
                         default=False,
@@ -87,7 +87,7 @@ def parse_args(args):
                         type=int,
                         help='Number of CPUs used by INFERNAL and HMMER')
 
-    parser.add_argument('-dt', '--distance_thresh',
+    parser.add_argument('-dt', '--distance-thresh',
                         dest='distance_threshold',
                         default=4000,
                         action='store',
@@ -98,7 +98,7 @@ def parse_args(args):
                         default=".",
                         help='Set the output directory (default: current)')
 
-    parser.add_argument("--union_integrases",
+    parser.add_argument("--union-integrases",
                         default=False,
                         help="Instead of taking intersection of hits from Phage_int profile (Tyr recombinases)"
                              " and integron_integrase profile, use the union of the hits",
@@ -117,7 +117,7 @@ def parse_args(args):
                         default=distutils.spawn.find_executable("prodigal"),
                         help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
 
-    parser.add_argument('--path_func_annot',
+    parser.add_argument('--path-func-annot',
                         help='Path to file containing all hmm bank paths (one per line)')
 
     parser.add_argument("--gembase",
@@ -126,39 +126,39 @@ def parse_args(args):
                              " Folder structure must be preserved",
                         action="store_true")
 
-    parser.add_argument('--attc_model',
+    parser.add_argument('--attc-model',
                         default='attc_4.cm',
                         help='path or file to the attc model (Covariance Matrix)')
 
-    parser.add_argument('--evalue_attc',
+    parser.add_argument('--evalue-attc',
                         default=1.,
                         type=float,
                         help='set evalue threshold to filter out hits above it (default: 1)')
 
-    parser.add_argument("--keep_palindromes",
+    parser.add_argument("--keep-palindromes",
                         default=False,
                         help="for a given hit, if the palindromic version is found,"
                              " don't remove the one with highest evalue ",
                         action="store_true")
 
-    parser.add_argument("--no_proteins",
+    parser.add_argument("--no-proteins",
                         help="Don't annotate CDS and don't find integrase, just look for attC sites.",
                         default=False,
                         action="store_true")
 
-    parser.add_argument('--max_attc_size',
+    parser.add_argument('--max-attc-size',
                         default=200,
                         type=int,
                         help='set maximum value fot the attC size (default: 200bp)')
 
-    parser.add_argument('--min_attc_size',
+    parser.add_argument('--min-attc-size',
                         default=40,
                         type=int,
                         help='set minimum value fot the attC size (default: 40bp)')
 
-    parser.add_argument("--eagle_eyes",
+    parser.add_argument("--eagle-eyes",
                         default=False,
-                        help="Synonym of --local_max. Like a soaring eagle in the sky,"
+                        help="Synonym of --local-max. Like a soaring eagle in the sky,"
                              " catching rabbits(or attC sites) by surprise.",
                         action="store_true")
     output_options = parser.add_argument_group("Output options")
@@ -188,7 +188,7 @@ def parse_args(args):
                               default=False,
                               help="Set the default topology for replicons to 'linear'",
                               action="store_true")
-    parser.add_argument("--topology_file",
+    parser.add_argument("--topology-file",
                         help="The path to a file where the topology for each replicon is specified")
 
     parser.add_argument("-V", "--version",
@@ -253,7 +253,7 @@ def find_integron_in_one_replicon(replicon, config):
             fa_hmm = scan_hmm_bank(config.func_annot_path)
         else:
             raise IntegronError("the dir '{}' neither 'bank_hmm' exists, specify the location of hmm "
-                                "profile with --path_func_annot option".format(config.func_annot_path))
+                                "profile with --path-func-annot option".format(config.func_annot_path))
         is_func_annot = True
 
     elif config.path_func_annot and config.no_proteins is False:

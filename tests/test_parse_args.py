@@ -65,13 +65,13 @@ class TestParseArgs(IntegronTest):
     def test_local_max(self):
         cfg = parse_args(['replicon'])
         self.assertFalse(cfg.local_max)
-        cfg = parse_args(['--local_max', 'replicon'])
+        cfg = parse_args(['--local-max', 'replicon'])
         self.assertTrue(cfg.local_max)
 
     def test_func_annot(self):
         cfg = parse_args(['replicon'])
         self.assertFalse(cfg.func_annot)
-        cfg = parse_args(['--func_annot', 'replicon'])
+        cfg = parse_args(['--func-annot', 'replicon'])
         self.assertTrue(cfg.func_annot)
 
     def test_cpu(self):
@@ -85,7 +85,7 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['replicon'])
         self.assertEqual(cfg.distance_threshold, 4000)
         dt = 50
-        cfg = parse_args(['--distance_thresh', str(dt), 'replicon'])
+        cfg = parse_args(['--distance-thresh', str(dt), 'replicon'])
         self.assertEqual(cfg.distance_threshold, dt)
 
     def test_outdir(self):
@@ -98,7 +98,7 @@ class TestParseArgs(IntegronTest):
     def test_union_integrase(self):
         cfg = parse_args(['replicon'])
         self.assertFalse(cfg.union_integrases)
-        cfg = parse_args(['--union_integrases', 'replicon'])
+        cfg = parse_args(['--union-integrases', 'replicon'])
         self.assertTrue(cfg.union_integrases)
 
     def test_cmsearch(self):
@@ -126,7 +126,7 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['replicon'])
         self.assertIsNone(cfg.path_func_annot)
         func_annot = 'foo'
-        cfg = parse_args(['--path_func_annot', func_annot, 'replicon'])
+        cfg = parse_args(['--path-func-annot', func_annot, 'replicon'])
         self.assertEqual(cfg.path_func_annot, func_annot)
 
     def test_gembase(self):
@@ -139,33 +139,33 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['replicon'])
         self.assertEqual(cfg.model_attc_name, 'attc_4')
         model = 'foo'
-        cfg = parse_args(['--attc_model', model, 'replicon'])
+        cfg = parse_args(['--attc-model', model, 'replicon'])
         self.assertEqual(cfg.model_attc_name, model)
 
     def test_evalues_attc(self):
         cfg = parse_args(['replicon'])
         self.assertEqual(cfg.evalue_attc, 1.0)
         evalue = 5.0
-        cfg = parse_args(['--evalue_attc', str(evalue), 'replicon'])
+        cfg = parse_args(['--evalue-attc', str(evalue), 'replicon'])
         self.assertEqual(cfg.evalue_attc, evalue)
 
     def test_keep_palindromes(self):
         cfg = parse_args(['replicon'])
         self.assertFalse(cfg.keep_palindromes)
-        cfg = parse_args(['--keep_palindromes', 'replicon'])
+        cfg = parse_args(['--keep-palindromes', 'replicon'])
         self.assertTrue(cfg.keep_palindromes)
 
     def test_no_proteins(self):
         cfg = parse_args(['replicon'])
         self.assertFalse(cfg.no_proteins)
-        cfg = parse_args(['--no_proteins', 'replicon'])
+        cfg = parse_args(['--no-proteins', 'replicon'])
         self.assertTrue(cfg.no_proteins)
 
     def test_max_attc_size(self):
         cfg = parse_args(['replicon'])
         self.assertEqual(cfg.max_attc_size, 200)
         max_attc_size = 50
-        cfg = parse_args(['--max_attc_size', str(max_attc_size), 'replicon'])
+        cfg = parse_args(['--max-attc-size', str(max_attc_size), 'replicon'])
         self.assertEqual(cfg.max_attc_size, max_attc_size)
 
 
@@ -173,14 +173,14 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['replicon'])
         self.assertEqual(cfg.min_attc_size, 40)
         min_attc_size = 50
-        cfg = parse_args(['--min_attc_size', str(min_attc_size), 'replicon'])
+        cfg = parse_args(['--min-attc-size', str(min_attc_size), 'replicon'])
         self.assertEqual(cfg.min_attc_size, min_attc_size)
 
     def test_eagle_eyes(self):
         cfg = parse_args(['replicon'])
         self.assertFalse(cfg.local_max)
         # eagle option is an "alias" for local_max
-        cfg = parse_args(['--eagle_eyes', 'replicon'])
+        cfg = parse_args(['--eagle-eyes', 'replicon'])
         self.assertTrue(cfg.local_max)
 
     def test_circular(self):
@@ -215,7 +215,7 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['replicon'])
         self.assertIsNone(cfg.topology_file)
         topo = 'foo'
-        cfg = parse_args(['--topology_file', topo, 'replicon'])
+        cfg = parse_args(['--topology-file', topo, 'replicon'])
         self.assertEqual(cfg.topology_file, topo)
 
     def test_verbose(self):
