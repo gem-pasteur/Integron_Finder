@@ -151,7 +151,7 @@ def read_hmm(replicon_id, infile, cfg, evalue=1., coverage=0.5):
             df.loc[idx+idx2, "hmmfrom"] = hmmfrom[best_evalue]   # hmmfrom
             df.loc[idx+idx2, "hmmto"] = hmmto[best_evalue]     # hmm to
             df.loc[idx+idx2, "alifrom"] = alifrom[best_evalue]   # alifrom
-            df.loc[idx+idx2, "alito"] = alito [best_evalue]  # ali to
+            df.loc[idx+idx2, "alito"] = alito[best_evalue]  # ali to
             df.loc[idx+idx2, "len_profile"] = float(len_profile)
             df.loc[idx+idx2, "Accession_number"] = replicon_id
             df.loc[idx+idx2, "query_name"] = query
