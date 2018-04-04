@@ -147,7 +147,7 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cp
 
 
 def find_attc_max(integrons, replicon, distance_threshold,
-                  model_attc_path, max_attc_size, circular=True, outfile="attC_max_1.res", out_dir='.'):
+                  model_attc_path, max_attc_size, circular=True, outfile="attC_max_1.res", out_dir='.', cpu=1):
     """
     Look for attC site with cmsearch --max option which remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
@@ -179,6 +179,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
     :param int max_attc_size: maximum value fot the attC size.
     :param bool circular: True if replicon is circular, False otherwise.
     :param str outfile: the name of cmsearch result file.
+    :param int cpu: call local_max with the right number of cpu
     :return:
     :rtype: :class:`pd.DataFrame` object
 
@@ -222,7 +223,9 @@ def find_attc_max(integrons, replicon, distance_threshold,
                 window_end = min(size_replicon, window_end + distance_threshold_right)
 
             strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
-            df_max = local_max(replicon, window_beg, window_end, model_attc_path, strand_search=strand, out_dir=out_dir)
+            df_max = local_max(replicon, window_beg, window_end, model_attc_path,
+                               strand_search=strand, out_dir=out_dir,
+                               cpu_nb=cpu)
             max_elt = pd.concat([max_elt, df_max])
 
             # If we find new attC after the last found with default algo and if the integrase is on the left
@@ -238,7 +241,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                              circular, distance_threshold, max_attc_size,
                              model_attc_path,
                              search_left=go_left, search_right=go_right,
-                             out_dir=out_dir)
+                             out_dir=out_dir, cpu=cpu)
 
         elif all(full_element.type == "CALIN"):
             if full_element[full_element.pos_beg.isin(max_final.pos_beg)].empty:
@@ -255,7 +258,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                 df_max = local_max(replicon, window_beg, window_end,
                                    model_attc_path,
                                    strand_search=strand,
-                                   out_dir=out_dir)
+                                   out_dir=out_dir, cpu_nb=cpu)
                 max_elt = pd.concat([max_elt, df_max])
 
                 if not df_max.empty:  # Max can sometimes find bigger attC than permitted
@@ -268,7 +271,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      circular, distance_threshold, max_attc_size,
                                      model_attc_path,
                                      search_left=go_left, search_right=go_right,
-                                     out_dir=out_dir)
+                                     out_dir=out_dir, cpu=cpu)
 
         elif all(full_element.type == "In0"):
             if all(full_element.model != "Phage_integrase"):
@@ -284,7 +287,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                    window_beg, window_end,
                                    model_attc_path,
                                    strand_search=strand,
-                                   out_dir=out_dir)
+                                   out_dir=out_dir, cpu_nb=cpu)
                 max_elt = pd.concat([max_elt, df_max])
                 if not max_elt.empty:
                     max_elt = expand(replicon,
@@ -292,7 +295,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      circular, distance_threshold, max_attc_size,
                                      model_attc_path,
                                      search_left=True, search_right=True,
-                                     out_dir=out_dir)
+                                     out_dir=out_dir, cpu=cpu)
 
         max_final = pd.concat([max_final, max_elt])
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)

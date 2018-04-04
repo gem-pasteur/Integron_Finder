@@ -187,7 +187,7 @@ def expand(replicon,
            circular, dist_threshold, max_attc_size,
            model_attc_path,
            search_left=False, search_right=False,
-           out_dir='.'):
+           out_dir='.', cpu=1):
     """
     for a given element, we can search on the left hand side (if integrase is on the right for instance)
     or right hand side (opposite situation) or both side (only integrase or only attC sites)
@@ -219,6 +219,7 @@ def expand(replicon,
     :param bool search_left: need to search on right of ???
     :param bool search_right: need to search on right of ???
     :param str out_dir: The path to directory where to write results
+    :param int cpu: the number of cpu use by expand
     :return: a copy of max_elt with attC hits
     :rtype: :class:`pandas.DataFrame` object
 
@@ -247,7 +248,7 @@ def expand(replicon,
                                window_beg, window_end,
                                model_attc_path,
                                strand_search=searched_strand,
-                               out_dir=out_dir
+                               out_dir=out_dir, cpu_nb=cpu
                                )
             max_elt = pd.concat([max_elt, df_max])
 
@@ -279,7 +280,8 @@ def expand(replicon,
                                window_beg, window_end,
                                model_attc_path,
                                strand_search=searched_strand,
-                               out_dir=out_dir)
+                               out_dir=out_dir,
+                               cpu_nb=cpu)
             max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
 
             if circular:

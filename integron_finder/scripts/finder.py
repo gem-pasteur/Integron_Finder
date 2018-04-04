@@ -205,6 +205,7 @@ def parse_args(args):
                                default=0,
                                help='Decrease verbosity of output (can be cumulative : -qq)'
                                )
+
     parsed_args = parser.parse_args(args)
 
     # eagle_eyes is just an alias to local_max in whole program use local_max
@@ -298,7 +299,8 @@ def find_integron_in_one_replicon(replicon, config):
             circular = True if replicon.topology == 'circ' else False
             integron_max = find_attc_max(integrons, replicon, config.distance_threshold,
                                          config.model_attc_path, config.max_attc_size,
-                                         circular=circular, out_dir=result_dir_other)
+                                         circular=circular, out_dir=result_dir_other,
+                                         cpu=config.cpu)
             integron_max.to_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
             _log.info("Search with local_max done... :")
 
