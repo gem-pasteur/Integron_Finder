@@ -121,7 +121,7 @@ sequence seq_(2|4) contains invalid characters, the sequence is skipped."""
         with self.catch_log() as log:
             received_seq_id = sorted([seq.id for seq in seq_db if seq])
             got_warning = log.get_value().strip()
-        self.assertRegexpMatches(got_warning, expected_warning)
+        self.assertRegex(got_warning, expected_warning)
         expected_seq_id = sorted(['seq_1', 'seq_3'])
         self.assertListEqual(expected_seq_id, received_seq_id)
 
@@ -133,7 +133,7 @@ sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 5
         with self.catch_log() as log:
             received_seq_id = sorted([seq.id for seq in seq_db if seq])
             got_warning = log.get_value().strip()
-        self.assertRegexpMatches(got_warning, expected_warning)
+        self.assertRegexp(got_warning, expected_warning)
         expected_seq_id = sorted(['seq_1', 'seq_3'])
         self.assertListEqual(expected_seq_id, received_seq_id)
 

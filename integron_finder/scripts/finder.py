@@ -354,7 +354,7 @@ def find_integron_in_one_replicon(replicon, config):
                                                  "type_elt", "annotation", "model",
                                                  "type", "default", "distance_2attC", "considered_topology"]]
         integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
-        integrons_describe.index = range(len(integrons_describe))
+        integrons_describe.index = list(range(len(integrons_describe)))
         integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
         integrons_describe.to_csv(outfile, sep="\t", index=0, na_rep="NA")
 

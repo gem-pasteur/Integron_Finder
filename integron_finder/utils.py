@@ -124,12 +124,12 @@ class FastaIterator(object):
         alphabet = set(self.alphabet.letters.upper())
         return seq_letters.issubset(alphabet)
 
-    def next(self):
+    def __next__(self):
         """
         :return: The next sequence (the order of sequences is not guaranteed).
         :rtype: a :class:`Bio.SeqRecord` object or None if the sequence is not compliant with the alphabet.
         """
-        seq = self.seq_gen.next()
+        seq = next(self.seq_gen)
         if not self._check_seq_alphabet_compliance(seq.seq):
             _log.warning("sequence {} contains invalid characters, the sequence is skipped.".format(seq.id))
             return None

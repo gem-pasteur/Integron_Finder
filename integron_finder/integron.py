@@ -415,7 +415,7 @@ class Integron(object):
         pseq = [i for i in pc]
         d = {len(i): [] for i in pseq}
         _ = [d[len(i)].append(i.seq.upper()) for i in pseq]
-        for k, i in d.iteritems():
+        for k, i in d.items():
             motifs_Pc.append(motifs.create(i))
             motifs_Pc[-1].name = "Pc_int1"
 

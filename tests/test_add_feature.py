@@ -51,7 +51,7 @@ class TestAddFeature(IntegronTest):
         sequences_db = FastaIterator(self.replicon_path)
         topologies = Topology('lin')
         sequences_db.topologies = topologies
-        self.seq = sequences_db.next()
+        self.seq = next(sequences_db)
 
         self.prot_file = self.find_data(os.path.join("Results_Integron_Finder_acba.007.p01.13",
                                                      "other_{}".format(self.replicon_id),

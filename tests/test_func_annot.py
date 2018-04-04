@@ -75,7 +75,7 @@ class TestFuncAnnot(IntegronTest):
         sequences_db = FastaIterator(self.replicon_path)
         topologies = Topology('lin')
         sequences_db.topologies = topologies
-        self.replicon = sequences_db.next()
+        self.replicon = next(sequences_db)
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         if os.path.isdir(self.tmp_dir):

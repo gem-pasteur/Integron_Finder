@@ -31,7 +31,7 @@ import sys
 import unittest
 import platform
 import colorlog
-from StringIO import StringIO
+from io import StringIO
 from contextlib import contextmanager
 
 from integron_finder import IntegronError, logger_set_level

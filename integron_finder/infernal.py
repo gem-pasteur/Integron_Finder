@@ -75,7 +75,7 @@ def read_infernal(infile, replicon_id, len_model_attc,
     df = df[(abs(df.pos_end_tmp - df.pos_beg_tmp) < size_max_attc) & (size_min_attc < abs(df.pos_end_tmp - df.pos_beg_tmp))]
     if not df.empty:
         df.sort_values(['pos_end_tmp', 'evalue'], inplace=True)
-        df.index = range(0, len(df))
+        df.index = list(range(0, len(df)))
         idx = (df.pos_beg_tmp > df.pos_end_tmp)
         df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: x["pos_end_tmp"] - (len_model_attc - x["cm_fin"]), axis=1)
         df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: x["pos_beg_tmp"] + (x["cm_debut"] - 1), axis=1)
@@ -292,7 +292,7 @@ def expand(replicon,
                 window_beg = max(0, window_beg - dist_threshold)
 
     max_elt.drop_duplicates(inplace=True)
-    max_elt.index = range(len(max_elt))
+    max_elt.index = list(range(len(max_elt)))
     return max_elt
 
 

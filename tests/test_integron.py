@@ -420,7 +420,7 @@ class TestIntegron(IntegronTest):
         topologies = Topology('lin')
         sequences_db.topologies = topologies
 
-        replicon = sequences_db.next()
+        replicon = next(sequences_db)
 
         args = argparse.Namespace()
         args.eagle_eyes = False

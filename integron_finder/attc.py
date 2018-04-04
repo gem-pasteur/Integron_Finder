@@ -299,5 +299,5 @@ def find_attc_max(integrons, replicon, distance_threshold,
 
         max_final = pd.concat([max_final, max_elt])
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)
-        max_final.index = range(len(max_final))
+        max_final.index = list(range(len(max_final)))
     return max_final
