@@ -213,14 +213,37 @@ def parse_args(args):
 
 
 def find_integron_in_one_replicon(replicon, config):
-    in_dir, sequence_file = os.path.split(config.replicon_path)
-    replicon_name = replicon.name
+    """
+    scan replicon for integron.
 
+      * presence of integrase
+      * presence of attC sites
+      * presence of promoters and attI sites
+
+    depending on the configuration
+
+     * perform functional annotation
+
+    produce a file containing presence of putative integrons
+
+    depending on configuration
+
+        * produce genbank file with replicon and annotations with integrons
+        * produce schema of replicon with integrons (in pdf)
+
+    :param replicon: the replicon to analyse.
+    :type replicon: a :class:`Bio.SeqRecord` object.
+    :param config: The configuration
+    :type config: a :class:`integron_finder.config.Config` object.
+    """
+    in_dir, sequence_file = os.path.split(config.replicon_path)
     result_dir_other = os.path.join(config.result_dir, "other_{}".format(replicon.id))
     try:
         os.mkdir(result_dir_other)
     except OSError:
         pass
+    tmp_replicon_path = os.path.join(result_dir_other, replicon.id + '.fst')
+    SeqIO.write(replicon, tmp_replicon_path, "fasta")
 
     if config.func_annot and not config.no_proteins and not config.path_func_annot:
         if os.path.exists('bank_hmm'):
@@ -242,6 +265,7 @@ def find_integron_in_one_replicon(replicon, config):
         _log.warning("No hmm profiles for functional annotation detected, skip functional annotation step.")
 
     if config.gembase:
+        replicon_name = utils.get_name_from_path(config.replicon_path)
         prot_file = os.path.join(in_dir, "..", "Proteins", replicon_name + ".prt")
     else:
         prot_file = os.path.join(result_dir_other, replicon.id + ".prt")
@@ -255,11 +279,11 @@ def find_integron_in_one_replicon(replicon, config):
 
     if not config.no_proteins:
         if not os.path.isfile(intI_file) or not os.path.isfile(phageI_file):
-            find_integrase(config.replicon_path, replicon, prot_file, result_dir_other, config)
+            find_integrase(tmp_replicon_path, replicon, prot_file, result_dir_other, config)
 
     _log.info("Starting Default search ... :")
     if not os.path.isfile(attC_default_file):
-        find_attc(config.replicon_path, replicon.name, config.cmsearch, result_dir_other, config.model_attc_path,
+        find_attc(tmp_replicon_path, replicon.name, config.cmsearch, result_dir_other, config.model_attc_path,
                   cpu=config.cpu)
 
     _log.info("Default search done... : ")
@@ -310,14 +334,14 @@ def find_integron_in_one_replicon(replicon, config):
     #######################
     # Writing out results #
     #######################
-    _log.info("Writing out results")
+    _log.info("Writing out results for replicon {}".format(replicon.id))
 
     if config.pdf:
         for j, integron in enumerate(integrons, 1):
             if integron.type() == "complete":
                 integron.draw_integron(file=os.path.join(config.result_dir, "{}_{}.pdf".format(replicon.id, j)))
 
-    outfile = os.path.join(config.result_dir, replicon_name + ".integrons")
+    outfile = os.path.join(config.result_dir, replicon.id + ".integrons")
     if integrons:
         integrons_describe = pd.concat([i.describe() for i in integrons])
         dic_id = {id_: "{:02}".format(j) for j, id_ in
@@ -346,8 +370,8 @@ def find_integron_in_one_replicon(replicon, config):
     if not config.keep_tmp:
         try:
             shutil.rmtree(result_dir_other)
-        except:
-            pass
+        except Exception as err:
+            _log.warning("Cannot remove temporary results : '{} : {}'".format(result_dir_other, str(err)))
 
 
 def header(args):
@@ -484,6 +508,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
             _log.info("############ Processing replicon {} ({}/{}) ############".format(replicon.name,
                                                                                         rep_no,
                                                                                         sequences_db_len))
+
             find_integron_in_one_replicon(replicon, config)
         else:
             _log.warning("############ Skipping replicon {} ({}/{}) ############".format(replicon.name,
