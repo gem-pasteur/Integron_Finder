@@ -28,6 +28,7 @@
 
 import os
 from subprocess import call
+import colorlog
 
 from Bio import BiopythonExperimentalWarning
 import warnings
@@ -41,6 +42,8 @@ from Bio import SeqIO
 
 from .utils import get_name_from_path, read_multi_prot_fasta
 from .hmm import read_hmm
+
+_log = colorlog.getLogger(__name__)
 
 
 def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', evalue=10, coverage=0.5):
@@ -105,6 +108,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
                             prot_tmp]
 
                 try:
+                    _log.debug("run hmmsearch: {}".format(' '.join(hmm_cmd)))
                     returncode = call(hmm_cmd)
                 except Exception as err:
                     raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
