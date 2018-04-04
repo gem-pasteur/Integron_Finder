@@ -28,10 +28,13 @@
 
 import os
 from subprocess import call
+import colorlog
 import pandas as pd
 from Bio import SeqIO
 
 from .utils import model_len
+
+_log = colorlog.getLogger(__name__)
 
 
 def read_infernal(infile, replicon_id, len_model_attc,
@@ -51,17 +54,21 @@ def read_infernal(infile, replicon_id, len_model_attc,
             | and each row is a hit that match the attc covariance model.
     :rtype: :class:`pandas.DataFrame` object
     """
-
+    _log.debug("read_infernal {}, {}, {}, evalue={}, size_max_attc={}, size_min_attc={}".format(
+        infile, replicon_id, len_model_attc, evalue, size_max_attc, size_min_attc
+    ))
     try:
         _ = pd.read_table(infile, comment="#")
     except:
         return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
 
-    df = pd.read_table(infile, sep="\s*", engine="python",  header=None, skipfooter=10, skiprows=2)
+    df = pd.read_table(infile, sep="\s+", engine="python",  header=None,
+                       skipfooter=10, skiprows=2, usecols=[2, 5, 6, 7, 8, 9, 15])
+    # some line can have different number of columns due to difference in description
+    # we do not use this columns so we must parse only cols we need
     # Keep only columns: query_name(2), mdl from(5), mdl to(6), seq from(7),
     # seq to(8), strand(9), E-value(15)
-    df = df[[2, 5, 6, 7, 8, 9, 15]]
     df.columns = ["cm_attC", "cm_debut", "cm_fin", "pos_beg_tmp", "pos_end_tmp", "sens", "evalue"]
     df["Accession_number"] = replicon_id
     df = df[df.evalue < evalue]  # filter on evalue
@@ -144,6 +151,7 @@ def local_max(replicon,
             mod_attc_path=model_attc_path,
             infile=infile_path)
     try:
+        _log.debug("run cmsearch: {}".format(cmsearch_cmd))
         returncode = call(cmsearch_cmd.split())
     except Exception as err:
         raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd, err))
@@ -235,7 +243,6 @@ def expand(replicon,
         searched_strand = "both" if search_left else "top"  # search on both strands if search in both directions
 
         while not df_max.empty and 0 < (window_beg and window_end) < replicon_size:
-
             df_max = local_max(replicon,
                                window_beg, window_end,
                                model_attc_path,
