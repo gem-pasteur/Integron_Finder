@@ -237,7 +237,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
                              window_beg, window_end, max_elt, df_max,
                              circular, distance_threshold, max_attc_size,
                              model_attc_path,
-                             search_left=go_left, search_right=go_right)
+                             search_left=go_left, search_right=go_right,
+                             out_dir=out_dir)
 
         elif all(full_element.type == "CALIN"):
             if full_element[full_element.pos_beg.isin(max_final.pos_beg)].empty:
@@ -266,7 +267,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      window_beg, window_end, max_elt, df_max,
                                      circular, distance_threshold, max_attc_size,
                                      model_attc_path,
-                                     search_left=go_left, search_right=go_right)
+                                     search_left=go_left, search_right=go_right,
+                                     out_dir=out_dir)
 
         elif all(full_element.type == "In0"):
             if all(full_element.model != "Phage_integrase"):
@@ -289,7 +291,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      window_beg, window_end, max_elt, df_max,
                                      circular, distance_threshold, max_attc_size,
                                      model_attc_path,
-                                     search_left=True, search_right=True)
+                                     search_left=True, search_right=True,
+                                     out_dir=out_dir)
 
         max_final = pd.concat([max_final, max_elt])
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)
