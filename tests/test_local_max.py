@@ -250,7 +250,7 @@ class TestLocalMax(IntegronTest):
                                    cmsearch_bin=cmsearch_bin, out_dir=self.out_dir, cpu_nb=self.cpu_nb
                                    )
         self.assertTrue(str(ctx.exception).endswith(
-            "failed : [Errno 2] No such file or directory".format(cmsearch_bin)))
+            "failed : [Errno 2] No such file or directory: 'failed_cmsearch': 'failed_cmsearch'".format(cmsearch_bin)))
 
         infernal.call = lambda x: 1
         with self.assertRaises(RuntimeError) as ctx:

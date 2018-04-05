@@ -419,4 +419,4 @@ class TestFuncAnnot(IntegronTest):
         # Annotate proteins
         with self.assertRaises(RuntimeError) as ctx:
             func_annot(integrons, self.replicon, self.prot_file, self.hmm_files, self.cfg, self.tmp_dir)
-        self.assertTrue(str(ctx.exception).endswith("failed : [Errno 2] No such file or directory"))
+        self.assertTrue(str(ctx.exception).endswith("failed : [Errno 2] No such file or directory: 'nimportnaoik': 'nimportnaoik'"))
