@@ -35,6 +35,8 @@ import pandas as pd
 from matplotlib import use as m_use
 m_use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.colors
+
 # display warning only for non installed integron_finder
 from Bio import BiopythonExperimentalWarning
 import warnings
@@ -668,14 +670,15 @@ class Integron(object):
                   "#d3d3d3" for (i, j) in zip(full.annotation,
                                               full.type_elt)]
 
-        colors_alpha = [j+[i] for j, i in zip([[ord(c) / 255. for c in i[1:].decode("hex")] for i in colors],
-                                              alpha)]
+        # colors_alpha = [j+[i] for j, i in zip([[ord(c) / 255. for c in i[1:].decode("hex")] for i in colors],
+        #                                      alpha)]
 
-        #ec = ["red" if i =="attC" else
+        colors_alpha = [matplotlib.colors.to_rgba_array(c, a)[0].tolist() for c, a in zip(colors, alpha)]
+
+        # ec = ["red" if i =="attC" else
         #      "white" for i in full.type_elt]
-        z_order = [100 if i == "attC" else
-                   1 for i in full.type_elt]
-
+        # z_order = [100 if i == "attC" else 1 for i in full.type_elt]
+        z_order = 10
         ax.barh(np.zeros(len(full)), full.pos_end-full.pos_beg,
                 height=h, left=full.pos_beg,
                 color=colors_alpha, zorder=z_order, ec=None)  # edgecolor=ec,
@@ -689,7 +692,7 @@ class Integron(object):
         ax.set_xlim(xlims)
         fig.subplots_adjust(left=0.05, right=0.80)
         ax.hlines(0, ax.get_xlim()[0], ax.get_xlim()[1], "lightgrey", "--")
-        ax.grid("on", "major", axis="x")
+        ax.grid(True, "major", axis="x")
         ax.set_ylim(-4, 4)
         ax.get_yaxis().set_visible(False)
         if file:
