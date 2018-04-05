@@ -143,7 +143,7 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
             type_integron = integron_desc.loc[i].type
             start_integron = integron_desc.loc[i].pos_beg
             end_integron = integron_desc.loc[i].pos_end
-            tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(start_integron - 1, end_integron),
+            tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(int(start_integron) - 1, int(end_integron)),
                                         strand=0,
                                         type="integron",
                                         qualifiers={"integron_id": i, "integron_type": type_integron}
@@ -151,8 +151,8 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
             replicon.features.append(tmp)
             if integron_desc.loc[i].type_elt == "protein":
 
-                tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(integron_desc.loc[i].pos_beg - 1,
-                                                                                integron_desc.loc[i].pos_end),
+                tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(int(integron_desc.loc[i].pos_beg) - 1,
+                                                                                int(integron_desc.loc[i].pos_end)),
                                             strand=integron_desc.loc[i].strand,
                                             type="CDS" if integron_desc.loc[i].annotation != "intI" else "integrase",
                                             qualifiers={"protein_id": integron_desc.loc[i].element,
@@ -165,8 +165,8 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
                 replicon.features.append(tmp)
 
             else:
-                tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(integron_desc.loc[i].pos_beg - 1,
-                                                                                integron_desc.loc[i].pos_end),
+                tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(int(integron_desc.loc[i].pos_beg) - 1,
+                                                                                int(integron_desc.loc[i].pos_end)),
                                             strand=integron_desc.loc[i].strand,
                                             type=integron_desc.loc[i].type_elt,
                                             qualifiers={integron_desc.loc[i].type_elt: integron_desc.loc[i].element,
@@ -182,10 +182,10 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
 
             if diff.any():
                 pos = np.where(diff)[0][0]
-                start_integron_1 = integron_desc.loc[i].pos_beg.values[pos]
+                start_integron_1 = int(integron_desc.loc[i].pos_beg.values[pos])
                 end_integron_1 = len(replicon)
                 start_integron_2 = 1
-                end_integron_2 = integron_desc.loc[i].pos_end.values[pos-1]
+                end_integron_2 = int(integron_desc.loc[i].pos_end.values[pos-1])
 
                 f1 = SeqFeature.FeatureLocation(start_integron_1 - 1, end_integron_1)
                 f2 = SeqFeature.FeatureLocation(start_integron_2 - 1, end_integron_2)
@@ -195,8 +195,8 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
                                             qualifiers={"integron_id": i, "integron_type": type_integron}
                                             )
             else:
-                start_integron = integron_desc.loc[i].pos_beg.values[0]
-                end_integron = integron_desc.loc[i].pos_end.values[-1]
+                start_integron = int(integron_desc.loc[i].pos_beg.values[0])
+                end_integron = int(integron_desc.loc[i].pos_end.values[-1])
 
                 tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(start_integron - 1, end_integron),
                                             strand=0,
@@ -206,7 +206,8 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
             replicon.features.append(tmp)
             for r in integron_desc.loc[i].iterrows():
                 if r[1].type_elt == "protein":
-                    tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(r[1].pos_beg - 1, r[1].pos_end),
+                    tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(int(r[1].pos_beg) - 1,
+                                                                                    int(r[1].pos_end)),
                                                 strand=r[1].strand,
                                                 type="CDS" if r[1].annotation != "intI" else "integrase",
                                                 qualifiers={"protein_id": r[1].element,
@@ -218,7 +219,8 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
                                                      if prt.id == r[1].element][0].seq
                     replicon.features.append(tmp)
                 else:
-                    tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(r[1].pos_beg - 1, r[1].pos_end),
+                    tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(int(r[1].pos_beg) - 1,
+                                                                                    int(r[1].pos_end)),
                                                 strand=r[1].strand,
                                                 type=r[1].type_elt,
                                                 qualifiers={r[1].type_elt: r[1].element, "model": r[1].model}
