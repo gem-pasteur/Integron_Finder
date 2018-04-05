@@ -140,10 +140,15 @@ class IntegronTest(unittest.TestCase):
             # location cannot be directly compared
             self.assertEqual(str(s1_feat.location), str(s2_feat.location))
 
-            for attr in ('qualifiers', 'strand', 'type'):
+            for attr in ('strand', 'type'):
                 f1_attr = getattr(s1_feat, attr)
                 f2_attr = getattr(s2_feat, attr)
                 self.assertEqual(f1_attr, f2_attr, msg="{} are different: {} != {}".format(attr, f1_attr, f2_attr))
+
+            # The order of qualifers does not matter
+            # ('integron_type', ['complete']), ('integron_id', ['integron_01'])
+            # ('integron_id', ['integron_01']), ('integron_type', ['complete'])
+            self.assertDictEqual(dict(s1_feat.qualifiers), dict(s2_feat.qualifiers))
 
     def assertHmmEqual(self, hmm1, hmm2):
         with open(hmm1) as hmm1_file, open(hmm2) as hmm2_file:
