@@ -51,11 +51,11 @@ class TestGetVersion(IntegronTest):
         forced_vers = '$' + 'VERSION'
         integron_finder.__version__ = forced_vers
 
-        with self.catch_io(out=True, err=True):
+        with self.catch_io(out=True, err=False):
             try:
                 finder.main(['integron_finder', '-V'])
             except TypeError as err:
-                version = sys.stderr.getvalue()
+                version = sys.stdout.getvalue()
                 # program exit with returncode = 0
                 self.assertEqual(str(err), '0')
             finally:
@@ -88,11 +88,11 @@ Python {0}
         forced_vers = '1.5.2'
         integron_finder.__version__ = forced_vers
 
-        with self.catch_io(out=True, err=True):
+        with self.catch_io(out=True, err=False):
             try:
                 finder.main(['integron_finder', '-V'])
             except TypeError as err:
-                version = sys.stderr.getvalue()
+                version = sys.stdout.getvalue()
                 # program exit with returncode = 0
                 self.assertEqual(str(err), '0')
             finally:
