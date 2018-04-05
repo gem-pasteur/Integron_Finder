@@ -43,10 +43,9 @@ class TestScanHmmBank(IntegronTest):
         """
         Test that when the given path does not exist, the function raises an exception
         """
-        with self.assertRaises(IOError) as exp:
+        with self.assertRaises(IOError) as ctx:
             scan_hmm_bank("wrong_path")
-        raised = exp.exception
-        self.assertEqual(raised.message, "wrong_path no such file or directory")
+        self.assertEqual(str(ctx.exception), "wrong_path no such file or directory")
 
     def test_scan_dir(self):
         """
