@@ -84,6 +84,21 @@ init_logger()
 
 
 def logger_set_level(level=colorlog.logging.logging.WARNING):
+
+    levels = {'NOTSET': colorlog.logging.logging.NOTSET,
+              'DEBUG': colorlog.logging.logging.DEBUG,
+              'INFO': colorlog.logging.logging.INFO,
+              'WARNING': colorlog.logging.logging.WARNING,
+              'ERROR': colorlog.logging.logging.ERROR,
+              'CRITICAL': colorlog.logging.logging.CRITICAL,
+              }
+    if level in levels:
+        level = levels[level]
+    elif not isinstance(level, int):
+        raise IntegronError("Level must be {} or a positive integer")
+    elif level < 0:
+        raise IntegronError("Level must be {} or a positive integer")
+
     logger = colorlog.getLogger('integron_finder')
     if level <= colorlog.logging.logging.DEBUG:
         formatter = colorlog.ColoredFormatter(
