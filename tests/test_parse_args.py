@@ -55,7 +55,7 @@ class TestParseArgs(IntegronTest):
                 _ = parse_args([])
             except TypeError as err:
                 msg = sys.stderr.getvalue()
-                msg_end = 'error: too few arguments\n'
+                msg_end = 'error: the following arguments are required: replicon\n'
                 self.assertTrue(msg.endswith(msg_end), "{} != {}".format(msg[len(msg) - len(msg_end):], msg_end))
                 # program exit with returncode = 2
                 self.assertEqual(str(err), '2')
@@ -256,11 +256,11 @@ class TestParseArgs(IntegronTest):
         real_exit = sys.exit
 
         sys.exit = self.fake_exit
-        with self.catch_io(err=True):
+        with self.catch_io(out=True):
             try:
                 _ = cfg = parse_args(['--version'])
             except TypeError as err:
-                msg = sys.stderr.getvalue()
+                msg = sys.stdout.getvalue()
                 msg_expected = """integron_finder version NOT packaged, it should be development version
 Python {}
 
