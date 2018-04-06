@@ -49,7 +49,8 @@ except ImportError as err:
 
 from integron_finder.integron import Integron, find_integron
 from integron_finder.config import Config
-from integron_finder.utils import read_single_dna_fasta
+from integron_finder.utils import FastaIterator
+from integron_finder.topology import Topology
 from integron_finder.infernal import read_infernal
 
 
@@ -65,6 +66,8 @@ class TestFindIntegons(IntegronTest):
             self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
         # by default use empty Namespace just to match with api
         # if need some values create a local config with these values
@@ -97,7 +100,10 @@ class TestFindIntegons(IntegronTest):
     def test_find_integron(self):
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        replicon = sequences_db.next()
         replicon_results_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
                                                             'other_{}'.format(replicon.id)))
         attc_file = os.path.join(replicon_results_path, '{}_attc_table.res'.format(replicon.id))
@@ -152,8 +158,12 @@ class TestFindIntegons(IntegronTest):
 
     def test_find_integron_attC_is_df(self):
         replicon_name = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        replicon = sequences_db.next()
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
                                                 'other_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
@@ -198,7 +208,7 @@ class TestFindIntegons(IntegronTest):
 
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
-        self.assertEqual(integron.replicon.name, replicon_name)
+        self.assertEqual(integron.replicon.name, replicon_id)
 
         exp = pd.DataFrame({'annotation': ['attC'] * 3,
                             'distance_2attC': [np.nan, 1196.0, 469.0],
@@ -223,8 +233,12 @@ class TestFindIntegons(IntegronTest):
 
     def test_find_integron_proteins(self):
         replicon_name = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        replicon = sequences_db.next()
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
                                                 'other_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
@@ -240,7 +254,10 @@ class TestFindIntegons(IntegronTest):
         args.union_integrases = False
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
 
-        replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        replicon = sequences_db.next()
         args = argparse.Namespace()
         args.evalue_attc = 1.
         args.max_attc_size = 200
@@ -268,7 +285,7 @@ class TestFindIntegons(IntegronTest):
         self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
-        self.assertEqual(integron.replicon.name, replicon_name)
+        self.assertEqual(integron.replicon.name, replicon_id)
 
         exp = pd.DataFrame({'annotation': 'intI',
                             'distance_2attC': np.nan,
@@ -306,8 +323,12 @@ class TestFindIntegons(IntegronTest):
 
     def test_find_integron_proteins_n_union_integrase(self):
         replicon_name = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        replicon = sequences_db.next()
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
                                                 'other_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
@@ -351,7 +372,7 @@ class TestFindIntegons(IntegronTest):
         self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(len(integrons), 1)
         integron = integrons[0]
-        self.assertEqual(integron.replicon.name, replicon_name)
+        self.assertEqual(integron.replicon.name, replicon_id)
 
         exp = pd.DataFrame({'annotation': 'intI',
                             'distance_2attC': np.nan,

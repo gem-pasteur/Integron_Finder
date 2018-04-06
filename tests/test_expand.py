@@ -45,7 +45,8 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder import infernal
-from integron_finder.utils import read_single_dna_fasta
+from integron_finder.utils import FastaIterator
+from integron_finder.topology import Topology
 
 _local_max_ori = infernal.local_max
 
@@ -55,13 +56,13 @@ def local_max_mock():
     to avoid to call cmsearch (we don't want to test local max), I have been cached the results
     of local_max and replace the function by this mock
     """
-    _cache = {('lian.001.c02.10', 942899, 947099, 'attc_4', 'top'):
+    _cache = {('LIAN.001.C02_10', 942899, 947099, 'attc_4', 'top'):
                   pd.read_csv(TestExpand.find_data('local_max_right_circular_1.csv')),
-              ('lian.001.c02.10', 946899, 951099, 'attc_4', 'top'):
+              ('LIAN.001.C02_10', 946899, 951099, 'attc_4', 'top'):
                   pd.read_csv(TestExpand.find_data('local_max_right_circular_2.csv')),
-              ('lian.001.c02.10', 930689, 934889, 'attc_4', 'bottom'):
+              ('LIAN.001.C02_10', 930689, 934889, 'attc_4', 'bottom'):
                   pd.read_csv(TestExpand.find_data('local_max_left_circular.csv')),
-              ('lian.001.c02.10', 930689, 930889, 'attc_4', 'bottom'):
+              ('LIAN.001.C02_10', 930689, 930889, 'attc_4', 'bottom'):
                   pd.read_csv(TestExpand.find_data('local_max_left_linear.csv'))
               }
 
@@ -87,6 +88,8 @@ class TestExpand(IntegronTest):
             self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
 
         self.model_attc_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
@@ -108,7 +111,10 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        replicon = sequences_db.next()
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -128,7 +134,10 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        replicon = sequences_db.next()
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -148,7 +157,10 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        replicon = sequences_db.next()
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -168,7 +180,10 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        replicon = sequences_db.next()
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))

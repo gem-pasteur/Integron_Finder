@@ -50,7 +50,8 @@ except ImportError as err:
 
 from integron_finder.integron import Integron
 from integron_finder.config import Config
-from integron_finder.utils import read_single_dna_fasta
+from integron_finder.utils import FastaIterator
+from integron_finder.topology import Topology
 from integron_finder.attc import find_attc_max
 
 
@@ -65,6 +66,8 @@ class TestFindAttCMax(IntegronTest):
             self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
 
         args = argparse.Namespace()
@@ -78,7 +81,10 @@ class TestFindAttCMax(IntegronTest):
 
         replicon_name = 'OBAL001.B.00005.C001'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        self.replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        self.replicon = sequences_db.next()
 
         self.integron = Integron(self.replicon, self.cfg)
 
