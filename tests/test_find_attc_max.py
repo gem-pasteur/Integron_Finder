@@ -84,7 +84,7 @@ class TestFindAttCMax(IntegronTest):
         sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
         sequences_db.topologies = topologies
-        self.replicon = sequences_db.next()
+        self.replicon = next(sequences_db)
 
         self.integron = Integron(self.replicon, self.cfg)
 

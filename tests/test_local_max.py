@@ -128,7 +128,7 @@ class TestLocalMax(IntegronTest):
         sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
         sequences_db.topologies = topologies
-        self.replicon = sequences_db.next()
+        self.replicon = next(sequences_db)
         self.evalue_attc = 1.
         self.max_attc_size = 200
         self.min_attc_size = 40

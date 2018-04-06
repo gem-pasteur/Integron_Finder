@@ -103,7 +103,7 @@ class TestFindIntegons(IntegronTest):
         sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
         sequences_db.topologies = topologies
-        replicon = sequences_db.next()
+        replicon = next(sequences_db)
         replicon_results_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
                                                             'other_{}'.format(replicon.id)))
         attc_file = os.path.join(replicon_results_path, '{}_attc_table.res'.format(replicon.id))
@@ -163,7 +163,7 @@ class TestFindIntegons(IntegronTest):
         sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
         sequences_db.topologies = topologies
-        replicon = sequences_db.next()
+        replicon = next(sequences_db)
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
                                                 'other_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
@@ -238,7 +238,7 @@ class TestFindIntegons(IntegronTest):
         sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
         sequences_db.topologies = topologies
-        replicon = sequences_db.next()
+        replicon = next(sequences_db)
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
                                                 'other_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
@@ -257,7 +257,7 @@ class TestFindIntegons(IntegronTest):
         sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
         sequences_db.topologies = topologies
-        replicon = sequences_db.next()
+        replicon = next(sequences_db)
         args = argparse.Namespace()
         args.evalue_attc = 1.
         args.max_attc_size = 200
@@ -328,7 +328,7 @@ class TestFindIntegons(IntegronTest):
         sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
         sequences_db.topologies = topologies
-        replicon = sequences_db.next()
+        replicon = next(sequences_db)
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
                                                 'other_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
