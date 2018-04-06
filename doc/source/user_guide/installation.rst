@@ -11,12 +11,12 @@ Installation
 IntegronFinder dependencies
 ===========================
 
-IntegronFinder is built with Python 2.7, and a few libraries are needed:
+IntegronFinder is built with Python >= 3.4, and a few libraries are needed:
 
-- Python 2.7
+- Python >=3.4
    - Pandas (>=0.18.0)
    - Numpy (>=1.9.1)
-   - Biopython (>=1.65)
+   - Biopython (>=1.68)
    - Matplotlib (>=1.4.3)
 
 From version 1.5.1, integron_finder will check and install theses libraries for you.
@@ -25,7 +25,7 @@ In addition, IntegronFinder has external dependencies, which have to be
 installed prior the use of the program (click to access the corresponding
 website).
 
-- `HMMER 3.1b1`_
+- `HMMER 3.1b2`_
 - `INFERNAL 1.1`_
 - `Prodigal V2.6.2`_
 
@@ -41,7 +41,71 @@ Installation procedure
 ======================
 
 .. warning::
-    When installing a new version (up to 1.5.1 included) of IntegronFinder, do not forget to :ref:`uninstall <uninstallation>` the previous version installed !
+    When installing a new version (up to 2.0 included) of IntegronFinder,
+    do not forget to :ref:`uninstall <uninstallation>` the previous version installed !
+
+.. warning::
+    If You upgrading from version prior to 2.0 to 2.0 be careful the python used changed for 3.x.
+    The python 2.7 is not supported anymore. So if you installed ``integron_finder`` within a virtualenv
+    you need to create a new one based on python3.
+
+
+From Version 2.0
+----------------
+
+System wide installation
+""""""""""""""""""""""""
+1. Open a terminal and hit::
+
+    sudo pip install integron_finder
+
+2. To get an updated version (no need to uninstall)::
+
+    sudo pip install -U integron_finder
+
+
+User wide installation
+""""""""""""""""""""""
+
+1. Open a terminal and hit::
+
+    pip install --user integron_finder
+
+
+Installation in a virtualenv
+""""""""""""""""""""""""""""
+
+The virtual environment (`virtualenv`_) is a system to isolate a python program from the system and avoid libraries conflict.
+So you can install a different python or libraries version than your system in each virtualenv.
+So if you update the system it will not change anything for your program and *vice versa*.
+If you want to remove the program just remove the virtual environment.
+
+Create a virtual environment::
+
+    virtualenv -p python3 Integron_Finder
+
+activate you virtualenv::
+
+    source Integron_Finder/bin/activate
+
+The name of the virtualenv appear in parenthesis at the beginning of the prompt.
+Then install integron_finder::
+
+    pip install integron_finder
+
+
+To run integron finder, you have to activate (once per session) the virtual environment::
+
+    source source Integron_Finder/bin/activate
+
+When you do not need to use integron_finder just deactivate the virtual environment.
+In the active terminal just type::
+
+    deactivate
+
+The integron_finder command will disappear from the path.
+The name of the virtualenv disappear from the prompt.
+
 
 From Version 1.5.1 and after
 ----------------------------
@@ -65,7 +129,7 @@ For Version 1.5 and before
 
 
 .. note::
-  Super-user privileges (*i.e.*, ``sudo``) are necesserary if you want to
+  Super-user privileges (*i.e.*, ``sudo``) are necessary if you want to
   install the program in the general file architecture.
 
 .. note::
@@ -108,31 +172,40 @@ How to install Python
 The purpose of this section is to provide some help about installing python
 dependencies for IntegronFinder if you never installed any python package.
 
-As IntegronFinder has not been test on Windows, we assume Unix-based operating system. For Windows users, the best would be to install a unix virtual machine on your computer.
+As IntegronFinder has not been test on Windows, we assume Unix-based operating system.
+For Windows users, the best would be to install a unix virtual machine on your computer.
 
-Usually a python distribution is already installed on your machine. However, if you don't know how to install libraries, we recommend to re-install it from a distribution which contains pre-compiled libraries. There are two main distributions (click to access website):
+Usually a python distribution is already installed on your machine.
+However, if you don't know how to install libraries, we recommend to re-install it from a distribution which contains pre-compiled libraries.
+There are two main distributions (click to access website):
 
 - `Enthought Canopy`_
 - `Anaconda`_
 
-Download version 2.7 which correspond to your machine, then make sure that python from these distributions is the default one (you can possibly choose that in the preference and/or during installation).
-They both come with all the needed packages but Biopython. If you have a **student email adress** from a university-delivering degree, you can request an academic licence to *Enthough Canopy* (see `Canopy for Academics`_) which will allow you to download additional packages including Biopython.
+Download version 3.x which correspond to your machine,
+then make sure that python from these distributions is the default one
+(you can possibly choose that in the preference and/or during installation).
+They both come with all the needed packages but Biopython.
+If you have a **student email adress** from a university-delivering degree,
+you can request an academic licence to *Enthough Canopy* (see `Canopy for Academics`_)
+which will allow you to download additional packages including Biopython.
 
-Otherwise, you will have to install Biopython manually. ``pip`` is recommended as a python packages installer. It works as follow::
+Otherwise, you will have to install Biopython manually. ``pip`` is recommended as a python packages installer.
+It works as follow::
 
-    (sudo) pip install Biopython==1.65
+    (sudo) pip install Biopython==1.71
 
-To install version 1.65 of Biopython (recommended for IntegronFinder).
+To install version 1.71 of Biopython (recommended for IntegronFinder).
 
 .. note::
-    If you don't manage to install all the packages, try googling the error, or don't hesisate to ask a question on `stackoverflow`_.
+    If you don't manage to install all the packages, try googling the error, or don't hesitate to ask a question on `stackoverflow`_.
 
 .. _`Enthought Canopy`: https://store.enthought.com/
 .. _`Anaconda`: https://www.continuum.io/downloads
 .. _`Canopy for Academics`: https://store.enthought.com/#canopy-academic
 .. _`stackoverflow`: http://stackoverflow.com/
 
-.. _`HMMER 3.1b1`: http://hmmer.janelia.org/
+.. _`HMMER 3.1b2`: http://hmmer.janelia.org/
 .. _`INFERNAL 1.1`: http://infernal.janelia.org/
 .. _`Prodigal V2.6.2`: https://github.com/hyattpd/Prodigal/releases
 .. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/tag/v1.5.0

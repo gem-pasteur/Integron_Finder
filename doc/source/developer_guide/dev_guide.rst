@@ -11,24 +11,32 @@ Developer installation
 
 If you are not part of the project, start by forking IntegronFinder repository.
 For that, sign in to your account on github, and go to https://github.com/gem-pasteur/Integron_Finder.
-Then, click on 'Fork' (under your account icone).
+Then, click on 'Fork' (under your account icon).
 This will create a copy of the repository, but with your username instead of 'gem-pasteur'.
 
 create a virtual environment::
 
-    virtualenv -p python2.7 integron_finder
+    virtualenv -p python3 Integron_Finder
 
 activate you virtualenv::
 
-    source integron_finder/bin/activate
+    source Integron_Finder/bin/activate
 
-then install integron_finder in developper mode::
+then install integron_finder in developer mode::
 
-    pip install -e https://github.com/gem-pasteur/Integron_Finder#egg=integron_finder
+    pip install -e git+https://github.com/gem-pasteur/Integron_Finder#egg=integron_finder
 
-it install the requirements and create a directory in the virtualenv src/integron_finder
+or clone your repository manually, then install it ::
+
+    mkdir src
+    cd src
+    git clone https://github.com/gem-pasteur/Integron_Finder
+    python setup.py develop
+
+It install the requirements and create a directory in the virtualenv src/integron_finder
 and create links in the virtualenv. So integron finder is runnable and you can modify the sources and run it again
 without to reinstall the project.
+
 
 Send changes to upstream repository
 ===================================
@@ -36,18 +44,18 @@ Send changes to upstream repository
 If you want to integrate your code in the upstream (main) repository, you need to
 create a pull request.
 
-1. create a new branch with ``<your branch name>`` a descriptive name
+1. Create a new branch with ``<your branch name>`` a descriptive name
    (e.g. 'adding-xx-feature', 'fixing-typos', etc.), so that others understand what your are working on.
-2. work on it
-3. test that your work does not break the tests.
+2. Work on it
+3. Test that your work does not break the tests.
    add tests corresponding to your code
-4. push your local branch on your integron_finder clone on github ::
+4. Push your local branch on your integron_finder clone on github ::
 
-   git push --set-upstream origin <your branch name>
+        git push --set-upstream origin <your branch name>
 
 5. ask for pull request
 
-    - go to your forked repository on github `https://github.com/<your_login>/Integron_Finder/pulls`
+    - Go to your forked repository on github `https://github.com/<your_login>/Integron_Finder/pulls`
     - Click on 'New pull request'
     - Choose your repository and the branch on which you did your changes in 'head fork' (right-hand side), and choose 'gem-pasteur/Integron_Finder' with the branch on which you want to merge (probably master) in 'base fork' (left-hand side).
     - A green 'Able to merge' text should appear if git is able to automatically merge the 2 branches. In that case, click on 'Create pull request', write your comments on the changes you made, why etc., and save. We will receive the pull request.
@@ -82,7 +90,7 @@ or::
     python tests/run_tests.py -vv tests/test_utils.py
 
 to run specific tests
-Or, if you also want to get code coverage::
+Or, if you also want to get code coverage (you need to install coverage ``pip install coverage``)::
 
     coverage run  --source integron_finder tests/run_tests.py
 

@@ -35,11 +35,14 @@ It will perform a search, and outputs the results in a directory called
 - mysequence.gbk
    A GenBank file with the sequence annotated with the same annotations from
    the previous file.
+   generated on;y if ``--gbk`` option is set.
 - mysequence_X.pdf
    For each complete integron, a simple graphic of the region is depicted
+   generated only if ``--pdf`` option is set
 - other
    A folder containing outputs of the different step in the program. It includes
    notably the protein file in fasta (mysequence.prt).
+   This directory is available only if option ``--keep-tmp`` is set.
 
 .. _local_max:
 
@@ -47,9 +50,11 @@ Thorough local detection
 ------------------------
 
 This option allows a more sensitive search. It will be slower if integrons are
-found, but will be as fast if nothing is detected::
+found, but will be as fast if nothing is detected.
 
-    integron_finder mysequence.fst --local_max
+.. code-block:: bash
+
+    integron_finder mysequence.fst --local-max
 
 .. _func_annot:
 
@@ -59,19 +64,19 @@ Functional annotation
 This option allows to annotate cassettes given HMM profiles. As Resfams database
 is distributed, to annotate antibiotic resistance genes, just use::
 
-    integron_finder mysequence.fst --func_annot
+    integron_finder mysequence.fst --func-annot
 
 IntegronFinder will look in the directory
 ``Integron_Finder-x.x/data/Functional_annotation`` and use all ``.hmm`` files
 available to annotate. By default, there is only ``Resfams.hmm``, but one can
 add any other HMM file here. Alternatively, if one wants to use a database which
 is present elsewhere on the user's computer without copying it into that
-directory, one can specify the following option::
+directory, one can specify the following option ::
 
     integron_finder mysequence.fst --path_func_annot bank_hmm
 
 where ``bank_hmm`` is a file containing one absolute path to a hmm file per
-line, and you can comment out a line::
+line, and you can comment out a line ::
 
   ~/Downloads/Integron_Finder-x.x/data/Functional_annotation/Resfams.hmm
   ~/Documents/Data/Pfam-A.hmm
@@ -93,16 +98,46 @@ INFERNAL::
 
 Default is 1.
 
-Circularity
------------
+Topology
+--------
 
-By default, IntegronFinder assumes your replicon to be circular. However, if they aren't, or if it's PCR fragments or contigs, you can specify that it's a linear fragment::
+By default, IntegronFinder assumes that
 
-    integron_finder mylinearsequence.fst --linear
+    * your replicon is considered as **circular** if there is **only one replicon** in the input file.
+    * your replicons are considered as **linear** if there are **several replicons** in the input file.
 
-However, if ``--linear`` is not used and the replicon is smaller than ``4 x dt``
-(where ``dt`` is the distance threshold, so 4kb by default), the replicon is
-considered linear to avoid clustering problem
+However, you can change this default behavior and specify the default topology with options
+``--circ`` or ``--lin``::
+
+    integron_finder --lin mylinearsequence.fst
+    integron_finder --circ mycircularsequence.fst
+
+
+If you have multiple replicon in the input file with different topologies you can specify a topology for each
+replicon by providing a topology file.
+The syntax for the topology file is simple:
+
+    * one topology by line
+    * one line start by the seqid followed by 'circ' or 'lin' for circular or linear topologies.
+
+example::
+
+    seq_id_1 circ
+    seq_id_2 lin
+
+You can also mix the options ``--circ`` or ``--lin`` with option ``--topology-file``::
+
+    integron_finder --circ --topology-file path/to/topofile mysequences.fst
+
+In the example above the default topology is set to *circular*.
+The replicons specified in topofile supersede the default topology.
+
+
+.. warning::
+    However, if the replicon is smaller than ``4 x dt``
+    (where ``dt`` is the distance threshold, so 4kb by default), the replicon is considered linear
+    to avoid clustering problem.
+    The topology used to searching integron is report in the *\*.integrons file*
 
 
 .. _advance:
@@ -122,7 +157,7 @@ empirically estimated and is consistent with previous observations showing that
 biggest gene cassettes are about 2 kb long. This value of 4 kb can be modify
 though::
 
-    integron_finder mysequence.fst --distance_thresh 10000
+    integron_finder mysequence.fst --distance-thresh 10000
 
 or, equivalently::
 
@@ -131,7 +166,11 @@ or, equivalently::
 This sets the threshold for clustering to 10 kb.
 
 .. note::
-    The option ``--outdir`` allows you to chose the location of the Results folder (``Results_Integron_Finder_mysequence``). If this folder already exists, IntegronFinder will not re-run analyses already done, except functional annotation. It allows you to re-run rapidly IntegronFinder with a different ``--distance_threshold`` value. Functional annotation needs to re-run each time because depending on the aggregation parameters, the proteins associated with an integron might change.
+    The option ``--outdir`` allows you to chose the location of the Results folder (``Results_Integron_Finder_mysequence``).
+    If this folder already exists, IntegronFinder will not re-run analyses already done, except functional annotation.
+    It allows you to re-run rapidly IntegronFinder with a different ``--distance-thresh`` value.
+    Functional annotation needs to re-run each time because depending on the aggregation parameters,
+    the proteins associated with an integron might change.
 
 
 *attC* evalue
@@ -143,7 +182,7 @@ to the cost of a much higher false positive rate.
 
 ::
 
-    integron_finder mysequence.fst --evalue_attc 5
+    integron_finder mysequence.fst --evalue-attc 5
 
 Palindromes
 -----------
@@ -153,4 +192,20 @@ Palindromes
 highest evalue is discarded, but you can choose to keep them with the following
 option::
 
-    integron_finder mysequence.fst --keep_palindromes
+    integron_finder mysequence.fst --keep-palindromes
+
+Keep intermediate results
+-------------------------
+
+Integrons finder needs some intermediate results, It includes notably the protein file in fasta (mysequence.prt).
+A folder containing these outputs is generated for each replicon and have name ``other_<replicon_id>``
+This directory is remove at the end. You can keep this directory to see analyse each ``integron_finder`` steps
+with the option ``--keep-tmp``.
+
+
+Verbosity of outputs
+--------------------
+
+You can control the verbosity of the outputs with the options ``-v`` or ``-q`` to
+respectively increase or decrease the verbosity.
+These options are cumulative ``-vv`` or ``-qqq``.

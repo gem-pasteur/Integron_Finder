@@ -5,8 +5,8 @@ Welcome to IntegronFinder's documentation!
 ==========================================
 
 IntegronFinder is a program that detects integrons in DNA sequences.
-The program is available on a webserver :ref:`Mobyle <mobyle>` (closing end of 2016),
-on the :ref:`Galaxy Pasteur <galaxy>`, or by command line (`IntegronFinder on github`_).
+The program is available on a webserver
+:ref:`Galaxy Pasteur <galaxy>`, or by command line (`IntegronFinder on github`_).
 
    * You already read the :ref:`paper <references>` and want to install it ? Click :ref:`here <install>`
    * You did not read the paper (yet) but you would like to have rapid introduction to integrons and the program?
