@@ -84,7 +84,7 @@ Common commands: (see '--help-commands' for more)
 
   setup.py build      will build the package underneath 'build/'
   setup.py install    will install the package
-  setup.py test       run tests
+  setup.py test       run tests after in-place build
 """
 
 
@@ -204,26 +204,30 @@ except ImportError:
 ###################################################
 
 setup(name='integron_finder',
-      version="1.5.1",
+      version="2.0.rc1",
       description="Integron Finder aims at detecting integrons in DNA sequences",
       long_description=read_md('README.md'),
       author="Jean Cury",
       author_email="jean.cury@normalesup.org",
       url="https://github.com/gem-pasteur/Integron_Finder/",
-      download_url='https://github.com/gem-pasteur/Integron_Finder/archive/v1.5.1.tar.gz',
+      download_url='https://github.com/gem-pasteur/Integron_Finder/archive/v2.0.tar.gz',
       license="GPLv3",
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
           'Operating System :: POSIX',
-          'Programming Language :: Python :: 2',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
           'Intended Audience :: Science/Research',
           'Topic :: Scientific/Engineering :: Bio-Informatics'
           ],
 
-      python_requires='>=2.7, <3.0',
+      python_requires='>=3.4',
       install_requires=open("requirements.txt").read().split(),
+      extra_requires=open("requirements_dev.txt").read().split(),
       test_suite='tests.run_tests.discover',
       zip_safe=False,
       packages=find_packages(),

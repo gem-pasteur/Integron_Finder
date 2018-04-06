@@ -3,3 +3,7 @@ matplotlib>=2.2.2
 pandas>=0.22.0
 biopython>=1.70
 colorlog
+
+sphinx
+sphinx_rtd_theme
+pypandoc
