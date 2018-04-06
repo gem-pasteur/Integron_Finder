@@ -45,7 +45,8 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder.utils import read_single_dna_fasta
+from integron_finder.utils import FastaIterator
+from integron_finder.topology import Topology
 from integron_finder import infernal
 
 _call_ori = infernal.call
@@ -114,6 +115,8 @@ class TestLocalMax(IntegronTest):
             self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
 
         self.cmsearch = which('cmsearch')
@@ -122,7 +125,10 @@ class TestLocalMax(IntegronTest):
         self.cpu_nb = 1
         replicon_name = 'lian.001.c02.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        self.replicon = read_single_dna_fasta(replicon_path)
+        sequences_db = FastaIterator(replicon_path)
+        topologies = Topology('lin')
+        sequences_db.topologies = topologies
+        self.replicon = sequences_db.next()
         self.evalue_attc = 1.
         self.max_attc_size = 200
         self.min_attc_size = 40

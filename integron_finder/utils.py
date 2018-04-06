@@ -36,25 +36,6 @@ from Bio import SeqIO
 _log = colorlog.getLogger(__name__)
 
 
-def make_single_fasta_reader(alphabet):
-
-    def read_fasta(path):
-        """
-        :param path: The path to the fasta file.
-        :return: The sequence parsed.
-        :rtype: :class:`Bio.SeqRecord.SeqRecord` object
-        """
-        seq = SeqIO.read(path, "fasta",  alphabet=alphabet)
-        seq.name = get_name_from_path(path)
-        return seq
-    return read_fasta
-
-
-read_single_dna_fasta = make_single_fasta_reader(Seq.IUPAC.unambiguous_dna)
-
-read_single_prot_fasta = make_single_fasta_reader(Seq.IUPAC.protein)
-
-
 def make_multi_fasta_reader(alphabet):
     """
     fasta generator maker
