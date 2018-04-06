@@ -486,7 +486,7 @@ class Integron(object):
         ax.set_xlim(xlims)
         fig.subplots_adjust(left=0.05, right=0.80)
         ax.hlines(0, ax.get_xlim()[0], ax.get_xlim()[1], "lightgrey", "--")
-        ax.grid("on", "major", axis="x")
+        ax.grid(True, "major", axis="x")
         ax.set_ylim(-4, 4)
         ax.get_yaxis().set_visible(False)
         if file != 0:
