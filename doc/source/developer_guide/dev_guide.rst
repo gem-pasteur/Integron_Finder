@@ -89,13 +89,14 @@ or::
 
     python tests/run_tests.py -vv tests/test_utils.py
 
-to run specific tests
-Or, if you also want to get code coverage (you need to install coverage ``pip install coverage``)::
+to run specific tests.
+
+If you also want to get code coverage (you need to install coverage)::
 
     coverage run  --source integron_finder tests/run_tests.py
 
 Add ``-vv`` to get more details on each test passed/failed.
-If you want to see the coverage in html output, run::
+If you want to see the coverage in html output, run (after executing the command above)::
 
      coverage html
 
@@ -109,13 +110,22 @@ If you want to create a new test file, adding a file in tests directory, must st
 Then, write your TestCase by inherits from IntegronTest and your tests using unittest framework
 (see examples in existing files), and :ref:`run them<runtest>`.
 
+
+.. _documentation:
+
 Documentation
 =============
 
-Documentation is done using ``sphinx``. Source files are located in ``doc/sources``. You can complete them.
-
-To generate html documentation, go to ``doc`` directory, and run::
+Documentation is done using ``sphinx``. Source files are located in ``doc/sources``.
+To generate the documentation you just have to run the makefile located in *doc* directory. ::
 
     make html
 
+To generate the documentation in *html* format or ::
+
+    make latexpdf
+
+to generate the documentation in pdf format (for this option you need to have latex installed on your compute)
+
+You can complete them.
 
