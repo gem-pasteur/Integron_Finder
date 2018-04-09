@@ -27,7 +27,12 @@
 ####################################################################################
 
 import os
-from tempfile import NamedTemporaryFile
+import tempfile
+import shutil
+
+import pandas as pd
+import pandas.util.testing as pdt
+
 try:
     from tests import IntegronTest
 except ImportError as err:
@@ -79,7 +84,7 @@ class TestUtils(IntegronTest):
         expected_seq_top = ['lin', 'lin', 'lin']
         self.assertListEqual(expected_seq_top, received_seq_top)
 
-        with NamedTemporaryFile(mode='w') as topology_file:
+        with tempfile.NamedTemporaryFile(mode='w') as topology_file:
             topology_file.write("""ACBA.007.P01_13 linear
 LIAN.001.C02_10 circular
 PSSU.001.C01_13 linear
@@ -166,3 +171,69 @@ sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 5
 
         expected = utils.SeqDesc('OBAL001.B.00005.C001_00003', -1, 3317, 4294)
         self.assertTupleEqual(expected, prot_attr)
+
+    def test_merge_results(self):
+        tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        if os.path.exists(tmp_dir) and os.path.isdir(tmp_dir):
+            shutil.rmtree(tmp_dir)
+        os.makedirs(tmp_dir)
+        f1 = os.path.join(tmp_dir, 'f1')
+        dtype = {"ID_integron": 'str',
+                 "ID_replicon": 'str',
+                 "element": 'str',
+                 "pos_beg": 'int',
+                 "pos_beg": 'int',
+                 "strand": 'int',
+                 "evalue": 'float',
+                 "type_elt": 'str',
+                 "annotation": 'str',
+                 "model": 'str',
+                 "type": 'str',
+                 "default": 'str',
+                 "distance_2attC": 'float',
+                 "considered_topology": 'str'
+                 }
+        try:
+            res1 = pd.DataFrame({"ID_integron": ['integron_01'],
+                                "ID_replicon": ['ACBA.007.P01_13'],
+                                "element": ['Pc_int1'],
+                                "pos_beg": [25],
+                                "pos_end": [51],
+                                "strand": [-1],
+                                "evalue": [None],
+                                "type_elt": ['Promoter'],
+                                "annotation": ['Pc_1'],
+                                "model": [None],
+                                "type": ['complete'],
+                                "default": ['No'],
+                                "distance_2attC": [None],
+                                "considered_topology": ['lin'],
+                                })
+            res1 = res1.astype(dtype=dtype)
+            res1.to_csv(f1, sep="\t", index=False, na_rep="NA")
+
+            f2 = os.path.join(tmp_dir, 'f2')
+            res2 = pd.DataFrame({"ID_integron": ['integron_02'],
+                                "ID_replicon": ['LIAN.001.C02_10'],
+                                "element": ['LIAN.001.C02_10_825'],
+                                "pos_beg": [934165],
+                                "pos_end": [934689],
+                                "strand": [-1],
+                                "evalue": [1.9e-26],
+                                "type_elt": ['protein intI'],
+                                "annotation": ['intersection_tyr_intI'],
+                                "model": [None],
+                                "type": ['complete'],
+                                "default": ['No'],
+                                "distance_2attC": [None],
+                                "considered_topology": ['lin']
+                                })
+            res2 = res2.astype(dtype=dtype)
+            res2.to_csv(f2, sep="\t", index=False, na_rep="NA")
+
+            expected_res = pd.concat([res1, res2])
+            res = utils.merge_results(f1, f2)
+            pdt.assert_frame_equal(expected_res, res)
+        finally:
+            shutil.rmtree(tmp_dir)
+

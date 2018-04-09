@@ -252,6 +252,13 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['--keep-tmp', 'replicon'])
         self.assertTrue(cfg.keep_tmp)
 
+    def test_split_results(self):
+        cfg = parse_args(['replicon'])
+        self.assertFalse(cfg.split_results)
+        cfg = parse_args(['--split-results', 'replicon'])
+        self.assertTrue(cfg.split_results)
+
+
     def test_version(self):
         real_exit = sys.exit
 

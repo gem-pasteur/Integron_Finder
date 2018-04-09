@@ -177,6 +177,11 @@ def parse_args(args):
                                 default=False,
                                 help='keep intermediate results. '
                                      'This results are stored in directory named other_<replicon id>')
+    output_options.add_argument('--split-results',
+                                action='store_true',
+                                default=False,
+                                help='Instead of merging integron results from all replicon in one file,'
+                                     'keep them in separated files.')
 
     topology_grp = parser.add_mutually_exclusive_group()
     topology_grp.add_argument("--circ",
@@ -236,6 +241,7 @@ def find_integron_in_one_replicon(replicon, config):
     :type replicon: a :class:`Bio.SeqRecord` object.
     :param config: The configuration
     :type config: a :class:`integron_finder.config.Config` object.
+    :returns: the path to the integrons file (<replicon_id>.integrons)
     """
     in_dir, sequence_file = os.path.split(config.replicon_path)
     result_dir_other = os.path.join(config.result_dir, "other_{}".format(replicon.id))
@@ -356,7 +362,7 @@ def find_integron_in_one_replicon(replicon, config):
         integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
         integrons_describe.index = list(range(len(integrons_describe)))
         integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
-        integrons_describe.to_csv(outfile, sep="\t", index=0, na_rep="NA")
+        integrons_describe.to_csv(outfile, sep="\t", index=False, na_rep="NA")
 
         if config.gbk:
             add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
@@ -374,6 +380,9 @@ def find_integron_in_one_replicon(replicon, config):
             shutil.rmtree(result_dir_other)
         except Exception as err:
             _log.warning("Cannot remove temporary results : '{} : {}'".format(result_dir_other, str(err)))
+
+    return outfile
+
 
 
 def header(args):
@@ -499,6 +508,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     # do the job #
     ##############
     sequences_db_len = len(sequences_db)
+    all_res = []
     for rep_no, replicon in enumerate(sequences_db, 1):
         # if replicon contains illegal characters
         # or replicon is too short < 50 bp
@@ -511,11 +521,22 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                                                                                         rep_no,
                                                                                         sequences_db_len))
 
-            find_integron_in_one_replicon(replicon, config)
+            res = find_integron_in_one_replicon(replicon, config)
+            all_res.append(res)
         else:
             _log.warning("############ Skipping replicon {} ({}/{}) ############".format(replicon.name,
                                                                                          rep_no,
                                                                                          sequences_db_len))
+
+    if not config.split_results:
+        _log.info("Merging integrons results.")
+        agg_file = utils.merge_results(*all_res)
+        outfile = os.path.join(config.result_dir, utils.get_name_from_path(config.replicon_path) + ".integrons")
+        agg_file.to_csv(outfile, sep="\t", index=False, na_rep="NA")
+        for result in all_res:
+            if result != outfile:
+                # in special case where the merged file has the same name that a replicon result file
+                os.unlink(result)
 
 
 if __name__ == "__main__":

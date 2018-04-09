@@ -34,6 +34,9 @@ import colorlog
 from io import StringIO
 from contextlib import contextmanager
 
+import pandas as pd
+import pandas.util.testing as pdt
+
 from integron_finder import IntegronError, logger_set_level
 
 class IntegronTest(unittest.TestCase):
@@ -127,6 +130,12 @@ class IntegronTest(unittest.TestCase):
         self.maxDiff = None
         with open(f1) as fh1, open(f2) as fh2:
             self.assertMultiLineEqual(fh1.read(), fh2.read(), msg=msg)
+
+    def assertIntegronResultEqual(self, f1, f2):
+        df1 = pd.read_table(f1, sep="\t")
+        df2 = pd.read_table(f2, sep="\t")
+        pdt.assert_frame_equal(df1, df2)
+
 
     def assertSeqRecordEqual(self, s1, s2):
         for attr in ('id', 'name', 'seq'):

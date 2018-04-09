@@ -91,11 +91,11 @@ class TestAcba(IntegronTest):
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
-        output_filename = '{}.integrons'.format(replicon_id)
+        output_filename = '{}.integrons'.format(replicon_filename)
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
                                                            output_filename))
         test_result_path = os.path.join(test_result_dir, output_filename)
-        self.assertFileEqual(expected_result_path, test_result_path)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
         gbk = '{}.gbk'.format(replicon_filename)
         gbk_test = os.path.join(test_result_dir, gbk)
@@ -128,10 +128,10 @@ class TestAcba(IntegronTest):
         gbk_test = SeqIO.read(gbk_test, 'gb')
         self.assertSeqRecordEqual(expected_gbk, gbk_test)
 
-        output_filename = '{}.integrons'.format(replicon_id)
+        output_filename = '{}.integrons'.format(replicon_filename)
         expected_result_path = self.find_data(os.path.join(output_dirname, output_filename))
         test_result_path = os.path.join(test_result_dir, output_filename)
-        self.assertFileEqual(expected_result_path, test_result_path)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
 
     def test_acba_simple_with_pdf(self):
@@ -174,11 +174,11 @@ class TestAcba(IntegronTest):
         gbk_test = SeqIO.read(gbk_test, 'gb')
         self.assertSeqRecordEqual(expected_gbk, gbk_test)
 
-        output_filename = '{}.integrons'.format(replicon_id)
+        output_filename = '{}.integrons'.format(replicon_filename)
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_filename),
                                                            output_filename))
         test_result_path = os.path.join(result_dir, output_filename)
-        self.assertFileEqual(expected_result_path, test_result_path)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
         output_filename = os.path.join('other_{}'.format(replicon_id), replicon_id + '_Resfams_fa_table.res')
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_filename),
@@ -208,13 +208,11 @@ class TestAcba(IntegronTest):
         gbk_test = SeqIO.read(gbk_test, 'gb')
         self.assertSeqRecordEqual(expected_gbk, gbk_test)
 
-        output_filename = '{}.integrons'.format(replicon_id)
+        output_filename = '{}.integrons'.format(replicon_filename)
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_filename),
                                                            output_filename))
         test_result_path = os.path.join(result_dir, output_filename)
-        self.assertFileEqual(expected_result_path, test_result_path,
-                             msg=None)
-        # msg="{} and {} differ".format(expected_result_path, test_result_path))
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
         output_filename = os.path.join('other_{}'.format(replicon_id), '{}_Resfams_fa_table.res'.format(replicon_id))
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_filename),
