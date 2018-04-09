@@ -7,3 +7,4 @@ colorlog
 sphinx
 sphinx_rtd_theme
 pypandoc
+coverage
