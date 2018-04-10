@@ -16,7 +16,7 @@ from: ubuntu:xenial
 %post
     export  DEBIAN_FRONTEND=noninteractive
     apt-get update -y
-    apt-get install -y wget python-pip
+    apt-get install -y wget python3 python3-pip
     apt-get install -y hmmer infernal prodigal
 
     if ! test -d /pasteur
@@ -40,7 +40,7 @@ from: ubuntu:xenial
     fi
     mkdir integron_finder
     tar -xzf integron_finder-${if_vers}.tar.gz -C integron_finder --strip-components 1
-    pip install integron_finder-${if_vers}.tar.gz
+    pip3 install integron_finder-${if_vers}.tar.gz
 
 %help
 
@@ -61,23 +61,32 @@ Integron Finder is under open source licence GPLv3
 to get usage run
   ./integron_finder.simg -h
 or
- singularity run integron_finder.simg -h
+  singularity run integron_finder.simg -h
+or
+  singularity run shub://integron_finder -h
+
 
 ### Example
 
     integron_finder myfastafile.fst --local_max --func_annot
 
+## Input:
+
+    a file containing one or several replicon (nucleic) in fasta format.
+
 ## Output :
 
-A folder name `Results_<id_genome>`, inside there are different files :
+A folder name `Results_<input_file>`, inside there are different files :
 
-- *.gbk : contains the input sequence with all integrons and features found.
 - *.integrons : contain list of all element detected (attc, protein near attC, integrase, Pc, attI, Pint) with position,
-  strand, evalue, etc...
+  strand, evalue, etc... by default there is one file with integrons from all replicons but if you prefer to have
+  one file by replicon you can add the option --split. In this case one file per replicon will be generated.
+- *.gbk : contains the input sequence with all integrons and features found (if --gbk is set).
 - *.pdf : representation of complete integrons detected (with integrase (redish) and at least one attc (blueish)).
-  If a protein has a hit with an antibiotic resistance gene, it's yellow, otherwise grey.
+  If a protein has a hit with an antibiotic resistance gene, it's yellow, otherwise grey. (if --pdf is set)
 
- and one folder, `other`, containing the different outputs of the different steps of the program.
+ and one folder by replicon, `other_<replicon_id>`, containing the different outputs of the different steps
+ of the program for this replicon. (if --keep-tmp is set)
 
 # Galaxy
 
