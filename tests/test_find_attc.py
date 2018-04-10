@@ -29,6 +29,7 @@
 import os
 import tempfile
 import shutil
+import re
 from distutils.spawn import find_executable
 
 # display warning only for non installed integron_finder
@@ -88,7 +89,7 @@ class TestFindAttc(IntegronTest):
         replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         with self.assertRaises(RuntimeError) as ctx:
             attc.find_attc(replicon_path, self.replicon_name, cmsearch_bin, self.tmp_dir, self.model_attc)
-        self.assertTrue(str(ctx.exception).endswith("failed : [Errno 2] No such file or directory: 'foo': 'foo'"),
+        self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: 'foo'", str(ctx.exception)),
                         msg=str(ctx.exception))
 
     def test_find_attc_no_model(self):

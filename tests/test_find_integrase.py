@@ -223,7 +223,7 @@ class TestFindIntegrase(IntegronTest):
 
         with self.assertRaises(RuntimeError) as ctx:
             integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
-        self.assertTrue(str(ctx.exception).endswith("failed : [Errno 2] No such file or directory: 'foo': 'foo'"))
+        self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: 'foo'", str(ctx.exception)))
 
         replicon.__class__.__len__ = len_ori
 
@@ -268,7 +268,7 @@ class TestFindIntegrase(IntegronTest):
 
         with self.assertRaises(RuntimeError) as ctx:
             integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
-        self.assertTrue(re.match("^foo .* failed : \[Errno 2\] No such file or directory: 'foo': 'foo'$",
+        self.assertTrue(re.match("^foo .* failed : \[Errno 2\] No such file or directory: 'foo'",
                                  str(ctx.exception)))
 
 

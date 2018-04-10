@@ -29,6 +29,7 @@
 import os
 import tempfile
 import shutil
+import re
 
 import pandas as pd
 import pandas.util.testing as pdt
@@ -255,8 +256,8 @@ class TestLocalMax(IntegronTest):
                                    max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                    cmsearch_bin=cmsearch_bin, out_dir=self.out_dir, cpu_nb=self.cpu_nb
                                    )
-        self.assertTrue(str(ctx.exception).endswith(
-            "failed : [Errno 2] No such file or directory: 'failed_cmsearch': 'failed_cmsearch'".format(cmsearch_bin)))
+        self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: '{}'".format(cmsearch_bin),
+                        str(ctx.exception)))
 
         infernal.call = lambda x: 1
         with self.assertRaises(RuntimeError) as ctx:
