@@ -117,11 +117,12 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
     integrons = []
 
     if not intI_ac.empty and attc_ac:
-        n_attc_array = len(attc_ac)  # If an array hasn't been clustered with an Integrase
-                                     # or if an integrase lacks an array
-                                     # redontant info, we could check for len(attc_ac)==0
-                                     # -> to remove
-        for i, id_int in enumerate(intI_ac.ID_prot.values): #For each Integrase
+        n_attc_array = len(attc_ac)
+        # If an array hasn't been clustered with an Integrase
+        # or if an integrase lacks an array
+        # redundant info, we could check for len(attc_ac)==0
+        # -> to remove
+        for i, id_int in enumerate(intI_ac.ID_prot.values):  # For each Integrase
 
             if n_attc_array == 0:  # No more array to attribute to an integrase
 
@@ -133,7 +134,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                                        intI_ac.evalue.values[i],
                                        intI_ac.query_name.values[i])
 
-            else: # we still have attC and int :
+            else:  # we still have attC and int :
                 attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
                 attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
 
@@ -141,7 +142,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                                       (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
 
                 if attc_ac:
-                    #tmp = (distances /
+                    # tmp = (distances /
                     #       np.array([[len(aac) for aac in attc_ac]]))
 
                     side, idx_attc = np.where(distances == distances.min())
@@ -201,9 +202,9 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
             integrons.append(Integron(replicon, cfg))
             for a_tmp in attc_array.values:
                 integrons[-1].add_attC(a_tmp[4],
-                                              a_tmp[5],
-                                              1 if a_tmp[6] == "+" else -1,
-                                              a_tmp[7], cfg.model_attc_name)
+                                       a_tmp[5],
+                                       1 if a_tmp[6] == "+" else -1,
+                                       a_tmp[7], cfg.model_attc_name)
 
     elif intI_ac.pos_end.values.size >= 1 and not attc_ac: # If intI only
         for i, id_int in enumerate(intI_ac.ID_prot.values):
@@ -361,15 +362,15 @@ class Integron(object):
         ######## Promoter of integrase #########
 
         if self.has_integrase():
-            ## PintI1
+            # PintI1
             p_intI1 = motifs.create([Seq.Seq("TTGCTGCTTGGATGCCCGAGGCATAGACTGTACA")])
             p_intI1.name = "P_intI1"
 
-            ## PintI2
-            ## Not known
+            # PintI2
+            # Not known
 
-            ## PintI3
-            ## Not known
+            # PintI3
+            # Not known
 
             motifs_Pint = [p_intI1]
 
@@ -410,7 +411,7 @@ class Integron(object):
 
         ######## Promoter of K7 #########
 
-        ## Pc-int1
+        # Pc-int1
         motifs_Pc = []
 
         pc = SeqIO.parse(os.path.join(self.cfg.model_dir, "variants_Pc_intI1.fst"), "fasta")
@@ -421,16 +422,14 @@ class Integron(object):
             motifs_Pc.append(motifs.create(i))
             motifs_Pc[-1].name = "Pc_int1"
 
-        ## Pc-int2
-        ## Not known
+        # Pc-int2
+        # Not known
 
-        ## Pc-int3
+        # Pc-int3
 
         pc_intI3 = motifs.create([Seq.Seq("TAGACATAAGCTTTCTCGGTCTGTAGGCTGTAATG"),
                                   Seq.Seq("TAGACATAAGCTTTCTCGGTCTGTAGGATGTAATG")])
-        #                                                             *
         pc_intI3.name = "Pc_int3"
-
         motifs_Pc.append(pc_intI3)
 
         if self.type() == "complete":
@@ -493,17 +492,17 @@ class Integron(object):
         """
         dist_atti = 500
 
-        ## attI1
+        # attI1
         instances_attI1 = [Seq.Seq('TGATGTTATGGAGCAGCAACGATGTTACGCAGCAGGGCAGTCGCCCTAAAACAAAGTT')]
         attI1 = motifs.create(instances_attI1)
         attI1.name = "attI1"
 
-        ## attI2
+        # attI2
         instances_attI2 = [Seq.Seq('TTAATTAACGGTAAGCATCAGCGGGTGACAAAACGAGCATGCTTACTAATAAAATGTT')]
         attI2 = motifs.create(instances_attI2)
         attI2.name = "attI2"
 
-        ## attI3
+        # attI3
         instances_attI3 = [Seq.Seq('CTTTGTTTAACGACCACGGTTGTGGGTATCCGGTGTTTGGTCAGATAAACCACAAGTT')]
         attI3 = motifs.create(instances_attI3)
         attI3.name = "attI3"
