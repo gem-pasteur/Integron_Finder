@@ -35,15 +35,18 @@ Integron Finder is under [open source licence GPLv3](https://opensource.org/lice
 # Usage
 
 ```
-usage: integron_finder [-h] [--local_max] [--func_annot] [--cpu CPU]
-                       [-dt DISTANCE_THRESH] [--outdir .] [--linear]
-                       [--union_integrases] [--cmsearch CMSEARCH]
+usage: integron_finder [-h] [--local-max] [--func-annot] [--cpu CPU]
+                       [-dt DISTANCE_THRESHOLD] [--outdir OUTDIR]
+                       [--union-integrases] [--cmsearch CMSEARCH]
                        [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
-                       [--path_func_annot bank_hmm] [--gembase]
-                       [--attc_model file.cm] [--evalue_attc 1]
-                       [--keep_palindromes] [--no_proteins]
-                       [--max_attc_size 200] [--min_attc_size 40]
-                       [--eagle_eyes] [-V]
+                       [--path-func-annot PATH_FUNC_ANNOT] [--gembase]
+                       [--attc-model ATTC_MODEL] [--evalue-attc EVALUE_ATTC]
+                       [--keep-palindromes] [--no-proteins]
+                       [--max-attc-size MAX_ATTC_SIZE]
+                       [--min-attc-size MIN_ATTC_SIZE] [--eagle-eyes] [--pdf]
+                       [--gbk] [--keep-tmp] [--split-results]
+                       [--circ | --linear] [--topology-file TOPOLOGY_FILE]
+                       [-V] [-v] [-q]
                        replicon
 
 positional arguments:
@@ -52,18 +55,16 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --local_max           Allows thorough local detection (slower but more
+  --local-max           Allows thorough local detection (slower but more
                         sensitive and do not increase false positive rate).
-  --func_annot          Functional annotation of CDS associated with integrons
+  --func-annot          Functional annotation of CDS associated with integrons
                         HMM files are needed in Func_annot folder.
   --cpu CPU             Number of CPUs used by INFERNAL and HMMER
-  -dt DISTANCE_THRESH, --distance_thresh DISTANCE_THRESH
+  -dt DISTANCE_THRESHOLD, --distance-thresh DISTANCE_THRESHOLD
                         Two elements are aggregated if they are distant of
                         DISTANCE_THRESH [4kb] or less
-  --outdir .            Set the output directory (default: current)
-  --linear              Consider replicon as linear. If replicon smaller than
-                        20kb, it will be considered as linear
-  --union_integrases    Instead of taking intersection of hits from Phage_int
+  --outdir OUTDIR       Set the output directory (default: current)
+  --union-integrases    Instead of taking intersection of hits from Phage_int
                         profile (Tyr recombinases) and integron_integrase
                         profile, use the union of the hits
   --cmsearch CMSEARCH   Complete path to cmsearch if not in PATH. eg:
@@ -73,24 +74,45 @@ optional arguments:
                         /usr/local/bin/hmmsearch
   --prodigal PRODIGAL   Complete path to prodigal if not in PATH. eg:
                         /usr/local/bin/prodigal
-  --path_func_annot bank_hmm
+  --path-func-annot PATH_FUNC_ANNOT
                         Path to file containing all hmm bank paths (one per
                         line)
   --gembase             Use gembase formatted protein file instead of
                         Prodigal. Folder structure must be preserved
-  --attc_model file.cm  path or file to the attc model (Covariance Matrix)
-  --evalue_attc 1       set evalue threshold to filter out hits above it
+  --attc-model ATTC_MODEL
+                        path or file to the attc model (Covariance Matrix)
+  --evalue-attc EVALUE_ATTC
+                        set evalue threshold to filter out hits above it
                         (default: 1)
-  --keep_palindromes    for a given hit, if the palindromic version is found,
+  --keep-palindromes    for a given hit, if the palindromic version is found,
                         don't remove the one with highest evalue
-  --no_proteins         Don't annotate CDS and don't find integrase, just look
+  --no-proteins         Don't annotate CDS and don't find integrase, just look
                         for attC sites.
-  --max_attc_size 200   set maximum value fot the attC size (default: 200bp)
-  --min_attc_size 40    set minimum value fot the attC size (default: 40bp)
-  --eagle_eyes          Synonym of --local_max. Like a soaring eagle in the
-                        sky, catching rabbits(or attC sites) by surprise.
+  --max-attc-size MAX_ATTC_SIZE
+                        set maximum value fot the attC size (default: 200bp)
+  --min-attc-size MIN_ATTC_SIZE
+                        set minimum value fot the attC size (default: 40bp)
+  --eagle-eyes          Synonym of --local-max. Like a soaring eagle in the
+                        sky, catching rabbits (or attC sites) by surprise.
+  --circ                Set the default topology for replicons to 'cirular'
+  --linear              Set the default topology for replicons to 'linear'
+  --topology-file TOPOLOGY_FILE
+                        The path to a file where the topology for each
+                        replicon is specified
   -V, --version         show program's version number and exit
 
+Output options:
+  --pdf                 For each complete integron, a simple graphic of the
+                        region is depicted (in pdf format)
+  --gbk                 generate a GenBank file with the sequence annotated
+                        with the same annotations than .integrons file.
+  --keep-tmp            keep intermediate results. This results are stored in
+                        directory named other_<replicon id>
+  --split-results       Instead of merging integron results from all replicon
+                        in one file, keep them in separated files.
+
+  -v, --verbose         Increase verbosity of output (can be cumulative : -vv)
+  -q, --quiet           Decrease verbosity of output (can be cumulative : -qq)
 ```
 
 
