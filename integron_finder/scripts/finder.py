@@ -159,7 +159,7 @@ def parse_args(args):
     parser.add_argument("--eagle-eyes",
                         default=False,
                         help="Synonym of --local-max. Like a soaring eagle in the sky,"
-                             " catching rabbits(or attC sites) by surprise.",
+                             " catching rabbits (or attC sites) by surprise.",
                         action="store_true")
     output_options = parser.add_argument_group("Output options")
     output_options.add_argument('--pdf',
@@ -180,7 +180,7 @@ def parse_args(args):
     output_options.add_argument('--split-results',
                                 action='store_true',
                                 default=False,
-                                help='Instead of merging integron results from all replicon in one file,'
+                                help='Instead of merging integron results from all replicon in one file, '
                                      'keep them in separated files.')
 
     topology_grp = parser.add_mutually_exclusive_group()
