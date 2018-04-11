@@ -26,7 +26,6 @@
 # If not, see <http://www.gnu.org/licenses/>.                                      #
 ####################################################################################
 
-
 import os
 import colorlog
 import numpy as np
