@@ -51,7 +51,6 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     :return: a list attC sites found on replicon
     :rtype: list of :class:`pandas.DataFrame` objects
     """
-
     ok = False
 
     position_bkp_minus = []
@@ -79,9 +78,9 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
 
     if not ok:
         if attc_df.empty:
-            return []
+            attc_array = []
         else:
-            return [attc_df]
+            attc_array = [attc_df]
     else:
         if attc_plus.empty:
             array_plus = []
@@ -114,7 +113,7 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
         for a in attc_array:
             a[intcols] = a[intcols].astype(int)
             a["evalue"] = a["evalue"].astype(float)
-        return attc_array
+    return attc_array
 
 
 def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cpu=1):
