@@ -524,9 +524,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
             res = find_integron_in_one_replicon(replicon, config)
             all_res.append(res)
         else:
-            _log.warning("############ Skipping replicon {} ({}/{}) ############".format(replicon.name,
-                                                                                         rep_no,
-                                                                                         sequences_db_len))
+            _log.warning("############ Skipping replicon {}/{} ############".format(rep_no,
+                                                                                    sequences_db_len))
 
     if not config.split_results:
         _log.info("Merging integrons results.")
