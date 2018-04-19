@@ -94,7 +94,7 @@ class TestSplit(IntegronTest):
 
 class TestParseArgs(IntegronTest):
 
-    def test_parse_args(self):
+    def test_parse_replicon(self):
         parsed_args = split.parse_args(['replicon'])
         self.assertEqual(parsed_args.chunk, None)
         self.assertEqual(parsed_args.outdir, '.')
@@ -102,6 +102,7 @@ class TestParseArgs(IntegronTest):
         self.assertEqual(parsed_args.verbose, 0)
         self.assertEqual(parsed_args.replicon, 'replicon')
 
+    def test_parse_outdir(self):
         parsed_args = split.parse_args(['--outdir', 'foo', 'replicon'])
         self.assertEqual(parsed_args.chunk, None)
         self.assertEqual(parsed_args.outdir, 'foo')
@@ -109,12 +110,29 @@ class TestParseArgs(IntegronTest):
         self.assertEqual(parsed_args.verbose, 0)
         self.assertEqual(parsed_args.replicon, 'replicon')
 
+    def test_parse_chunk(self):
         parsed_args = split.parse_args(['--outdir', 'foo', '--chunk', '10', 'replicon'])
         self.assertEqual(parsed_args.chunk, 10)
         self.assertEqual(parsed_args.outdir, 'foo')
         self.assertEqual(parsed_args.quiet, 0)
         self.assertEqual(parsed_args.verbose, 0)
         self.assertEqual(parsed_args.replicon, 'replicon')
+
+    def test_verbose(self):
+        parsed_args = split.parse_args(['--outdir', 'foo', '--chunk', '10', 'replicon'])
+        self.assertEqual(parsed_args.verbose, 0)
+        parsed_args = split.parse_args(['--outdir', 'foo', '--chunk', '10', '--verbose', 'replicon'])
+        self.assertEqual(parsed_args.verbose, 1)
+        parsed_args = split.parse_args(['--outdir', 'foo', '--chunk', '10', '-vv', 'replicon'])
+        self.assertEqual(parsed_args.verbose, 2)
+
+    def test_quiet(self):
+        parsed_args = split.parse_args(['--outdir', 'foo', '--chunk', '10', 'replicon'])
+        self.assertEqual(parsed_args.quiet, 0)
+        parsed_args = split.parse_args(['--outdir', 'foo', '--chunk', '10', '--quiet', 'replicon'])
+        self.assertEqual(parsed_args.quiet, 1)
+        parsed_args = split.parse_args(['--outdir', 'foo', '--chunk', '10', '-qq', 'replicon'])
+        self.assertEqual(parsed_args.quiet, 2)
 
 
 class TestMain(IntegronTest):
