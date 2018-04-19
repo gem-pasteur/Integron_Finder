@@ -47,7 +47,7 @@ if not integron_finder.__version__.endswith('VERSION'):
 import colorlog
 _log = colorlog.getLogger('integron_finder.split')
 
-from integron_finder import IntegronError, logger_set_level
+from integron_finder import logger_set_level
 from integron_finder import utils
 
 
@@ -123,10 +123,10 @@ def parse_args(args):
 
     parser.add_argument('--chunk',
                         type=int,
-                        help='The number of files generate. ' \
-                             'Each chunks will contains n replicon where ' \
-                             'n = number of replicon in the input file / chunk.' \
-                             'The n may vary in some chunks because some replicon can be skip ' \
+                        help='The number of files generate. '
+                             'Each chunks will contains n replicon where '
+                             'n = number of replicon in the input file / chunk.'
+                             'The n may vary in some chunks because some replicon can be skip '
                              'if they contains illegal characters or are too short (<50bp)')
 
     parser.add_argument('-o', '--outdir',
