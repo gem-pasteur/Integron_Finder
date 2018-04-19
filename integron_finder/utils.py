@@ -216,5 +216,7 @@ def merge_results(*results_file):
         res = pd.read_table(one_result, sep="\t")
         all_res.append(res)
     agg_results = pd.concat(all_res)
+    # agg_results = agg_results.set_index(['ID_replicon', 'ID_integron'])
+    # agg_results.drop_duplicates(inplace=True)
     return agg_results
 
