@@ -517,7 +517,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
             # to mimic integron_finder 1.5 behavior
             # if sequences_db_len == 1:
             #    replicon.name = utils.get_name_from_path(config.replicon_path)
-            _log.info("############ Processing replicon {} ({}/{}) ############".format(replicon.name,
+            _log.info("############ Processing replicon {} ({}/{}) ############".format(replicon.id,
                                                                                         rep_no,
                                                                                         sequences_db_len))
 
