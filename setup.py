@@ -238,7 +238,8 @@ setup(name='integron_finder',
       entry_points={
           'console_scripts': [
               'integron_finder=integron_finder.scripts.finder:main',
-              'integron_split=integron_finder.scripts.split:main'
+              'integron_split=integron_finder.scripts.split:main',
+              'integron_merge=integron_finder.scripts.merge:main',
           ]
       },
       # (dataprefix +'where to put the data in the install, [where to find the data in the tar ball]
