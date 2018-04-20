@@ -34,10 +34,14 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
+from integron_finder import logger_set_level
 from integron_finder.hmm import scan_hmm_bank
 
 
 class TestScanHmmBank(IntegronTest):
+
+    def setUp(self):
+        logger_set_level('INFO')
 
     def test_wrong_path(self):
         """
