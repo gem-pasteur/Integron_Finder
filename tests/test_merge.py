@@ -29,14 +29,9 @@
 import tempfile
 import os
 import shutil
-import sys
-import glob
 
-from Bio import BiopythonExperimentalWarning
-import warnings
-warnings.simplefilter('ignore', FutureWarning)
-warnings.simplefilter('ignore', BiopythonExperimentalWarning)
-from Bio import SeqIO, Seq
+import pandas as pd
+import pandas.util.testing as pdt
 
 try:
     from tests import IntegronTest
@@ -44,7 +39,8 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-import integron_finder.scripts.split as split
+from integron_finder import IntegronError, logger_set_level
+import integron_finder.scripts.merge as merge
 
 
 class TestMerge(IntegronTest):
@@ -56,66 +52,89 @@ class TestMerge(IntegronTest):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
         self.replicons = ('acba.007.p01.13', 'lian.001.c02.10', 'pssu.001.c01.13')
+        self.ids = ('ACBA.007.P01_13', 'LIAN.001.C02_10', 'PSSU.001.C01_13')
         self.res_dirs = []
         for rep in self.replicons:
             res_dir = os.path.join(self.out_dir, 'Result_{}'.format(rep))
             os.makedirs(res_dir)
-            in_dir = self.find_data('Results_Integron_finder_()'.format(rep))
-            shutil.copyfile(os.path.join(in_dir, '{}.integrons'.format(rep)), res_dir)
-            for gbk in glob.glob(os.path.join(in_dir, '*.gbk')):
-                shutil.copyfile(gbk, res_dir)
-            for pdf in glob.glob(os.path.join(in_dir, '*.pdf')):
-                shutil.copyfile(pdf, res_dir)
             self.res_dirs.append(res_dir)
+
+            res_file = self.find_data("{}_local_max_lin.integrons".format(rep))
+            shutil.copyfile(res_file, os.path.join(res_dir, "{}.integrons".format(rep)))
+
+        for _id in self.ids:
+            gbk_file = self.find_data("{}_local_max_lin.gbk".format(_id))
+            shutil.copyfile(gbk_file, os.path.join(res_dir, "{}.gbk".format(_id)))
+            pdf_file = self.find_data("{}_1_local_max_lin.pdf".format(_id))
+            shutil.copyfile(pdf_file, os.path.join(res_dir, "{}_1.pdf".format(_id)))
 
 
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
+        logger_set_level('INFO')
 
-    def test_merge(self):
+    def test_merge_integrons(self):
+        outfile = os.path.join(self.out_dir, 'merged.integrons')
+        merge.merge_integrons(outfile, *self.res_dirs)
+        agg_results = pd.read_table(outfile, sep="\t")
 
-        result_to_merge = [self.find_data('Results_Integron_Finder_{}'.format(r) for r in replicons)
-        chunk_names = split.split(replicon_path, outdir=self.out_dir)
+        expe_result_file = self.find_data('acba_lian_pssu_merged.integrons')
+        expected_results = pd.read_table(expe_result_file, sep="\t")
 
+        pdt.assert_frame_equal(agg_results, expected_results)
 
+    def test_merge_no_files(self):
+        outfile = os.path.join(self.out_dir, 'merged.integrons')
+        for rep, res_dir in zip(self.replicons, self.res_dirs):
+            os.unlink(os.path.join(res_dir, "{}.integrons".format(rep)))
+        exp_msg = 'No integrons file to merge'
+        with self.assertRaises(IntegronError) as ctx:
+            # 100 is to disable CRITICAL log message
+            logger_set_level(100)
+            merge.merge_integrons(outfile, *self.res_dirs)
+        self.assertEqual(str(ctx.exception), exp_msg)
+
+    def test_copy_file(self):
+        merge.copy_file(self.out_dir, '.gbk', *self.res_dirs)
+        merge.copy_file(self.out_dir, '.pdf', *self.res_dirs)
+        for _id in self.ids:
+            self.assertTrue(os.path.exists(os.path.join(self.out_dir, '{}.gbk'.format(_id))))
+            self.assertTrue(os.path.exists(os.path.join(self.out_dir, '{}_1.pdf'.format(_id))))
 
 
 class TestParseArgs(IntegronTest):
 
     def test_parse_one_result(self):
-        parsed_args = split.parse_args(['outdir', 'outfile' 'result_1'])
-        self.assertEqual(parsed_args.outdir, None)
-        self.assertEqual(parsed_args.outfile, 'foo')
-        self.assertTupleEqual(parsed_args.outfile.results, ('result_1',))
+        parsed_args = merge.parse_args(['outdir', 'outfile', 'result_1'])
+        self.assertEqual(parsed_args.outdir, 'outdir')
+        self.assertEqual(parsed_args.outfile, 'outfile')
+        self.assertListEqual(parsed_args.results, ['result_1'])
         self.assertEqual(parsed_args.quiet, 0)
         self.assertEqual(parsed_args.verbose, 0)
-        self.assertEqual(parsed_args.replicon, 'replicon')
 
     def test_parse_2_results(self):
-        parsed_args = split.parse_args(['outdir', 'outfile' 'result_1', 'result_2'])
-        self.assertEqual(parsed_args.outdir, None)
-        self.assertEqual(parsed_args.outfile, 'foo')
-        self.assertTupleEqual(parsed_args.outfile.results, ('result_1', 'result_2'))
+        parsed_args = merge.parse_args(['outdir', 'outfile', 'result_1', 'result_2'])
+        self.assertEqual(parsed_args.outdir, 'outdir')
+        self.assertEqual(parsed_args.outfile, 'outfile')
+        self.assertListEqual(parsed_args.results, ['result_1', 'result_2'])
         self.assertEqual(parsed_args.quiet, 0)
         self.assertEqual(parsed_args.verbose, 0)
-        self.assertEqual(parsed_args.replicon, 'replicon')
-
 
     def test_verbose(self):
-        parsed_args = split.parse_args(['outdir', 'outfile' 'result_1', 'result'])
+        parsed_args = merge.parse_args(['outdir', 'outfile', 'result_1', 'result_2'])
         self.assertEqual(parsed_args.verbose, 0)
-        parsed_args = split.parse_args(['--verbose', 'outdir', 'outfile' 'result'])
+        parsed_args = merge.parse_args(['--verbose', 'outdir', 'outfile', 'result'])
         self.assertEqual(parsed_args.verbose, 1)
-        parsed_args = split.parse_args(['-vv', 'outdir', 'outfile' 'result'])
+        parsed_args = merge.parse_args(['-vv', 'outdir', 'outfile', 'result'])
         self.assertEqual(parsed_args.verbose, 2)
 
     def test_quiet(self):
-        parsed_args = split.parse_args(['outdir', 'outfile' 'result'])
+        parsed_args = merge.parse_args(['outdir', 'outfile', 'result'])
         self.assertEqual(parsed_args.quiet, 0)
-        parsed_args = split.parse_args(['--quiet', 'outdir', 'outfile' 'result'])
+        parsed_args = merge.parse_args(['--quiet', 'outdir', 'outfile', 'result'])
         self.assertEqual(parsed_args.quiet, 1)
-        parsed_args = split.parse_args(['-qq', 'outdir', 'outfile' 'result'])
+        parsed_args = merge.parse_args(['-qq', 'outdir', 'outfile', 'result'])
         self.assertEqual(parsed_args.quiet, 2)
 
 
@@ -123,50 +142,84 @@ class TestMain(IntegronTest):
 
     def setUp(self):
         tmp_dir = tempfile.gettempdir()
-        self.out_dir = os.path.join(tmp_dir, 'test_integron_split')
+        self.out_dir = os.path.join(tmp_dir, 'test_integron_merge')
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
+        self.replicons = ('acba.007.p01.13', 'lian.001.c02.10', 'pssu.001.c01.13')
+        self.ids = ('ACBA.007.P01_13', 'LIAN.001.C02_10', 'PSSU.001.C01_13')
+        self.res_dirs = []
+        for rep in self.replicons:
+            res_dir = os.path.join(self.out_dir, 'Result_{}'.format(rep))
+            os.makedirs(res_dir)
+            self.res_dirs.append(res_dir)
+
+            res_file = self.find_data("{}_local_max_lin.integrons".format(rep))
+            shutil.copyfile(res_file, os.path.join(res_dir, "{}.integrons".format(rep)))
+
+        for _id in self.ids:
+            gbk_file = self.find_data("{}_local_max_lin.gbk".format(_id))
+            shutil.copyfile(gbk_file, os.path.join(res_dir, "{}.gbk".format(_id)))
+            pdf_file = self.find_data("{}_1_local_max_lin.pdf".format(_id))
+            shutil.copyfile(pdf_file, os.path.join(res_dir, "{}_1.pdf".format(_id)))
+
 
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
 
 
-    def test_wo_chunk(self):
-        replicon_path = self.find_data(os.path.join('Replicons', 'multi_fasta.fst'))
-        command = 'integron_split --outdir {} {}'.format(self.out_dir, replicon_path)
+    def test_main(self):
+        outfile = 'merged.integrons'
+        command = 'integron_merge {} {} {}'.format(self.out_dir, outfile, ' '.join(self.res_dirs))
         with self.catch_io(out=True, err=True):
-            split.main(command.split()[1:])
-            out = sys.stdout.getvalue()
-        chunk_names = out.split()
-        seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        files_expected = [os.path.join(self.out_dir, r + '.fst') for r in seq_index]
-        self.assertListEqual(files_expected, chunk_names)
-        for f in chunk_names:
-            seq_it = SeqIO.parse(f, 'fasta')
-            for s in seq_it:
-                ref_seq = seq_index[s.id]
-                self.assertEqual(s.id, ref_seq.id)
-                self.assertEqual(s.description, ref_seq.description)
-                self.assertEqual(s.seq, ref_seq.seq)
+            merge.main(command.split()[1:])
+            # out = sys.stdout.getvalue()
 
+        integron_file = os.path.join(self.out_dir, outfile)
+        merge.merge_integrons(integron_file, *self.res_dirs)
+        agg_results = pd.read_table(integron_file, sep="\t")
 
-    def test_w_chunk(self):
-        replicon_path = self.find_data(os.path.join('Replicons', 'multi_fasta.fst'))
-        chunk = 2
-        command = 'integron_split --outdir {} --chunk {} {}'.format(self.out_dir, chunk, replicon_path)
+        expe_result_file = self.find_data('acba_lian_pssu_merged.integrons')
+        expected_results = pd.read_table(expe_result_file, sep="\t")
+
+        pdt.assert_frame_equal(agg_results, expected_results)
+
+        merge.copy_file(self.out_dir, '.gbk', *self.res_dirs)
+        merge.copy_file(self.out_dir, '.pdf', *self.res_dirs)
+        for _id in self.ids:
+            self.assertTrue(os.path.exists(os.path.join(self.out_dir, '{}.gbk'.format(_id))))
+            self.assertTrue(os.path.exists(os.path.join(self.out_dir, '{}_1.pdf'.format(_id))))
+
+    def test_main_outdir_exists(self):
+        bad_outdir = os.path.join(self.out_dir, 'bad_out_dir')
+        open(bad_outdir, 'w').close()
+        exp_msg = "'{}' already exists and is not a directory".format(bad_outdir)
+        with self.assertRaises(IOError) as ctx:
+            command = 'integron_merge {} {} {}'.format(bad_outdir, 'whatever', ' '.join(self.res_dirs))
+            # 100 is to disable CRITICAL log message
+            merge.main(command.split()[1:], log_level=100)
+        self.assertEqual(str(ctx.exception), exp_msg)
+
+    def test_main_no_outdir(self):
+        outfile = 'merged.integrons'
+        out_dir = os.path.join(self.out_dir, 'real_outdir')
+        command = 'integron_merge {} {} {}'.format(out_dir, outfile, ' '.join(self.res_dirs))
         with self.catch_io(out=True, err=True):
-            split.main(command.split()[1:])
-            out = sys.stdout.getvalue()
-        chunk_names = out.split()
-        seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        files_expected = [os.path.join(self.out_dir, "multi_fasta_chunk_{}.fst".format(i)) for i in range(1, chunk + 1)]
-        self.assertListEqual(files_expected, chunk_names)
-        for f in chunk_names:
-            seq_it = SeqIO.parse(f, 'fasta')
-            for s in seq_it:
-                ref_seq = seq_index[s.id]
-                self.assertEqual(s.id, ref_seq.id)
-                self.assertEqual(s.description, ref_seq.description)
-                self.assertEqual(s.seq, ref_seq.seq)
+            merge.main(command.split()[1:])
+            # out = sys.stdout.getvalue()
+
+        integron_file = os.path.join(out_dir, outfile)
+        merge.merge_integrons(integron_file, *self.res_dirs)
+        agg_results = pd.read_table(integron_file, sep="\t")
+
+        expe_result_file = self.find_data('acba_lian_pssu_merged.integrons')
+        expected_results = pd.read_table(expe_result_file, sep="\t")
+
+        pdt.assert_frame_equal(agg_results, expected_results)
+
+        merge.copy_file(self.out_dir, '.gbk', *self.res_dirs)
+        merge.copy_file(self.out_dir, '.pdf', *self.res_dirs)
+        for _id in self.ids:
+            self.assertTrue(os.path.exists(os.path.join(out_dir, '{}.gbk'.format(_id))))
+            self.assertTrue(os.path.exists(os.path.join(out_dir, '{}_1.pdf'.format(_id))))
