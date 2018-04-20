@@ -517,7 +517,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
             # to mimic integron_finder 1.5 behavior
             # if sequences_db_len == 1:
             #    replicon.name = utils.get_name_from_path(config.replicon_path)
-            _log.info("############ Processing replicon {} ({}/{}) ############".format(replicon.id,
+            _log.info("############ Processing replicon {} ({}/{}) ############\n".format(replicon.id,
                                                                                         rep_no,
                                                                                         sequences_db_len))
 
@@ -528,7 +528,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                                                                                     sequences_db_len))
 
     if not config.split_results:
-        _log.info("Merging integrons results.")
+        _log.info("Merging integrons results.\n")
         agg_file = utils.merge_results(*all_res)
         outfile = os.path.join(config.result_dir, utils.get_name_from_path(config.replicon_path) + ".integrons")
         agg_file.to_csv(outfile, sep="\t", index=False, na_rep="NA")
