@@ -1,62 +1,51 @@
 #!/usr/bin/env nextflow
 
 replicons_file = file(params.replicons)
+params.cpu = 1
 
-
-process_split{
+process split{
 
     input:
         file replicons from replicons_file
 
     output:
-        file "*.fst" into chunks
-
-    beforeScript 'source /home/bneron/Projects/GEM/Integron_Finder/python3/bin/activate'
+        file "*.fst" into chunk_files mode flatten
 
     """
     integron_split ${replicons}
     """
 }
 
-/*
- * myFileChannel = Channel.fromPath( '/path/*b', type: 'dir' )
- */
 
-process_integron_finder{
+process integron_finder{
     input:
-        file chunk from chunks
+        file one_chunk from chunk_files
 
     output:
-        path "Integron_Finder_Results_*" into chunk_results
+        file "Results_Integron_Finder_${one_chunk.baseName}" into all_chunk_results_dir
 
-    beforeScript 'source /home/bneron/Projects/GEM/Integron_Finder/python3/bin/activate'
+    script:
+        """
+        integron_finder --gbk --pdf --cpu ${params.cpu} ${one_chunk} > "${one_chunk}.out" 2>&1
+        """
+}
+
+
+process merge{
+    publishDir "Results_Integron_Finder_${replicons_file.simpleName}"
+
+    input:
+        file all_chunk_results from all_chunk_results_dir.toList()
+
+    output:
+        file "Results_Integron_Finder_${replicons_file.simpleName}"
 
     """
-    integron_finder --gbk --pdf ${chunk}
+    integron_merge "Results_Integron_Finder_${replicons_file.baseName}" "${replicons_file.baseName}" ${all_chunk_results}
     """
 }
 
-Channel
-    .from chunk_results
-    .collect()
-    .set(all_chunk_results)
-
-process_merge{
-    publishDir "Integron_Finder_Results_${replicons.simplename}"
-
-    input:
-        all_chunk_results
-
-    output:
-        "${replicons.simplename}.integrons"
-
-    beforeScript 'source /home/bneron/Projects/GEM/Integron_Finder/python3/bin/activate'
-
-    """
-    integron_merge "Integron_Finder_Results_${replicons.simplename}" "${replicons.simplename}" all_chunks
-    """
-}
 
 workflow.onComplete {
-    println ( workflow.success ? "\nDone! Integrons are in --> " : "Oops .. something went wrong" )
+    println ( workflow.success ? "\nDone! Integrons are in --> Results_Integron_Finder_${replicons_file.simpleName}" : "Oops .. something went wrong" )
 }
