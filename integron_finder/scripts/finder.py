@@ -518,8 +518,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
             # if sequences_db_len == 1:
             #    replicon.name = utils.get_name_from_path(config.replicon_path)
             _log.info("############ Processing replicon {} ({}/{}) ############\n".format(replicon.id,
-                                                                                        rep_no,
-                                                                                        sequences_db_len))
+                                                                                          rep_no,
+                                                                                          sequences_db_len))
 
             res = find_integron_in_one_replicon(replicon, config)
             all_res.append(res)
