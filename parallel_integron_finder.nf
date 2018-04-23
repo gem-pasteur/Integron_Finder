@@ -2,6 +2,9 @@
 
 replicons_file = file(params.replicons)
 params.cpu = 1
+params.gbk = false
+
+println(params)
 
 process split{
 
@@ -47,5 +50,16 @@ process merge{
 
 
 workflow.onComplete {
-    println ( workflow.success ? "\nDone! Integrons are in --> Results_Integron_Finder_${replicons_file.simpleName}" : "Oops .. something went wrong" )
+    if ( workflow.success )
+        println("\nDone!")
+        println("Results are in --> ${workDir}/zzzzzz/xxxx/Results_Integron_Finder_${replicons_file.simpleName}")
+
 }
+
+workflow.onError {
+    println "Oops .. something went wrong"
+    println "Pipeline execution stopped with the following message: ${workflow.errorMessage}"
+}
+
+
+
