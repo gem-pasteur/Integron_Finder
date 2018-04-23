@@ -1,20 +1,26 @@
-replicons = file('')
+#!/usr/bin/env nextflow
+
+replicons_file = file(params.replicons)
 
 
 process_split{
 
     input:
-        file replicons
+        file replicons from replicons_file
 
     output:
-        file "${}" into chunks
+        file "*.fst" into chunks
+
+    beforeScript 'source /home/bneron/Projects/GEM/Integron_Finder/python3/bin/activate'
 
     """
     integron_split ${replicons}
     """
 }
 
-# myFileChannel = Channel.fromPath( '/path/*b', type: 'dir' )
+/*
+ * myFileChannel = Channel.fromPath( '/path/*b', type: 'dir' )
+ */
 
 process_integron_finder{
     input:
@@ -22,6 +28,8 @@ process_integron_finder{
 
     output:
         path "Integron_Finder_Results_*" into chunk_results
+
+    beforeScript 'source /home/bneron/Projects/GEM/Integron_Finder/python3/bin/activate'
 
     """
     integron_finder --gbk --pdf ${chunk}
@@ -42,6 +50,8 @@ process_merge{
     output:
         "${replicons.simplename}.integrons"
 
+    beforeScript 'source /home/bneron/Projects/GEM/Integron_Finder/python3/bin/activate'
+
     """
     integron_merge "Integron_Finder_Results_${replicons.simplename}" "${replicons.simplename}" all_chunks
     """
@@ -49,3 +59,4 @@ process_merge{
 
 workflow.onComplete {
     println ( workflow.success ? "\nDone! Integrons are in --> " : "Oops .. something went wrong" )
+}
