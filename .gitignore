@@ -49,3 +49,10 @@ Results_Integron_Finder*/
 # Singularity images #
 ######################
 Singularity/integron_finder.simg
+
+####################
+# nextflow outputs #
+####################
+.nextflow.log*
+.nextflow
+work/
