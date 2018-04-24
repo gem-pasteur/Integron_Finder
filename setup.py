@@ -129,7 +129,7 @@ def subst_vars(src, dst, vars):
     try:
         src_file = open(src, "r")
     except os.error as err:
-        raise DistutilsFileError("could not open '{0}': {1)".format(src, err))
+        raise DistutilsFileError("could not open '{0}': {1}".format(src, err))
     try:
         dest_file = open(dst, "w")
     except os.error as err:
