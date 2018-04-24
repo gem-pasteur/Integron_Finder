@@ -29,7 +29,7 @@ process integron_finder{
 
     script:
         """
-        integron_finder --gbk --pdf --cpu ${params.cpu} ${one_chunk} > "${one_chunk}.out" 2>&1
+        integron_finder --gbk --pdf --cpu ${params.cpu} --mute ${one_chunk}
         """
 }
 
