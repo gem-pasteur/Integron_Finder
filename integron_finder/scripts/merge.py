@@ -42,7 +42,6 @@ if not integron_finder.__version__.endswith('VERSION'):
 
 # must be done after import 'integron_finder'
 import colorlog
-_log = colorlog.getLogger('integron_finder.merge')
 
 from integron_finder import IntegronError, logger_set_level
 from integron_finder import utils
@@ -126,12 +125,19 @@ def main(args=None, log_level=None):
     :param log_level: the output verbosity
     :type log_level: a positive int or a string among 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
     """
+    global _log
+
     args = sys.argv[1:] if args is None else args
     parsed_args = parse_args(args)
 
+    integron_finder.init_logger()
+    _log = colorlog.getLogger('integron_finder.merge')
+
     if not log_level:
         # logs are specify from args options
-        logger_set_level("INFO")
+        if not log_level:
+            # logs are specify from args options
+            logger_set_level(utils.log_level(parsed_args.verbose, parsed_args.quiet))
     else:
         # used by unit tests to mute or unmute logs
         logger_set_level(log_level)

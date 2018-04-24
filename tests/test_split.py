@@ -30,6 +30,7 @@ import tempfile
 import os
 import shutil
 import sys
+import glob
 
 from Bio import BiopythonExperimentalWarning
 import warnings
@@ -43,6 +44,7 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
+import integron_finder
 import integron_finder.scripts.split as split
 
 
@@ -118,6 +120,12 @@ class TestParseArgs(IntegronTest):
         self.assertEqual(parsed_args.verbose, 0)
         self.assertEqual(parsed_args.replicon, 'replicon')
 
+    def test_mute(self):
+        parsed_args = split.parse_args(['replicon'])
+        self.assertFalse(parsed_args.mute)
+        parsed_args = split.parse_args(['--mute', 'replicon'])
+        self.assertTrue(parsed_args.mute)
+
     def test_verbose(self):
         parsed_args = split.parse_args(['--outdir', 'foo', '--chunk', '10', 'replicon'])
         self.assertEqual(parsed_args.verbose, 0)
@@ -153,11 +161,10 @@ class TestMain(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', 'multi_fasta.fst'))
         command = 'integron_split --outdir {} {}'.format(self.out_dir, replicon_path)
         with self.catch_io(out=True, err=True):
-            split.main(command.split()[1:])
-            out = sys.stdout.getvalue()
-        chunk_names = out.split()
+            split.main(command.split()[1:], log_level="WARNING")
         seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        files_expected = [os.path.join(self.out_dir, r + '.fst') for r in seq_index]
+        files_expected = sorted([os.path.join(self.out_dir, r + '.fst') for r in seq_index])
+        chunk_names = sorted(glob.glob(os.path.join(self.out_dir, '*.fst')))
         self.assertListEqual(files_expected, chunk_names)
         for f in chunk_names:
             seq_it = SeqIO.parse(f, 'fasta')
@@ -173,11 +180,11 @@ class TestMain(IntegronTest):
         chunk = 2
         command = 'integron_split --outdir {} --chunk {} {}'.format(self.out_dir, chunk, replicon_path)
         with self.catch_io(out=True, err=True):
-            split.main(command.split()[1:])
-            out = sys.stdout.getvalue()
-        chunk_names = out.split()
+            split.main(command.split()[1:], log_level="WARNING")
         seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        files_expected = [os.path.join(self.out_dir, "multi_fasta_chunk_{}.fst".format(i)) for i in range(1, chunk + 1)]
+        files_expected = sorted([os.path.join(self.out_dir, "multi_fasta_chunk_{}.fst".format(i))
+                                 for i in range(1, chunk + 1)])
+        chunk_names = sorted(glob.glob(os.path.join(self.out_dir, '*.fst')))
         self.assertListEqual(files_expected, chunk_names)
         for f in chunk_names:
             seq_it = SeqIO.parse(f, 'fasta')

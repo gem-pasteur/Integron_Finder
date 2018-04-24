@@ -45,7 +45,6 @@ if not integron_finder.__version__.endswith('VERSION'):
 
 # must be done after import 'integron_finder'
 import colorlog
-_log = colorlog.getLogger('integron_finder.split')
 
 from integron_finder import logger_set_level
 from integron_finder import utils
@@ -53,13 +52,14 @@ from integron_finder import utils
 
 def split(replicon_path, chunk=None, outdir='.'):
     """
-    split the replicon_file in *chunk* chunks and write them in files.
+    Split the replicon_file in *chunk* chunks and write them in files.
 
-    :param str replicon_path: the path to the replicon file
-    :param int chunk: the number of chunk desire (chunk > 0)
-    :param str outdir: the path of a directory where to write chunk files
-    :return: the name of all chunks created
-    :rtype: list of strings
+    :param str replicon_path: The path to the replicon file.
+    :param int chunk: The number of chunk desire (chunk > 0).
+    :param str outdir: The path of a directory where to write chunk files.
+                       The directory must exists.
+    :return: The name of all chunks created.
+    :rtype: List of strings.
     """
     def grouper(sequences_db, chunk_size):
         """
@@ -92,9 +92,9 @@ def split(replicon_path, chunk=None, outdir='.'):
             else:
                 rep_no_in_db = (chunk_no - 1) * chunk_size + rep_no
                 if rep_no_in_db <= sequences_db_len:
-                    _log.warning("############ Skipping replicon {}/{} in chunk {} ############".format(rep_no_in_db,
-                                                                                                        sequences_db_len,
-                                                                                                        chunk_no))
+                    _log.warning("Skipping replicon {}/{} in chunk {}".format(rep_no_in_db,
+                                                                              sequences_db_len,
+                                                                              chunk_no))
         if chunk_out:
             if chunk_size == 1:
                 chunk_name = "{}.fst".format(replicon_name)
@@ -102,7 +102,7 @@ def split(replicon_path, chunk=None, outdir='.'):
                 replicon_name = utils.get_name_from_path(replicon_path)
                 chunk_name = "{}_chunk_{}.fst".format(replicon_name, chunk_no)
             chunk_name = os.path.join(outdir, chunk_name)
-            _log.debug("writing chunk '{}'".format(chunk_name))
+            _log.info("writing chunk '{}'".format(chunk_name))
             SeqIO.write(chunk_out, chunk_name, "fasta")
             all_chunk_name.append(chunk_name)
     return all_chunk_name
@@ -131,7 +131,13 @@ def parse_args(args):
 
     parser.add_argument('-o', '--outdir',
                         default='.',
-                        help='The path to the directory where to write the chunks')
+                        help='The path to the directory where to write the chunks.\n'
+                             'It must exists.')
+    parser.add_argument("--mute",
+                        action='store_true',
+                        default=False,
+                        help="mute the log on stdout."
+                             "(continue to log on integron_split.out)")
 
     verbosity_grp = parser.add_argument_group()
     verbosity_grp.add_argument('-v', '--verbose',
@@ -155,18 +161,25 @@ def main(args=None, log_level=None):
     :param loglevel: the output verbosity
     :type loglevel: a positive int or a string among 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
     """
+    global _log
+
     args = sys.argv[1:] if args is None else args
     parsed_args = parse_args(args)
 
+    integron_finder.init_logger(log_file=os.path.join(parsed_args.outdir, 'integron_split.out'),
+                                out=not parsed_args.mute)
+    _log = colorlog.getLogger('integron_finder.split')
+
     if not log_level:
         # logs are specify from args options
-        logger_set_level("INFO")
+        logger_set_level(utils.log_level(parsed_args.verbose, parsed_args.quiet))
     else:
         # used by unit tests to mute or unmute logs
         logger_set_level(log_level)
 
     chunk_names = split(parsed_args.replicon, chunk=parsed_args.chunk, outdir=parsed_args.outdir)
     print(' '.join(chunk_names))
+
 
 if __name__ == '__main__':
     main()
