@@ -264,9 +264,11 @@ class TestAcba(IntegronTest):
                                                                          )
                                                                          )
         with self.assertRaises(RuntimeError) as ctx:
-            with self.catch_log():
+            with self.catch_io(out=True):
                 # in case the error is not raised
                 # anyway do not want to mess up the test output
+                # I cannot catch log because loggers are reinitialized in main
+                # I need to catch stdout as log are write on
                 main(command.split()[1:])
 
         err_msg = "cannot find 'hmmsearch' in PATH.\n" \
@@ -285,9 +287,11 @@ class TestAcba(IntegronTest):
                                                                          )
                                                                          )
         with self.assertRaises(RuntimeError) as ctx:
-            with self.catch_log():
+            with self.catch_io(out=True):
                 # in case the error is not raised
                 # anyway do not want to mess up the test output
+                # I cannot catch log because loggers are reinitialized in main
+                # I need to catch stdout as log are write on
                 main(command.split()[1:])
 
         err_msg = "cannot find 'prodigal' in PATH.\n" \
@@ -306,11 +310,12 @@ class TestAcba(IntegronTest):
                                                                          )
                                                                          )
         with self.assertRaises(RuntimeError) as ctx:
-            with self.catch_log():
+            with self.catch_io(out=True):
                 # in case the error is not raised
                 # anyway do not want to mess up the test output
+                # I cannot catch log because loggers are reinitialized in main
+                # I need to catch stdout as log are write on
                 main(command.split()[1:])
-
         err_msg = "cannot find 'cmsearch' in PATH.\n" \
                   "Please install infernal package or setup 'cmsearch' binary path with --cmsearch option"
 

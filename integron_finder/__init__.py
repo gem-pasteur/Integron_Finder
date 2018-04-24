@@ -60,27 +60,35 @@ Python {1}
     return version_text
 
 
-def init_logger(out=sys.stderr):
-    handler = colorlog.StreamHandler(out)
-    formatter = colorlog.ColoredFormatter("%(log_color)s%(levelname)-8s : %(reset)s %(message)s",
-                                          datefmt=None,
-                                          reset=True,
-                                          log_colors={
-                                              'DEBUG':    'cyan',
-                                              'INFO':     'green',
-                                              'WARNING':  'yellow',
-                                              'ERROR':    'red',
-                                              'CRITICAL': 'bold_red',
-                                          },
-                                          secondary_log_colors={},
-                                          style='%'
-                                          )
-    handler.setFormatter(formatter)
+def init_logger(log_file=None, out=True):
     logger = colorlog.getLogger('integron_finder')
-    logger.addHandler(handler)
-    logger.setLevel(colorlog.logging.logging.WARNING)
-
-init_logger()
+    logging = colorlog.logging.logging
+    if out:
+        stdout_handler = colorlog.StreamHandler(sys.stdout)
+        stdout_formatter = colorlog.ColoredFormatter("%(log_color)s%(levelname)-8s : %(reset)s %(message)s",
+                                                     datefmt=None,
+                                                     reset=True,
+                                                     log_colors={
+                                                         'DEBUG':    'cyan',
+                                                         'INFO':     'green',
+                                                         'WARNING':  'yellow',
+                                                         'ERROR':    'red',
+                                                         'CRITICAL': 'bold_red',
+                                                     },
+                                                     secondary_log_colors={},
+                                                     style='%'
+                                                     )
+        stdout_handler.setFormatter(stdout_formatter)
+        logger.addHandler(stdout_handler)
+    else:
+        null_handler = logging.NullHandler()
+        logger.addHandler(null_handler)
+    if log_file:
+        file_handler = logging.FileHandler(log_file)
+        file_formatter = logging.Formatter("%(levelname)-8s : %(message)s")
+        file_handler.setFormatter(file_formatter)
+        logger.addHandler(file_handler)
+    logger.setLevel(logging.WARNING)
 
 
 def logger_set_level(level=colorlog.logging.logging.WARNING):
@@ -101,7 +109,7 @@ def logger_set_level(level=colorlog.logging.logging.WARNING):
 
     logger = colorlog.getLogger('integron_finder')
     if level <= colorlog.logging.logging.DEBUG:
-        formatter = colorlog.ColoredFormatter(
+        stdout_formatter = colorlog.ColoredFormatter(
             "%(log_color)s%(levelname)-8s : %(module)s: L %(lineno)d :%(reset)s %(message)s",
             datefmt=None,
             reset=True,
@@ -115,7 +123,12 @@ def logger_set_level(level=colorlog.logging.logging.WARNING):
             secondary_log_colors={},
             style='%'
             )
-        handler = logger.handlers[0]
-        handler.setFormatter(formatter)
+        stdout_handler = logger.handlers[0]
+        stdout_handler.setFormatter(stdout_formatter)
+
+        logging = colorlog.logging.logging
+        file_formatter = logging.Formatter("%(levelname)-8s : %(module)s: L %(lineno)d : %(message)s")
+        file_handler = logger.handlers[1]
+        file_handler.setFormatter(file_formatter)
 
     logger.setLevel(level)

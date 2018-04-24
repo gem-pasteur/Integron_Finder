@@ -200,6 +200,12 @@ def parse_args(args):
                         action="version",
                         version=integron_finder.get_version_message())
 
+    parser.add_argument("--mute",
+                        action='store_true',
+                        default=False,
+                        help="mute the log on stdout."
+                             "(continue to log on integron_finder.out)")
+
     verbosity_grp = parser.add_argument_group()
     verbosity_grp.add_argument('-v', '--verbose',
                                action='count',
@@ -444,8 +450,40 @@ def main(args=None, loglevel=None):
     :type loglevel: a positive int or a string among 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
     """
 
+    global _log
+
     args = sys.argv[1:] if args is None else args
     config = parse_args(args)
+
+    ###################################
+    # Prepare directories for results #
+    ###################################
+
+    # need to create directory before to init logger
+    # as we write log in integron_finder.out in this dir
+
+    if not os.path.exists(config.outdir):
+        os.mkdir(config.outdir)
+    else:
+        if not os.path.isdir(config.outdir):
+            msg = "outdir '{}' already exists and is not a directory".format(config.outdir)
+            # _log.critical(msg)
+            # we can not log it because logger are not initialized yet.
+            raise IOError(msg)
+
+    try:
+        os.mkdir(config.result_dir)
+    except OSError:
+        pass
+
+    ####################
+    # init the loggers #
+    ####################
+    log_file = os.path.join(config.result_dir, 'integron_finder.out')
+    integron_finder.init_logger(log_file=log_file,
+                                out=not config.mute)
+
+    _log = colorlog.getLogger('integron_finder')
 
     if not loglevel:
         # logs are specify from args options
@@ -454,37 +492,46 @@ def main(args=None, loglevel=None):
         # used by unit tests to mute or unmute logs
         logger_set_level(loglevel)
 
+    #######################################
+    # do last config check before running #
+    #######################################
     if config.cmsearch is None:
-        raise RuntimeError("""cannot find 'cmsearch' in PATH.
-Please install infernal package or setup 'cmsearch' binary path with --cmsearch option""")
+        msg = """cannot find 'cmsearch' in PATH.
+Please install infernal package or setup 'cmsearch' binary path with --cmsearch option"""
+        _log.critical(msg)
+        raise RuntimeError(msg)
 
     if config.hmmsearch is None:
-        raise RuntimeError("""cannot find 'hmmsearch' in PATH.
-Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option""")
+        msg = """cannot find 'hmmsearch' in PATH.
+Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option"""
+        _log.critical(msg)
+        raise RuntimeError(msg)
 
     if config.prodigal is None:
-        raise RuntimeError("""cannot find 'prodigal' in PATH.
-Please install prodigal package or setup 'prodigal' binary path with --prodigal option""")
-
-    ###################################
-    # Prepare directories for results #
-    ###################################
-    if not os.path.exists(config.outdir):
-        os.mkdir(config.outdir)
-    else:
-        if not os.path.isdir(config.outdir):
-            raise IOError("outdir '{}' already exists and is not a directory".format(config.outdir))
-
-    try:
-        os.mkdir(config.result_dir)
-    except OSError:
-        pass
+        msg = """cannot find 'prodigal' in PATH.
+Please install prodigal package or setup 'prodigal' binary path with --prodigal option"""
+        _log.critical(msg)
+        raise RuntimeError(msg)
 
     ################
     # print Header #
     ################
-
-    print(header(args))
+    log_header = colorlog.getLogger('integron_finder.header')
+    logging = colorlog.logging.logging
+    handlers = []
+    header_log_file = logging.FileHandler(log_file)
+    handlers.append(header_log_file)
+    if not config.mute:
+        header_stream = colorlog.StreamHandler(sys.stdout)
+        handlers.append(header_stream)
+    formatter = colorlog.ColoredFormatter("%(message)s")
+    for h in handlers:
+        h.setFormatter(formatter)
+        log_header.addHandler(h)
+    log_header.setLevel(colorlog.logging.logging.INFO)
+    log_header.propagate = False
+    log_header.info(header(args))
+    # print(header(args))
 
     ################
     # set topology #
