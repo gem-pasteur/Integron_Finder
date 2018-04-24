@@ -30,6 +30,7 @@ import os
 import shutil
 import tempfile
 import functools
+import argparse
 
 from Bio import BiopythonExperimentalWarning
 import warnings
@@ -44,6 +45,7 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder import integrase
+from integron_finder import config
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
 
@@ -318,6 +320,79 @@ class TestAcba(IntegronTest):
                 main(command.split()[1:])
         err_msg = "cannot find 'cmsearch' in PATH.\n" \
                   "Please install infernal package or setup 'cmsearch' binary path with --cmsearch option"
+
+        self.assertEqual(err_msg, str(ctx.exception))
+
+
+    def test_outdir_is_file(self):
+        replicon_filename = 'acba.007.p01.13'
+        bad_out_dir = os.path.join(self.out_dir, 'bad_out_dir')
+        open(bad_out_dir, 'w').close()
+        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=bad_out_dir,
+                                                                         replicon=self.find_data(
+                                                                             os.path.join('Replicons',
+                                                                                          '{}.fst'.format(replicon_filename))
+                                                                         )
+                                                                         )
+        with self.assertRaises(IsADirectoryError) as ctx:
+            with self.catch_io(out=True):
+                # in case the error is not raised
+                # anyway do not want to mess up the test output
+                # I cannot catch log because loggers are reinitialized in main
+                # I need to catch stdout as log are write on
+                main(command.split()[1:])
+        err_msg = "outdir '{}' already exists and is not a directory".format(bad_out_dir)
+
+        self.assertEqual(err_msg, str(ctx.exception))
+
+
+    def test_resultdir_is_file(self):
+        replicon_filename = 'acba.007.p01.13'
+        args = argparse.Namespace()
+        args.replicon = self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
+        args.outdir = self.out_dir
+        cf = config.Config(args)
+        result_dir_is_file = cf.result_dir
+        open(result_dir_is_file, 'w').close()
+        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
+                                                                         replicon=self.find_data(
+                                                                             os.path.join('Replicons',
+                                                                                          '{}.fst'.format(replicon_filename))
+                                                                         )
+                                                                         )
+        with self.assertRaises(IsADirectoryError) as ctx:
+            with self.catch_io(out=True):
+                # in case the error is not raised
+                # anyway do not want to mess up the test output
+                # I cannot catch log because loggers are reinitialized in main
+                # I need to catch stdout as log are write on
+                main(command.split()[1:])
+        err_msg = "result dir '{}' already exists and is not a directory".format(self.out_dir)
+
+        self.assertEqual(err_msg, str(ctx.exception))
+
+
+    def test_resultdir_not_writable(self):
+        replicon_filename = 'acba.007.p01.13'
+        args = argparse.Namespace()
+        args.replicon = self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
+        args.outdir = self.out_dir
+        cf = config.Config(args)
+        os.mkdir(cf.result_dir, mode=0o500)
+        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
+                                                                         replicon=self.find_data(
+                                                                             os.path.join('Replicons',
+                                                                                          '{}.fst'.format(replicon_filename))
+                                                                         )
+                                                                         )
+        with self.assertRaises(PermissionError) as ctx:
+            with self.catch_io(out=True):
+                # in case the error is not raised
+                # anyway do not want to mess up the test output
+                # I cannot catch log because loggers are reinitialized in main
+                # I need to catch stdout as log are write on
+                main(command.split()[1:])
+        err_msg = "result dir '{}' already exists and is not writable".format(self.out_dir)
 
         self.assertEqual(err_msg, str(ctx.exception))
 

@@ -449,7 +449,6 @@ def main(args=None, loglevel=None):
     :param loglevel: the output verbosity
     :type loglevel: a positive int or a string among 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
     """
-
     global _log
 
     args = sys.argv[1:] if args is None else args
@@ -469,12 +468,21 @@ def main(args=None, loglevel=None):
             msg = "outdir '{}' already exists and is not a directory".format(config.outdir)
             # _log.critical(msg)
             # we can not log it because logger are not initialized yet.
-            raise IOError(msg)
+            raise IsADirectoryError(msg)
 
-    try:
+    if not os.path.exists(config.result_dir):
         os.mkdir(config.result_dir)
-    except OSError:
-        pass
+    else:
+        if not os.path.isdir(config.result_dir):
+            msg = "result dir '{}' already exists and is not a directory".format(config.outdir)
+            # _log.critical(msg)
+            # we can not log it because logger are not initialized yet.
+            raise IsADirectoryError(msg)
+        elif not os.access(config.result_dir, os.W_OK):
+            msg = "result dir '{}' already exists and is not writable".format(config.outdir)
+            # _log.critical(msg)
+            # we can not log it because logger are not initialized yet.
+            raise PermissionError(msg)
 
     ####################
     # init the loggers #
