@@ -15,7 +15,7 @@ process split{
         file "*.fst" into chunk_files mode flatten
 
     """
-    integron_split ${replicons}
+    integron_split --mute ${replicons}
     """
 }
 
