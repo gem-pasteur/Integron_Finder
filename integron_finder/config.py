@@ -31,6 +31,7 @@ import os
 from . import utils
 from . import __INTEGRON_DATA__
 
+
 class Config(object):
     """
     Config object hold values issue from command lines
