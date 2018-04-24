@@ -218,6 +218,12 @@ class TestParseArgs(IntegronTest):
         cfg = parse_args(['--topology-file', topo, 'replicon'])
         self.assertEqual(cfg.topology_file, topo)
 
+    def test_mute(self):
+        cfg = parse_args(['replicon'])
+        self.assertFalse(cfg.mute)
+        cfg = parse_args(['--mute', 'replicon'])
+        self.assertTrue(cfg.mute)
+
     def test_verbose(self):
         cfg = parse_args(['replicon'])
         self.assertEqual(cfg.verbose, 0)
