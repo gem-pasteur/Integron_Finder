@@ -220,3 +220,14 @@ def merge_results(*results_file):
     # agg_results.drop_duplicates(inplace=True)
     return agg_results
 
+
+def log_level(verbose, quiet):
+        """
+        :return: the level to apply to loggers. 0 <= level <=50
+        :rtype: int
+        """
+        default = 20  # info
+        level = default - (10 * verbose) + (10 * quiet)
+        level = max(10, level)
+        level = min(50, level)
+        return level

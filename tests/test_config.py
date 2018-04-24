@@ -63,6 +63,17 @@ class TestConfig(IntegronTest):
         cf = config.Config(self.args)
         self.assertEqual(cf.input_dir, os.path.split(os.path.abspath('../foo'))[0])
 
+    def test_result_dir(self):
+        replicon = '../foo.fasta'
+        outdir = 'outdir'
+        self.args.replicon = replicon
+        self.args.outdir = outdir
+        cf = config.Config(self.args)
+        exp_result_dir = os.path.abspath(os.path.join(outdir,
+                                                      "Results_Integron_Finder_" +
+                                                      os.path.splitext(os.path.split(replicon)[1])[0]))
+        self.assertEqual(cf.result_dir, exp_result_dir)
+
     def test_default_topology(self):
         self.args.circular = True
         self.args.linear = False
@@ -74,6 +85,9 @@ class TestConfig(IntegronTest):
         self.assertEqual(cf.default_topology, 'lin')
         self.args.circular = False
         self.args.linear = False
+        cf = config.Config(self.args)
+        self.assertIsNone(cf.default_topology)
+        self.args = argparse.Namespace()
         cf = config.Config(self.args)
         self.assertIsNone(cf.default_topology)
 
@@ -95,7 +109,7 @@ class TestConfig(IntegronTest):
     def test_model_attc_path(self):
         cf = config.Config(self.args)
         with self.assertRaises(RuntimeError) as ctx:
-            cf.model_len
+            cf.model_attc_path
         self.assertEqual(str(ctx.exception), "'model_attc' is not define.")
         
         self.args.attc_model = 'bar'
@@ -108,7 +122,7 @@ class TestConfig(IntegronTest):
     def test_model_attc_name(self):
         cf = config.Config(self.args)
         with self.assertRaises(RuntimeError) as ctx:
-            cf.model_len
+            cf.model_attc_name
         self.assertEqual(str(ctx.exception), "'model_attc' is not define.")
 
         self.args.attc_model = 'bar'

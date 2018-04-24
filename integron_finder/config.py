@@ -155,8 +155,5 @@ class Config(object):
         :return: the level to apply to loggers. 0 <= level <=50
         :rtype: int
         """
-        default = 20  # info
-        level = default - (10 * self._args.verbose) + (10 * self._args.quiet)
-        level = max(10, level)
-        level = min(50, level)
+        level = utils.log_level(self._args.verbose, self._args.quiet)
         return level
