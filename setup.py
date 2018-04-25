@@ -204,7 +204,7 @@ except ImportError:
 ###################################################
 
 setup(name='integron_finder',
-      version="2.0.rc1",
+      version="2.0rc1",
       description="Integron Finder aims at detecting integrons in DNA sequences",
       long_description=read_md('README.md'),
       author="Jean Cury",
