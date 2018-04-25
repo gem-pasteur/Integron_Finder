@@ -126,10 +126,10 @@ class TestLocalMax(IntegronTest):
         self.cpu_nb = 1
         replicon_name = 'lian.001.c02.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        self.replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            self.replicon = next(sequences_db)
         self.evalue_attc = 1.
         self.max_attc_size = 200
         self.min_attc_size = 40

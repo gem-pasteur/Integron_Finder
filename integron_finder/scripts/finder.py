@@ -539,48 +539,45 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     log_header.setLevel(colorlog.logging.logging.INFO)
     log_header.propagate = False
     log_header.info(header(args))
-    # print(header(args))
 
-    ################
-    # set topology #
-    ################
+    with utils.FastaIterator(config.replicon_path, dist_threshold=config.distance_threshold) as sequences_db:
+        ################
+        # set topology #
+        ################
+        default_topology = 'circ' if len(sequences_db) == 1 else 'lin'
+        if config.linear:
+            default_topology = 'lin'
+        elif config.circular:
+            default_topology = 'circ'
+        # the both options are mutually exclusive
+        topologies = Topology(default_topology, topology_file=config.topology_file)
 
-    sequences_db = utils.FastaIterator(config.replicon_path, dist_threshold=config.distance_threshold)
+        # allow sequences_db to inject topology information
+        # in seq.topology attribute
+        sequences_db.topologies = topologies
 
-    default_topology = 'circ' if len(sequences_db) == 1 else 'lin'
-    if config.linear:
-        default_topology = 'lin'
-    elif config.circular:
-        default_topology = 'circ'
-    # the both options are mutually exclusive
-    topologies = Topology(default_topology, topology_file=config.topology_file)
+        ##############
+        # do the job #
+        ##############
+        sequences_db_len = len(sequences_db)
+        all_res = []
+        for rep_no, replicon in enumerate(sequences_db, 1):
+            # if replicon contains illegal characters
+            # or replicon is too short < 50 bp
+            # then replicon is None
+            if replicon is not None:
+                # to mimic integron_finder 1.5 behavior
+                # if sequences_db_len == 1:
+                #    replicon.name = utils.get_name_from_path(config.replicon_path)
+                _log.info("############ Processing replicon {} ({}/{}) ############\n".format(replicon.id,
+                                                                                              rep_no,
+                                                                                              sequences_db_len))
 
-    # allow sequences_db to inject topology information
-    # in seq.topology attribute
-    sequences_db.topologies = topologies
-
-    ##############
-    # do the job #
-    ##############
-    sequences_db_len = len(sequences_db)
-    all_res = []
-    for rep_no, replicon in enumerate(sequences_db, 1):
-        # if replicon contains illegal characters
-        # or replicon is too short < 50 bp
-        # then replicon is None
-        if replicon is not None:
-            # to mimic integron_finder 1.5 behavior
-            # if sequences_db_len == 1:
-            #    replicon.name = utils.get_name_from_path(config.replicon_path)
-            _log.info("############ Processing replicon {} ({}/{}) ############\n".format(replicon.id,
-                                                                                          rep_no,
-                                                                                          sequences_db_len))
-
-            res = find_integron_in_one_replicon(replicon, config)
-            all_res.append(res)
-        else:
-            _log.warning("############ Skipping replicon {}/{} ############".format(rep_no,
-                                                                                    sequences_db_len))
+                res = find_integron_in_one_replicon(replicon, config)
+                all_res.append(res)
+            else:
+                _log.warning("############ Skipping replicon {}/{} ############".format(rep_no,
+                                                                                        sequences_db_len))
 
     if not config.split_results:
         _log.info("Merging integrons results.\n")

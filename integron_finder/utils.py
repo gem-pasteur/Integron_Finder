@@ -114,7 +114,7 @@ class FastaIterator(object):
         try:
             seq = next(self.seq_gen)
         except StopIteration as err:
-            self.seq_index.close()
+            self.close()
             raise err from None
         if not self._check_seq_alphabet_compliance(seq.seq):
             _log.warning("sequence {} contains invalid characters, the sequence is skipped.".format(seq.id))
@@ -143,6 +143,14 @@ class FastaIterator(object):
         """:returns: The number of sequence in the file"""
         return len(self.seq_index)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    def close(self):
+        self.seq_index.close()
 
 def model_len(path):
     """

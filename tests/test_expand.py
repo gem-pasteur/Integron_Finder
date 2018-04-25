@@ -111,10 +111,10 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -134,10 +134,10 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -157,10 +157,10 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))
@@ -180,10 +180,10 @@ class TestExpand(IntegronTest):
         max_attc_size = 200
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         max_elt_input = pd.read_csv(os.path.join(self._data_dir, 'max_elt_input_1.csv'))
         df_max_input = pd.read_csv(os.path.join(self._data_dir, 'df_max_input_1.csv'))

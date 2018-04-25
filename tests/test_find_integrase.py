@@ -86,10 +86,11 @@ class TestFindIntegrase(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
 
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
+
         prot_file = os.path.join(self.tmp_dir, replicon_name + ".prt")
 
         shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
@@ -108,10 +109,10 @@ class TestFindIntegrase(IntegronTest):
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 200
@@ -133,10 +134,10 @@ class TestFindIntegrase(IntegronTest):
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 200
@@ -158,10 +159,10 @@ class TestFindIntegrase(IntegronTest):
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 200
@@ -182,10 +183,10 @@ class TestFindIntegrase(IntegronTest):
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 500000
@@ -209,10 +210,10 @@ class TestFindIntegrase(IntegronTest):
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 500000
@@ -235,10 +236,10 @@ class TestFindIntegrase(IntegronTest):
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         len_ori = replicon.__class__.__len__
         replicon.__class__.__len__ = lambda x: 500000
@@ -259,10 +260,10 @@ class TestFindIntegrase(IntegronTest):
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
@@ -280,10 +281,10 @@ class TestFindIntegrase(IntegronTest):
 
         replicon_name = 'acba.007.p01.13'
         replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
 
         prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
         shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon.id + ".prt"),

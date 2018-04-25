@@ -57,30 +57,29 @@ class TestUtils(IntegronTest):
         file_name = 'multi_fasta'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         topologies = Topology('lin')
-
-        seq_db = utils.FastaIterator(replicon_path)
-        seq_db.topologies = topologies
+        with utils.FastaIterator(replicon_path) as seq_db:
+            seq_db.topologies = topologies
+            received_seq_id = sorted([seq.id for seq in seq_db])
 
         expected_seq_id = sorted(['ACBA.007.P01_13', 'LIAN.001.C02_10', 'PSSU.001.C01_13'])
-        received_seq_id = sorted([seq.id for seq in seq_db])
         self.assertListEqual(expected_seq_id, received_seq_id)
         self.assertEqual(len(seq_db), 3)
 
         expected_seq_name = expected_seq_id
-        seq_db = utils.FastaIterator(replicon_path)
-        seq_db.topologies = topologies
-        received_seq_name = sorted([seq.name for seq in seq_db])
+        with utils.FastaIterator(replicon_path) as seq_db:
+            seq_db.topologies = topologies
+            received_seq_name = sorted([seq.name for seq in seq_db])
         self.assertListEqual(expected_seq_name, received_seq_name)
 
         replicon_name = 'foo'
-        seq_db = utils.FastaIterator(replicon_path, replicon_name=replicon_name)
-        seq_db.topologies = topologies
+        with utils.FastaIterator(replicon_path, replicon_name=replicon_name) as seq_db:
+            seq_db.topologies = topologies
+            received_seq_id = set([seq.name for seq in seq_db])
         expected_seq_name = set([replicon_name])
-        received_seq_id = set([seq.name for seq in seq_db])
         self.assertSetEqual(expected_seq_name, received_seq_id)
 
-        seq_db = utils.FastaIterator(replicon_path)
-        received_seq_top = [seq.topology for seq in seq_db]
+        with utils.FastaIterator(replicon_path) as seq_db:
+            received_seq_top = [seq.topology for seq in seq_db]
         expected_seq_top = ['lin', 'lin', 'lin']
         self.assertListEqual(expected_seq_top, received_seq_top)
 
@@ -91,43 +90,42 @@ PSSU.001.C01_13 linear
 """)
             topology_file.flush()
             topologies = Topology('lin', topology_file=topology_file.name)
-            seq_db = utils.FastaIterator(replicon_path)
-            seq_db.topologies = topologies
-            received_seq_top = sorted([seq.topology for seq in seq_db])
+            with utils.FastaIterator(replicon_path) as seq_db:
+                seq_db.topologies = topologies
+                received_seq_top = sorted([seq.topology for seq in seq_db])
             expected_seq_top = sorted(['lin', 'circ', 'lin'])
             self.assertListEqual(expected_seq_top, received_seq_top)
 
         file_name = 'acba_short'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         topologies = Topology('circ')
-        seq_db = utils.FastaIterator(replicon_path)
-        seq_db.topologies = topologies
-        received_seq_top = [seq.topology for seq in seq_db]
+        with utils.FastaIterator(replicon_path) as seq_db:
+            seq_db.topologies = topologies
+            received_seq_top = [seq.topology for seq in seq_db]
         expected_seq_top = ['lin']
         self.assertListEqual(expected_seq_top, received_seq_top)
 
         file_name = 'replicon_bad_char'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-        seq_db = utils.FastaIterator(replicon_path)
-
-        # 2 sequences are rejected so 2 message are produced (for seq 2 and 4)
         expected_warning = """sequence seq_(4|2) contains invalid characters, the sequence is skipped.
 sequence seq_(2|4) contains invalid characters, the sequence is skipped."""
-        with self.catch_log() as log:
-            received_seq_id = sorted([seq.id for seq in seq_db if seq])
-            got_warning = log.get_value().strip()
+        with utils.FastaIterator(replicon_path) as seq_db:
+            # 2 sequences are rejected so 2 message are produced (for seq 2 and 4)
+            with self.catch_log() as log:
+                received_seq_id = sorted([seq.id for seq in seq_db if seq])
+                got_warning = log.get_value().strip()
         self.assertRegex(got_warning, expected_warning)
         expected_seq_id = sorted(['seq_1', 'seq_3'])
         self.assertListEqual(expected_seq_id, received_seq_id)
 
         file_name = 'replicon_too_short'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-        seq_db = utils.FastaIterator(replicon_path)
         expected_warning = """sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\).
 sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\)."""
-        with self.catch_log() as log:
-            received_seq_id = sorted([seq.id for seq in seq_db if seq])
-            got_warning = log.get_value().strip()
+        with utils.FastaIterator(replicon_path) as seq_db:
+            with self.catch_log() as log:
+                received_seq_id = sorted([seq.id for seq in seq_db if seq])
+                got_warning = log.get_value().strip()
         self.assertRegex(got_warning, expected_warning)
         expected_seq_id = sorted(['seq_1', 'seq_3'])
         self.assertListEqual(expected_seq_id, received_seq_id)

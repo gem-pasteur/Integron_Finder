@@ -81,10 +81,10 @@ class TestFindAttCMax(IntegronTest):
 
         replicon_name = 'OBAL001.B.00005.C001'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        self.replicon = next(sequences_db)
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            self.replicon = next(sequences_db)
 
         self.integron = Integron(self.replicon, self.cfg)
 

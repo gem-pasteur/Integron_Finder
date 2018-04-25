@@ -73,10 +73,10 @@ class TestFuncAnnot(IntegronTest):
         """
         replicon_name = "acba.007.p01.13"
         self.replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        sequences_db = FastaIterator(self.replicon_path)
         topologies = Topology('lin')
-        sequences_db.topologies = topologies
-        self.replicon = next(sequences_db)
+        with FastaIterator(self.replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            self.replicon = next(sequences_db)
 
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         if os.path.isdir(self.tmp_dir):

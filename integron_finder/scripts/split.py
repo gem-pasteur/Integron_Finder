@@ -71,40 +71,41 @@ def split(replicon_path, chunk=None, outdir='.'):
         args = [iter(sequences_db)] * chunk_size
         return zip_longest(*args)
 
-    sequences_db = utils.FastaIterator(replicon_path)
-    sequences_db_len = len(sequences_db)
-    if not chunk:
-        chunk_size = 1
-    else:
-        chunk_size = math.ceil(sequences_db_len / chunk)
+    with utils.FastaIterator(replicon_path) as sequences_db:
+        sequences_db_len = len(sequences_db)
+        if not chunk:
+            chunk_size = 1
+        else:
+            chunk_size = math.ceil(sequences_db_len / chunk)
 
-    chunks = grouper(sequences_db, chunk_size)
-    all_chunk_name = []
-    for chunk_no, chunk_in in enumerate(chunks, 1):
-        # if replicon contains illegal characters
-        # or replicon is too short < 50 bp
-        # then replicon is None
-        chunk_out = []
-        for rep_no, replicon in enumerate(chunk_in, 1):
-            if replicon is not None:
-                replicon_name = replicon.id
-                chunk_out.append(replicon)
-            else:
-                rep_no_in_db = (chunk_no - 1) * chunk_size + rep_no
-                if rep_no_in_db <= sequences_db_len:
-                    _log.warning("Skipping replicon {}/{} in chunk {}".format(rep_no_in_db,
-                                                                              sequences_db_len,
-                                                                              chunk_no))
-        if chunk_out:
-            if chunk_size == 1:
-                chunk_name = "{}.fst".format(replicon_name)
-            else:
-                replicon_name = utils.get_name_from_path(replicon_path)
-                chunk_name = "{}_chunk_{}.fst".format(replicon_name, chunk_no)
-            chunk_name = os.path.join(outdir, chunk_name)
-            _log.info("writing chunk '{}'".format(chunk_name))
-            SeqIO.write(chunk_out, chunk_name, "fasta")
-            all_chunk_name.append(chunk_name)
+        chunks = grouper(sequences_db, chunk_size)
+        all_chunk_name = []
+        for chunk_no, chunk_in in enumerate(chunks, 1):
+            # if replicon contains illegal characters
+            # or replicon is too short < 50 bp
+            # then replicon is None
+            chunk_out = []
+            for rep_no, replicon in enumerate(chunk_in, 1):
+                if replicon is not None:
+                    replicon_name = replicon.id
+                    chunk_out.append(replicon)
+                else:
+                    rep_no_in_db = (chunk_no - 1) * chunk_size + rep_no
+                    if rep_no_in_db <= sequences_db_len:
+                        _log.warning("Skipping replicon {}/{} in chunk {}".format(rep_no_in_db,
+                                                                                  sequences_db_len,
+                                                                                  chunk_no))
+            if chunk_out:
+                if chunk_size == 1:
+                    chunk_name = "{}.fst".format(replicon_name)
+                else:
+                    replicon_name = utils.get_name_from_path(replicon_path)
+                    chunk_name = "{}_chunk_{}.fst".format(replicon_name, chunk_no)
+                chunk_name = os.path.join(outdir, chunk_name)
+                _log.info("writing chunk '{}'".format(chunk_name))
+                SeqIO.write(chunk_out, chunk_name, "fasta")
+                all_chunk_name.append(chunk_name)
+
     return all_chunk_name
 
 
