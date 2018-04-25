@@ -259,3 +259,38 @@ class TestFindAttCMax(IntegronTest):
         exp = exp.astype(dtype=self.max_dtype)
 
         pdt.assert_frame_equal(max_final, exp)
+
+    def test_find_attc_max_In0(self):
+        replicon_name = 'ESCO001.B.00018.P002'
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        topologies = Topology('circ')
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
+
+        integron = Integron(replicon, self.cfg)
+
+        integrase = pd.DataFrame({'pos_beg': [90229],
+                                  'pos_end': [91242],
+                                  'strand': -1,
+                                  'evalue': 1.400000e-24,
+                                  'type_elt': 'protein',
+                                  'annotation': 'intI',
+                                  'model': 'intersection_tyr_intI',
+                                  'distance_2attC': np.nan
+                                  },
+                                 index=['ESCO001.B.00018.P002_106'],
+                                 columns=self.columns)
+        integrase = integrase.astype(dtype=self.dtype)
+        integron.integrase = integrase
+        integrons = [integron]
+
+        max_final = find_attc_max(integrons, replicon,
+                                  self.cfg.distance_threshold, self.cfg.model_attc_path,
+                                  self.cfg.max_attc_size,
+                                  circular=True,
+                                  out_dir=self.tmp_dir)
+
+        exp = pd.DataFrame(columns=self.max_cols)
+        exp = exp.astype(dtype=self.max_dtype)
+        pdt.assert_frame_equal(max_final, exp)

@@ -187,9 +187,11 @@ def find_attc_max(integrons, replicon, distance_threshold,
     columns = ['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']
     data_type = {'Accession_number': 'str', 'cm_attC': 'str',
                  'cm_debut': 'int', 'cm_fin': 'int',
-                 'pos_beg': 'int', 'pos_end': 'int', }
+                 'pos_beg': 'int', 'pos_end': 'int',
+                 'sens': 'str', 'evalue': 'float'
+                 }
     max_final = pd.DataFrame(columns=columns)
-    max_final = max_final.astype(dtype=data_type)
+
     for i in integrons:
         max_elt = pd.DataFrame(columns=columns)
         max_elt = max_elt.astype(dtype=data_type)
@@ -285,7 +287,6 @@ def find_attc_max(integrons, replicon, distance_threshold,
                 df_max = local_max(replicon,
                                    window_beg, window_end,
                                    model_attc_path,
-                                   strand_search=strand,
                                    out_dir=out_dir, cpu_nb=cpu)
                 max_elt = pd.concat([max_elt, df_max])
                 if not max_elt.empty:
@@ -299,4 +300,5 @@ def find_attc_max(integrons, replicon, distance_threshold,
         max_final = pd.concat([max_final, max_elt])
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)
         max_final.index = list(range(len(max_final)))
+    max_final = max_final.astype(dtype=data_type)
     return max_final
