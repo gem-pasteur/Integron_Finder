@@ -173,6 +173,7 @@ class TestMain(IntegronTest):
                 self.assertEqual(s.id, ref_seq.id)
                 self.assertEqual(s.description, ref_seq.description)
                 self.assertEqual(s.seq, ref_seq.seq)
+        seq_index.close()
 
 
     def test_w_chunk(self):
@@ -193,3 +194,4 @@ class TestMain(IntegronTest):
                 self.assertEqual(s.id, ref_seq.id)
                 self.assertEqual(s.description, ref_seq.description)
                 self.assertEqual(s.seq, ref_seq.seq)
+        seq_index.close()
