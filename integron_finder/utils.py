@@ -111,7 +111,11 @@ class FastaIterator(object):
         :return: The next sequence (the order of sequences is not guaranteed).
         :rtype: a :class:`Bio.SeqRecord` object or None if the sequence is not compliant with the alphabet.
         """
-        seq = next(self.seq_gen)
+        try:
+            seq = next(self.seq_gen)
+        except StopIteration as err:
+            self.seq_index.close()
+            raise err from None
         if not self._check_seq_alphabet_compliance(seq.seq):
             _log.warning("sequence {} contains invalid characters, the sequence is skipped.".format(seq.id))
             return None
