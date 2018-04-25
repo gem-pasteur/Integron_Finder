@@ -31,6 +31,7 @@ import shutil
 import tempfile
 import functools
 import argparse
+import unittest
 
 from Bio import BiopythonExperimentalWarning
 import warnings
@@ -371,7 +372,7 @@ class TestAcba(IntegronTest):
 
         self.assertEqual(err_msg, str(ctx.exception))
 
-
+    @unittest.skipIf(os.getuid() == 0, "root have always permission to write")
     def test_resultdir_not_writable(self):
         replicon_filename = 'acba.007.p01.13'
         args = argparse.Namespace()
