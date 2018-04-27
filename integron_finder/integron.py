@@ -712,4 +712,3 @@ class Integron(object):
         :return: True if integron has attc sites False otherwise.
         """
         return not self.attC.empty
-
