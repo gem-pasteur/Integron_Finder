@@ -57,7 +57,7 @@ def merge_integrons(out_file, *in_dirs):
     """
     integrons_files = []
     for _dir in in_dirs:
-        in_files = glob.glob(os.path.join(_dir, '*' + 'integrons'))
+        in_files = glob.glob(os.path.join(_dir, '*' + '.integrons'))
         integrons_files.extend(in_files)
     if integrons_files:
         agg_file = utils.merge_results(*integrons_files)
@@ -67,6 +67,24 @@ def merge_integrons(out_file, *in_dirs):
         msg = "No integrons file to merge"
         _log.critical(msg)
         raise IntegronError(msg)
+
+
+def merge_summary(out_file, *in_dirs):
+    """
+
+    :param in_dirs: The path of the source directories
+    :type in_dirs: list of str
+    :param str out_file: The path to the merged file
+    :return: The The path to the merged file
+    """
+    summaries_files = []
+    for _dir in in_dirs:
+        in_files = glob.glob(os.path.join(_dir, '*' + '.summary'))
+        summaries_files.extend(in_files)
+    if summaries_files:
+        agg_file = utils.merge_results(*summaries_files)
+        agg_file.to_csv(out_file, sep="\t", na_rep="NA", columns=['complete', 'In0', 'CALIN'])
+        return out_file
 
 
 def copy_file(out_dir, ext, *in_dirs):
