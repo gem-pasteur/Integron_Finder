@@ -362,25 +362,15 @@ def find_integron_in_one_replicon(replicon, config):
     base_outfile = os.path.join(config.result_dir, replicon.id)
     integron_file = base_outfile + ".integrons"
     if integrons:
-        integrons_describe = pd.concat([i.describe() for i in integrons])
-        dic_id = {id_: "{:02}".format(j) for j, id_ in
-                  enumerate(integrons_describe.sort_values("pos_beg").ID_integron.unique(), 1)}
-        integrons_describe.ID_integron = ["integron_" + dic_id[id_] for id_ in integrons_describe.ID_integron]
-        integrons_describe = integrons_describe[["ID_integron", "ID_replicon", "element",
-                                                 "pos_beg", "pos_end", "strand", "evalue",
-                                                 "type_elt", "annotation", "model",
-                                                 "type", "default", "distance_2attC", "considered_topology"]]
-        integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
-        integrons_describe.index = list(range(len(integrons_describe)))
-        integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
-        integrons_describe.to_csv(integron_file, sep="\t", index=False, na_rep="NA")
+        integrons_report = results.integrons_report(integrons)
+        integrons_report.to_csv(integron_file, sep="\t", index=False, na_rep="NA")
 
-        summary = results.summary(integrons_describe)
+        summary = results.summary(integrons_report)
         summary_file = base_outfile + ".summary"
         summary.to_csv(summary_file, sep="\t", na_rep="NA", index=False,
                        columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
         if config.gbk:
-            add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
+            add_feature(replicon, integrons_report, prot_file, config.distance_threshold)
             SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
     else:
         with open(integron_file, "w") as out_f:
