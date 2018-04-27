@@ -32,7 +32,6 @@ from collections import namedtuple
 import colorlog
 from Bio import Seq
 from Bio import SeqIO
-import pandas as pd
 
 _log = colorlog.getLogger(__name__)
 
@@ -209,28 +208,6 @@ def non_gembase_parser(description):
     stop = int(stop)
     strand = int(strand)
     return SeqDesc(id_, strand, start, stop)
-
-
-def merge_results(*results_file):
-    """
-
-    :param results_file: the path of the files (.replicons) to merge.
-    :type results_file: str
-    :return: all results aggregated in one :class:`pandas.DataFrame` object
-    :rtype: a :class:`pandas.DataFrame` object with cols
-            "ID_integron", "ID_replicon", "element",
-            "pos_beg", "pos_end", "strand", "evalue",
-            "type_elt", "annotation", "model",
-            "type", "default", "distance_2attC", "considered_topology"
-    """
-    all_res = []
-    for one_result in results_file:
-        res = pd.read_table(one_result, sep="\t")
-        all_res.append(res)
-    agg_results = pd.concat(all_res)
-    # agg_results = agg_results.set_index(['ID_replicon', 'ID_integron'])
-    # agg_results.drop_duplicates(inplace=True)
-    return agg_results
 
 
 def log_level(verbose, quiet):
