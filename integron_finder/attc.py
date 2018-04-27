@@ -131,14 +131,14 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cp
     """
     cmsearch_cmd = [cmsearch_path,
                     "--cpu", str(cpu),
-                    "-o", os.path.join(out_dir, replicon_id + "_attc.res"),
+                    "-A", os.path.join(out_dir, replicon_id + "_attc.res"),
                     "--tblout", os.path.join(out_dir, replicon_id + "_attc_table.res"),
                     "-E", "10",
                     model_attc,
                     replicon_path]
     try:
         _log.debug("run cmsearch: {}".format(' '.join(cmsearch_cmd)))
-        returncode = call(cmsearch_cmd)
+        returncode = call(cmsearch_cmd, stdout=open(os.devnull, 'w'))
     except Exception as err:
         raise RuntimeError("{0} failed : {1}".format(' '.join(cmsearch_cmd), err))
     if returncode != 0:
