@@ -157,6 +157,7 @@ class TestUtils(IntegronTest):
 
         pdt.assert_frame_equal(expected_res, res)
 
+
     def test_summary(self):
         acba_res = self.find_data('Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.integrons')
         acba_df = pd.read_table(acba_res)
@@ -172,10 +173,10 @@ class TestUtils(IntegronTest):
                              'complete': [1],
                              'In0': [0],
                              'CALIN': [0],
-                             }, columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+                            }, columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
         exp = exp.astype(dtype=dtype)
 
-        lian_res = self.find_data('Results_Integron_Finder_lian.001.c02.10/lian.001.c02.10.integrons')
+        lian_res = self.find_data('lian.001.c02.10_simple.integrons')
         lian_df = pd.read_table(lian_res)
         summary = results.summary(lian_df)
         exp = pd.DataFrame({'ID_replicon': ['LIAN.001.C02_10'] * 6,
@@ -183,10 +184,6 @@ class TestUtils(IntegronTest):
                              'complete': [0, 1, 0, 0, 0, 0],
                              'In0': [0] * 6,
                              'CALIN': [1, 0, 1, 1, 1, 1],
-                             }, columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+                            }, columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
         exp = exp.astype(dtype=dtype)
-        print()
-        print(exp)
-        print("===================")
-        print(summary)
         pdt.assert_frame_equal(exp, summary)
