@@ -187,3 +187,11 @@ class TestUtils(IntegronTest):
                             }, columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
         exp = exp.astype(dtype=dtype)
         pdt.assert_frame_equal(exp, summary)
+
+
+    def test_filter_calin(self):
+        lian_res = self.find_data('lian.001.c02.10_simple.integrons')
+        lian_df = pd.read_table(lian_res)
+        filtered = results.filter_calin(lian_df, 4)
+        exp = lian_df[lian_df.ID_integron != 'integron_03']
+        pdt.assert_frame_equal(exp, filtered)
