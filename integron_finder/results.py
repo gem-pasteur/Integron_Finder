@@ -32,9 +32,8 @@ def summary(result):
     for empty_col in empty_cols:
         summary[empty_col] = 0
     summary = summary.reset_index()
-    summary.columns = ['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN']
-
-    return summary
+    summary.columns.name = None
+    return summary[['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN']]
 
 
 def filter_calin(result, threshold=2):
