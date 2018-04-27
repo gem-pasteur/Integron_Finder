@@ -596,13 +596,14 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         outfile_base_name = os.path.join(config.result_dir, utils.get_name_from_path(config.replicon_path))
         merged_integron_file = outfile_base_name + ".integrons"
         agg_integrons.to_csv(merged_integron_file, sep="\t", index=False, na_rep="NA")
-        agg_summary.to_csv(outfile_base_name + ".summary", sep="\t", index=False, na_rep="NA",
-                           columns=['complete', 'In0', 'CALIN'])
+        merged_summary_file = outfile_base_name + ".summary"
+        agg_summary.to_csv(merged_summary_file, sep="\t", index=False, na_rep="NA",
+                           columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
 
-        for integron_file in all_integrons:
-            if integron_file != merged_integron_file:
+        for _file in all_integrons + all_summaries:
+            if _file != merged_integron_file and _file != merged_summary_file:
                 # in special case where the merged file has the same name that a replicon result file
-                os.unlink(integron_file)
+                os.unlink(_file)
 
 
 if __name__ == "__main__":
