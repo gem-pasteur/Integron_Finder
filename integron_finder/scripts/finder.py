@@ -56,6 +56,7 @@ from Bio import SeqIO
 
 from integron_finder import IntegronError, logger_set_level
 from integron_finder import utils
+from integron_finder import results
 from integron_finder.topology import Topology
 from integron_finder.config import Config
 from integron_finder.hmm import scan_hmm_bank
@@ -247,7 +248,10 @@ def find_integron_in_one_replicon(replicon, config):
     :type replicon: a :class:`Bio.SeqRecord` object.
     :param config: The configuration
     :type config: a :class:`integron_finder.config.Config` object.
-    :returns: the path to the integrons file (<replicon_id>.integrons)
+    :returns: the path to the integron file (<replicon_id>.integrons)
+              and the summary file (<replicon_id.summary>).
+              if there is no integron the summary file is None
+    :rtype: tuple (str integron_file, str summary_file) or (str integron_file, None)
     """
     in_dir, sequence_file = os.path.split(config.replicon_path)
     result_dir_other = os.path.join(config.result_dir, "other_{}".format(replicon.id))
@@ -355,7 +359,8 @@ def find_integron_in_one_replicon(replicon, config):
             if integron.type() == "complete":
                 integron.draw_integron(file=os.path.join(config.result_dir, "{}_{}.pdf".format(replicon.id, j)))
 
-    outfile = os.path.join(config.result_dir, replicon.id + ".integrons")
+    base_outfile = os.path.join(config.result_dir, replicon.id)
+    integron_file = base_outfile + ".integrons"
     if integrons:
         integrons_describe = pd.concat([i.describe() for i in integrons])
         dic_id = {id_: "{:02}".format(j) for j, id_ in
@@ -368,14 +373,19 @@ def find_integron_in_one_replicon(replicon, config):
         integrons_describe['evalue'] = integrons_describe.evalue.astype(float)
         integrons_describe.index = list(range(len(integrons_describe)))
         integrons_describe.sort_values(["ID_integron", "pos_beg", "evalue"], inplace=True)
-        integrons_describe.to_csv(outfile, sep="\t", index=False, na_rep="NA")
+        integrons_describe.to_csv(integron_file, sep="\t", index=False, na_rep="NA")
 
+        summary = results.summary(integrons_describe)
+        summary_file = base_outfile + ".summary"
+        summary.to_csv(summary_file, sep="\t", na_rep="NA", index=False,
+                       columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
         if config.gbk:
             add_feature(replicon, integrons_describe, prot_file, config.distance_threshold)
             SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
     else:
-        with open(outfile, "w") as out_f:
+        with open(integron_file, "w") as out_f:
             out_f.write("# No Integron found\n")
+        summary_file = None
 
     #########################
     # clean temporary files #
@@ -387,7 +397,7 @@ def find_integron_in_one_replicon(replicon, config):
         except Exception as err:
             _log.warning("Cannot remove temporary results : '{} : {}'".format(result_dir_other, str(err)))
 
-    return outfile
+    return integron_file, summary_file
 
 
 
@@ -560,34 +570,39 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         # do the job #
         ##############
         sequences_db_len = len(sequences_db)
-        all_res = []
+        all_integrons = []
+        all_summaries = []
         for rep_no, replicon in enumerate(sequences_db, 1):
             # if replicon contains illegal characters
             # or replicon is too short < 50 bp
             # then replicon is None
             if replicon is not None:
-                # to mimic integron_finder 1.5 behavior
-                # if sequences_db_len == 1:
-                #    replicon.name = utils.get_name_from_path(config.replicon_path)
                 _log.info("############ Processing replicon {} ({}/{}) ############\n".format(replicon.id,
                                                                                               rep_no,
                                                                                               sequences_db_len))
 
-                res = find_integron_in_one_replicon(replicon, config)
-                all_res.append(res)
+                integron_res, summary = find_integron_in_one_replicon(replicon, config)
+                all_integrons.append(integron_res)
+                if summary:
+                    all_summaries.append(summary)
             else:
                 _log.warning("############ Skipping replicon {}/{} ############".format(rep_no,
                                                                                         sequences_db_len))
 
     if not config.split_results:
         _log.info("Merging integrons results.\n")
-        agg_file = utils.merge_results(*all_res)
-        outfile = os.path.join(config.result_dir, utils.get_name_from_path(config.replicon_path) + ".integrons")
-        agg_file.to_csv(outfile, sep="\t", index=False, na_rep="NA")
-        for result in all_res:
-            if result != outfile:
+        agg_integrons = results.merge_results(*all_integrons)
+        agg_summary = results.merge_results(*all_summaries)
+        outfile_base_name = os.path.join(config.result_dir, utils.get_name_from_path(config.replicon_path))
+        merged_integron_file = outfile_base_name + ".integrons"
+        agg_integrons.to_csv(merged_integron_file, sep="\t", index=False, na_rep="NA")
+        agg_summary.to_csv(outfile_base_name + ".summary", sep="\t", index=False, na_rep="NA",
+                           columns=['complete', 'In0', 'CALIN'])
+
+        for integron_file in all_integrons:
+            if integron_file != merged_integron_file:
                 # in special case where the merged file has the same name that a replicon result file
-                os.unlink(result)
+                os.unlink(integron_file)
 
 
 if __name__ == "__main__":
