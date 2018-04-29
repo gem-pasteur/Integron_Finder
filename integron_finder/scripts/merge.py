@@ -45,7 +45,7 @@ import colorlog
 
 from integron_finder import IntegronError, logger_set_level
 from integron_finder import utils
-
+from integron_finder import  results
 
 def merge_integrons(out_file, *in_dirs):
     """
@@ -60,7 +60,7 @@ def merge_integrons(out_file, *in_dirs):
         in_files = glob.glob(os.path.join(_dir, '*' + '.integrons'))
         integrons_files.extend(in_files)
     if integrons_files:
-        agg_file = utils.merge_results(*integrons_files)
+        agg_file = results.merge_results(*integrons_files)
         agg_file.to_csv(out_file, index=False, sep="\t", na_rep="NA")
         return out_file
     else:
@@ -82,7 +82,7 @@ def merge_summary(out_file, *in_dirs):
         in_files = glob.glob(os.path.join(_dir, '*' + '.summary'))
         summaries_files.extend(in_files)
     if summaries_files:
-        agg_file = utils.merge_results(*summaries_files)
+        agg_file = results.merge_results(*summaries_files)
         agg_file.to_csv(out_file, sep="\t", na_rep="NA", columns=['complete', 'In0', 'CALIN'])
         return out_file
 
