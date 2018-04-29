@@ -29,7 +29,9 @@
 import os
 import tempfile
 import shutil
+import argparse
 
+import numpy as np
 import pandas as pd
 import pandas.util.testing as pdt
 
@@ -39,6 +41,10 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
+from integron_finder.integron import Integron
+from integron_finder.topology import Topology
+from integron_finder.utils import FastaIterator
+from integron_finder.config import Config
 from integron_finder import results
 
 
@@ -56,7 +62,100 @@ class TestUtils(IntegronTest):
                 shutil.rmtree(self.tmp_dir)
             except Exception:
                 pass
-            
+
+    def test_integrons_report(self):
+        replicon_name = "acba.007.p01.13"
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        topologies = Topology('circ')
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
+
+        args = argparse.Namespace()
+        cfg = Config(args)
+        cfg._args.eagle_eyes = False
+        cfg._args.eagle_eyes = False
+        cfg._args.local_max = False
+
+        integron = Integron(replicon, cfg)
+        columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
+        dtype = {"pos_beg": 'int',
+                      "pos_end": 'int',
+                      "strand": 'int',
+                      "evalue": 'float',
+                      "type_elt": 'str',
+                      "annotation": 'str',
+                      "model": 'str',
+                      "distance_2attC": 'float'}
+        data_integrase = {"pos_beg": 55,
+                          "pos_end": 1014,
+                          "strand": 1,
+                          "evalue": 1.900000e-25,
+                          "type_elt": "protein",
+                          "annotation": "intI",
+                          "model": "intersection_tyr_intI",
+                          "distance_2attC": np.nan}
+        id_int = "ACBA.007.P01_13_1"
+
+        integrase = pd.DataFrame(data_integrase, columns=columns, index=[id_int])
+        integrase = integrase.astype(dtype=dtype)
+
+        data_attc = {"pos_beg": [17825, 19080, 19618],
+                     "pos_end": [17884, 19149, 19726],
+                     "strand": [-1] * 3,
+                     "evalue": [1.000000e-09, 1.000000e-04, 1.100000e-07],
+                     "type_elt": ["attC"] * 3,
+                     "annotation": ["attC"] * 3,
+                     "model": ["attc_4"] * 3,
+                     "distance_2attC": [np.nan, 1196.0, 469.0]}
+
+        attC = pd.DataFrame(data_attc,
+                            columns=columns,
+                            index=['attc_00{}'.format(i) for i in range(1, 4)])
+        attC = attC.astype(dtype=dtype)
+
+        promoter = pd.DataFrame({'pos_beg': 25,
+                                 'pos_end': 51,
+                                 'strand': -1,
+                                 'evalue': np.nan,
+                                 'type_elt': 'Promoter',
+                                 'annotation': 'Pc_1',
+                                 'model': np.nan,
+                                 'distance_2attC': np.nan
+                                 },
+                                index=['Pc_int1'],
+                                columns=columns
+                                )
+        promoter = promoter.astype(dtype=dtype)
+
+        proteins = pd.DataFrame({'pos_beg': [17375, 17886, 19090, 19721],
+                                 'pos_end': [17722, 18665, 19749, 20254],
+                                 'strand': [-1] * 4,
+                                 'evalue': [np.nan] * 4,
+                                 'type_elt': ['protein'] * 4,
+                                 'annotation': ['protein'] * 4,
+                                 'model': [np.nan] * 4,
+                                 'distance_2attC': [np.nan] * 4
+                                 },
+                                index=['ACBA.007.P01_13_2{}'.format(i) for i in range(0, 4)],
+                                columns=columns
+                                )
+        proteins = proteins.astype(dtype=dtype)
+
+        integron.integrase = integrase
+        integron.attC = attC
+        integron.promoter = promoter
+        integron.proteins = proteins
+        report = results.integrons_report([integron])
+        exp_report = pd.read_table(
+            self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
+                                        '{}.integrons'.format(replicon_name)
+                                        ))
+        )
+        exp_report = exp_report.astype(dtype=dtype)
+        pdt.assert_frame_equal(exp_report, report)
+
+
     def test_merge_integrons(self):
         f1 = os.path.join(self.tmp_dir, 'f1')
         dtype = {"ID_integron": 'str',
@@ -120,6 +219,13 @@ class TestUtils(IntegronTest):
             f3_fo.write("# No Integron found \n")
 
         res = results.merge_results(f1, f3, f2)
+        pdt.assert_frame_equal(expected_res, res)
+
+        res = results.merge_results()
+        expected_res = pd.DataFrame(columns=['ID_integron', 'ID_replicon', 'element',
+                                             'pos_beg', 'pos_end', 'strand', 'evalue',
+                                             'type_elt annotation', 'model', 'type', 'default',
+                                             'distance_2attC', 'considered_topology'])
         pdt.assert_frame_equal(expected_res, res)
 
 
