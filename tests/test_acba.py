@@ -33,6 +33,9 @@ import functools
 import argparse
 import unittest
 
+import pandas as pd
+import pandas.util.testing as pdt
+
 from Bio import BiopythonExperimentalWarning
 import warnings
 warnings.simplefilter('ignore', FutureWarning)
@@ -99,6 +102,12 @@ class TestAcba(IntegronTest):
                                                            output_filename))
         test_result_path = os.path.join(test_result_dir, output_filename)
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        summary_file_name = '{}.summary'.format(replicon_filename)
+        exp_summary_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13', summary_file_name))
+        exp_summary = pd.read_table(exp_summary_path)
+        test_summary = os.path.join(test_result_dir, summary_file_name)
+        pdt.assert_frame_equal(exp_summary, test_summary)
 
         gbk = '{}.gbk'.format(replicon_filename)
         gbk_test = os.path.join(test_result_dir, gbk)
