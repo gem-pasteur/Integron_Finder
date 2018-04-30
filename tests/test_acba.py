@@ -106,7 +106,8 @@ class TestAcba(IntegronTest):
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13', summary_file_name))
         exp_summary = pd.read_table(exp_summary_path)
-        test_summary = os.path.join(test_result_dir, summary_file_name)
+        test_summary_path = os.path.join(test_result_dir, summary_file_name)
+        test_summary = pd.read_table(test_summary_path)
         pdt.assert_frame_equal(exp_summary, test_summary)
 
         gbk = '{}.gbk'.format(replicon_filename)
