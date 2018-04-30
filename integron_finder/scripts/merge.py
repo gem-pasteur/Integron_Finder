@@ -83,7 +83,9 @@ def merge_summary(out_file, *in_dirs):
         summaries_files.extend(in_files)
     if summaries_files:
         agg_file = results.merge_results(*summaries_files)
-        agg_file.to_csv(out_file, sep="\t", na_rep="NA", columns=['complete', 'In0', 'CALIN'])
+        agg_file.to_csv(out_file, sep="\t", na_rep="NA",
+                        columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'],
+                        index=False)
         return out_file
 
 
@@ -171,6 +173,8 @@ def main(args=None, log_level=None):
 
     integron_file_out = os.path.join(outdir, parsed_args.outfile + ".integrons")
     merge_integrons(integron_file_out, *parsed_args.results)
+    summary_file_out = os.path.join(outdir, parsed_args.outfile + ".summary")
+    merge_summary(summary_file_out, *parsed_args.results)
     copy_file(outdir, '.gbk', *parsed_args.results)
     copy_file(outdir, '.pdf', *parsed_args.results)
 
