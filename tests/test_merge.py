@@ -58,13 +58,14 @@ class TestMerge(IntegronTest):
             res_dir = os.path.join(self.out_dir, 'Result_{}'.format(rep))
             os.makedirs(res_dir)
             self.res_dirs.append(res_dir)
-
             res_file = self.find_data("{}_local_max_lin.integrons".format(rep))
             shutil.copyfile(res_file, os.path.join(res_dir, "{}.integrons".format(rep)))
 
         for _id in self.ids:
-            gbk_file = self.find_data("{}_local_max_lin.gbk".format(_id))
-            shutil.copyfile(gbk_file, os.path.join(res_dir, "{}.gbk".format(_id)))
+            for ext in ('gbk', 'summary'):
+                gbk_file = self.find_data("{}_local_max_lin.{}".format(_id, ext))
+                shutil.copyfile(gbk_file, os.path.join(res_dir, "{}.{}".format(_id, ext)))
+
             pdf_file = self.find_data("{}_1_local_max_lin.pdf".format(_id))
             shutil.copyfile(pdf_file, os.path.join(res_dir, "{}_1.pdf".format(_id)))
 
@@ -81,8 +82,22 @@ class TestMerge(IntegronTest):
 
         expe_result_file = self.find_data('acba_lian_pssu_merged.integrons')
         expected_results = pd.read_table(expe_result_file, sep="\t")
+        pdt.assert_frame_equal(agg_results, expected_results)
+
+    def test_merge_summary(self):
+        outfile = os.path.join(self.out_dir, 'merged.summary')
+        merge.merge_summary(outfile, *self.res_dirs)
+        agg_results = pd.read_table(outfile, sep="\t")
+        agg_results.sort_values(by=['ID_replicon', 'ID_integron'], inplace=True)
+        agg_results.reset_index(inplace=True, drop=True)
+
+        expe_result_file = self.find_data('acba_lian_pssu_merged.summary')
+        expected_results = pd.read_table(expe_result_file, sep="\t")
+        expected_results.sort_values(by=['ID_replicon', 'ID_integron'], inplace=True)
+        expected_results.reset_index(inplace=True, drop=True)
 
         pdt.assert_frame_equal(agg_results, expected_results)
+
 
     def test_merge_no_files(self):
         outfile = os.path.join(self.out_dir, 'merged.integrons')
