@@ -5,7 +5,6 @@ replicons_file = Channel.fromPath(params.replicons)
 /*************************
  * Default options
  *************************/
-params.cpu = 1
 
 params.gbk = false
 gbk = ''
@@ -153,10 +152,7 @@ process integron_finder{
 
     script:
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} \\
-        ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} \\
-        ${max_attc_size} ${min_attc_size} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} \\
-        --cpu ${task.cpu} --mute ${one_chunk}
+        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${max_attc_size} ${min_attc_size} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpu} --mute ${one_chunk}
         """
 }
 
