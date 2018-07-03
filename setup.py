@@ -85,8 +85,8 @@ Common commands: (see '--help-commands' for more)
   setup.py install    will install the package
   setup.py test       run tests after in-place build
 """
-
-INSTALL_DATA_ROOT = ''
+from pip.locations import distutils_scheme
+INSTALL_DATA_ROOT = os.path.join(distutils_scheme('')['data'], 'share')
 
 def get_install_data_dir(inst):
     """
