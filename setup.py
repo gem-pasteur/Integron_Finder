@@ -112,7 +112,10 @@ def get_install_data_dir(inst):
     elif 'prefix' in inst:
         install_dir = os.path.join(inst['prefix'][1], 'share')
     else:
-        install_dir = os.path.join(sysconfig.get_path('data'), 'share')
+        from pip.locations import distutils_scheme
+        install_dir = distutils_scheme('')['data']
+
+        #install_dir = os.path.join(sysconfig.get_path('data'), 'share')
     return install_dir
 
 
