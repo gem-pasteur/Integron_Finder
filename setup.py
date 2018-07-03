@@ -26,7 +26,6 @@
 # If not, see <http://www.gnu.org/licenses/>.                                      #
 ####################################################################################
 
-from __future__ import print_function
 
 import os
 import sysconfig
@@ -87,6 +86,7 @@ Common commands: (see '--help-commands' for more)
   setup.py test       run tests after in-place build
 """
 
+INSTALL_DATA_ROOT = ''
 
 def get_install_data_dir(inst):
     """
@@ -114,6 +114,9 @@ def get_install_data_dir(inst):
     else:
         from pip.locations import distutils_scheme
         install_dir = os.path.join(distutils_scheme('')['data'], 'share')
+    global INSTALL_DATA_ROOT
+    if not INSTALL_DATA_ROOT:
+        INSTALL_DATA_ROOT = install_dir
     return install_dir
 
 
@@ -142,7 +145,7 @@ def subst_vars(src, dst, vars):
                 dest_file.write(new_line)
 
 
-def expand_data(data_to_expand):
+def expand_data(data_to_expand, prefix_dir=''):
     """
     From data structure like setup.py data_files (see http://)
      [(directory/where/to/copy/the/file, [path/to/file/in/archive/file1, ...]), ...]
@@ -166,7 +169,7 @@ def expand_data(data_to_expand):
 
     data_struct = []
     for base_dest_dir, src in data_to_expand:
-        base_dest_dir = os.path.normpath(base_dest_dir)
+        base_dest_dir = os.path.normpath(os.path.join(prefix_dir, base_dest_dir))
         for one_src in src:
             if os.path.isdir(one_src):
                 for path, _, files in os.walk(one_src):
@@ -176,6 +179,9 @@ def expand_data(data_to_expand):
                     data_struct.append((os.path.join(base_dest_dir, path_2_create), [os.path.join(path, f) for f in files]))
             if os.path.isfile(one_src):
                 data_struct.append((base_dest_dir, [one_src]))
+    print("#########################################################")
+    print(data_struct)
+    print("#########################################################")
     return data_struct
 
 #####################
@@ -247,7 +253,7 @@ setup(name='integron_finder',
       data_files=expand_data([('share/integron_finder/data/', ['data']),
                               ('share/integron_finder/doc/html', ['doc/build/html']),
                               ('share/integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
-                              ]),
+                              ], prefix_dir=INSTALL_DATA_ROOT),
 
       cmdclass={'install_lib': install_lib},
       distclass=UsageDistribution
