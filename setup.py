@@ -114,9 +114,14 @@ def get_install_data_dir(inst):
     else:
         from pip.locations import distutils_scheme
         install_dir = os.path.join(distutils_scheme('')['data'], 'share')
+    print("#########################")
+    print("setting INSTALL_DATA_ROOT")
+    print("INSTALL_DATA_ROOT=", INSTALL_DATA_ROOT)
     global INSTALL_DATA_ROOT
     if not INSTALL_DATA_ROOT:
         INSTALL_DATA_ROOT = install_dir
+    print("INSTALL_DATA_ROOT=", INSTALL_DATA_ROOT)
+    print("#########################")
     return install_dir
 
 
@@ -180,6 +185,7 @@ def expand_data(data_to_expand, prefix_dir=''):
             if os.path.isfile(one_src):
                 data_struct.append((base_dest_dir, [one_src]))
     print("#########################################################")
+    print("prefix_dir=",prefix_dir)
     print(data_struct)
     print("#########################################################")
     return data_struct
@@ -188,7 +194,7 @@ def expand_data(data_to_expand, prefix_dir=''):
 # for the pypi site #
 #####################
 
-# pypi use longdescription in rst to generate the package page
+# pypi use long_description in rst to generate the package page
 # but github or gitlab use markdown
 # to generate the package and push it on pypi we need
 # pandoc to convert on the fly the READmE.md => rst
@@ -209,6 +215,9 @@ except ImportError:
 ###################################################
 # the configuration of the installer start bellow #
 ###################################################
+print("##################################")
+print("INSTALL_DATA_ROOT=",INSTALL_DATA_ROOT)
+print("##################################")
 
 setup(name='integron_finder',
       version="2.0rc1",
