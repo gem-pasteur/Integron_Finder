@@ -85,6 +85,7 @@ Common commands: (see '--help-commands' for more)
   setup.py install    will install the package
   setup.py test       run tests after in-place build
 """
+
 from pip.locations import distutils_scheme
 INSTALL_DATA_ROOT = os.path.join(distutils_scheme('')['data'], 'share')
 
@@ -259,9 +260,9 @@ setup(name='integron_finder',
           ]
       },
       # (dataprefix +'where to put the data in the install, [where to find the data in the tar ball]
-      data_files=expand_data([('share/integron_finder/data/', ['data']),
-                              ('share/integron_finder/doc/html', ['doc/build/html']),
-                              ('share/integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
+      data_files=expand_data([('integron_finder/data/', ['data']),
+                              ('integron_finder/doc/html', ['doc/build/html']),
+                              ('integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
                               ], prefix_dir=INSTALL_DATA_ROOT),
 
       cmdclass={'install_lib': install_lib},
