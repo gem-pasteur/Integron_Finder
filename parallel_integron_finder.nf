@@ -121,9 +121,10 @@ process split{
     output:
         file "*.fst" into chunk_files mode flatten
 
-    """
-    integron_split --mute ${replicons}
-    """
+    script:
+        """
+        integron_split --mute ${replicons}
+        """
 }
 
 
@@ -165,10 +166,11 @@ process merge{
 
     output:
         file "Results_Integron_Finder_${params.out}"
-
-    """
-    integron_merge "Results_Integron_Finder_${params.out}" "${params.out}" ${all_chunk_results}
-    """
+        
+    script:
+        """
+        integron_merge "Results_Integron_Finder_${params.out}" "${params.out}" ${all_chunk_results}
+        """
 }
 
 
