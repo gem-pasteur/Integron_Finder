@@ -268,9 +268,9 @@ setup(name='integron_finder',
           ]
       },
       # (dataprefix +'where to put the data in the install, [where to find the data in the tar ball]
-      data_files=expand_data([('integron_finder/data/', ['data']),
-                              ('integron_finder/doc/html', ['doc/build/html']),
-                              ('integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
+      data_files=expand_data([('share/integron_finder/data/', ['data']),
+                              ('share/integron_finder/doc/html', ['doc/build/html']),
+                              ('share/integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
                               ]),
 
       cmdclass={'install_lib': install_lib},
