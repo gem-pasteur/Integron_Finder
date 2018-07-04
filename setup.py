@@ -43,6 +43,18 @@ from setuptools.dist import Distribution
 from setuptools.command.install_lib import install_lib as _install_lib
 
 
+from pip.locations import distutils_scheme
+INSTALL_DATA_ROOT = os.path.join(distutils_scheme('')['data'], 'share')
+
+import sys
+if 'setup.py' in sys.argv:
+    INSTALLER= 'setuptools'
+else:
+    INSTALLER = 'pip'
+
+print("#######################################", INSTALLER , "##########################################")
+
+
 class install_lib(_install_lib):
 
     def finalize_options(self):
@@ -50,11 +62,7 @@ class install_lib(_install_lib):
         _install_lib.finalize_options(self)
 
     def run(self):
-        if os.path.exists(self.build_dir):
-            installer = 'pip'
-        else:
-            installer = 'fucking_setuptools'
-        script_tmp_dir = self.build_dir if installer != 'fucking_setuptools' else self.install_dir
+        script_tmp_dir = self.build_dir if INSTALLER != 'setuptools' else self.install_dir
 
         def subst_file(_file, vars_2_subst):
             input_file = os.path.join(script_tmp_dir, _file)
@@ -86,8 +94,6 @@ Common commands: (see '--help-commands' for more)
   setup.py test       run tests after in-place build
 """
 
-from pip.locations import distutils_scheme
-INSTALL_DATA_ROOT = os.path.join(distutils_scheme('')['data'], 'share')
 
 def get_install_data_dir(inst):
     """
@@ -115,14 +121,6 @@ def get_install_data_dir(inst):
     else:
         from pip.locations import distutils_scheme
         install_dir = os.path.join(distutils_scheme('')['data'], 'share')
-    print("#########################")
-    print("setting INSTALL_DATA_ROOT")
-    print("INSTALL_DATA_ROOT=", INSTALL_DATA_ROOT)
-    global INSTALL_DATA_ROOT
-    if not INSTALL_DATA_ROOT:
-        INSTALL_DATA_ROOT = install_dir
-    print("INSTALL_DATA_ROOT=", INSTALL_DATA_ROOT)
-    print("#########################")
     return install_dir
 
 
@@ -151,7 +149,7 @@ def subst_vars(src, dst, vars):
                 dest_file.write(new_line)
 
 
-def expand_data(data_to_expand, prefix_dir=''):
+def expand_data(data_to_expand):
     """
     From data structure like setup.py data_files (see http://)
      [(directory/where/to/copy/the/file, [path/to/file/in/archive/file1, ...]), ...]
@@ -174,8 +172,18 @@ def expand_data(data_to_expand, prefix_dir=''):
         return truncated
 
     data_struct = []
+    global INSTALLER
+    global INSTALL_DATA_ROOT
+
     for base_dest_dir, src in data_to_expand:
-        base_dest_dir = os.path.normpath(os.path.join(prefix_dir, base_dest_dir))
+        if INSTALLER == 'setuptools':
+            # to install data in shared location not in fucking egg
+            # we need to provide absolute path
+            base_dest_dir = os.path.normpath(os.path.join(INSTALL_DATA_ROOT, base_dest_dir))
+        else:
+            # however pip does not understand absolute paths
+            # it transform them in relative and rebuild usr/local/share
+            base_dest_dir = os.path.normpath(base_dest_dir)
         for one_src in src:
             if os.path.isdir(one_src):
                 for path, _, files in os.walk(one_src):
@@ -186,7 +194,6 @@ def expand_data(data_to_expand, prefix_dir=''):
             if os.path.isfile(one_src):
                 data_struct.append((base_dest_dir, [one_src]))
     print("#########################################################")
-    print("prefix_dir=",prefix_dir)
     print(data_struct)
     print("#########################################################")
     return data_struct
@@ -263,7 +270,7 @@ setup(name='integron_finder',
       data_files=expand_data([('integron_finder/data/', ['data']),
                               ('integron_finder/doc/html', ['doc/build/html']),
                               ('integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
-                              ], prefix_dir=INSTALL_DATA_ROOT),
+                              ]),
 
       cmdclass={'install_lib': install_lib},
       distclass=UsageDistribution
