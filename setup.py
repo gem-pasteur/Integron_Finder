@@ -246,7 +246,7 @@ setup(name='integron_finder',
 
       python_requires='>=3.4',
       install_requires=open("requirements.txt").read().split(),
-      extra_requires=open("requirements_dev.txt").read().split(),
+      extras_require={'dev': open("requirements_dev.txt").read().split()},
       test_suite='tests.run_tests.discover',
       zip_safe=False,
       packages=find_packages(),
