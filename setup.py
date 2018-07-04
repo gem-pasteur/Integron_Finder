@@ -178,14 +178,14 @@ def expand_data(data_to_expand):
     global INSTALL_DATA_ROOT
 
     for base_dest_dir, src in data_to_expand:
-        if INSTALLER == 'setuptools':
-            # to install data in shared location not in fucking egg
-            # we need to provide absolute path
-            base_dest_dir = os.path.normpath(os.path.join(INSTALL_DATA_ROOT, base_dest_dir))
-        else:
-            # however pip does not understand absolute paths
-            # it transform them in relative and rebuild usr/local/share
-            base_dest_dir = os.path.normpath(base_dest_dir)
+        # to install data in shared location not in fucking egg
+        # we need to provide absolute path
+        # however pip does not understand absolute paths
+        # it transform them in relative and rebuild usr/local/share
+        # futhermore this function is run during the distribution creation
+        # and not during installation step
+        # so always with setuptools even the installation phase used pip
+        base_dest_dir = os.path.normpath(base_dest_dir)
         for one_src in src:
             if os.path.isdir(one_src):
                 for path, _, files in os.walk(one_src):
@@ -227,9 +227,6 @@ except ImportError:
 ###################################################
 # the configuration of the installer start bellow #
 ###################################################
-print("##################################")
-print("INSTALL_DATA_ROOT=",INSTALL_DATA_ROOT)
-print("##################################")
 
 setup(name='integron_finder',
       version="2.0rc1",
