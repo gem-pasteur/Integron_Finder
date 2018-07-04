@@ -24,19 +24,22 @@ activate you virtualenv::
 
 then install integron_finder in developer mode::
 
-    pip install -e git+https://github.com/gem-pasteur/Integron_Finder#egg=integron_finder
+    pip install -e git+https://github.com/gem-pasteur/Integron_Finder#egg=integron_finder[dev]
 
 or clone your repository manually, then install it ::
 
     mkdir src
     cd src
     git clone https://github.com/gem-pasteur/Integron_Finder
-    python setup.py develop
+    cd Integron_Finder
+    pip install -e .[dev]
 
 It install the requirements and create a directory in the virtualenv src/integron_finder
 and create links in the virtualenv. So integron finder is runnable and you can modify the sources and run it again
 without to reinstall the project.
 
+.. note::
+    [dev] allow to install extra dependecies to generate documentation, compute test coverage ...
 
 Send changes to upstream repository
 ===================================

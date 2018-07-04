@@ -14,7 +14,11 @@ See Documentation for how to use it:
 
 # Installation
 
+for user
+
      pip install integron_finder
+
+for more installation option, for developer see documentaiton
 
 # Licence:
 
