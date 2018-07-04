@@ -52,7 +52,9 @@ if 'setup.py' in sys.argv:
 else:
     INSTALLER = 'pip'
 
-print("#######################################", INSTALLER , "##########################################")
+print("########################################")
+print("#            ", INSTALLER , "        #")
+print("##########################################")
 
 
 class install_lib(_install_lib):
@@ -194,7 +196,9 @@ def expand_data(data_to_expand):
             if os.path.isfile(one_src):
                 data_struct.append((base_dest_dir, [one_src]))
     print("#########################################################")
-    print(data_struct)
+    print("INSTALLER=", INSTALLER)
+    print("INSTALL_DATA_ROOT=", INSTALL_DATA_ROOT)
+    print("data_struct = ", data_struct)
     print("#########################################################")
     return data_struct
 
