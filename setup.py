@@ -52,10 +52,6 @@ if 'setup.py' in sys.argv:
 else:
     INSTALLER = 'pip'
 
-print("########################################")
-print("#            ", INSTALLER , "        #")
-print("##########################################")
-
 
 class install_lib(_install_lib):
 
@@ -64,7 +60,10 @@ class install_lib(_install_lib):
         _install_lib.finalize_options(self)
 
     def run(self):
-        script_tmp_dir = self.build_dir if INSTALLER != 'setuptools' else self.install_dir
+        if INSTALLER == 'pip':
+            script_tmp_dir = self.build_dir
+        else: #setuptools
+            raise DistutilsSetupError("setuptools is not supported, please use pip instead.")
 
         def subst_file(_file, vars_2_subst):
             input_file = os.path.join(script_tmp_dir, _file)
@@ -195,11 +194,6 @@ def expand_data(data_to_expand):
                     data_struct.append((os.path.join(base_dest_dir, path_2_create), [os.path.join(path, f) for f in files]))
             if os.path.isfile(one_src):
                 data_struct.append((base_dest_dir, [one_src]))
-    print("#########################################################")
-    print("INSTALLER=", INSTALLER)
-    print("INSTALL_DATA_ROOT=", INSTALL_DATA_ROOT)
-    print("data_struct = ", data_struct)
-    print("#########################################################")
     return data_struct
 
 #####################
