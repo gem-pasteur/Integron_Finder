@@ -35,7 +35,7 @@ try:
 except ImportError:
     warnings = None
 
-from distutils.errors import DistutilsFileError
+from distutils.errors import DistutilsFileError, DistutilsSetupError
 from distutils.util import subst_vars as distutils_subst_vars
 
 from setuptools import setup, find_packages
@@ -63,7 +63,7 @@ class install_lib(_install_lib):
         if INSTALLER == 'pip':
             script_tmp_dir = self.build_dir
         else: #setuptools
-            raise DistutilsSetupError("setuptools is not supported, please use pip instead.")
+            raise DistutilsSetupError("'setuptools' is not supported. Please use 'pip' instead.")
 
         def subst_file(_file, vars_2_subst):
             input_file = os.path.join(script_tmp_dir, _file)
