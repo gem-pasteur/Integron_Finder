@@ -119,6 +119,7 @@ class TestFindIntegons(IntegronTest):
         args.evalue_attc = 1.0
         args.max_attc_size = 200
         args.min_attc_size = 40
+        args.calin_threshold = 2
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -156,6 +157,47 @@ class TestFindIntegons(IntegronTest):
         pdt.assert_frame_equal(integron.proteins, exp)
 
 
+    def test_find_integron_calin_threshold(self):
+        replicon_name = 'ESCO001.B.00018.P002'
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        topologies = Topology('circ')
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
+        replicon_results_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
+                                                            'other_{}'.format(replicon.id)))
+        attc_file = os.path.join(replicon_results_path, '{}_attc_table.res'.format(replicon.id))
+        intI_file = os.path.join(replicon_results_path, '{}_intI.res'.format(replicon.id))
+        phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon.id))
+
+        args = argparse.Namespace()
+        args.no_proteins = True
+        args.keep_palindromes = True
+        args.distance_threshold = 4000
+        args.attc_model = 'attc_4.cm'
+        args.evalue_attc = 1.0
+        args.max_attc_size = 200
+        args.min_attc_size = 40
+
+        args.calin_threshold = 2
+
+        cfg = Config(args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+
+        with self.catch_log() as log:
+            integrons = find_integron(replicon, attc_file, intI_file, phageI_file, cfg)
+
+        self.assertEqual(len(integrons), 2)
+
+        args.calin_threshold = 3
+        cfg = Config(args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+
+        with self.catch_log() as log:
+            integrons = find_integron(replicon, attc_file, intI_file, phageI_file, cfg)
+        self.assertEqual(len(integrons), 1)
+
+
     def test_find_integron_attC_is_df(self):
         replicon_name = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
@@ -183,6 +225,7 @@ class TestFindIntegons(IntegronTest):
         args.max_attc_size = 200
         args.min_attc_size = 40
         args.distance_threshold = 4000
+        args.calin_threshold = 2
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
         len_model_attc = 47  # length in 'CLEN' (value for model attc_4.cm)
@@ -268,6 +311,7 @@ class TestFindIntegons(IntegronTest):
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
         args.union_integrases = False
         args.keep_palindromes = True
+        args.calin_threshold = 2
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -350,6 +394,7 @@ class TestFindIntegons(IntegronTest):
         args.max_attc_size = 200
         args.min_attc_size = 40
         args.distance_threshold = 4000  # (4kb at least between 2 different arrays)
+        args.calin_threshold = 2
         args.attc_model = 'attc_4.cm'
         args.no_proteins = False
         args.keep_palindromes = True
