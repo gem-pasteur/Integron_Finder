@@ -14,10 +14,11 @@ IntegronFinder dependencies
 IntegronFinder is built with Python >= 3.4, and a few libraries are needed:
 
 - Python >=3.4
-   - Pandas (>=0.18.0)
-   - Numpy (>=1.9.1)
-   - Biopython (>=1.68)
-   - Matplotlib (>=1.4.3)
+- Pandas (>=0.22)
+- Numpy (>=1.14.2)
+- Biopython (>=1.70)
+- Matplotlib (>=2.2.2)
+- colorlog
 
 From version 1.5.1, integron_finder will check and install theses libraries for you.
 
@@ -59,6 +60,18 @@ System wide installation
 
     sudo pip install integron_finder
 
+.. warning::
+    On recent Debian/Ubuntu the --user option is forced. So use of --root option give an unexpected behavior
+    and you cannot use --prefix option at all unless you add option --system
+    for instance ::
+
+        sudo pip install --system integron_finder
+
+    or ::
+
+        pip install --prefix=/tmp/test_if --system integron_finder
+
+
 2. To get an updated version (no need to uninstall)::
 
     sudo pip install -U integron_finder
@@ -96,7 +109,7 @@ Then install integron_finder::
 
 To run integron finder, you have to activate (once per session) the virtual environment::
 
-    source source Integron_Finder/bin/activate
+    source  Integron_Finder/bin/activate
 
 When you do not need to use integron_finder just deactivate the virtual environment.
 In the active terminal just type::
