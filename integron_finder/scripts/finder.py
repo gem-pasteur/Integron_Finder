@@ -136,6 +136,11 @@ def parse_args(args):
                         type=float,
                         help='set evalue threshold to filter out hits above it (default: 1)')
 
+    parser.add_argument('--calin-threshold',
+                        default=2,
+                        type=int,
+                        help="keep 'CALIN' only if attC sites nuber >= calin-threshold (default: 2")
+
     parser.add_argument("--keep-palindromes",
                         default=False,
                         help="for a given hit, if the palindromic version is found,"

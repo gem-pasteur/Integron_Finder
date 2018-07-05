@@ -215,6 +215,15 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                                         intI_ac.evalue.values[i],
                                         intI_ac.query_name.values[i])
 
+    #########################################
+    # filter CALIN integron on attc number  #
+    #########################################
+    _log.debug("filter out 'CALIN' with less attC sites than {}".format(cfg.calin_threshold))
+    integrons = [i for i in integrons if i.type() != 'CALIN' or len(i.attC) >= cfg.calin_threshold]
+
+    ###############
+    # log summary #
+    ###############
     _log.info("In replicon {}, there are:".format(replicon.id))
     _log.info("- {} complete integron(s) found with a total {} attC site(s)".format(sum(
         [1 if i.type() == "complete" else 0 for i in integrons]),
