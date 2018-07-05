@@ -18,3 +18,6 @@ include COPYING
 include COPYRIGHT
 include requirements.txt
 include requirements_dev.txt
+
+include parallel_integron_finder.nf
+include nextflow.profile.config
