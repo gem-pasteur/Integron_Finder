@@ -176,7 +176,7 @@ If you don't want to use it but you prefer to use an installed version you can r
 
 
 All options available in non parallel version are also available for the parallel one.
-A typical command line will be
+A typical command line will be: ::
 
     ./parallel_integron_finder.nf -profile standard --replicons all_coli.fst --circ  --out E_Coli_all
 
