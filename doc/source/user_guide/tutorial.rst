@@ -124,12 +124,12 @@ The file nextflow.profile.config provide two profile a standard and cluster prof
     for more details see: https://medium.com/coderscorner/installing-oracle-java-8-in-ubuntu-16-10-845507b13343
 
     so now install nextflow.
-    If you have  capsule error like
+    If you have  capsule error like ::
 
         CAPSULE EXCEPTION: Error resolving dependencies. while processing attribute Allow-Snapshots: false (for stack trace, run with -Dcapsule.log=verbose)
         Unable to initialize nextflow environment
 
-    install nextflow as follow (change the nextflow version with the last release)
+    install nextflow as follow (change the nextflow version with the last release) ::
 
         wget -O nextflow http://www.nextflow.io/releases/v0.30.2/nextflow-0.30.2-all
         chmod 777 nextflow
