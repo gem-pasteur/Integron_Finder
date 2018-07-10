@@ -171,14 +171,16 @@ class TestFindIntegons(IntegronTest):
         phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon.id))
 
         args = argparse.Namespace()
-        args.no_proteins = True
+        args.no_proteins = False
         args.keep_palindromes = True
         args.distance_threshold = 4000
         args.attc_model = 'attc_4.cm'
         args.evalue_attc = 1.0
         args.max_attc_size = 200
         args.min_attc_size = 40
-
+        args.local_max = False
+        args.gembase = False
+        args.union_integrases = False
         args.calin_threshold = 2
 
         cfg = Config(args)
