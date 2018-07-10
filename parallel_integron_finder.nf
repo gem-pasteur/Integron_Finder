@@ -40,6 +40,8 @@ params.topologyFile = false
 topology_file = ''
 params.keepTmp = false
 keep_tmp = ''
+calin_threshold = false
+params.calin_threshold = ''
 
 if (params.gbk){
     gbk = '--gbk'
@@ -108,6 +110,9 @@ if (params.topologyFile){
 if (params.keepTmp){
     keep_tmp = '--keepTmp'
 }
+if {params.calin_threshold}{
+    calin_threshold = "--calin-threshold ${params.calin_threshold}"
+
 
 /****************************************
  *           The workflow               *
@@ -148,12 +153,13 @@ process integron_finder{
         val max_attc_size
         val min_attc_size
         val keep_tmp
+        val calin_threshold
     output:
         file "Results_Integron_Finder_${one_chunk.baseName}" into all_chunk_results_dir
 
     script:
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${max_attc_size} ${min_attc_size} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpu} --mute ${one_chunk}
+        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpu} --mute ${one_chunk}
         """
 }
 
