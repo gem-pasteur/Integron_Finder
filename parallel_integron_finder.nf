@@ -40,8 +40,8 @@ params.topologyFile = false
 topology_file = ''
 params.keepTmp = false
 keep_tmp = ''
-calin_threshold = false
-params.calin_threshold = ''
+params.calin_threshold = false
+calin_threshold = ''
 
 if (params.gbk){
     gbk = '--gbk'
@@ -110,8 +110,9 @@ if (params.topologyFile){
 if (params.keepTmp){
     keep_tmp = '--keepTmp'
 }
-if {params.calin_threshold}{
+if (params.calin_threshold){
     calin_threshold = "--calin-threshold ${params.calin_threshold}"
+}
 
 
 /****************************************
