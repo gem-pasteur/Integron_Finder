@@ -1,0 +1,10 @@
+ID_integron	ID_replicon	element	pos_beg	pos_end	strand	evalue	type_elt	annotation	model	type	default	distance_2attC	considered_topology
+integron_01	ESCO001.B.00018.P002	ESCO001.B.00018.P002_106	90229	91242	-1	1.3999999999999999e-24	protein	intI	intersection_tyr_intI	In0	Yes	NA	circ
+integron_01	ESCO001.B.00018.P002	Pc_int1	91245	91271	1	NA	Promoter	Pc_1	NA	In0	Yes	NA	circ
+integron_01	ESCO001.B.00018.P002	P_intI1	91263	91297	-1	NA	Promoter	Pint_1	NA	In0	Yes	NA	circ
+integron_01	ESCO001.B.00018.P002	attI1	91322	91380	1	NA	attI	attI_1	NA	In0	Yes	NA	circ
+integron_02	ESCO001.B.00018.P002	ESCO001.B.00018.P002_120	104134	104742	1	NA	protein	protein	NA	CALIN	Yes	NA	circ
+integron_02	ESCO001.B.00018.P002	attc_001	104737	104796	1	4.5e-05	attC	attC	attc_4	CALIN	Yes	NA	circ
+integron_02	ESCO001.B.00018.P002	ESCO001.B.00018.P002_121	104812	105591	1	2.799999999999999e-166	protein	ANT3	RF0027	CALIN	Yes	NA	circ
+integron_02	ESCO001.B.00018.P002	attc_002	105593	105652	1	4.1e-09	attC	attC	attc_4	CALIN	Yes	797.0	circ
+integron_02	ESCO001.B.00018.P002	ESCO001.B.00018.P002_122	105733	106437	-1	NA	protein	protein	NA	CALIN	Yes	NA	circ
