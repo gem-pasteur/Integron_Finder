@@ -138,7 +138,8 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cp
                     replicon_path]
     try:
         _log.debug("run cmsearch: {}".format(' '.join(cmsearch_cmd)))
-        returncode = call(cmsearch_cmd, stdout=open(os.devnull, 'w'))
+        with open(os.devnull, 'w') as dev_null:
+            returncode = call(cmsearch_cmd, stdout=dev_null)
     except Exception as err:
         raise RuntimeError("{0} failed : {1}".format(' '.join(cmsearch_cmd), err))
     if returncode != 0:
