@@ -68,13 +68,14 @@ class TestSplit(IntegronTest):
         seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
         files_expected = [os.path.join(self.out_dir, r + '.fst') for r in seq_index]
         self.assertListEqual(files_expected, chunk_names)
-        for f in chunk_names:
-            seq_it = SeqIO.parse(f, 'fasta')
-            for s in seq_it:
-                ref_seq = seq_index[s.id]
-                self.assertEqual(s.id, ref_seq.id)
-                self.assertEqual(s.description, ref_seq.description)
-                self.assertEqual(s.seq, ref_seq.seq)
+        for one_chunk in chunk_names:
+            with open(one_chunk) as f:
+                seq_it = SeqIO.parse(f, 'fasta')
+                for s in seq_it:
+                    ref_seq = seq_index[s.id]
+                    self.assertEqual(s.id, ref_seq.id)
+                    self.assertEqual(s.description, ref_seq.description)
+                    self.assertEqual(s.seq, ref_seq.seq)
 
     def test_split_w_chunk(self):
         replicon_path = self.find_data(os.path.join('Replicons', 'multi_fasta.fst'))
