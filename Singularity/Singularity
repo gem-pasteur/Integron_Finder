@@ -16,7 +16,9 @@ from: ubuntu:xenial
 %post
     export  DEBIAN_FRONTEND=noninteractive
     apt-get update -y
-    apt-get install -y wget python3 python3-pip
+    apt-get install -y wget python3 python3-pip git
+    # to generate documentation
+    apt-get install -y python3-sphinx python3-sphinx-rtd-theme texlive texlive-latex-extra
     apt-get install -y hmmer infernal prodigal
 
     if ! test -d /pasteur
@@ -30,17 +32,27 @@ from: ubuntu:xenial
     ################################
     cd /usr/local/src/
 
-    if_vers='1.5.1'
-    url='https://pypi.python.org/packages/cb/0a/3c91eb70d00006a40ebcdc3ed07074bad6f8b0baae36669cfa064f016a5d/integron_finder-1.5.1.tar.gz#md5=ab054c00236a863ea060ffc33f9c7b74'
-    wget "${url}"
-
+    if_git_url="https://github.com/gem-pasteur/Integron_Finder.git"
     if test -d integron_finder
     then
-        rm -Rf integron_finder
+        cd integron_finder
+        git checkout dev
+        git pull
+    else
+        git clone ${if_git_url} integron_finder
+        cd integron_finder
+        git checkout dev
     fi
-    mkdir integron_finder
-    tar -xzf integron_finder-${if_vers}.tar.gz -C integron_finder --strip-components 1
-    pip3 install integron_finder-${if_vers}.tar.gz
+    if test -d dist
+    then
+        rm -Rf dist
+    fi
+    cd doc
+    make html
+    make latexpdf
+    cd -
+    python3 setup.py sdist
+    pip3 install dist/integron_finder-*.tar.gz
 
 %help
 
@@ -126,4 +138,4 @@ and if you use the function `--func_annot` which uses Resfams:
 
 %test
     cd /usr/local/src/integron_finder
-    python setup.py test
+    python3 setup.py test
