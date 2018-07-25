@@ -17,8 +17,6 @@ from: ubuntu:xenial
     export  DEBIAN_FRONTEND=noninteractive
     apt-get update -y
     apt-get install -y wget python3 python3-pip git
-    # to generate documentation
-    apt-get install -y python3-sphinx python3-sphinx-rtd-theme texlive texlive-latex-extra
     apt-get install -y hmmer infernal prodigal
 
     if ! test -d /pasteur
@@ -38,11 +36,13 @@ from: ubuntu:xenial
     then
         rm -Rf integron_finder
     fi
-
-    pip3 download -d . "integron_finder==${if_ver}"
+    #just for testing the package from pipy test
+    pip3 download --index-url https://test.pypi.org/simple/ --no-deps integron_finder==2.0rc1
+    #pip3 download -d . "integron_finder==${if_ver}"
     pip3 install "integron_finder-${if_ver}.tar.gz"
     # to run tests. See test section
-    tar -xzf "integron_finder-${if_ver}.tar.gz"
+    mkdir integron_finder
+    tar -xzf integron_finder-${if_ver}.tar.gz --strip-components=1 -C integron_finder
 
 %help
 
