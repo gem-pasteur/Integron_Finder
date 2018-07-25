@@ -19,8 +19,6 @@ from: ubuntu:xenial
     apt-get install -y wget python3 python3-pip git
     # line below is needed by matplotlib if it's installed from source instead of using wheels
     apt-get install -y libfreetype6-dev pkg-config libpng12-dev
-    # to generate documentation
-    apt-get install -y python3-sphinx python3-sphinx-rtd-theme texlive texlive-latex-extra
     apt-get install -y hmmer infernal prodigal
 
     if ! test -d /pasteur
@@ -49,10 +47,6 @@ from: ubuntu:xenial
     then
         rm -Rf dist
     fi
-    cd doc
-    make html
-    make latexpdf
-    cd -
     python3 setup.py sdist
     pip3 install --no-binary dist/integron_finder-*.tar.gz
 
