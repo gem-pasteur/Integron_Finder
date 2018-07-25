@@ -17,8 +17,6 @@ from: ubuntu:xenial
     export  DEBIAN_FRONTEND=noninteractive
     apt-get update -y
     apt-get install -y wget python3 python3-pip git
-    # line below is needed by matplotlib if it's installed from source instead of using wheels
-    apt-get install -y libfreetype6-dev pkg-config libpng12-dev
     apt-get install -y hmmer infernal prodigal
 
     if ! test -d /pasteur
@@ -44,7 +42,7 @@ from: ubuntu:xenial
     # to avoid ugly warning message
     # '/usr/lib/python3.5/importlib/_bootstrap.py:222: RuntimeWarning: numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88'
     # image build on singularity-hub add --no-binary
-    pip3 install --no-binary "integron_finder-${if_ver}.tar.gz"
+    pip3 install --no-binary numpy --no-binary pandas "integron_finder-${if_ver}.tar.gz"
     # to run tests. See test section
     mkdir integron_finder
     tar -xzf integron_finder-${if_ver}.tar.gz --strip-components=1 -C integron_finder
