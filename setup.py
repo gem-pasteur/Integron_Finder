@@ -29,11 +29,7 @@
 
 import os
 import sysconfig
-
-try:
-    import warnings
-except ImportError:
-    warnings = None
+import warnings
 
 from distutils.errors import DistutilsFileError, DistutilsSetupError
 from distutils.util import subst_vars as distutils_subst_vars
@@ -207,13 +203,21 @@ def expand_data(data_to_expand):
 
 try:
     from pypandoc import convert
-
     def read_md(f):
-        return convert(f, 'rst')
-
+        try:
+            return convert(f, 'rst')
+        except OSError as err:
+            if str(err).startswith('No pandoc was found:'):
+                warnings.warn("'pypandoc' module do not found 'pandoc' lib.\n"
+                              "Please install pandoc to convert Markdown to RST",
+                              RuntimeWarning)
+                return open(f, 'r').read()
+        else:
+            raise err
 except ImportError:
     import sys
-    print("WARNING: pypandoc module not found.\nCould not convert Markdown to RST", file=sys.stderr)
+    warnings.warn("WARNING: pypandoc module not found.\nCould not convert Markdown to RST",
+                  ImportWarning)
 
     def read_md(f):
         return open(f, 'r').read()
