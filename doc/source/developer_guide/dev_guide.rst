@@ -39,7 +39,7 @@ and create links in the virtualenv. So integron finder is runnable and you can m
 without to reinstall the project.
 
 .. note::
-    `[dev]` allow to install extra dependecies to generate documentation, compute test coverage ...
+    `[dev]` allow to install extra dependencies to generate documentation, compute test coverage ...
 
 .. warning::
     Debian/Ubuntu distribution `--user` is the default. So the `--prefix` option does not work
