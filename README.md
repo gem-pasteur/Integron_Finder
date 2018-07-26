@@ -1,7 +1,6 @@
 [![install](https://img.shields.io/github/downloads/gem-pasteur/Integron_finder/total.svg)](https://github.com/gem-pasteur/Integron_Finder/releases/latest) [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest) [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) [![Build Status](https://travis-ci.org/gem-pasteur/Integron_Finder.svg?branch=dev)](https://travis-ci.org/gem-pasteur/Integron_Finder)
   
-Integron Finder
-===============
+# Integron Finder
 
 Finds integrons in DNA sequences
 
@@ -12,9 +11,9 @@ or you can use it online on the
 See Documentation for how to use it: 
 [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest)
 
-# Installation
+## Installation
 
-## For user
+### For user
 
      pip install integron_finder
 
@@ -22,7 +21,7 @@ for more installation options, for developer see documentation
 
 or use a container
 
-### Singularity container
+#### Singularity container
 
 For reproducibility and easy way to use integron_finder without installing 
 third party software (hmmsearc, ...) or libraries we provides containers based on singularity
@@ -44,17 +43,23 @@ when you have the image in local you can use it as if integron_finder has been i
     
     ./integron_finder -h
     
-## For developer
+### For developer
 
 If you want to develop or submit a patch on this software you are welcome.
 See "Developer installation" in documentation.
 
 
-# Licence:
+## Licence:
 
 Integron Finder developed and released under [open source licence GPLv3](https://opensource.org/licenses/GPL-3.0)
 
-# Dependencies :
+## Contributing 
+
+We encourage contributions, bug report, enhancement ... 
+
+But before to do that we encourage to read [the contributing guide](CONTRIBUTING.md).
+
+## Dependencies
 
 - Python >=3.4
 - Pandas >=0.22.0
@@ -65,7 +70,7 @@ Integron Finder developed and released under [open source licence GPLv3](https:/
 - INFERNAL >=1.1.2
 - Prodigal >=2.6.2
 
-# Usage
+## Usage
 
 ```
 usage: integron_finder [-h] [--local-max] [--func-annot] [--cpu CPU]
@@ -159,7 +164,7 @@ Output options:
 
     integron_finder --local_max --func_annot myfastafile.fst
 
-## Output :
+### Output :
 
 A folder name `Results_<id_genome>`, inside there are different files :
 
