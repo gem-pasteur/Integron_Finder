@@ -5,9 +5,9 @@ you've taken the first step toward becoming a contributor to integron_finder!
 
 ## What skills do I need?
 
-If you know Python3 and oop, you can contribute to the code. 
-We also have a basic usage of [pandas](https://pandas.pydata.org/) and 
-[numpy](http://www.numpy.org/) but it's not mandatory to contribute.
+If you know Python3, you can contribute to the code. 
+We also use [pandas](https://pandas.pydata.org/) and 
+[numpy](http://www.numpy.org/) libraries.
 
 And there are also many ways to contribute to the project without programming. 
 If you'd like to get involved in design, 
