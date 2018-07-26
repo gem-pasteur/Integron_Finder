@@ -52,21 +52,26 @@ Send changes to upstream repository
 If you want to integrate your code in the upstream (main) repository, you need to
 create a pull request.
 
-1. Create a new branch with ``<your branch name>`` a descriptive name
+1. Read the `Contibuting guide <https://github.com/gem-pasteur/Integron_Finder/blob/master/CONTRIBUTING.md>`_
+2. Create a new branch with ``<your branch name>`` a descriptive name
    (e.g. 'adding-xx-feature', 'fixing-typos', etc.), so that others understand what your are working on.
-2. Work on it
-3. Test that your work does not break the tests.
+3. Work on it
+4. Test that your work does not break the tests.
    add tests corresponding to your code
-4. Push your local branch on your integron_finder clone on github ::
+5. Push your local branch on your integron_finder clone on github ::
 
         git push --set-upstream origin <your branch name>
 
-5. ask for pull request
+6. ask for pull request
 
     - Go to your forked repository on github `https://github.com/<your_login>/Integron_Finder/pulls`
     - Click on 'New pull request'
-    - Choose your repository and the branch on which you did your changes in 'head fork' (right-hand side), and choose 'gem-pasteur/Integron_Finder' with the branch on which you want to merge (probably master) in 'base fork' (left-hand side).
-    - A green 'Able to merge' text should appear if git is able to automatically merge the 2 branches. In that case, click on 'Create pull request', write your comments on the changes you made, why etc., and save. We will receive the pull request.
+    - Choose your repository and the branch on which you did your changes in 'head fork' (right-hand side),
+      and choose 'gem-pasteur/Integron_Finder' with the branch on which you want to merge
+      (probably master) in 'base fork' (left-hand side).
+    - A green 'Able to merge' text should appear if git is able to automatically merge the 2 branches.
+      In that case, click on 'Create pull request', write your comments on the changes you made, why etc,
+      and save. We will receive the pull request.
 
 
 .. _tests:
