@@ -1,7 +1,7 @@
 # Developers:
     
     - Jean Cury <>
-    - Bertrand Néron <bneron@pasteur.fr>
+    - Bertrand Néron <https://github.com/bneron>
     - Amandine Perrin <>
     
 # Contributors:
