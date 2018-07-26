@@ -14,27 +14,56 @@ See Documentation for how to use it:
 
 # Installation
 
-for user
+## For user
 
      pip install integron_finder
 
-for more installation option, for developer see documentaiton
+for more installation options, for developer see documentation
+
+or use a container
+
+### Singularity container
+
+For reproducibility and easy way to use integron_finder without installing 
+third party software (hmmsearc, ...) or libraries we provides containers based on singularity
+
+[![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1314)
+
+So you just have to install singularity (https://github.com/singularityware/singularity)
+
+then 
+
+    singularity run shub:gem-pasteur/Integron_Finder -h
+    
+to run the last version (from master branch) 
+if you prefer download a specific version (with renaming the container on the fly) 
+
+    singularity pull --name integron_finder shub:gem-pasteur/Integron_Finder:2.0
+    
+when you have the image in local you can use it as if integron_finder has been installed
+    
+    ./integron_finder -h
+    
+## For developer
+
+If you want to develop or submit a patch on this software you are welcome.
+See "Developer installation" in documentation.
+
 
 # Licence:
 
-Integron Finder is under [open source licence GPLv3](https://opensource.org/licenses/GPL-3.0)
+Integron Finder developed and released under [open source licence GPLv3](https://opensource.org/licenses/GPL-3.0)
 
 # Dependencies :
 
-- Python 2.7
-- Pandas 0.18.0
-- Numpy 1.9.1
-- Biopython 1.69
-- Matplotlib 1.4.3
-- psutils 2.1.3
-- HMMER 3.1b1
-- INFERNAL 1.1
-- Prodigal V2.6.2
+- Python >=3.4
+- Pandas >=0.22.0
+- Numpy >=1.14.2
+- Biopython >=1.70
+- Matplotlib >=2.2.2
+- HMMER >=3.1b2
+- INFERNAL >=1.1.2
+- Prodigal >=2.6.2
 
 # Usage
 
@@ -45,12 +74,13 @@ usage: integron_finder [-h] [--local-max] [--func-annot] [--cpu CPU]
                        [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
                        [--path-func-annot PATH_FUNC_ANNOT] [--gembase]
                        [--attc-model ATTC_MODEL] [--evalue-attc EVALUE_ATTC]
+                       [--calin-threshold CALIN_THRESHOLD]
                        [--keep-palindromes] [--no-proteins]
                        [--max-attc-size MAX_ATTC_SIZE]
                        [--min-attc-size MIN_ATTC_SIZE] [--eagle-eyes] [--pdf]
                        [--gbk] [--keep-tmp] [--split-results]
                        [--circ | --linear] [--topology-file TOPOLOGY_FILE]
-                       [-V] [-v] [-q]
+                       [-V] [--mute] [-v] [-q]
                        replicon
 
 positional arguments:
@@ -88,6 +118,9 @@ optional arguments:
   --evalue-attc EVALUE_ATTC
                         set evalue threshold to filter out hits above it
                         (default: 1)
+  --calin-threshold CALIN_THRESHOLD
+                        keep 'CALIN' only if attC sites nuber >= calin-
+                        threshold (default: 2
   --keep-palindromes    for a given hit, if the palindromic version is found,
                         don't remove the one with highest evalue
   --no-proteins         Don't annotate CDS and don't find integrase, just look
@@ -104,6 +137,8 @@ optional arguments:
                         The path to a file where the topology for each
                         replicon is specified
   -V, --version         show program's version number and exit
+  --mute                mute the log on stdout.(continue to log on
+                        integron_finder.out)
 
 Output options:
   --pdf                 For each complete integron, a simple graphic of the
@@ -122,19 +157,19 @@ Output options:
 
 ### Example
 
-    integron_finder myfastafile.fst --local_max --func_annot
+    integron_finder --local_max --func_annot myfastafile.fst
 
 ## Output :
 
 A folder name `Results_<id_genome>`, inside there are different files :
 
-- ***.gbk** : contains the input sequence with all integrons and features found.
 - ***.integrons** : contain list of all element detected (attc, protein near attC, integrase, Pc, attI, Pint) with position, 
   strand, evalue, etc...
-- ***.pdf** : representation of complete integrons detected (with integrase (redish) and at least one attc (blueish)).
+- ***.gbk** : contains the input sequence with all integrons and features found (if --gbk option is set).
+- ***.pdf** : representation of complete integrons detected (with integrase (redish) and at least one attc (blueish) (if --pdf option is set)).
   If a protein has a hit with an antibiotic resistance gene, it's yellow, otherwise grey.
 
- and one folder, `other`, containing the different outputs of the different steps of the program.
+ and one folder, `other`, containing the different outputs of the different steps of the program (if --keep-tmp is set).
 
 # Galaxy
 
