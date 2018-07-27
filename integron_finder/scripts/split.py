@@ -32,6 +32,7 @@ import math
 import os
 import argparse
 from itertools import zip_longest
+import re
 
 from Bio import SeqIO
 
@@ -53,6 +54,11 @@ from integron_finder import utils
 def split(replicon_path, chunk=None, outdir='.'):
     """
     Split the replicon_file in *chunk* chunks and write them in files.
+    the name of the chunk is the input filename with suffix '_chunk_i'
+    (where i is the chunk number) if the chunk contains several sequences
+    or the id of the sequence if there is only one sequence in the chunk.
+    There also a system that prevent to over write an existing file by appending (number)
+    to the file name for instance ESCO001.B.00018.P002_(1).fst
 
     :param str replicon_path: The path to the replicon file.
     :param int chunk: The number of chunk desire (chunk > 0).
@@ -96,9 +102,21 @@ def split(replicon_path, chunk=None, outdir='.'):
                                                                                   sequences_db_len,
                                                                                   chunk_no))
             if chunk_out:
-                replicon_name = utils.get_name_from_path(replicon_path)
-                chunk_name = "{}_chunk_{}.fst".format(replicon_name, chunk_no)
+                if chunk_size == 1:
+                    chunk_name = "{}.fst".format(replicon_name)
+                else:
+                    replicon_name = utils.get_name_from_path(replicon_path)
+                    chunk_name = "{}_chunk_{}.fst".format(replicon_name, chunk_no)
                 chunk_name = os.path.join(outdir, chunk_name)
+                i = 0
+                while os.path.exists(chunk_name):
+                    root, ext = os.path.splitext(chunk_name)
+                    i += 1
+                    match = re.search("_\(\d+\)$", root)
+                    if match:
+                        root = root[:match.start()]
+                    chunk_name = "{}_({}){}".format(root, i, ext)
+
                 _log.info("writing chunk '{}'".format(chunk_name))
                 SeqIO.write(chunk_out, chunk_name, "fasta")
                 all_chunk_name.append(chunk_name)
