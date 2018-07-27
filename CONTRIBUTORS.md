@@ -6,4 +6,4 @@
     
 # Contributors:
     
-    - Kenzo-Hugo Hillion <>
+    - Kenzo-Hugo Hillion <https://github.com/khillion>
