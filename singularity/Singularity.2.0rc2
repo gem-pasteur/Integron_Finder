@@ -37,7 +37,7 @@ from: ubuntu:xenial
         rm -Rf integron_finder
     fi
     #just for testing the package from pipy test
-    pip3 download --index-url https://test.pypi.org/simple/ --no-deps integron_finder==2.0rc1
+    pip3 download --index-url https://test.pypi.org/simple/ --no-deps integron_finder==${if_ver}
     #pip3 download -d . "integron_finder==${if_ver}"
     # to avoid ugly warning message
     # '/usr/lib/python3.5/importlib/_bootstrap.py:222: RuntimeWarning: numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88'
