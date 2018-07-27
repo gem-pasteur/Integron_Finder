@@ -96,11 +96,8 @@ def split(replicon_path, chunk=None, outdir='.'):
                                                                                   sequences_db_len,
                                                                                   chunk_no))
             if chunk_out:
-                if chunk_size == 1:
-                    chunk_name = "{}.fst".format(replicon_name)
-                else:
-                    replicon_name = utils.get_name_from_path(replicon_path)
-                    chunk_name = "{}_chunk_{}.fst".format(replicon_name, chunk_no)
+                replicon_name = utils.get_name_from_path(replicon_path)
+                chunk_name = "{}_chunk_{}.fst".format(replicon_name, chunk_no)
                 chunk_name = os.path.join(outdir, chunk_name)
                 _log.info("writing chunk '{}'".format(chunk_name))
                 SeqIO.write(chunk_out, chunk_name, "fasta")
