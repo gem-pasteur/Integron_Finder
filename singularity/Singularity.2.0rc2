@@ -5,7 +5,7 @@ from: ubuntu:xenial
     org.label-schema.maintainer Bertrand Neron
     org.label-schema.maintainer.email bneron@pasteur.fr
     org.label-schema.authors Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
-    org.label-schema.package.version 1.5.1
+    org.label-schema.package.version 2.0rc2
     org.label-schema.package.license GPLv3
     org.label-schema.package.homepage https://github.com/gem-pasteur/Integron_Finder/
     org.label-schema.vcs-url https://github.com/gem-pasteur/Integron_Finder/
@@ -28,29 +28,24 @@ from: ubuntu:xenial
     ################################
     # integron_finder installation #
     ################################
-    cd /usr/local/src/
+    # do not forget to modify version in labels section
+    if_ver='2.0rc2'
 
-    if_git_url="https://github.com/gem-pasteur/Integron_Finder.git"
+    cd /usr/local/src/
     if test -d integron_finder
     then
-        cd integron_finder
-        git checkout dev
-        git pull
-    else
-        git clone ${if_git_url} integron_finder
-        cd integron_finder
-        git checkout dev
+        rm -Rf integron_finder
     fi
-
-    if test -d dist
-    then
-        rm -Rf dist
-    fi
-    python3 setup.py sdist
+    #just for testing the package from pipy test
+    pip3 download --index-url https://test.pypi.org/simple/ --no-deps integron_finder==2.0rc1
+    #pip3 download -d . "integron_finder==${if_ver}"
     # to avoid ugly warning message
     # '/usr/lib/python3.5/importlib/_bootstrap.py:222: RuntimeWarning: numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88'
     # image build on singularity-hub add --no-binary
-    pip3 install --no-binary numpy --no-binary pandas dist/integron_finder-*.tar.gz
+    pip3 install --no-binary numpy --no-binary pandas "integron_finder-${if_ver}.tar.gz"
+    # to run tests. See test section
+    mkdir integron_finder
+    tar -xzf integron_finder-${if_ver}.tar.gz --strip-components=1 -C integron_finder
 
 %help
 
@@ -104,7 +99,7 @@ You can use this program without installing it, through the pasteur galaxy webse
 
 https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F1.5.1
 
-# Citation 
+# Citation
 
 The paper is published in Nucleic Acid Research.
 
