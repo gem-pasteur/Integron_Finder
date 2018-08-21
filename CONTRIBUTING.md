@@ -88,7 +88,7 @@ Fill in [the template](.github/ISSUE_TEMPLATE.md), including the steps that you 
 #### Before Submitting An Enhancement Suggestion
 
 * **Check if you're using [the latest version of integron_finder](https://github.com/gem-pasteur/integron_finder/releases)**.
-* **Perform a [cursory search](https://github.com/gem_pasteur/integron_finder/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)** 
+* **Perform a [cursory search](https://github.com/gem-pasteur/integron_finder/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)** 
   to see if the enhancement has already been suggested. 
   If it has, add a comment to the existing issue instead of opening a new one.
 
