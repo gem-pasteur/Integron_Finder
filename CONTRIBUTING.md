@@ -56,7 +56,7 @@ Explain the problem and include additional details to help maintainers reproduce
   If you're providing snippets in the issue, use [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
 * **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
 * **Explain which behavior you expected to see instead and why.**
-* **If you're reporting that emg_analyzer crashed**, 
+* **If you're reporting that integron_finder crashed**, 
   include a crash report with a stack trace from the operating system. 
   Include the crash report in the issue in a [code block](https://help.github.com/articles/markdown-basics/#multiple-lines), 
   a [file attachment](https://help.github.com/articles/file-attachments-on-issues-and-pull-requests/), 
@@ -66,16 +66,16 @@ Explain the problem and include additional details to help maintainers reproduce
 
 ##### Provide more context by answering these questions:
 
-* **Did the problem start happening recently** (e.g. after updating to a new version of emg_analyzer) or was this always a problem?
-* If the problem started happening recently, **can you reproduce the problem in an older version of emg_analyzer?** 
-  What's the most recent version in which the problem doesn't happen? You can download older versions of emg_analyzer from 
-  [the releases page](https://github.com/freeh4cker/emg_analyzer/releases).
+* **Did the problem start happening recently** (e.g. after updating to a new version of integron_finder) or was this always a problem?
+* If the problem started happening recently, **can you reproduce the problem in an older version of integron_finder?** 
+  What's the most recent version in which the problem doesn't happen? You can download older versions of integron_finder from 
+  [the releases page](https://github.com/gem-pasteur/integron_finder/releases).
 * **Can you reliably reproduce the issue?** If not, provide details about how often the problem happens and under which conditions it normally happens.
 * If the problem is related to working with files (e.g. opening and editing files), 
 
 ### Suggesting Enhancements
 
-This section guides you through submitting an enhancement suggestion for emg_analyzer, 
+This section guides you through submitting an enhancement suggestion for integron_finder, 
 including completely new features and minor improvements to existing functionality. 
 Following these guidelines helps maintainers and the community understand your suggestion :pencil: 
 and find related suggestions :mag_right:.
@@ -87,8 +87,8 @@ Fill in [the template](.github/ISSUE_TEMPLATE.md), including the steps that you 
 
 #### Before Submitting An Enhancement Suggestion
 
-* **Check if you're using [the latest version of emg_analyzer](https://github.com/freeh4cker/emg_analyzer/releases)**.
-* **Perform a [cursory search](https://github.com/freeh4cker/emg_analyzer/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)** 
+* **Check if you're using [the latest version of integron_finder](https://github.com/gem-pasteur/integron_finder/releases)**.
+* **Perform a [cursory search](https://github.com/gem_pasteur/integron_finder/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)** 
   to see if the enhancement has already been suggested. 
   If it has, add a comment to the existing issue instead of opening a new one.
 
@@ -101,13 +101,13 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 * **Provide specific examples to demonstrate the steps**. 
   Include copy/pasteable snippets which you use in those examples, as [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
 * **Describe the current behavior** and **explain which behavior you expected to see instead** and why.
-* **Explain why this enhancement would be useful** to most emg_analyzer users.
-* **Specify which version of emg_analyzer you're using.** You can get the exact version by running `emg_analyzer --version` in your terminal.
+* **Explain why this enhancement would be useful** to most integron_finder users.
+* **Specify which version of integron_finder you're using.** You can get the exact version by running `integron_finder --version` in your terminal.
 * **Specify the name and version of the OS you're using.**
 
 ### Your First Code Contribution
 
-Unsure where to begin contributing to emg_analyzer? You can start by looking through these `beginner` and `help-wanted` issues:
+Unsure where to begin contributing to integron_finder? You can start by looking through these `beginner` and `help-wanted` issues:
 
 * [Beginner issues][beginner] - issues which should only require a few lines of code, and a test or two.
 * [Help wanted issues][help-wanted] - issues which should be a bit more involved than `beginner` issues.
