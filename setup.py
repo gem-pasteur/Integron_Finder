@@ -39,9 +39,6 @@ from setuptools.dist import Distribution
 from setuptools.command.install_lib import install_lib as _install_lib
 
 
-from pip.locations import distutils_scheme
-INSTALL_DATA_ROOT = os.path.join(distutils_scheme('')['data'], 'share')
-
 import sys
 if 'setup.py' in sys.argv:
     INSTALLER= 'setuptools'
@@ -116,7 +113,14 @@ def get_install_data_dir(inst):
     elif 'prefix' in inst:
         install_dir = os.path.join(inst['prefix'][1], 'share')
     else:
-        from pip.locations import distutils_scheme
+        try:
+            from pip.locations import distutils_scheme
+        except ImportError:
+            # from pip >=10 distutils_scheme has move into _internal package.
+            # It's ugly but I haven't other choice
+            # because the asshole Debian/Ubuntu patch pip to install in /usr/local
+            # but not python. So when use sysconfig.get_paths['data'] it return '/usr'
+            from pip._internal.locations import distutils_scheme
         install_dir = os.path.join(distutils_scheme('')['data'], 'share')
     return install_dir
 
@@ -169,8 +173,6 @@ def expand_data(data_to_expand):
         return truncated
 
     data_struct = []
-    global INSTALLER
-    global INSTALL_DATA_ROOT
 
     for base_dest_dir, src in data_to_expand:
         # to install data in shared location not in fucking egg
@@ -227,7 +229,7 @@ except ImportError:
 ###################################################
 
 setup(name='integron_finder',
-      version="2.0rc2",
+      version="2.0rc1",
       description="Integron Finder aims at detecting integrons in DNA sequences",
       long_description=read_md('README.md'),
       author="Jean Cury",
