@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris.                              #
+# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -72,7 +72,7 @@ class FastaIterator(object):
 
     """
 
-    def __init__(self, path, alphabet=Seq.IUPAC.unambiguous_dna, replicon_name=None, dist_threshold=4000):
+    def __init__(self, path, alphabet=Seq.IUPAC.ambiguous_dna, replicon_name=None, dist_threshold=4000):
         """
 
         :param str path: The path to the file containing the sequences.

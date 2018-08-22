@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris.                              #
+# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -41,7 +41,7 @@ from setuptools.command.install_lib import install_lib as _install_lib
 
 import sys
 if 'setup.py' in sys.argv:
-    INSTALLER= 'setuptools'
+    INSTALLER = 'setuptools'
 else:
     INSTALLER = 'pip'
 
@@ -55,7 +55,7 @@ class install_lib(_install_lib):
     def run(self):
         if INSTALLER == 'pip':
             script_tmp_dir = self.build_dir
-        else: #setuptools
+        else:  # setuptools
             raise DistutilsSetupError("'setuptools' is not supported. Please use 'pip' instead.")
 
         def subst_file(_file, vars_2_subst):
@@ -175,13 +175,6 @@ def expand_data(data_to_expand):
     data_struct = []
 
     for base_dest_dir, src in data_to_expand:
-        # to install data in shared location not in fucking egg
-        # we need to provide absolute path
-        # however pip does not understand absolute paths
-        # it transform them in relative and rebuild usr/local/share
-        # futhermore this function is run during the distribution creation
-        # and not during installation step
-        # so always with setuptools even the installation phase used pip
         base_dest_dir = os.path.normpath(base_dest_dir)
         for one_src in src:
             if os.path.isdir(one_src):
@@ -249,17 +242,14 @@ setup(name='integron_finder',
           'Intended Audience :: Science/Research',
           'Topic :: Scientific/Engineering :: Bio-Informatics'
           ],
-
       python_requires='>=3.4',
       install_requires=open("requirements.txt").read().split(),
       extras_require={'dev': open("requirements_dev.txt").read().split()},
       test_suite='tests.run_tests.discover',
       zip_safe=False,
       packages=find_packages(),
-
-      # file where some variable must be fix by install
+      # file where some variables must be fixed by install
       fix_prefix=['integron_finder/__init__.py'],
-
       entry_points={
           'console_scripts': [
               'integron_finder=integron_finder.scripts.finder:main',

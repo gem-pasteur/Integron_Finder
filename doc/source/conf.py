@@ -55,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'IntegronFinder'
-copyright = u'2015-2018 Institut Pasteur, Paris'
+copyright = u'2015-2018 Institut Pasteur, Paris, CNRS.'
 author = u'Jean Cury, Bertrand Néron, Eduardo PC Rocha'
 
 # The version info for the project you're documenting, acts as replacement for
