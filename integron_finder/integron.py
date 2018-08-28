@@ -137,8 +137,12 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                 attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
                 attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
 
-                distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
-                                      (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
+                if replicon.topology == 'circ':
+                    distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
+                                          (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
+                else:
+                    distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
+                                          (intI_ac.pos_beg.values[i] - attc_right)])
 
                 if attc_ac:
                     # tmp = (distances /
