@@ -82,6 +82,37 @@ class TestAcba(IntegronTest):
         finder.distutils.spawn.find_executable = self.find_executable_ori
 
 
+    def test_acba_simple_linear(self):
+        replicon_filename = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = "integron_finder --outdir {out_dir} --linear {replicon}".format(out_dir=self.out_dir,
+                                                                                  replicon=self.find_data(
+                                                                                      os.path.join('Replicons',
+                                                                                         replicon_filename + '.fst'
+                                                                                         )
+                                                                                       )
+                                                                                  )
+
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:], loglevel='WARNING')
+
+        output_filename = '{}.integrons'.format(replicon_filename)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13.linear',
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        summary_file_name = '{}.summary'.format(replicon_filename)
+        exp_summary_path = self.find_data(
+            os.path.join('Results_Integron_Finder_acba.007.p01.13.linear', summary_file_name))
+        exp_summary = pd.read_table(exp_summary_path)
+        test_summary_path = os.path.join(test_result_dir, summary_file_name)
+        test_summary = pd.read_table(test_summary_path)
+        pdt.assert_frame_equal(exp_summary, test_summary)
+
+
     def test_acba_simple_no_gbk_no_pdf(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
