@@ -141,9 +141,8 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                     distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
                                           (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
                 else:
-                    distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
-                                          (intI_ac.pos_beg.values[i] - attc_right)])
-
+                    distances = np.array([abs(attc_left - intI_ac.pos_end.values[i]),
+                                          abs(intI_ac.pos_beg.values[i] - attc_right)])
                 if attc_ac:
                     # tmp = (distances /
                     #       np.array([[len(aac) for aac in attc_ac]]))
