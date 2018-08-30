@@ -9,6 +9,7 @@ User Guide
 
    introduction
    installation
+   changes
    tutorial
    webserver
    references

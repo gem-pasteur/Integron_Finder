@@ -18,6 +18,8 @@ the *attC* site.
 
 **How does it work ?**
 
+For each sequence in the input file:
+
 - First, IntegronFinder annotates the DNA sequence's CDS with Prodigal.
 
 - Second, IntegronFinder detects independently integron integrase and *attC*
