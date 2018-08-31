@@ -185,7 +185,7 @@ How to install Python
 The purpose of this section is to provide some help about installing python
 dependencies for IntegronFinder if you never installed any python package.
 
-As IntegronFinder has not been test on Windows, we assume Unix-based operating system.
+As IntegronFinder has not been tested on Windows, we assume Unix-based operating system.
 For Windows users, the best would be to install a unix virtual machine on your computer.
 
 Usually a python distribution is already installed on your machine.
@@ -198,12 +198,9 @@ There are two main distributions (click to access website):
 Download version 3.x which correspond to your machine,
 then make sure that python from these distributions is the default one
 (you can possibly choose that in the preference and/or during installation).
-They both come with all the needed packages but Biopython.
-If you have a **student email adress** from a university-delivering degree,
-you can request an academic licence to *Enthough Canopy* (see `Canopy for Academics`_)
-which will allow you to download additional packages including Biopython.
+Make sure Biopython is installed, otherwise, you will have to install Biopython.
+``pip`` or ``conda`` are recommended as a python packages installer.
 
-Otherwise, you will have to install Biopython manually. ``pip`` is recommended as a python packages installer.
 It works as follow::
 
     (sudo) pip install Biopython==1.71
@@ -213,8 +210,8 @@ To install version 1.71 of Biopython (recommended for IntegronFinder).
 .. note::
     If you don't manage to install all the packages, try googling the error, or don't hesitate to ask a question on `stackoverflow`_.
 
+.. _`Anaconda`: https://www.anaconda.com/download/
 .. _`Enthought Canopy`: https://store.enthought.com/
-.. _`Anaconda`: https://www.continuum.io/downloads
 .. _`Canopy for Academics`: https://store.enthought.com/#canopy-academic
 .. _`stackoverflow`: http://stackoverflow.com/
 
