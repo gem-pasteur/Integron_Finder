@@ -2,14 +2,15 @@
 
 .. _tutorial:
 
-********
-Tutorial
-********
+***********
+Quick start
+***********
 
 We assume here that the program is :ref:`installed <install>`.
 
-Basic use
-=========
+For everyone
+============
+
 .. note::
    The different options will be shown separately, but they can be used
    alltogether unless otherwise stated.
@@ -89,197 +90,21 @@ line, and you can comment out a line ::
 Here, annotation will be made using Pfam-A et Resfams, but not Pfam-B. If a
 protein is hit by 2 different profiles, the one with the best e-value will be kept.
 
+Keep intermediate results
+-------------------------
 
-.. _parallel:
-
-Parallelization
----------------
-
-The time limiting part are HMMER (search integrase) and INFERNAL (search *attC* sites).
-So if you have to analyze one or few replicon the user can set the number of CPU used by HMMER and INFERNAL::
-
-  integron_finder mysequences.fst --cpu 4
-
-Default is 1.
+Integrons finder needs some intermediate results, It includes notably the protein file in fasta (mysequences.prt).
+A folder containing these outputs is generated for each replicon and have name ``other_<replicon_id>``
+This directory is remove at the end. You can keep this directory to see analyse each ``integron_finder`` steps
+with the option ``--keep-tmp``.
 
 
-If you want to deal with lot of replicons (from 10 to more than thoushand) we provide a workflow to parallelize
-the execution by the data. This mean that we cut the data input in chunks (by default of one replicon) then execute
-integron_finder in parallel on each replicon (the number of parallel tasks can be limitted) then agregate the results
-in one golbal summary.
-The workflow use the `nextflow <https://www.nextflow.io/>`_ framework and can be run on a single machine or a cluster.
+Verbosity of outputs
+--------------------
 
-So to run parallel_integron_finder.nf you have to install nextflow first, and  :ref:`integron_finder <install>`.
-Then we provide 2 files parallel_integron_finder.nf which is the workflow itself in nextflow syntax and nextflow.profile.config
-which is a configuration file to execute the workflow.
-The wokflow file should not be modified. Whereas the profile must be adapted to the local architecture.
-
-The file nextflow.profile.config provide two profile a standard and cluster profile
-
-.. warning::
-
-    On Ubuntu Bionic Beaver (18.04) The default java is not suitable to run nextflow
-    So you have to install another jvm
-
-        sudo add-apt-repository ppa:webupd8team/java
-        sudo apt-get update
-        sudo apt-get install oracle-java8-installer
-
-    for more details see: https://medium.com/coderscorner/installing-oracle-java-8-in-ubuntu-16-10-845507b13343
-
-    so now install nextflow.
-    If you have  capsule error like ::
-
-        CAPSULE EXCEPTION: Error resolving dependencies. while processing attribute Allow-Snapshots: false (for stack trace, run with -Dcapsule.log=verbose)
-        Unable to initialize nextflow environment
-
-    install nextflow as follow (change the nextflow version with the last release) ::
-
-        wget -O nextflow http://www.nextflow.io/releases/v0.30.2/nextflow-0.30.2-all
-        chmod 777 nextflow
-
-    for more details see: https://github.com/nextflow-io/nextflow/issues/770#issuecomment-400384617
-
-
-standard profile
-""""""""""""""""
-
-You can specify the number of tasks in parallel by setting the queueSize value ::
-
-    standard {
-            executor {
-                name = 'local'
-                queueSize = 7
-            }
-            process{
-                container = 'Singularity/integron_finder.simg'
-                executor = 'local'
-                $integron_finder{
-                    errorStrategy = 'ignore'
-                    cpu=params.cpu
-                }
-            }
-     }
-
-This profile is to work with the integron_finder singularity image.
-If you don't want to use it but you prefer to use an installed version you can remove the `container` line as following. ::
-
-    standard {
-            executor {
-                name = 'local'
-                queueSize = 7
-            }
-            process{
-                executor = 'local'
-                $integron_finder{
-                    errorStrategy = 'ignore'
-                    cpu=params.cpu
-                }
-            }
-     }
-
-
-All options available in non parallel version are also available for the parallel one.
-A typical command line will be: ::
-
-    ./parallel_integron_finder.nf -profile standard --replicons all_coli.fst --circ  --out E_Coli_all
-
-.. note::
-    the option starting with one dash are for nextflow, whereas the options starting by two dashes are for integron_finder
-
-if you execute this line 2 directory will be created one named `work` containing lot of subdirectories this for all jobs
-launch by nextflow and a directory named `Results_Integron_Finder_E_Coli_all` which contain the final results:
-
-    * integron_report.html
-    * integron_timeline.html
-    * integron_trace.txt
-    * Results_Integron_Finder_E_Coli_all
-
-:integron_report.html: is an HTML execution report: a single document which includes many useful metrics about
-    a workflow execution. For further details see https://www.nextflow.io/docs/latest/tracing.html#execution-report
-
-:integron_timeline.html: is an HTML timeline for all processes executed in your pipeline.
-    For further details see https://www.nextflow.io/docs/latest/tracing.html#timeline-report
-
-:integron_trace.txt: creates an execution tracing file that contains some useful information about
-    each process executed in your pipeline script, including: submission time, start time, completion time,
-    cpu and memory used. For further details see https://www.nextflow.io/docs/latest/tracing.html#trace-report
-
-:Results_Integron_Finder_E_Coli_all: contains the actual results as in non parallel version.
-
-
-cluster profile
-"""""""""""""""
-
-The cluster profile is intented to work on a cluster managed by SLURM.
-If You cluster is managed by an other drm change executor name by the right value
-(see `nextflow supported cluster <https://www.nextflow.io/docs/latest/executor.html>`_ )
-
-You can also managed
-
-* The number of task in parallel with the `executor.queueSize` parameter (here 500).
-  If you remove this line, the system will send in parallel as many jobs as there are replicons in your data set.
-* The queue with `process.queue` parameter (here common,dedicated)
-* and some options specific to your cluster management systems with `process.clusterOptions` parameter ::
-
-
-    cluster {
-        executor {
-            name = 'slurm'
-            queueSize = 500
-        }
-
-        process{
-            container = 'Singularity/integron_finder.simg'
-            executor = 'slurm'
-            queue= 'common,dedicated'
-            clusterOptions = '--qos=fast'
-            $integron_finder{
-                cpu=params.cpu
-            }
-        }
-    }
-
-    singularity{
-        enabled = true
-        runOptions = '-B /pasteur'
-        autoMounts = false
-    }
-
-
-
-The profile above is intended to work with singularity.
-If you want to work with an installed version of `integron_finder`
-remove the `process.container` line and the `singularity block`. ::
-
-   cluster {
-        executor {
-            name = 'slurm'
-            queueSize = 500
-        }
-
-        process{
-            executor = 'slurm'
-            queue= 'common,dedicated'
-            clusterOptions = '--qos=fast'
-            $integron_finder{
-                cpu=params.cpu
-            }
-        }
-    }
-
-
-To run the parallel version on cluster, for instance on a cluster managed by slurm,
-I can launch the main nextflow process in one slot. The parallelization and the submission on the other slots
-is made by nextflow itself so the command line look like: ::
-
-    sbatch --qos fast -p common nextflow run  parallel_integron_finder.nf -profile cluster --replicons all_coli.fst --cpu 2 --local-max --gbk --circ --out E_Coli_all
-
-
-The results will be the same as describe in local execution.
-
-
-
+You can control the verbosity of the outputs with the options ``-v`` or ``-q`` to
+respectively increase or decrease the verbosity.
+These options are cumulative ``-vv`` or ``-qqq``.
 
 Topology
 --------
@@ -323,10 +148,175 @@ The replicons specified in topofile supersede the default topology.
     The topology used to searching integron is report in the *\*.integrons file*
 
 
+For big data people
+===================
+
+.. _parallel:
+
+Parallelization
+---------------
+
+The time limiting part are HMMER (search integrase) and INFERNAL (search *attC* sites).
+So if you have to analyze one or few replicons the user can set the number of CPU used by HMMER and INFERNAL::
+
+  integron_finder mysequences.fst --cpu 4
+
+Default is 1.
+
+
+If you want to deal with a fasta file with a lot of replicons (from 10 to more than thousand) we provide a workflow to parallelize the execution of the data.
+This mean that we cut the data input into chunks (by default of one replicon) then execute
+IntegronFinder in parallel on each replicon (the number of parallel tasks can be limited) then aggregate the results
+in one global summary.
+The workflow use the `nextflow <https://www.nextflow.io/>`_ framework and can be run on a single machine or a cluster.
+
+First, you have to install `nextflow <https://www.nextflow.io/>`_ first, and  :ref:`integron_finder <install>`.
+Then we provide 2 files (you need to download them from the IntegronFinder github repo.)
+
+- `parallel_integron_finder.nf` which is the workflow itself in nextflow syntax
+- `nextflow.config` which is a configuration file to execute the workflow.
+
+The workflow file should not be modified. Whereas the profile must be adapted to the local architecture.
+
+The file `nextflow.config` provide two profiles:
+    - a standard profile for local use
+    - a cluster profile
+
+.. warning::
+
+    On Ubuntu Bionic Beaver (18.04) The default java is not suitable to run nextflow
+    So you have to install another jvm
+
+        sudo add-apt-repository ppa:webupd8team/java
+        sudo apt-get update
+        sudo apt-get install oracle-java8-installer
+
+    for more details see: https://medium.com/coderscorner/installing-oracle-java-8-in-ubuntu-16-10-845507b13343
+
+    so now install nextflow.
+    If you have  capsule error like ::
+
+        CAPSULE EXCEPTION: Error resolving dependencies. while processing attribute Allow-Snapshots: false (for stack trace, run with -Dcapsule.log=verbose)
+        Unable to initialize nextflow environment
+
+    install nextflow as follow (change the nextflow version with the last release) ::
+
+        wget -O nextflow http://www.nextflow.io/releases/v0.30.2/nextflow-0.30.2-all
+        chmod 777 nextflow
+
+    for more details see: https://github.com/nextflow-io/nextflow/issues/770#issuecomment-400384617
+
+
+standard profile
+""""""""""""""""
+
+This profile is used if you want to parallelize IntegronFinder on your machine.
+You can specify the number of tasks in parallel by setting the queueSize value ::
+
+    standard {
+            executor {
+                name = 'local'
+                queueSize = 7
+            }
+            process{
+                // Uncomment the next line if you use a singularity container
+                // container = 'Singularity/integron_finder.simg'
+                executor = 'local'
+                $integron_finder{
+                    errorStrategy = 'ignore'
+                    cpu=params.cpu
+                }
+            }
+     }
+
+If you installed IntegronFinder with singularity, just uncomment the container line in the script, and set the proper path to the container.
+
+All options available in non parallel version are also available for the parallel one.
+A typical command line will be::
+
+    ./parallel_integron_finder.nf -profile standard --replicons all_coli.fst --circ --out E_coli_all
+
+.. note::
+    the option starting with one dash are for nextflow, whereas the options starting by two dashes are for integron_finder
+.. note::
+    Replicons will be considered linear by default (see above), here we use `--circ` to consider replicons circular.
+
+If you execute this line, 2 directories will be created. One named `work` containing lot of subdirectories this for all jobs
+launch by nextflow and a directory named `Results_Integron_Finder_E_coli_all` which contain the final results:
+
+    * integron_report.html
+    * integron_timeline.html
+    * integron_trace.txt
+    * Results_Integron_Finder_E_coli_all
+
+:integron_report.html: is an HTML execution report: a single document which includes many useful metrics about
+    a workflow execution. For further details see https://www.nextflow.io/docs/latest/tracing.html#execution-report
+
+:integron_timeline.html: is an HTML timeline for all processes executed in your pipeline.
+    For further details see https://www.nextflow.io/docs/latest/tracing.html#timeline-report
+
+:integron_trace.txt: creates an execution tracing file that contains some useful information about
+    each process executed in your pipeline script, including: submission time, start time, completion time,
+    cpu and memory used. For further details see https://www.nextflow.io/docs/latest/tracing.html#trace-report
+
+:Results_Integron_Finder_E_coli_all: contains the actual results as in non parallel version.
+
+
+cluster profile
+"""""""""""""""
+
+The cluster profile is intented to work on a cluster managed by SLURM.
+If You cluster is managed by an other drm change executor name by the right value
+(see `nextflow supported cluster <https://www.nextflow.io/docs/latest/executor.html>`_ )
+
+You can also managed
+
+- The number of task in parallel with the `executor.queueSize` parameter (here 500).
+  If you remove this line, the system will send in parallel as many jobs as there are replicons in your data set.
+- The queue with `process.queue` parameter (here common,dedicated)
+- and some options specific to your cluster management systems with `process.clusterOptions` parameter ::
+
+
+    cluster {
+        executor {
+            name = 'slurm'
+            queueSize = 500
+        }
+
+        process{
+            // Uncomment the next line if you use a singularity container
+            // container = 'Singularity/integron_finder.simg'
+            executor = 'slurm'
+            queue= 'common,dedicated'
+            clusterOptions = '--qos=fast'
+            $integron_finder{
+                cpu=params.cpu
+            }
+        }
+    }
+
+    singularity{
+        enabled = true
+        runOptions = '-B /pasteur'
+        autoMounts = false
+    }
+
+If you installed IntegronFinder with singularity, just uncomment the container line in the script, and set the proper path to the container.
+
+
+To run the parallel version on cluster, for instance on a cluster managed by slurm,
+I can launch the main nextflow process in one slot. The parallelization and the submission on the other slots
+is made by nextflow itself so the command line look like: ::
+
+    sbatch --qos fast -p common nextflow run  parallel_integron_finder.nf -profile cluster --replicons all_coli.fst --cpu 2 --local-max --gbk --circ --out E_coli_all
+
+
+The results will be the same as describe in local execution.
+
 .. _advance:
 
-Advanced options
-================
+For integron diggers
+====================
 
 .. _distance_threshold:
 
@@ -355,17 +345,32 @@ This sets the threshold for clustering to 10 kb.
     Functional annotation needs to re-run each time because depending on the aggregation parameters,
     the proteins associated with an integron might change.
 
+Integrase
+---------
+
+We use two HMM profiles for the detection of the integron integrase. One for tyrosine recombinase and one for a specific part of the integron integrase. To be specific we use the intersection of both hits, but one might want to use the union of both hits (and sees whether it exists cluster of attC sites nearby non integron-integrase...). To do so, use::
+
+    integron_finder mysequences.fst --union-integrases
 
 *attC* evalue
 -------------
 
 The default evalue is 1. Sometimes, degenerated *attC* sites can have a evalue
-above 1 and one may want to increase this value to have a better sensitivity,
-to the cost of a much higher false positive rate.
-
+above 1 and one may want to increase this value to have a better sensitivity.
 ::
 
     integron_finder mysequences.fst --evalue-attc 5
+
+Here is a plot of how the sensitivity and false positive rate evolve as a function of the evalue:
+
+|attC_evalue|
+
+
+.. |attC_evalue| image:: /_static/evalue_attC.*
+      :align: middle
+      :width: 400px
+      :alt: attC evalue
+
 
 Palindromes
 -----------
@@ -376,19 +381,3 @@ highest evalue is discarded, but you can choose to keep them with the following
 option::
 
     integron_finder mysequences.fst --keep-palindromes
-
-Keep intermediate results
--------------------------
-
-Integrons finder needs some intermediate results, It includes notably the protein file in fasta (mysequences.prt).
-A folder containing these outputs is generated for each replicon and have name ``other_<replicon_id>``
-This directory is remove at the end. You can keep this directory to see analyse each ``integron_finder`` steps
-with the option ``--keep-tmp``.
-
-
-Verbosity of outputs
---------------------
-
-You can control the verbosity of the outputs with the options ``-v`` or ``-q`` to
-respectively increase or decrease the verbosity.
-These options are cumulative ``-vv`` or ``-qqq``.

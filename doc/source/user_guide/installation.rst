@@ -29,6 +29,7 @@ website).
 - `HMMER 3.1b2`_
 - `INFERNAL 1.1`_
 - `Prodigal V2.6.2`_
+- `Nextflow`_ (for parallelization)
 
 After installation of these programs, they should be in your ``$PATH`` (*i.e.*
 you can type in a terminal ``hmmsearch``, ``cmsearch``, or ``prodigal`` and a
@@ -218,6 +219,8 @@ To install version 1.71 of Biopython (recommended for IntegronFinder).
 .. _`HMMER 3.1b2`: http://hmmer.janelia.org/
 .. _`INFERNAL 1.1`: http://infernal.janelia.org/
 .. _`Prodigal V2.6.2`: https://github.com/hyattpd/Prodigal/releases
+.. _`Nextflow`: https://www.nextflow.io/
+
 .. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/tag/v1.5.0
 .. _`virtualenv`: http://www.virtualenv.org/
 .. _`Canopy CLI`: http://docs.enthought.com/canopy/configure/canopy-cli.html#canopy-cli-venv
