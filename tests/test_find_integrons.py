@@ -276,11 +276,11 @@ class TestFindIntegons(IntegronTest):
         pdt.assert_frame_equal(integron.proteins, exp)
 
 
-    def test_find_integron_proteins(self):
+    def test_find_integron_proteins_circ_replicon(self):
         replicon_name = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
+        topologies = Topology('circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -299,10 +299,6 @@ class TestFindIntegons(IntegronTest):
         args.union_integrases = False
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
 
-        topologies = Topology('circ')
-        with FastaIterator(replicon_path) as sequences_db:
-            sequences_db.topologies = topologies
-            replicon = next(sequences_db)
         args = argparse.Namespace()
         args.evalue_attc = 1.
         args.max_attc_size = 200
@@ -366,6 +362,185 @@ class TestFindIntegons(IntegronTest):
         pdt.assert_frame_equal(integron.attI, exp)
         pdt.assert_frame_equal(integron.proteins, exp)
 
+
+    def test_find_integron_proteins_lin_replicon(self):
+        replicon_name = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        topologies = Topology('lin')
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
+        exp_result_dir = 'Results_Integron_Finder_acba.007.p01.13.linear'
+        attc_file = self.find_data(os.path.join(exp_result_dir,
+                                                'other_{}'.format(replicon.id),
+                                                '{}_attc_table.res'.format(replicon.id)))
+        intI_file = self.find_data(os.path.join(exp_result_dir,
+                                                'other_{}'.format(replicon.id),
+                                                '{}_intI.res'.format(replicon.id)))
+        phageI_file = self.find_data(os.path.join(exp_result_dir,
+                                                  'other_{}'.format(replicon.id),
+                                                  '{}_phage_int.res'.format(replicon.id)))
+        args = argparse.Namespace()
+        args.no_proteins = False
+        args.keep_palindromes = True
+        args.union_integrases = False
+        args.gembase = False  # needed by read_hmm which is called when no_proteins == False
+
+        args = argparse.Namespace()
+        args.evalue_attc = 1.
+        args.max_attc_size = 200
+        args.min_attc_size = 40
+        args.distance_threshold = 4000  # (4kb at least between 2 different arrays)
+        args.attc_model = 'attc_4.cm'
+        args.no_proteins = False
+        args.gembase = False  # needed by read_hmm which is called when no_proteins == False
+        args.union_integrases = False
+        args.keep_palindromes = True
+        args.calin_threshold = 2
+        cfg = Config(args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+
+        exp_msg = """In replicon {}, there are:
+- 0 complete integron(s) found with a total 0 attC site(s)
+- 1 CALIN element(s) found with a total of 3 attC site(s)
+- 1 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
+        with self.catch_log() as log:
+            integrons = find_integron(replicon,
+                                      attc_file,
+                                      intI_file,
+                                      phageI_file,
+                                      cfg)
+            catch_msg = log.get_value().strip()
+        self.assertEqual(catch_msg, exp_msg)
+        self.assertEqual(len(integrons), 2)
+
+        exp_int = []
+        exp = pd.DataFrame({'annotation': 'intI',
+                            'distance_2attC': np.nan,
+                            'evalue':  1.900000e-25,
+                            'model': 'intersection_tyr_intI',
+                            'pos_beg': 55,
+                            'pos_end': 1014,
+                            'strand': 1,
+                            'type_elt': 'protein'},
+                           columns=self.columns,
+                           index=['ACBA.007.P01_13_1'])
+        exp = exp.astype(dtype=self.dtype)
+        exp_int.append(exp)
+        exp_int.append(pd.DataFrame(columns=self.columns).astype(dtype=self.dtype))
+
+        exp_attC = [pd.DataFrame(columns=self.columns).astype(dtype=self.dtype)]
+        exp = pd.DataFrame({'annotation': ['attC'] * 3,
+                            'distance_2attC': [np.nan, 1196.0,  469.0],
+                            'evalue':  [1.000000e-09, 1.000000e-04, 1.100000e-07],
+                            'model': ['attc_4'] * 3,
+                            'pos_beg': [17825, 19080, 19618],
+                            'pos_end': [17884, 19149, 19726],
+                            'strand': [-1, -1, -1],
+                            'type_elt': 'attC'},
+                           columns=self.columns,
+                           index=['attc_001', 'attc_002', 'attc_003'])
+        exp = exp.astype(dtype=self.dtype)
+        exp_attC.append(exp)
+
+        for i, integron in enumerate(integrons):
+            self.assertEqual(integron.replicon.name, replicon_id)
+            pdt.assert_frame_equal(integron.integrase, exp_int[i])
+            pdt.assert_frame_equal(integron.attC, exp_attC[i])
+
+            empty = pd.DataFrame(columns=self.columns).astype(dtype=self.dtype)
+            pdt.assert_frame_equal(integron.promoter, empty)
+            pdt.assert_frame_equal(integron.attI, empty)
+            pdt.assert_frame_equal(integron.proteins, empty)
+
+
+    def test_find_integron_proteins_circ_replicon(self):
+        replicon_name = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
+        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        topologies = Topology('circ')
+        with FastaIterator(replicon_path) as sequences_db:
+            sequences_db.topologies = topologies
+            replicon = next(sequences_db)
+        exp_result_dir = 'Results_Integron_Finder_acba.007.p01.13.circular'
+        attc_file = self.find_data(os.path.join(exp_result_dir,
+                                                'other_{}'.format(replicon.id),
+                                                '{}_attc_table.res'.format(replicon.id)))
+        intI_file = self.find_data(os.path.join(exp_result_dir,
+                                                'other_{}'.format(replicon.id),
+                                                '{}_intI.res'.format(replicon.id)))
+        phageI_file = self.find_data(os.path.join(exp_result_dir,
+                                                  'other_{}'.format(replicon.id),
+                                                  '{}_phage_int.res'.format(replicon.id)))
+        args = argparse.Namespace()
+        args.no_proteins = False
+        args.keep_palindromes = True
+        args.union_integrases = False
+        args.gembase = False  # needed by read_hmm which is called when no_proteins == False
+
+        args = argparse.Namespace()
+        args.evalue_attc = 1.
+        args.max_attc_size = 200
+        args.min_attc_size = 40
+        args.distance_threshold = 4000  # (4kb at least between 2 different arrays)
+        args.attc_model = 'attc_4.cm'
+        args.no_proteins = False
+        args.gembase = False  # needed by read_hmm which is called when no_proteins == False
+        args.union_integrases = False
+        args.keep_palindromes = True
+        args.calin_threshold = 2
+        cfg = Config(args)
+        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+
+        exp_msg = """In replicon {}, there are:
+- 1 complete integron(s) found with a total 3 attC site(s)
+- 0 CALIN element(s) found with a total of 0 attC site(s)
+- 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
+        with self.catch_log() as log:
+            integrons = find_integron(replicon,
+                                      attc_file,
+                                      intI_file,
+                                      phageI_file,
+                                      cfg)
+            catch_msg = log.get_value().strip()
+        self.assertEqual(catch_msg, exp_msg)
+        self.assertEqual(len(integrons), 1)
+        integron = integrons[0]
+        self.assertEqual(integron.replicon.name, replicon_id)
+
+        exp = pd.DataFrame({'annotation': 'intI',
+                            'distance_2attC': np.nan,
+                            'evalue':  1.900000e-25,
+                            'model': 'intersection_tyr_intI',
+                            'pos_beg': 55,
+                            'pos_end': 1014,
+                            'strand': 1,
+                            'type_elt': 'protein'},
+                           columns=self.columns,
+                           index=['ACBA.007.P01_13_1'])
+        exp = exp.astype(dtype=self.dtype)
+        pdt.assert_frame_equal(integron.integrase, exp)
+
+        exp = pd.DataFrame({'annotation': ['attC'] * 3,
+                            'distance_2attC': [np.nan, 1196.0,  469.0],
+                            'evalue':  [1.000000e-09, 1.000000e-04, 1.100000e-07],
+                            'model': ['attc_4'] * 3,
+                            'pos_beg': [17825, 19080, 19618],
+                            'pos_end': [17884, 19149, 19726],
+                            'strand': [-1, -1, -1],
+                            'type_elt': 'attC'},
+                           columns=self.columns,
+                           index=['attc_001', 'attc_002', 'attc_003'])
+        exp = exp.astype(dtype=self.dtype)
+        pdt.assert_frame_equal(integron.attC, exp)
+
+        exp = pd.DataFrame(columns=self.columns)
+        exp = exp.astype(dtype=self.dtype)
+
+        pdt.assert_frame_equal(integron.promoter, exp)
+        pdt.assert_frame_equal(integron.attI, exp)
+        pdt.assert_frame_equal(integron.proteins, exp)
 
     def test_find_integron_proteins_n_union_integrase(self):
         replicon_name = 'acba.007.p01.13'

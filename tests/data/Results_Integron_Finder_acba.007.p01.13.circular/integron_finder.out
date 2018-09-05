@@ -40,7 +40,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
                      =======================
                      
-command used: integron_finder --linear tests/data/Replicons/acba.007.p01.13.fst --keep-tmp  
+command used: integron_finder --circ tests/data/Replicons/acba.007.p01.13.fst --keep-tmp  
   
                      =======================
                      
@@ -50,9 +50,9 @@ INFO     : ############ Processing replicon ACBA.007.P01_13 (1/1) ############
 INFO     : Starting Default search ... :
 INFO     : Default search done... : 
 INFO     : In replicon ACBA.007.P01_13, there are:
-INFO     : - 0 complete integron(s) found with a total 0 attC site(s)
-INFO     : - 1 CALIN element(s) found with a total of 3 attC site(s)
-INFO     : - 1 In0 element(s) found with a total of 0 attC site
+INFO     : - 1 complete integron(s) found with a total 3 attC site(s)
+INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
 INFO     : Adding promoters and attI ... :
 INFO     : Writing out results for replicon ACBA.007.P01_13
 INFO     : Merging integrons results.
