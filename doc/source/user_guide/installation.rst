@@ -29,6 +29,7 @@ website).
 - `HMMER 3.1b2`_
 - `INFERNAL 1.1`_
 - `Prodigal V2.6.2`_
+- `Nextflow`_ (for parallelization)
 
 After installation of these programs, they should be in your ``$PATH`` (*i.e.*
 you can type in a terminal ``hmmsearch``, ``cmsearch``, or ``prodigal`` and a
@@ -119,6 +120,37 @@ In the active terminal just type::
 The integron_finder command will disappear from the path.
 The name of the virtualenv disappear from the prompt.
 
+Conda Package
+"""""""""""""
+
+From 2.0 version, Integron_Finder is available as `conda <https://conda.io/docs/index.html>`_ package.
+Integron_finder is in `bioconda <https://bioconda.github.io/>`_From 2.0 version, Integron_Finder is available as [conda](https://conda.io/docs/index.html) package.
+Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
+(The advantage with this solution is that it will install prodigal, hmmer, and infernal too.)
+
+1. install conda
+2. Set up channels ::
+
+    conda config --add channels defaults
+    conda config --add channels conda-forge
+    conda config --add channels bioconda
+
+3. install integron_finder ::
+
+    conda install integron_finder
+ channel.
+(The advantage with this solution is that it will install prodigal, hmmer, and infernal too.)
+
+1. install conda
+2. Set up channels ::
+
+    conda config --add channels defaults
+    conda config --add channels conda-forge
+    conda config --add channels bioconda
+
+3. install integron_finder ::
+
+    conda install integron_finder
 
 From Version 1.5.1 and after
 ----------------------------
@@ -185,7 +217,7 @@ How to install Python
 The purpose of this section is to provide some help about installing python
 dependencies for IntegronFinder if you never installed any python package.
 
-As IntegronFinder has not been test on Windows, we assume Unix-based operating system.
+As IntegronFinder has not been tested on Windows, we assume Unix-based operating system.
 For Windows users, the best would be to install a unix virtual machine on your computer.
 
 Usually a python distribution is already installed on your machine.
@@ -198,12 +230,9 @@ There are two main distributions (click to access website):
 Download version 3.x which correspond to your machine,
 then make sure that python from these distributions is the default one
 (you can possibly choose that in the preference and/or during installation).
-They both come with all the needed packages but Biopython.
-If you have a **student email adress** from a university-delivering degree,
-you can request an academic licence to *Enthough Canopy* (see `Canopy for Academics`_)
-which will allow you to download additional packages including Biopython.
+Make sure Biopython is installed, otherwise, you will have to install Biopython.
+``pip`` or ``conda`` are recommended as a python packages installer.
 
-Otherwise, you will have to install Biopython manually. ``pip`` is recommended as a python packages installer.
 It works as follow::
 
     (sudo) pip install Biopython==1.71
@@ -213,14 +242,16 @@ To install version 1.71 of Biopython (recommended for IntegronFinder).
 .. note::
     If you don't manage to install all the packages, try googling the error, or don't hesitate to ask a question on `stackoverflow`_.
 
+.. _`Anaconda`: https://www.anaconda.com/download/
 .. _`Enthought Canopy`: https://store.enthought.com/
-.. _`Anaconda`: https://www.continuum.io/downloads
 .. _`Canopy for Academics`: https://store.enthought.com/#canopy-academic
 .. _`stackoverflow`: http://stackoverflow.com/
 
 .. _`HMMER 3.1b2`: http://hmmer.janelia.org/
 .. _`INFERNAL 1.1`: http://infernal.janelia.org/
 .. _`Prodigal V2.6.2`: https://github.com/hyattpd/Prodigal/releases
+.. _`Nextflow`: https://www.nextflow.io/
+
 .. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/tag/v1.5.0
 .. _`virtualenv`: http://www.virtualenv.org/
 .. _`Canopy CLI`: http://docs.enthought.com/canopy/configure/canopy-cli.html#canopy-cli-venv
