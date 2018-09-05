@@ -129,22 +129,22 @@ def parse_args(args):
 
     parser.add_argument('--attc-model',
                         default='attc_4.cm',
-                        help='path or file to the attc model (Covariance Matrix)')
+                        help='Path or file to the attc model (Covariance Matrix).')
 
     parser.add_argument('--evalue-attc',
                         default=1.,
                         type=float,
-                        help='set evalue threshold to filter out hits above it (default: 1)')
+                        help='Set evalue threshold to filter out hits above it (default: 1)')
 
     parser.add_argument('--calin-threshold',
                         default=2,
                         type=int,
-                        help="keep 'CALIN' only if attC sites nuber >= calin-threshold (default: 2")
+                        help="keep 'CALIN' only if attC sites nuber >= calin-threshold (default: 2)")
 
     parser.add_argument("--keep-palindromes",
                         default=False,
-                        help="for a given hit, if the palindromic version is found,"
-                             " don't remove the one with highest evalue ",
+                        help="For a given hit, if the palindromic version is found,"
+                             " don't remove the one with highest evalue.",
                         action="store_true")
 
     parser.add_argument("--no-proteins",
@@ -152,10 +152,15 @@ def parse_args(args):
                         default=False,
                         action="store_true")
 
+    parser.add_argument("--promoter-attI",
+                        help="Search also for promoter and attI sites. (default False)",
+                        default=False,
+                        action="store_true")
+
     parser.add_argument('--max-attc-size',
                         default=200,
                         type=int,
-                        help='set maximum value fot the attC size (default: 200bp)')
+                        help='Set maximum value fot the attC size (default: 200bp)')
 
     parser.add_argument('--min-attc-size',
                         default=40,
@@ -200,7 +205,7 @@ def parse_args(args):
                               help="Set the default topology for replicons to 'linear'",
                               action="store_true")
     parser.add_argument("--topology-file",
-                        help="The path to a file where the topology for each replicon is specified")
+                        help="The path to a file where the topology for each replicon is specified.")
 
     parser.add_argument("-V", "--version",
                         action="version",
@@ -334,19 +339,21 @@ def find_integron_in_one_replicon(replicon, config):
     ##########################
     # Add promoters and attI #
     ##########################
-    _log.info("Adding promoters and attI ... :")
     for integron in integrons:
         integron_type = integron.type()
         if integron_type != "In0":  # complete & CALIN
             if not config.no_proteins:
+                _log.info("Adding proteins ... :")
                 integron.add_proteins(prot_file)
 
-        if integron_type == "complete":
-            integron.add_promoter()
-            integron.add_attI()
-        elif integron_type == "In0":
-            integron.add_attI()
-            integron.add_promoter()
+        _log.info("Adding promoters and attI ... :")
+        if config.promoter_attI:
+            if integron_type == "complete":
+                integron.add_promoter()
+                integron.add_attI()
+            elif integron_type == "In0":
+                integron.add_attI()
+                integron.add_promoter()
     #########################
     # Functional annotation #
     #########################
