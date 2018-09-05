@@ -299,7 +299,7 @@ class TestFindIntegons(IntegronTest):
         args.union_integrases = False
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
 
-        topologies = Topology('lin')
+        topologies = Topology('circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
