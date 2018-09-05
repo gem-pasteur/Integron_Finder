@@ -198,7 +198,7 @@ def parse_args(args):
     topology_grp.add_argument("--circ",
                               dest='circular',
                               default=False,
-                              help="Set the default topology for replicons to 'cirular'",
+                              help="Set the default topology for replicons to 'circular'",
                               action="store_true")
     topology_grp.add_argument("--linear",
                               default=False,
