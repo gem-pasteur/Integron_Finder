@@ -590,9 +590,6 @@ class TestFindIntegons(IntegronTest):
         integron = integrons[0]
         self.assertEqual(integron.replicon.name, replicon_id)
 
-        pd.set_option('display.max_columns', 10)
-        pd.set_option('display.width', 500)
-
         empty = pd.DataFrame(columns=self.columns).astype(dtype=self.dtype)
 
         exp_int = []
