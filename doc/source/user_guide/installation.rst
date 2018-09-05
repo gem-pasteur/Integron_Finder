@@ -120,6 +120,37 @@ In the active terminal just type::
 The integron_finder command will disappear from the path.
 The name of the virtualenv disappear from the prompt.
 
+Conda Package
+"""""""""""""
+
+From 2.0 version, Integron_Finder is available as `conda <https://conda.io/docs/index.html>`_ package.
+Integron_finder is in `bioconda <https://bioconda.github.io/>`_From 2.0 version, Integron_Finder is available as [conda](https://conda.io/docs/index.html) package.
+Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
+(The advantage with this solution is that it will install prodigal, hmmer, and infernal too.)
+
+1. install conda
+2. Set up channels ::
+
+    conda config --add channels defaults
+    conda config --add channels conda-forge
+    conda config --add channels bioconda
+
+3. install integron_finder ::
+
+    conda install integron_finder
+ channel.
+(The advantage with this solution is that it will install prodigal, hmmer, and infernal too.)
+
+1. install conda
+2. Set up channels ::
+
+    conda config --add channels defaults
+    conda config --add channels conda-forge
+    conda config --add channels bioconda
+
+3. install integron_finder ::
+
+    conda install integron_finder
 
 From Version 1.5.1 and after
 ----------------------------

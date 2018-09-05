@@ -42,11 +42,28 @@ if you prefer download a specific version (with renaming the container on the fl
 when you have the image in local you can use it as if integron_finder has been installed
     
     ./integron_finder -h
-    
+
+#### Conda installation
+
+From 2.0 version, Integron_Finder is available as [conda](https://conda.io/docs/index.html) package.
+Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
+(The advantage with this solution is that it will install prodigal, hmmer, and infernal too.)
+
+1. install conda
+2. Set up channels ::
+
+    conda config --add channels defaults
+    conda config --add channels conda-forge
+    conda config --add channels bioconda
+
+3. install integron_finder ::
+
+    conda install integron_finder
+
 ### For developer
 
 If you want to develop or submit a patch on this software you are welcome.
-See "Developer installation" in documentation.
+See `Developer installation <https://integronfinder.readthedocs.io/en/latest/developer_guide/dev_guide.html#developer-installation>`_ in documentation.
 
 
 ## Licence:
