@@ -35,11 +35,10 @@ import numpy as np
 import pandas as pd
 import pandas.util.testing as pdt
 
-# display warning only for non installed integron_finder
-from Bio import BiopythonExperimentalWarning
-import warnings
-warnings.simplefilter('ignore', FutureWarning)
-warnings.simplefilter('ignore', BiopythonExperimentalWarning)
+# # display warning only for non installed integron_finder
+# from Bio import BiopythonExperimentalWarning
+# import warnings
+# warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 try:
     from tests import IntegronTest
@@ -47,7 +46,7 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder.integron import Integron, find_integron
+from integron_finder.integron import find_integron
 from integron_finder.config import Config
 from integron_finder.utils import FastaIterator
 from integron_finder.topology import Topology

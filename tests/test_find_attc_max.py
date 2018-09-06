@@ -35,12 +35,11 @@ import numpy as np
 import pandas as pd
 import pandas.util.testing as pdt
 
-# display warning only for non installed integron_finder
-from Bio import BiopythonExperimentalWarning
-from Bio import Seq, SeqIO
-import warnings
-warnings.simplefilter('ignore', FutureWarning)
-warnings.simplefilter('ignore', BiopythonExperimentalWarning)
+# # display warning only for non installed integron_finder
+# from Bio import BiopythonExperimentalWarning
+#
+# import warnings
+# warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 try:
     from tests import IntegronTest

@@ -36,11 +36,6 @@ m_use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.colors
 
-# display warning only for non installed integron_finder
-from Bio import BiopythonExperimentalWarning
-import warnings
-warnings.simplefilter('ignore', FutureWarning)
-warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 from Bio import Seq
 from Bio import SeqIO
 from Bio import motifs

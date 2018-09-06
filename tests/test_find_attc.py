@@ -32,11 +32,10 @@ import shutil
 import re
 from distutils.spawn import find_executable
 
-# display warning only for non installed integron_finder
-from Bio import BiopythonExperimentalWarning
-import warnings
-warnings.simplefilter('ignore', FutureWarning)
-warnings.simplefilter('ignore', BiopythonExperimentalWarning)
+# # display warning only for non installed integron_finder
+# from Bio import BiopythonExperimentalWarning
+# import warnings
+# warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 try:
     from tests import IntegronTest
