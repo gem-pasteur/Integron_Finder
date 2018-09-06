@@ -27,10 +27,8 @@
 ####################################################################################
 
 import sys
-import colorlog
 
-__version__ = '2.0.rc3'
-
+__version__ = '2.0rc3'
 __INTEGRON_DATA__ = '$INTEGRONDATA'
 
 
@@ -44,22 +42,17 @@ def get_version_message():
     from matplotlib import __version__ as mplt_vers
     from Bio import __version__ as bio_vers
     version_text = """integron_finder version {i_f}
-using:    
+Using:    
  - Python {py}
  - numpy {np}
  - pandas {pd}
  - matplolib {mplt}
  - biopython {bio}
- 
-integron_finder is released under open-source GPLv3,
-This program comes with ABSOLUTELY NO WARRANTY.
-This is free software, and you are welcome to redistribute it
-under certain conditions; see COPYING file for details. 
 
 Authors:
  - Jean Cury, Bertrand Neron, Eduardo Rocha,
 
-citation:
+Citation:
 
  Identification and analysis of integrons and cassette arrays in bacterial genomes
  Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
