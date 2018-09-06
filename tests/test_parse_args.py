@@ -267,24 +267,47 @@ class TestParseArgs(IntegronTest):
 
     def test_version(self):
         real_exit = sys.exit
-
         sys.exit = self.fake_exit
+
+        from numpy import __version__ as np_vers
+        from pandas import __version__ as pd_vers
+        from matplotlib import __version__ as mplt_vers
+        from Bio import __version__ as bio_vers
+        from integron_finder import __version__ as if_vers
+
         with self.catch_io(out=True):
             try:
                 _ = cfg = parse_args(['--version'])
             except TypeError as err:
                 msg = sys.stdout.getvalue()
-                msg_expected = """integron_finder version NOT packaged, it should be development version
-Python {}
+                msg_expected = """integron_finder version {i_f}
+using:    
+ - Python {py}
+ - numpy {np}
+ - pandas {pd}
+ - matplolib {mplt}
+ - biopython {bio}
+ 
+integron_finder is released under open-source GPLv3,
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it
+under certain conditions; see COPYING file for details. 
 
- - open-source GPLv3,
+Authors:
  - Jean Cury, Bertrand Neron, Eduardo Rocha,
- - citation:
+
+citation:
 
  Identification and analysis of integrons and cassette arrays in bacterial genomes
  Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
  Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
- """.format(sys.version)
+ """.format(i_f=if_vers,
+            py=sys.version.replace('\n', ' '),
+            np=np_vers,
+            pd=pd_vers,
+            mplt=mplt_vers,
+            bio=bio_vers
+            )
 
                 self.assertEqual(msg.strip(), msg_expected.strip())
                 # program exit with returncode = 2

@@ -45,6 +45,8 @@ if 'setup.py' in sys.argv:
 else:
     INSTALLER = 'pip'
 
+from integron_finder import __version__ as if_version
+
 
 class install_lib(_install_lib):
 
@@ -67,8 +69,7 @@ class install_lib(_install_lib):
 
         inst = self.distribution.command_options.get('install', {})
         _file = os.path.join('integron_finder', '__init__.py')
-        subst_file(_file, {'VERSION': self.distribution.get_version(),
-                           'INTEGRONDATA': os.path.join(get_install_data_dir(inst), 'integron_finder')})
+        subst_file(_file, {'INTEGRONDATA': os.path.join(get_install_data_dir(inst), 'integron_finder')})
 
         _install_lib.run(self)
 
@@ -222,7 +223,7 @@ except ImportError:
 ###################################################
 
 setup(name='integron_finder',
-      version="2.0rc3",
+      version=if_version,
       description="Integron Finder aims at detecting integrons in DNA sequences",
       long_description=read_md('README.md'),
       author="Jean Cury",

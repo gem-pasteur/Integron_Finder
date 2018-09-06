@@ -29,7 +29,7 @@
 import sys
 import colorlog
 
-__version__ = '$VERSION'
+__version__ = '2.0.rc3'
 
 __INTEGRON_DATA__ = '$INTEGRONDATA'
 
@@ -39,24 +39,38 @@ class IntegronError(Exception):
 
 
 def get_version_message():
-    # if week keep '$VERSION' as is
-    # the setup.py will replace it by the value set in setup
-    # so the test become True even if integron_finder is installed using setup.py
-    if __version__ == '$' + 'VERSION':
-        version = "NOT packaged, it should be development version"
-    else:
-        version = __version__
-    version_text = """integron_finder version {0}
-Python {1}
+    from numpy import __version__ as np_vers
+    from pandas import __version__ as pd_vers
+    from matplotlib import __version__ as mplt_vers
+    from Bio import __version__ as bio_vers
+    version_text = """integron_finder version {i_f}
+using:    
+ - Python {py}
+ - numpy {np}
+ - pandas {pd}
+ - matplolib {mplt}
+ - biopython {bio}
+ 
+integron_finder is released under open-source GPLv3,
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it
+under certain conditions; see COPYING file for details. 
 
- - open-source GPLv3,
+Authors:
  - Jean Cury, Bertrand Neron, Eduardo Rocha,
- - citation:
+
+citation:
 
  Identification and analysis of integrons and cassette arrays in bacterial genomes
  Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
  Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
- """.format(version, sys.version)
+ """.format(i_f=__version__,
+            py=sys.version.replace('\n', ' '),
+            np=np_vers,
+            pd=pd_vers,
+            mplt=mplt_vers,
+            bio=bio_vers
+    )
     return version_text
 
 
