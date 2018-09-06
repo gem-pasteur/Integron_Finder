@@ -27,8 +27,9 @@
 ####################################################################################
 
 import sys
+from time import localtime, strftime
 
-__version__ = '2.0rc3'
+__version__ = 'dev-{}'.format(strftime("%Y-%m-%d", localtime()))
 __INTEGRON_DATA__ = '$INTEGRONDATA'
 
 
