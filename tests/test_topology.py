@@ -34,8 +34,8 @@ except ImportError as err:
 
 from integron_finder.topology import Topology
 
-class TestTopology(IntegronTest):
 
+class TestTopology(IntegronTest):
 
     def test_parse_topology(self):
         topo = Topology('circ')

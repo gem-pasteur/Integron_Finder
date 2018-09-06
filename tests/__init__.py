@@ -39,6 +39,7 @@ import pandas.util.testing as pdt
 
 from integron_finder import IntegronError, logger_set_level
 
+
 class IntegronTest(unittest.TestCase):
 
     _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "data"))

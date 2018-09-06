@@ -30,10 +30,6 @@ import os
 from subprocess import call
 import colorlog
 
-from Bio import BiopythonExperimentalWarning
-import warnings
-warnings.simplefilter('ignore', BiopythonExperimentalWarning)
-
 import numpy as np
 import pandas as pd
 from Bio import SeqFeature

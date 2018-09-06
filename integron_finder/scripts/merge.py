@@ -39,7 +39,7 @@ import colorlog
 
 from integron_finder import IntegronError, logger_set_level
 from integron_finder import utils
-from integron_finder import  results
+from integron_finder import results
 
 
 def merge_integrons(out_file, *in_dirs):

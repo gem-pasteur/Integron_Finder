@@ -36,9 +36,9 @@ import unittest
 import pandas as pd
 import pandas.util.testing as pdt
 
-from Bio import BiopythonExperimentalWarning
-import warnings
-warnings.simplefilter('ignore', BiopythonExperimentalWarning)
+# from Bio import BiopythonExperimentalWarning
+# import warnings
+# warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 from Bio import SeqIO
 
 try:
