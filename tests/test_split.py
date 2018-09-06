@@ -29,7 +29,6 @@
 import tempfile
 import os
 import shutil
-import sys
 import glob
 
 from Bio import BiopythonExperimentalWarning
@@ -43,7 +42,6 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-import integron_finder
 import integron_finder.scripts.split as split
 
 

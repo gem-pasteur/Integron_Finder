@@ -37,7 +37,7 @@ import pandas.util.testing as pdt
 
 # display warning only for non installed integron_finder
 from Bio import BiopythonExperimentalWarning
-from Bio import Seq, SeqIO
+
 import warnings
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
