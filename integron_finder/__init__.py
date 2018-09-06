@@ -68,6 +68,7 @@ Citation:
 
 
 def init_logger(log_file=None, out=True):
+    import colorlog
     logger = colorlog.getLogger('integron_finder')
     logging = colorlog.logging.logging
     if out:
@@ -98,7 +99,16 @@ def init_logger(log_file=None, out=True):
     logger.setLevel(logging.WARNING)
 
 
-def logger_set_level(level=colorlog.logging.logging.WARNING):
+def logger_set_level(level='WARNING'):
+    # default value must be a string
+    # cannot be colorlog.logging.logging.WARNING for instance
+    # because setup import __init__ to get __version__
+    # so logger_set_level is defined
+    # if level is colorlog.logging.logging.WARNING
+    # that mean that colorlog must be already installed
+    # otherwise an error occured during pip install
+    #  NameError: name 'colorlog' is not defined
+    import colorlog
 
     levels = {'NOTSET': colorlog.logging.logging.NOTSET,
               'DEBUG': colorlog.logging.logging.DEBUG,

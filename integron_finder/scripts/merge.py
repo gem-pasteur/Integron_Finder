@@ -33,12 +33,6 @@ import glob
 import shutil
 
 import integron_finder
-if not integron_finder.__version__.endswith('VERSION'):
-    # display warning only for non installed integron_finder
-    from Bio import BiopythonExperimentalWarning
-    import warnings
-    warnings.simplefilter('ignore', FutureWarning)
-    warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 # must be done after import 'integron_finder'
 import colorlog
