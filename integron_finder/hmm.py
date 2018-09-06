@@ -36,7 +36,6 @@ import pandas as pd
 # display warning only for non installed integron_finder
 from Bio import BiopythonExperimentalWarning
 import warnings
-warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 from Bio import SearchIO

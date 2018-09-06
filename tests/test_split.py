@@ -34,7 +34,6 @@ import glob
 
 from Bio import BiopythonExperimentalWarning
 import warnings
-warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 from Bio import SeqIO, Seq
 

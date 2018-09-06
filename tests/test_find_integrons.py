@@ -38,7 +38,6 @@ import pandas.util.testing as pdt
 # display warning only for non installed integron_finder
 from Bio import BiopythonExperimentalWarning
 import warnings
-warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 try:

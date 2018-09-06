@@ -32,7 +32,6 @@ import colorlog
 
 from Bio import BiopythonExperimentalWarning
 import warnings
-warnings.simplefilter('ignore', FutureWarning)
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 import numpy as np
