@@ -28,10 +28,6 @@
 
 import os
 import tempfile
-import shutil
-
-import pandas as pd
-import pandas.util.testing as pdt
 
 try:
     from tests import IntegronTest
