@@ -64,15 +64,18 @@ def scan_hmm_bank(path):
         elif os.path.isfile(real_path):
             with open(real_path) as hmm_bank:
                 for bank_path in hmm_bank:
+                    bank_path = bank_path.strip()
                     if bank_path.startswith('#'):
                         continue
                     elif not os.path.isabs(bank_path):
                         if "_prefix_share" in globals():
                             prefix = _prefix_share
-                        else:
+                        elif 'INTEGRON_HOME' in os.environ:
                             prefix = os.environ['INTEGRON_HOME']
+                        else:
+                            prefix = ''
                         bank_path = os.path.normpath(os.path.join(prefix, bank_path))
-                    bank_files = glob.glob(os.path.expanduser(bank_path.strip("\n").strip()))
+                    bank_files = glob.glob(os.path.expanduser(bank_path))
                     if not bank_files:
                         _log.warning("func_annot '{}' does not match any files.".format(bank_path))
                     else:
