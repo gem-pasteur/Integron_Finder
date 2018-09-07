@@ -24,7 +24,7 @@ or use a container
 #### Singularity container
 
 For reproducibility and easy way to use integron_finder without installing 
-third party software (hmmsearc, ...) or libraries we provides containers based on singularity
+third party software (hmmsearch, ...) or libraries we provides containers based on singularity
 
 [![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1314)
 
