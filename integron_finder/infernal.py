@@ -98,8 +98,10 @@ def local_max(replicon,
     """
     :param replicon: The name of replicon (without suffix)
     :type replicon: :class:`Bio.Seq.SeqRecord` object.
-    :param int window_beg: start of window to search for attc (position of protein)
-    :param int window_end: end of window to search for attc (position of protein)
+    :param int window_beg: Start of window to search for attc (position of protein).
+    :param int window_end: End of window to search for attc (position of protein).
+    :param str model_attc_path: The path to the covariance model for attc (eg: attc_4.cm)
+                                used by cmsearch to find attC sites
     :param str strand_search: The strand on which to looking for attc.
                               Available values:
 
@@ -110,8 +112,8 @@ def local_max(replicon,
     :param float evalue_attc: evalue threshold to filter out hits above it
     :param int max_attc_size: The maximum value fot the attC size
     :param int min_attc_size: The minimum value fot the attC size
-    :param str cmsearch_bin: the path to cmsearch
-    :param str out_dir: the path to directory where to write results
+    :param str cmsearch_bin: The path to cmsearch
+    :param str out_dir: The path to directory where to write results
     :param int cpu_nb: The number of cpu used by cmsearch
     :return: DataFrame with same structure as the DataFrame returns by :func:`read_infernal`
              where position are converted on position on replicon and attc are filtered

@@ -63,9 +63,11 @@ def split(replicon_path, chunk=None, outdir='.'):
     def grouper(sequences_db, chunk_size):
         """
 
-        :param sequences_db:
-        :param chunk_size:
-        :return:
+        :param sequences_db: The sequences to group
+        :type sequences_db: A :class:`integron_finder.utils.FastaIterator` object.
+        :param int chunk_size: The number of sequence by Chunk file.
+        :return: a chunk of sequences.
+        :rtype: An iterator of tuples.
         """
         args = [iter(sequences_db)] * chunk_size
         return zip_longest(*args)
@@ -167,8 +169,8 @@ def main(args=None, log_level=None):
      main entry point to integron_split
 
     :param str args: the arguments passed on the command line
-    :param loglevel: the output verbosity
-    :type loglevel: a positive int or a string among 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
+    :param log_level: the output verbosity
+    :type log_level: a positive int or a string among 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
     """
     global _log
 

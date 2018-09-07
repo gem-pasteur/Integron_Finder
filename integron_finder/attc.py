@@ -178,7 +178,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
     :param str model_attc_path: path to the attc model (Covariance Matrix).
     :param int max_attc_size: maximum value fot the attC size.
     :param bool circular: True if replicon is circular, False otherwise.
-    :param str outfile: the name of cmsearch result file.
+    :param str out_dir: The directory where to write results
+                        used indirectly by some called functions as :func:`infernal.local_lmax` or `infernal.expand`.
     :param int cpu: call local_max with the right number of cpu
     :return:
     :rtype: :class:`pd.DataFrame` object
