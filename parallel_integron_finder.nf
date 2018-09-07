@@ -42,7 +42,8 @@ params.keepTmp = false
 keep_tmp = ''
 params.calin_threshold = false
 calin_threshold = ''
-promoter_attI = false
+params.promoter_attI = false
+promoter_attI = ''
 
 if (params.gbk){
     gbk = '--gbk'
