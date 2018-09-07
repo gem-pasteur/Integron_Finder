@@ -98,4 +98,3 @@ def find_integrase(replicon_path, replicon, prot_file, out_dir, cfg):
             raise RuntimeError("{0} failed : {1}".format(' '.join(cmd), err))
         if returncode != 0:
             raise RuntimeError("{0} failed return code = {1}".format(' '.join(cmd), returncode))
-

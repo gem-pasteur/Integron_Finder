@@ -59,7 +59,7 @@ def read_infernal(infile, replicon_id, len_model_attc,
     ))
     try:
         _ = pd.read_table(infile, comment="#")
-    except:
+    except Exception:
         return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
 
@@ -294,5 +294,4 @@ def expand(replicon,
     max_elt.drop_duplicates(inplace=True)
     max_elt.index = list(range(len(max_elt)))
     return max_elt
-
 

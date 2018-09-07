@@ -144,7 +144,7 @@ def read_hmm(replicon_id, infile, cfg, evalue=1., coverage=0.5):
             best_evalue = np.argmin(evalue_tmp)
 
             df.loc[idx+idx2, "ID_prot"] = id_prot
-            df.loc[idx+idx2, "ID_query"] = id_query # "-"  # remnant of ancient parsing function to keep data structure
+            df.loc[idx+idx2, "ID_query"] = id_query  # "-"  # remnant of ancient parsing function to keep data structure
             df.loc[idx+idx2, "pos_beg"] = int(pos_beg)
             df.loc[idx+idx2, "pos_end"] = int(pos_end)
             df.loc[idx+idx2, "strand"] = int(strand)
