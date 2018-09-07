@@ -147,7 +147,7 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cp
 
 
 def find_attc_max(integrons, replicon, distance_threshold,
-                  model_attc_path, max_attc_size, circular=True, outfile="attC_max_1.res", out_dir='.', cpu=1):
+                  model_attc_path, max_attc_size, circular=True, out_dir='.', cpu=1):
     """
     Look for attC site with cmsearch --max option which remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
