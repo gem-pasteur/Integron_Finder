@@ -120,14 +120,14 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cp
     """
     Call cmsearch to find attC sites in a single replicon.
 
-    :param str replicon_path: the path of the fasta file representing the replicon to analyse
-    :param str replicon_id: the id of the replicon to analyse
-    :param str cmsearch_path: the path to the cmsearch executable
-    :param str out_dir: the path to the directory where cmsearch outputs will be stored
-    :param str model_attc: path to the attc model (Covariance Matrix)
-    :param int cpu: the number of cpu used by cmsearch
-    :returns: None, the results are written on the disk
-    :raises RuntimeError: when cmsearch run failed
+    :param str replicon_path: the path of the fasta file representing the replicon to analyse.
+    :param str replicon_id: the id of the replicon to analyse.
+    :param str cmsearch_path: the path to the cmsearch executable.
+    :param str out_dir: the path to the directory where cmsearch outputs will be stored.
+    :param str model_attc: path to the attc model (Covariance Matrix).
+    :param int cpu: the number of cpu used by cmsearch.
+    :returns: None, the results are written on the disk.
+    :raises RuntimeError: when cmsearch run failed.
     """
     cmsearch_cmd = [cmsearch_path,
                     "--cpu", str(cpu),
