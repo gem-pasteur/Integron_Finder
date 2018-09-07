@@ -42,6 +42,7 @@ params.keepTmp = false
 keep_tmp = ''
 params.calin_threshold = false
 calin_threshold = ''
+promoter_attI = false
 
 if (params.gbk){
     gbk = '--gbk'
@@ -113,7 +114,9 @@ if (params.keepTmp){
 if (params.calin_threshold){
     calin_threshold = "--calin-threshold ${params.calin_threshold}"
 }
-
+if (params.promoter_attI){
+    promoter_attI = "--promoter-attI ${params.promoter_attI}"
+}
 
 /****************************************
  *           The workflow               *
@@ -160,7 +163,7 @@ process integron_finder{
 
     script:
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpu} --mute ${one_chunk}
+        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${params.promoter_attI} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpu} --mute ${one_chunk}
         """
 }
 
