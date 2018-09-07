@@ -395,7 +395,6 @@ def find_integron_in_one_replicon(replicon, config):
     return integron_file, summary_file
 
 
-
 def header(args):
     """
 

@@ -64,7 +64,7 @@ Citation:
             pd=pd_vers,
             mplt=mplt_vers,
             bio=bio_vers
-    )
+            )
     return version_text
 
 

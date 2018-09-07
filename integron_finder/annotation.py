@@ -52,7 +52,8 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
     :type replicon: :class:`Bio.Seq.SeqRecord` object
     :param str prot_file: the path to a fasta file containing the sequence proteins of the replicon
                           these proteins constitute the bank scanned by hmmsearch
-    :param str hmm_files: list of path of hmm profiles to use to scan the prot_file
+    :param hmm_files: List of path of hmm profiles to use to scan the prot_file
+    :type hmm_files: List[str]
     :param cfg: the configuration for this analyse
     :type cfg: :class:`integron_finder.config.Config`
     :param str out_dir: the path of the directory where to store the results
@@ -95,12 +96,12 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
                 hmm_out = os.path.join(out_dir, "{}_fa.res".format(name_wo_ext))
                 hmm_tableout = os.path.join(out_dir, "{}_fa_table.res".format(name_wo_ext))
                 hmm_cmd = [cfg.hmmsearch,
-                            "-Z", str(prot_nb),
-                            "--cpu", str(cfg.cpu),
-                            "--tblout", hmm_tableout,
-                            "-o", hmm_out,
-                            hmm,
-                            prot_tmp]
+                           "-Z", str(prot_nb),
+                           "--cpu", str(cfg.cpu),
+                           "--tblout", hmm_tableout,
+                           "-o", hmm_out,
+                           hmm,
+                           prot_tmp]
 
                 try:
                     _log.debug("run hmmsearch: {}".format(' '.join(hmm_cmd)))

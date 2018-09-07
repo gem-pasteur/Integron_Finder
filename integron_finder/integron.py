@@ -122,11 +122,11 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
 
                 integrons.append(Integron(replicon, cfg))
                 integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
-                                       intI_ac.pos_end.values[i],
-                                       id_int,
-                                       int(intI_ac.strand.values[i]),
-                                       intI_ac.evalue.values[i],
-                                       intI_ac.query_name.values[i])
+                                            intI_ac.pos_end.values[i],
+                                            id_int,
+                                            int(intI_ac.strand.values[i]),
+                                            intI_ac.evalue.values[i],
+                                            intI_ac.query_name.values[i])
 
             else:  # we still have attC and int :
                 attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
@@ -203,7 +203,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
                                        1 if a_tmp[6] == "+" else -1,
                                        a_tmp[7], cfg.model_attc_name)
 
-    elif intI_ac.pos_end.values.size >= 1 and not attc_ac: # If intI only
+    elif intI_ac.pos_end.values.size >= 1 and not attc_ac:  # If intI only
         for i, id_int in enumerate(intI_ac.ID_prot.values):
             integrons.append(Integron(replicon, cfg))
             integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
@@ -337,7 +337,7 @@ class Integron(object):
                                          self.attC.iloc[attC_len - 2].pos_end) % len(self.replicon))
         self.attC["distance_2attC"] = self.sizes_cassettes
 
-        #self.attC.sort_values(["pos_beg"], inplace = True)
+        # self.attC.sort_values(["pos_beg"], inplace = True)
         self.attC.index = ["attc_%03i" % int(j + 1) for j in self.attC.index]
 
 
@@ -462,9 +462,9 @@ class Integron(object):
             strand_array = self.attC.strand.unique()[0]
 
         if left < right:
-            seq_Pc = self.replicon.seq[left - dist_prom : right + dist_prom]
+            seq_Pc = self.replicon.seq[left - dist_prom:right + dist_prom]
         else:
-            seq_Pc1 = self.replicon.seq[left - dist_prom : self.replicon_size]
+            seq_Pc1 = self.replicon.seq[left - dist_prom:self.replicon_size]
             seq_Pc2 = self.replicon.seq[:right + dist_prom]
             seq_Pc = seq_Pc1 + seq_Pc2
 
