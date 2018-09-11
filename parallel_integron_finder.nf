@@ -45,6 +45,15 @@ topology_file = params['topology-file'] ? "--topology-file ${params['topology-fi
 keep_tmp = params['keep-tmp'] ? '--keep-tmp' : ''
 calin_threshold = params['calin-threshold'] ? "--calin-threshold ${params['calin-threshold']}" : ''
 
+if (! params.replicons){
+    throw new Exception("The option '--replicons' is mandatory.")
+}
+
+params.out = false
+replicon_file = new File(params.replicons)
+res_dir_suffix = params.out ? params.out : replicon_file.name.split("\\.", 2)[0]
+result_dir = "Results_Integron_Finder_${res_dir_suffix}"
+
 
 /****************************************
  *           The workflow               *
@@ -97,17 +106,17 @@ process integron_finder{
 
 
 process merge{
-    publishDir "Results_Integron_Finder_${params.out}", mode:'copy'
+    publishDir "${result_dir}", mode:'copy'
 
     input:
         file all_chunk_results from all_chunk_results_dir.toList()
 
     output:
-        file "Results_Integron_Finder_${params.out}"
+        file "${result_dir}"
         
     script:
         """
-        integron_merge "Results_Integron_Finder_${params.out}" "${params.out}" ${all_chunk_results}
+        integron_merge "${result_dir}" "${res_dir_suffix}" ${all_chunk_results}
         """
 }
 
@@ -115,7 +124,7 @@ process merge{
 workflow.onComplete {
     if ( workflow.success )
         println("\nDone!")
-        println("Results are in --> Results_Integron_Finder_${params.out}")
+        println("Results are in --> ${result_dir}")
 
 }
 
