@@ -7,112 +7,43 @@ replicons_file = Channel.fromPath(params.replicons)
  *************************/
 
 params.gbk = false
-gbk = ''
 params.pdf = false
-pdf = ''
-params.localMax= false
-local_max = ''
-params.funcAnnot = false
-func_annot = ''
-params.distanceThresh = false
-dist_thr = ''
-params.unionIntegrases = false
-union_integrases = ''
-params.pathFuncAnnot = false
-path_func_annot = ''
-params.attcModel = false
-attc_model = ''
-params.evalueAttc = false
-evalue_attc = ''
-params.keepPalindrome = false
-keep_palindrome = ''
-params.noProteins = false
-no_proteins = ''
-params.maxAttcSize = false
-max_attc_size = ''
-params.minAttcSize = false
-min_attc_size = ''
+params['local-max']= false
+params['func-annot'] = false
+params['distance-threshold'] = false
+params['union-integrases'] = false
+params['path-func-annot'] = false
+params['attc-model'] = false
+params['evalue-attc'] = false
+params['keep-palindrome'] = false
+params['no-proteins'] = false
+params['max-attc-size'] = false
+params['min-attc-size'] = false
 params.circ = false
-circ = ''
 params.linear = false
-linear = ''
-params.topologyFile = false
-topology_file = ''
-params.keepTmp = false
-keep_tmp = ''
-params.calin_threshold = false
-calin_threshold = ''
+params['topology-file'] = false
+params['keep-tmp'] = false
+params['calin-threshold'] = false
 
-if (params.gbk){
-    gbk = '--gbk'
-}
 
-if (params.pdf){
-    pdf = '--pdf'
-}
-
-if (params.localMax){
-    local_max = '--local-max'
-}
-
-if (params.funcAnnot){
-    func_annot = '--func-annot'
-}
-
-if (params.pathFuncAnnot){
-    path_func_annot = "--path-func-annot ${params.pathFuncAnnot}"
-}
-
-if (params.distanceThresh){
-    dist_thr = "--distance-thresh ${params.distanceThreshold}"
-}
-
-if (params.unionIntegrases){
-    union_integrases = '--union-integrase'
-}
-
-if (params.attcModel){
-    attc_model = "--attc-model ${params.attcModel}"
-}
-
-if (params.evalueAttc){
-    evalue_attc = "--evalue-attc ${params.evalueAttc}"
-}
-
-if (params.keepPalindrome){
-    keep_palindrome = '--keep-palindrome'
-}
-
-if (params.noProteins){
-    no_proteins = '--no-proteins'
-}
-
-if (params.maxAttcSize){
-    max_attc_size = "--max-attc-size ${params.maxAttcSize}"
-}
-
-if (params.minAttcSize){
-    min_attc_size = "--min-attc-size ${params.minAttcSize}"
-}
-
-if (params.circ){
-    circ = '--circ'
-}
-
-if (params.linear){
-    linear = '--linear'
-}
-
-if (params.topologyFile){
-    topology_file = "--topology-file ${params.topologyFile}"
-}
-
-if (params.keepTmp){
-    keep_tmp = '--keepTmp'
-}
-if (params.calin_threshold){
-    calin_threshold = "--calin-threshold ${params.calin_threshold}"
-}
+gbk = params.gbk ? '--gbk' : ''
+pdf = params.pdf ? '--pdf' : ''
+local_max = params['local-max'] ? '--local-max' : ''
+func_annot = params['func-annot'] ? '--func-annot' : ''
+path_func_annot = params['path-func-annot'] ? "--path-func-annot ${params['path-func-annot']}" : ''
+dist_thr = params['distance-threshold'] ? "--distance-thresh ${params['distance-threshold']}" : ''
+union_integrases = params['union-integrases'] ? '--union-integrase' : ''
+attc_model = params['attc-model'] ? "--attc-model ${params['attc-model']}" : ''
+evalue_attc = params['evalue-attc'] ? "--evalue-attc ${params['evalue-attc']}" : ''
+keep_palindrome = params['keep-palindrome'] ? '--keep-palindrome' : ''
+no_proteins = params['no-proteins'] ? '--no-proteins' : ''
+max_attc_size = params['max-attc-size'] ? "--max-attc-size ${params['max-attc-size']}" : ''
+min_attc_size = params['min-attc-size'] ? "--min-attc-size ${params['min-attc-size']}" : ''
+circ = params.circ ? '--circ' : ''
+linear = params.linear ? '--linear' : ''
+topology_file = params['topology-file'] ? "--topology-file ${params['topology-file']}" : ''
+keep_tmp = params['keep-tmp'] ? '--keep-tmp' : ''
+calin_threshold = params['calin-threshold'] ? "--calin-threshold ${params['calin-threshold']}" : ''
 
 
 /****************************************
@@ -160,13 +91,13 @@ process integron_finder{
 
     script:
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpu} --mute ${one_chunk}
+        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} --mute ${one_chunk}
         """
 }
 
 
 process merge{
-    publishDir "Results_Integron_Finder_${params.out}"
+    publishDir "Results_Integron_Finder_${params.out}", mode:'copy'
 
     input:
         file all_chunk_results from all_chunk_results_dir.toList()
