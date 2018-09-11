@@ -17,6 +17,7 @@ params['attc-model'] = false
 params['evalue-attc'] = false
 params['keep-palindrome'] = false
 params['no-proteins'] = false
+params['promoter-attI'] = false
 params['max-attc-size'] = false
 params['min-attc-size'] = false
 params.circ = false
@@ -37,6 +38,7 @@ attc_model = params['attc-model'] ? "--attc-model ${params['attc-model']}" : ''
 evalue_attc = params['evalue-attc'] ? "--evalue-attc ${params['evalue-attc']}" : ''
 keep_palindrome = params['keep-palindrome'] ? '--keep-palindrome' : ''
 no_proteins = params['no-proteins'] ? '--no-proteins' : ''
+promoter = params['promoter-attI'] ? '--promoter-attI' : ''
 max_attc_size = params['max-attc-size'] ? "--max-attc-size ${params['max-attc-size']}" : ''
 min_attc_size = params['min-attc-size'] ? "--min-attc-size ${params['min-attc-size']}" : ''
 circ = params.circ ? '--circ' : ''
@@ -91,6 +93,7 @@ process integron_finder{
         val evalue_attc
         val keep_palindrome
         val no_proteins
+        val promoter
         val max_attc_size
         val min_attc_size
         val keep_tmp
@@ -100,7 +103,7 @@ process integron_finder{
 
     script:
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} --mute ${one_chunk}
+        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} --mute ${one_chunk}
         """
 }
 
