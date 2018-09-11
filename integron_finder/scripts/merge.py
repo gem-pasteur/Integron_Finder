@@ -84,19 +84,36 @@ def merge_summary(out_file, *in_dirs):
         return out_file
 
 
-def copy_file(out_dir, ext, *in_dirs):
+def copy_file(out_dir, ext, *from_dirs):
     """
-    copy files in *in_dirs* and finishing with *ext* to the *out_dir* directory
+    copy files from *from_dirs* and finishing with *ext* to the *out_dir* directory
 
-    :param in_dirs: The path of the source directories
-    :type in_dirs: list of str
     :param str out_dir: The path to the destination directory
     :param str ext: the extension of files to copy
+    :param from_dirs: The path of the source directories
+    :type from_dirs: list of str
     """
-    for _dir in in_dirs:
-        in_files = glob.glob(os.path.join(_dir, '*' + ext))
-        for one_file in in_files:
+    for _dir in from_dirs:
+        from_files = glob.glob(os.path.join(_dir, '*' + ext))
+        for one_file in from_files:
             shutil.copy(one_file, out_dir)
+
+
+def copy_dir(out_dir, pattern, *from_dirs):
+    """
+    Look inside directories _from_dir if some dir match the pattern (glob)
+    and copy the last element of each matched path to out_dir
+
+    :param out_dir: The path to the destination directory
+    :param str pattern: pattern to match
+    :param from_dirs: The path of the source directories
+    :type from_dirs: list of str
+    """
+    for _dir in from_dirs:
+        dirs = glob.glob(os.path.join(_dir, pattern))
+        for one_dir in dirs:
+            dest_dir = os.path.basename(one_dir)
+            shutil.copytree(one_dir, os.path.join(out_dir, dest_dir))
 
 
 def parse_args(args=None):
@@ -172,6 +189,7 @@ def main(args=None, log_level=None):
     merge_summary(summary_file_out, *parsed_args.results)
     copy_file(outdir, '.gbk', *parsed_args.results)
     copy_file(outdir, '.pdf', *parsed_args.results)
+    copy_dir(outdir, 'other_*', *parsed_args.results)
 
 
 if __name__ == '__main__':
