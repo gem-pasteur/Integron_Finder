@@ -228,7 +228,7 @@ to download it ::
 
 to get the latest version or use *-r* option to specify a version::
 
-nextflow pull -r release_2.0 gem-pasteur/Integron_Finder
+    nextflow pull -r release_2.0 gem-pasteur/Integron_Finder
 
 to see what you download ::
 
@@ -236,7 +236,7 @@ to see what you download ::
 
 to execute it directly ::
 
-nextflow run gem-pasteur/Integron_Finder -profile standard --replicons all_coli.fst --circ
+    nextflow run gem-pasteur/Integron_Finder -profile standard --replicons all_coli.fst --circ
 
 
 
