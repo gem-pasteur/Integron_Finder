@@ -90,6 +90,13 @@ line, and you can comment out a line ::
 Here, annotation will be made using Pfam-A et Resfams, but not Pfam-B. If a
 protein is hit by 2 different profiles, the one with the best e-value will be kept.
 
+Search for promoter and AttI sites
+----------------------------------
+
+By default ``integron_finder`` look for *attC* sites and site-specific integron integrase,,
+If you want to search for known promoters (integrase, Pc-int1 and Pc-int3) and AttI sites
+in integrons elements you need to add the ``--promoter-attI`` option on the command line.
+
 Keep intermediate results
 -------------------------
 
@@ -178,9 +185,11 @@ Then we provide 2 files (you need to download them from the IntegronFinder githu
 
 The workflow file should not be modified. Whereas the profile must be adapted to the local architecture.
 
-The file `nextflow.config` provide two profiles:
+The file `nextflow.config` provide for profiles:
     - a standard profile for local use
     - a cluster profile
+    - a standard profile using singularity container
+    - a cluster profile using singularity container
 
 .. warning::
 
@@ -199,12 +208,36 @@ The file `nextflow.config` provide two profiles:
         CAPSULE EXCEPTION: Error resolving dependencies. while processing attribute Allow-Snapshots: false (for stack trace, run with -Dcapsule.log=verbose)
         Unable to initialize nextflow environment
 
-    install nextflow as follow (change the nextflow version with the last release) ::
+    install nextflow (>=0.29.0) as follow (change the nextflow version with the last release) ::
 
         wget -O nextflow http://www.nextflow.io/releases/v0.30.2/nextflow-0.30.2-all
         chmod 777 nextflow
 
     for more details see: https://github.com/nextflow-io/nextflow/issues/770#issuecomment-400384617
+
+How to get parallel_integron_finder
+""""""""""""""""""""""""""""""""""""
+
+The release contains the workflow `parallel_integron_finder.nf` and the `nextflow.config` at the top level of the archive
+But If you use pip to install Integron_Finder you have not easily access to them.
+But they can be downloaded or executed directly by using nextflow.
+
+to download it ::
+
+    nextflow pull gem-pasteur/Integron_Finder
+
+to get the latest version or use *-r* option to specify a version::
+
+nextflow pull -r release_2.0 gem-pasteur/Integron_Finder
+
+to see what you download ::
+
+    nextflow see Integron_Finder
+
+to execute it directly ::
+
+nextflow run gem-pasteur/Integron_Finder -profile standard --replicons all_coli.fst --circ
+
 
 
 standard profile
@@ -219,8 +252,6 @@ You can specify the number of tasks in parallel by setting the queueSize value :
                 queueSize = 7
             }
             process{
-                // Uncomment the next line if you use a singularity container
-                // container = 'Singularity/integron_finder.simg'
                 executor = 'local'
                 $integron_finder{
                     errorStrategy = 'ignore'
@@ -237,9 +268,12 @@ A typical command line will be::
     ./parallel_integron_finder.nf -profile standard --replicons all_coli.fst --circ --out E_coli_all
 
 .. note::
-    the option starting with one dash are for nextflow, whereas the options starting by two dashes are for integron_finder
+    The options starting with one dash are for nextflow workflow engine,
+    whereas the options starting by two dashes are for integron_finder workflow.
+
 .. note::
-    Replicons will be considered linear by default (see above), here we use `--circ` to consider replicons circular.
+    Replicons will be considered linear by default (see above),
+    here we use `--circ` to consider replicons circular.
 
 If you execute this line, 2 directories will be created. One named `work` containing lot of subdirectories this for all jobs
 launch by nextflow and a directory named `Results_Integron_Finder_E_coli_all` which contain the final results:
@@ -284,8 +318,6 @@ You can also managed
         }
 
         process{
-            // Uncomment the next line if you use a singularity container
-            // container = 'Singularity/integron_finder.simg'
             executor = 'slurm'
             queue= 'common,dedicated'
             clusterOptions = '--qos=fast'
@@ -295,23 +327,67 @@ You can also managed
         }
     }
 
-    singularity{
-        enabled = true
-        runOptions = '-B /pasteur'
-        autoMounts = false
-    }
-
-If you installed IntegronFinder with singularity, just uncomment the container line in the script, and set the proper path to the container.
-
-
 To run the parallel version on cluster, for instance on a cluster managed by slurm,
 I can launch the main nextflow process in one slot. The parallelization and the submission on the other slots
-is made by nextflow itself so the command line look like: ::
+is made by nextflow itself.
+Below a command line to run parallel_integron_finder and use 2 cpus per integron_finder task,
+each integron_finder task can be executed on different machines, each integron_finder task claim 2 cpus to speed up
+the attC sites or integrase search::
 
-    sbatch --qos fast -p common nextflow run  parallel_integron_finder.nf -profile cluster --replicons all_coli.fst --cpu 2 --local-max --gbk --circ --out E_coli_all
+    sbatch --qos fast -p common nextflow run  parallel_integron_finder.nf -profile cluster --replicons all_coli.fst --cpu 2 --local-max --gbk --circ
 
 
 The results will be the same as describe in local execution.
+
+singualrity profiles
+""""""""""""""""""""
+
+If you use the singularity integron_finder image, use the profile *standard_singularity*.
+With the command line below nextflow will download parallel_integron_finder from github and
+download the integron_finder image from the singularity-hub so you haven't to install anything except
+nextflow and singularity. ::
+
+    nextflow run gem-pasteur/Integron_Finder -profile standard_singularity --replicons all_coli.fst --circ --out E_coli_all
+
+
+You can also use the integron_finder singularity image on a cluster, for this use the profile *cluster_singularity*. ::
+
+    sbatch --qos fast -p common nextflow run  gem-pasteur/Integron_Finder:2.0 -profile cluster_singualrity --replicons all_coli.fst --cpu 2 --local-max --gbk --circ
+
+In the case of your cluster cannot reach the world wide web. you have to download the singularity image ::
+
+    singularity pull --name Integron_Finder shub://gem-pasteur/integron_finder:2.0
+
+the move the image on your cluster
+modify the nextflow.config to point on the location of the image, and adapt the cluster options
+ (executor, queue, ...) to your architecture ::
+
+     cluster_singularity {
+            executor {
+                name = 'slurm'
+                queueSize = 500
+            }
+
+            process {
+                container = /path/to/integron_finder
+                queue = 'common,dedicated'
+                clusterOptions = '--qos=fast'
+                withName: integron_finder {
+                    cpus = params.cpu
+                }
+            }
+            singularity {
+                enabled = true
+                runOptions = '-B /pasteur'
+                autoMounts = false
+           }
+        }
+    }
+
+then run it ::
+
+    sbatch --qos fast -p common nextflow run  ./parallel_integron_finder.nf -profile cluster_singualrity --replicons all_coli.fst --cpu 2 --local-max --gbk --circ
+
 
 .. _advance:
 
@@ -348,7 +424,11 @@ This sets the threshold for clustering to 10 kb.
 Integrase
 ---------
 
-We use two HMM profiles for the detection of the integron integrase. One for tyrosine recombinase and one for a specific part of the integron integrase. To be specific we use the intersection of both hits, but one might want to use the union of both hits (and sees whether it exists cluster of attC sites nearby non integron-integrase...). To do so, use::
+We use two HMM profiles for the detection of the integron integrase.
+One for tyrosine recombinase and one for a specific part of the integron integrase.
+To be specific we use the intersection of both hits,
+but one might want to use the union of both hits (and sees whether it exists cluster of attC sites nearby non integron-integrase...).
+To do so, use::
 
     integron_finder mysequences.fst --union-integrases
 
