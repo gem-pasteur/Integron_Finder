@@ -120,14 +120,14 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cp
     """
     Call cmsearch to find attC sites in a single replicon.
 
-    :param str replicon_path: the path of the fasta file representing the replicon to analyse
-    :param str replicon_id: the id of the replicon to analyse
-    :param str cmsearch_path: the path to the cmsearch executable
-    :param str out_dir: the path to the directory where cmsearch outputs will be stored
-    :param str model_attc: path to the attc model (Covariance Matrix)
-    :param int cpu: the number of cpu used by cmsearch
-    :returns: None, the results are written on the disk
-    :raises RuntimeError: when cmsearch run failed
+    :param str replicon_path: the path of the fasta file representing the replicon to analyse.
+    :param str replicon_id: the id of the replicon to analyse.
+    :param str cmsearch_path: the path to the cmsearch executable.
+    :param str out_dir: the path to the directory where cmsearch outputs will be stored.
+    :param str model_attc: path to the attc model (Covariance Matrix).
+    :param int cpu: the number of cpu used by cmsearch.
+    :returns: None, the results are written on the disk.
+    :raises RuntimeError: when cmsearch run failed.
     """
     cmsearch_cmd = [cmsearch_path,
                     "--cpu", str(cpu),
@@ -147,7 +147,7 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cp
 
 
 def find_attc_max(integrons, replicon, distance_threshold,
-                  model_attc_path, max_attc_size, circular=True, outfile="attC_max_1.res", out_dir='.', cpu=1):
+                  model_attc_path, max_attc_size, circular=True, out_dir='.', cpu=1):
     """
     Look for attC site with cmsearch --max option which remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
@@ -178,7 +178,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
     :param str model_attc_path: path to the attc model (Covariance Matrix).
     :param int max_attc_size: maximum value fot the attC size.
     :param bool circular: True if replicon is circular, False otherwise.
-    :param str outfile: the name of cmsearch result file.
+    :param str out_dir: The directory where to write results
+                        used indirectly by some called functions as :func:`infernal.local_lmax` or `infernal.expand`.
     :param int cpu: call local_max with the right number of cpu
     :return:
     :rtype: :class:`pd.DataFrame` object

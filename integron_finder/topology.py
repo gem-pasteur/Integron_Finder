@@ -28,6 +28,7 @@
 
 from collections import defaultdict
 
+
 class Topology(object):
     """Class to parse and handle replicons topologies"""
 
@@ -87,4 +88,3 @@ class Topology(object):
         :returns: the topology for the replicon corresponding to the replicon_id
         """
         return self._topology[replicon_id]
-

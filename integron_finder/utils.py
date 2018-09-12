@@ -151,6 +151,7 @@ class FastaIterator(object):
     def close(self):
         self.seq_index.close()
 
+
 def model_len(path):
     """
 
