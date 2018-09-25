@@ -125,11 +125,42 @@ def parse_args(args=None):
     :return: the arguments parsed.
     :rtype: a :class:`argparse.Namespace` object.
     """
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
+    description = """Merge different integron_finder results in one
+     
+ - merge the '.integrons' files
+ - merge the '.summary' files
+ - copy the *.pdf files if they exist
+ - copy the *.gbk file if they exist
+ - copy the temporary directory if they exist
+
+for instance to merge the results from 3 analysis
+     
+  - Results_Integron_Finder_psa_1
+  - Results_Integron_Finder_psa_2
+  - Results_Integron_Finder_psa_3
+     
+into new directory Results_Integron_Finder_foo_bar
+
+integron_merge Results_Integron_Finder_foo_bar baz  Results_Integron_Finder_psa*
+    
+will give :
+
+- one directory: Results_Integron_Finder_foo_bar
+
+containing
+
+    - baz .integrons
+    - baz .summary
+    - psa_1.gbk
+    - psa_2.gbk
+    - psa_3.gbk
+"""
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=description)
     parser.add_argument('outdir',
-                        help='path of the merged result directory')
+                        help='path of directory where the merged result must be stored')
     parser.add_argument('outfile',
-                        help='the basename of the result file without extension, eg : file1')
+                        help="the basename of the result files ('.integrons' and '.summary') "
+                             "without extension, eg : data_set_1")
     parser.add_argument('results',
                         nargs='+',
                         help='Path to the results dir to merge eg : path/to/ Results_Integron_Finder_acba.007.p01.13 '
