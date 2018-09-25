@@ -109,13 +109,13 @@ process integron_finder{
 
 
 process merge{
-    publishDir "${result_dir}", mode:'copy'
+    publishDir path:"${result_dir}", mode:'copy'
 
     input:
         file all_chunk_results from all_chunk_results_dir.toList()
 
     output:
-        file "${result_dir}"
+        file "${result_dir}" into finale_res
         
     script:
         """
