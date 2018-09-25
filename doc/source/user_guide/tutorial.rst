@@ -276,24 +276,8 @@ A typical command line will be::
     here we use `--circ` to consider replicons circular.
 
 If you execute this line, 2 directories will be created. One named `work` containing lot of subdirectories this for all jobs
-launch by nextflow and a directory named `Results_Integron_Finder_E_coli_all` which contain the final results:
-
-    * integron_report.html
-    * integron_timeline.html
-    * integron_trace.txt
-    * Results_Integron_Finder_E_coli_all
-
-:integron_report.html: is an HTML execution report: a single document which includes many useful metrics about
-    a workflow execution. For further details see https://www.nextflow.io/docs/latest/tracing.html#execution-report
-
-:integron_timeline.html: is an HTML timeline for all processes executed in your pipeline.
-    For further details see https://www.nextflow.io/docs/latest/tracing.html#timeline-report
-
-:integron_trace.txt: creates an execution tracing file that contains some useful information about
-    each process executed in your pipeline script, including: submission time, start time, completion time,
-    cpu and memory used. For further details see https://www.nextflow.io/docs/latest/tracing.html#trace-report
-
-:Results_Integron_Finder_E_coli_all: contains the actual results as in non parallel version.
+launch by nextflow and a directory named `Results_Integron_Finder_E_coli_all` which contain the final results
+as in non parallel version.
 
 
 cluster profile
@@ -360,7 +344,7 @@ In the case of your cluster cannot reach the world wide web. you have to downloa
 
 the move the image on your cluster
 modify the nextflow.config to point on the location of the image, and adapt the cluster options
- (executor, queue, ...) to your architecture ::
+(executor, queue, ...) to your architecture ::
 
      cluster_singularity {
             executor {
@@ -387,6 +371,45 @@ modify the nextflow.config to point on the location of the image, and adapt the 
 then run it ::
 
     sbatch --qos fast -p common nextflow run  ./parallel_integron_finder.nf -profile cluster_singualrity --replicons all_coli.fst --cpu 2 --local-max --gbk --circ
+
+
+If you want to have more details about the jobs execution you can add some options to generate report:
+
+Execution report
+""""""""""""""""
+To enable the creation of this report add the ``-with-report`` command line option when
+launching the pipeline execution. For example: ::
+
+    nextflow run  ./parallel_integron_finder.nf -profile standard -with-report [file name] --replicons
+
+It creates an HTML execution report: a single document which includes many useful metrics about
+a workflow execution. For further details see https://www.nextflow.io/docs/latest/tracing.html#execution-report
+
+Trace report
+""""""""""""
+
+In order to create the execution trace file add the ``-with-trace`` command line option when launching the pipeline
+execution. For example: ::
+
+    nextflow run  ./parallel_integron_finder.nf -profile standard -with-trace --replicons
+
+It creates an HTML timeline for all processes executed in your pipeline.
+For further details see https://www.nextflow.io/docs/latest/tracing.html#timeline-report
+
+Timeline report
+"""""""""""""""
+
+To enable the creation of the timeline report add the ``-with-timeline``
+command line option when launching the pipeline execution. For example: ::
+
+    nextflow run  ./parallel_integron_finder.nf -profile standard -with-timeline [file name] --replicons ...
+
+It creates an execution tracing file that contains some useful information about
+each process executed in your pipeline script, including: submission time, start time, completion time,
+cpu and memory used. For further details see https://www.nextflow.io/docs/latest/tracing.html#trace-report
+
+
+
 
 
 .. _advance:
