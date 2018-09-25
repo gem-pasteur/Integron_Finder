@@ -109,18 +109,23 @@ process integron_finder{
 
 
 process merge{
-    publishDir path:"${result_dir}", mode:'copy'
+    //publishDir path:"${result_dir}", mode:'copy'
 
     input:
         file all_chunk_results from all_chunk_results_dir.toList()
 
     output:
-        file "${result_dir}" into finale_res
+        file "tmp/*" into final_res mode flatten
         
     script:
         """
-        integron_merge "${result_dir}" "${res_dir_suffix}" ${all_chunk_results}
+        integron_merge "tmp" "${res_dir_suffix}" ${all_chunk_results}
         """
+}
+
+
+final_res.subscribe{
+    file -> file.copyTo(result_dir+"/"+file.name)
 }
 
 
