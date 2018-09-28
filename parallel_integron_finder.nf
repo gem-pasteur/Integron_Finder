@@ -1,7 +1,5 @@
 #!/usr/bin/env nextflow
 
-replicons_file = Channel.fromPath(params.replicons)
-
 /*************************
  * Default options
  *************************/
@@ -25,7 +23,7 @@ params.linear = false
 params['topology-file'] = false
 params['keep-tmp'] = false
 params['calin-threshold'] = false
-
+params.out = false
 
 gbk = params.gbk ? '--gbk' : ''
 pdf = params.pdf ? '--pdf' : ''
@@ -53,9 +51,12 @@ if (! params.replicons){
 if (params.circ && params.linear){
     throw new Exception("The options '--linear' and '--circ' are mutually exclusive.")
 }
-params.out = false
-replicon_file = Channel.fromPath(params.replicons)
 
+if(params.replicons.tokenize(',').size() > 1 && params.out){
+    throw new Exception("The options '--out' cannot be set when several replicon files are provides.")
+}
+
+replicons_file = Channel.fromPath(params.replicons.tokenize(',')).flatten()
 
 
 /****************************************
@@ -68,24 +69,28 @@ process split{
         file(replicons) from replicons_file
 
     output:
+        val("${replicons.baseName}") into input_id
         set val("${replicons.baseName}"), file("*.fst") into chunk_files mode flatten
-        stdout chunks
+        stdout nb_chunks
     script:
         """
-        integron_split --mute ${replicons}
+        integron_split --mute ${replicons} | wc -w
         """
 }
 
-
-// need to emit as nb_chunks values as chunk_files
-// otherwise only one integron_finder process is executed
-if_inputs = chunk_files.combine(chunks)
-
+/**********************************************************
+ need to emit as nb_chunks values as chunk_files
+ otherwise only one integron_finder process is executed
+ The first step is to create a channel containing [input_id, chunk_nb]
+ The second step is to emit as many times there is chunk_files
+************************************************************/
+id_nb = input_id.merge(nb_chunks)
+if_inputs = id_nb.cross(chunk_files)
 
 process integron_finder{
 
     input:
-        set val(input_id), file(one_chunk), val(chunks) from if_inputs
+        set val(input_id_nb), val(id_one_replicon) from if_inputs
         val gbk
         val pdf
         val local_max
@@ -106,10 +111,11 @@ process integron_finder{
         val keep_tmp
         val calin_threshold
     output:
-        set val(input_id), file("Results_Integron_Finder_${one_chunk.baseName}") into all_chunk_results_dir
+        set val(id), file("Results_Integron_Finder_${one_replicon.baseName}") into all_chunk_results_dir
 
     script:
-        nb_chunks = chunks.split(" ").size()
+        (id, nb) = input_id_nb
+        (_, one_replicon) = id_one_replicon
 
         if (params.circ){
             topo = '--circ'
@@ -122,7 +128,7 @@ process integron_finder{
         }
 
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${topo} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} --mute ${one_chunk}
+        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${topo} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} --mute ${one_replicon}
         """
 }
 
@@ -151,10 +157,7 @@ final_res.subscribe{
     input_id, result ->
         res_dir_suffix = params.out ? params.out : input_id
         result_dir = "Results_Integron_Finder_${res_dir_suffix}"
-        println("input_id = ${input_id}");
-        println("result = ${result}");
-        println("result_dir = ${result_dir}");
-        result.copyTo("${result_dir}" + "/" + result.name);
+        result.copyTo("${result_dir}/" + result.name);
 }
 
 
@@ -169,5 +172,3 @@ workflow.onError {
     println "Oops .. something went wrong"
     println "Pipeline execution stopped with the following message: ${workflow.errorMessage}"
 }
-
-
