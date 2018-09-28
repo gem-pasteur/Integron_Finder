@@ -50,12 +50,13 @@ calin_threshold = params['calin-threshold'] ? "--calin-threshold ${params['calin
 if (! params.replicons){
     throw new Exception("The option '--replicons' is mandatory.")
 }
-
+if (params.circ && params.linear){
+    throw new Exception("The options '--linear' and '--circ' are mutually exclusive.")
+}
 params.out = false
 replicon_file = new File(params.replicons)
 res_dir_suffix = params.out ? params.out : replicon_file.name.split("\\.", 2)[0]
 result_dir = "Results_Integron_Finder_${res_dir_suffix}"
-
 
 /****************************************
  *           The workflow               *
@@ -68,7 +69,7 @@ process split{
 
     output:
         file "*.fst" into chunk_files mode flatten
-
+        stdout chunks
     script:
         """
         integron_split --mute ${replicons}
@@ -76,9 +77,15 @@ process split{
 }
 
 
+// need emit as nb_chunks values as chunk_files
+// otherwise only one integron_finder process is executed
+if_inputs = chunk_files.combine(chunks)
+
+
 process integron_finder{
+
     input:
-        file one_chunk from chunk_files
+        set file(one_chunk), val(chunks) from if_inputs
         val gbk
         val pdf
         val local_max
@@ -102,14 +109,25 @@ process integron_finder{
         file "Results_Integron_Finder_${one_chunk.baseName}" into all_chunk_results_dir
 
     script:
+        nb_chunks = chunks.split(" ").size()
+
+        if (params.circ){
+            topo = '--circ'
+        } else if (params.linear){
+            topo = '--linear'
+        } else if ( nb_chunks == 1) {
+            topo = '--circ'
+        } else {
+            topo = '--linear'
+        }
+
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${circ} ${linear} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} --mute ${one_chunk}
+        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${topo} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} --mute ${one_chunk}
         """
 }
 
 
 process merge{
-    //publishDir path:"${result_dir}", mode:'copy'
 
     input:
         file all_chunk_results from all_chunk_results_dir.toList()
@@ -140,6 +158,3 @@ workflow.onError {
     println "Oops .. something went wrong"
     println "Pipeline execution stopped with the following message: ${workflow.errorMessage}"
 }
-
-
-
