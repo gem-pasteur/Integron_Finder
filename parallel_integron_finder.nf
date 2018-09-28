@@ -54,9 +54,9 @@ if (params.circ && params.linear){
     throw new Exception("The options '--linear' and '--circ' are mutually exclusive.")
 }
 params.out = false
-replicon_file = new File(params.replicons)
-res_dir_suffix = params.out ? params.out : replicon_file.name.split("\\.", 2)[0]
-result_dir = "Results_Integron_Finder_${res_dir_suffix}"
+replicon_file = Channel.fromPath(params.replicons)
+
+
 
 /****************************************
  *           The workflow               *
@@ -65,10 +65,10 @@ result_dir = "Results_Integron_Finder_${res_dir_suffix}"
 process split{
 
     input:
-        file replicons from replicons_file
+        file(replicons) from replicons_file
 
     output:
-        file "*.fst" into chunk_files mode flatten
+        set val("${replicons.baseName}"), file("*.fst") into chunk_files mode flatten
         stdout chunks
     script:
         """
@@ -77,7 +77,7 @@ process split{
 }
 
 
-// need emit as nb_chunks values as chunk_files
+// need to emit as nb_chunks values as chunk_files
 // otherwise only one integron_finder process is executed
 if_inputs = chunk_files.combine(chunks)
 
@@ -85,7 +85,7 @@ if_inputs = chunk_files.combine(chunks)
 process integron_finder{
 
     input:
-        set file(one_chunk), val(chunks) from if_inputs
+        set val(input_id), file(one_chunk), val(chunks) from if_inputs
         val gbk
         val pdf
         val local_max
@@ -106,7 +106,7 @@ process integron_finder{
         val keep_tmp
         val calin_threshold
     output:
-        file "Results_Integron_Finder_${one_chunk.baseName}" into all_chunk_results_dir
+        set val(input_id), file("Results_Integron_Finder_${one_chunk.baseName}") into all_chunk_results_dir
 
     script:
         nb_chunks = chunks.split(" ").size()
@@ -127,23 +127,34 @@ process integron_finder{
 }
 
 
+grouped_results = all_chunk_results_dir.groupTuple(by:0)
+
+
 process merge{
 
     input:
-        file all_chunk_results from all_chunk_results_dir.toList()
+        set val(input_id), file(all_chunk_results) from grouped_results
 
     output:
-        file "tmp/*" into final_res mode flatten
+        set val(input_id), file ("${result_dir}/*") into final_res mode flatten
         
     script:
+        res_dir_suffix = params.out ? params.out : input_id
+        result_dir = "Results_Integron_Finder_${res_dir_suffix}"
         """
-        integron_merge "tmp" "${res_dir_suffix}" ${all_chunk_results}
+        integron_merge "${result_dir}" "${res_dir_suffix}" ${all_chunk_results}
         """
 }
 
 
 final_res.subscribe{
-    file -> file.copyTo(result_dir+"/"+file.name)
+    input_id, result ->
+        res_dir_suffix = params.out ? params.out : input_id
+        result_dir = "Results_Integron_Finder_${res_dir_suffix}"
+        println("input_id = ${input_id}");
+        println("result = ${result}");
+        println("result_dir = ${result_dir}");
+        result.copyTo("${result_dir}" + "/" + result.name);
 }
 
 
@@ -158,3 +169,5 @@ workflow.onError {
     println "Oops .. something went wrong"
     println "Pipeline execution stopped with the following message: ${workflow.errorMessage}"
 }
+
+
