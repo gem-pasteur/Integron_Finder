@@ -114,14 +114,23 @@ process integron_finder{
         set val(id), file("Results_Integron_Finder_${one_replicon.baseName}") into all_chunk_results_dir
 
     script:
-        (id, nb) = input_id_nb
+        (id, nb_chunks) = input_id_nb
+        nb_chunks = nb_chunks.toInteger()
         (_, one_replicon) = id_one_replicon
+
+        /*
+        For sequential IF the default topology behavior is
+        if there is only one replicon in the replicon file then the topology is circular
+        if there are several replicons in the replicon file then the topology is linear
+        but for parallelisation we split replicon files in as file as replicon so the default topology is always circular.
+        To restore the same behavior we need to analyse the number of replicon per file and force the topology
+        */
 
         if (params.circ){
             topo = '--circ'
         } else if (params.linear){
             topo = '--linear'
-        } else if ( nb_chunks == 1) {
+        } else if (nb_chunks == 1) {
             topo = '--circ'
         } else {
             topo = '--linear'
@@ -152,7 +161,6 @@ process merge{
         """
 }
 
-
 final_res.subscribe{
     input_id, result ->
         res_dir_suffix = params.out ? params.out : input_id
@@ -160,12 +168,10 @@ final_res.subscribe{
         result.copyTo("${result_dir}/" + result.name);
 }
 
-
 workflow.onComplete {
     if ( workflow.success )
         println("\nDone!")
         println("Results are in --> ${result_dir}")
-
 }
 
 workflow.onError {
