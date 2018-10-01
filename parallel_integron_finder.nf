@@ -56,7 +56,8 @@ if(params.replicons.tokenize(',').size() > 1 && params.out){
     throw new Exception("The options '--out' cannot be set when several replicon files are provides.")
 }
 
-replicons_file = Channel.fromPath(params.replicons.tokenize(',')).flatten()
+//replicons_file = Channel.from(params.replicons.tokenize(',')).map{it -> file(it)}
+replicons_file = Channel.fromPath(params.replicons)
 
 
 /****************************************
@@ -69,28 +70,18 @@ process split{
         file(replicons) from replicons_file
 
     output:
-        val("${replicons.baseName}") into input_id
-        set val("${replicons.baseName}"), file("*.fst") into chunk_files mode flatten
-        stdout nb_chunks
+        set val("${replicons.baseName}"), stdout, file("*.fst") into chunk_files mode flatten
     script:
         """
         integron_split --mute ${replicons} | wc -w
         """
 }
 
-/**********************************************************
- need to emit as nb_chunks values as chunk_files
- otherwise only one integron_finder process is executed
- The first step is to create a channel containing [input_id, chunk_nb]
- The second step is to emit as many times there is chunk_files
-************************************************************/
-id_nb = input_id.merge(nb_chunks)
-if_inputs = id_nb.cross(chunk_files)
 
 process integron_finder{
 
     input:
-        set val(input_id_nb), val(id_one_replicon) from if_inputs
+        set val(id_input), val(nb_chunks), file(one_replicon) from chunk_files
         val gbk
         val pdf
         val local_max
@@ -111,20 +102,16 @@ process integron_finder{
         val keep_tmp
         val calin_threshold
     output:
-        set val(id), file("Results_Integron_Finder_${one_replicon.baseName}") into all_chunk_results_dir
+        set val(id_input), file("Results_Integron_Finder_${one_replicon.baseName}") into all_chunk_results_dir
 
     script:
-        (id, nb_chunks) = input_id_nb
-        nb_chunks = nb_chunks.toInteger()
-        (_, one_replicon) = id_one_replicon
-
-        /*
+        /*******************************************************************************************************
         For sequential IF the default topology behavior is
         if there is only one replicon in the replicon file then the topology is circular
         if there are several replicons in the replicon file then the topology is linear
         but for parallelisation we split replicon files in as file as replicon so the default topology is always circular.
         To restore the same behavior we need to analyse the number of replicon per file and force the topology
-        */
+        ********************************************************************************************************/
 
         if (params.circ){
             topo = '--circ'
