@@ -23,7 +23,6 @@ params.linear = false
 params['topology-file'] = false
 params['keep-tmp'] = false
 params['calin-threshold'] = false
-params.outdir = false
 
 gbk = params.gbk ? '--gbk' : ''
 pdf = params.pdf ? '--pdf' : ''
@@ -52,12 +51,13 @@ if (params.circ && params.linear){
     throw new Exception("The options '--linear' and '--circ' are mutually exclusive.")
 }
 
-if(params.replicons.tokenize(',').size() > 1 && params.outdir){
-    throw new Exception("The options '--outdir' cannot be set when several replicon files are provides.")
-}
 
-//replicons_file = Channel.from(params.replicons.tokenize(',')).map{it -> file(it)}
-replicons_file = Channel.fromPath(params.replicons)
+if (params.replicons.contains(',')){
+    paths = params.replicons.tokenize(',')
+    replicons_file = Channel.fromPath(paths)
+} else {
+    replicons_file = Channel.fromPath(params.replicons)
+}
 
 
 /****************************************
@@ -141,19 +141,22 @@ process merge{
         set val(input_id), file ("${result_dir}/*") into final_res mode flatten
         
     script:
-        res_dir_suffix = params.outdir ? params.outdir : input_id
-        result_dir = "Results_Integron_Finder_${res_dir_suffix}"
+        result_dir = "Results_Integron_Finder_${input_id}"
         """
-        integron_merge "${result_dir}" "${res_dir_suffix}" ${all_chunk_results}
+        integron_merge "${result_dir}" "${input_id}" ${all_chunk_results}
         """
 }
 
 
+final_res.subscribe{
+    input_id, result ->
+        result_dir = "Results_Integron_Finder_${input_id}"
+        result.copyTo("${result_dir}/" + result.name);
+}
 
 workflow.onComplete {
     if ( workflow.success )
         println("\nDone!")
-        println("Results are in --> ${result_dir}")
 }
 
 workflow.onError {
