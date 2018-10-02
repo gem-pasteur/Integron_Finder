@@ -263,28 +263,50 @@ You can specify the number of tasks in parallel by setting the queueSize value :
             }
      }
 
-If you installed IntegronFinder with singularity, just uncomment the container line in the script, and set the proper path to the container.
+If you installed IntegronFinder with singularity, just uncomment the container line in the script,
+and set the proper path to the container.
 
 All options available in non parallel version are also available for the parallel one.
-except the `--replicons` option which is specific to the paralleized version.
+except the `--outdir` which is not available and`--replicons` option which is specific to the paralleized version.
+
 `--replicons` allow to specify the path of a file containing the replicons.
-
-.. note::
-    Joker as '*' can be used to analysed several files at once.
-    But **do not forget** to protect the wild card from the shell
-    for instance by enclosing your pattern with simple quote.
-
-.. warning::
-    If you specify several files as input, the option `--outdir` is not allowed.
-
 
 A typical command line will be::
 
-    ./parallel_integron_finder.nf -profile standard --replicons all_coli.fst --circ --outdir E_coli_all
+    ./parallel_integron_finder.nf -profile standard --replicons all_coli.fst --circ
 
-or ::
+.. note::
+    Joker as `*` or `?` can be used in path to specify several files as input.
 
-    ./parallel_integron_finder.nf -profile standard --replicons 'replicons_dir/*.fst' --circ --outdir E_coli_all
+    But **do not forget** to protect the wild card from the shell
+    for instance by enclosing your glob pattern with simple quote. ::
+
+        nextflow run -profile standard parallel_integron_finder.nf --replicons 'replicons_dir/*.fst'
+
+    Two asterisks, i.e. `**`, works like `*` but crosses directory boundaries.
+    Curly brackets specify a collection of sub-patterns. ::
+
+        nextflow run -profile standard parallel_integron_finder.nf --replicons 'data/**.fa'
+        nextflow run -profile standard parallel_integron_finder.nf --replicons 'data/**/*.fa'
+        nextflow run -profile standard parallel_integron_finder.nf --replicons 'data/file_{1,2}.fa'
+
+    The first line will match files ending with the suffix `.fa` in the `data` folder and recursively in all its sub-folders.
+    While the second one only match the files which have the same suffix in any sub-folder in the data path.
+    Finally the last example capture two files: `data/file_1.fa`, `data/file_2.fa`
+
+    More than one path or glob pattern can be specified in one time using comma.
+    **Do not** insert spaces surrounding the comma ::
+
+        nextflow run -profile standard parallel_integron_finder --replicons 'some/path/*.fa,other/path/*.fst'
+
+    The command above will analyze all files ending by `.fa` in `/some/path`
+    with `.fst` extension in `other/path`
+
+    For further details see: https://www.nextflow.io/docs/latest/channel.html#frompath
+
+.. note::
+    The option `--outdir` is not allowed. Because you can specify several replicon files as input,
+    So in this circumstances specify only one name for the output is a none sense.
 
 .. note::
     The options starting with one dash are for nextflow workflow engine,
@@ -294,11 +316,14 @@ or ::
     Replicons will be considered linear by default (see above),
     here we use `--circ` to consider replicons circular.
 
+.. note::
+    If you specify several input files, the split and merge steps will be parallelized.
+
 If you execute this line, 2 kinds of directories will be created.
 
     * One named `work` containing lot of subdirectories this for all jobs
-      launch by nextflow
-    * directories named `Results_Integron_Finder_XXX` where XXX is the name of the replicon file.
+      launch by nextflow.
+    * Directories named `Results_Integron_Finder_XXX` where XXX is the name of the replicon file.
       So, one directory per replicon file will be created. These directories contain the final results
       as in non parallel version.
 
@@ -354,7 +379,7 @@ With the command line below nextflow will download parallel_integron_finder from
 download the integron_finder image from the singularity-hub so you haven't to install anything except
 nextflow and singularity. ::
 
-    nextflow run gem-pasteur/Integron_Finder -profile standard_singularity --replicons all_coli.fst --circ --outdir E_coli_all
+    nextflow run gem-pasteur/Integron_Finder -profile standard_singularity --replicons all_coli.fst --circ
 
 
 You can also use the integron_finder singularity image on a cluster, for this use the profile *cluster_singularity*. ::
