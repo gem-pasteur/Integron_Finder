@@ -276,14 +276,14 @@ A typical command line will be::
     ./parallel_integron_finder.nf -profile standard --replicons all_coli.fst --circ
 
 .. note::
-    Joker as `*` or `?` can be used in path to specify several files as input.
+    Joker as ``*`` or ``?`` can be used in path to specify several files as input.
 
     But **do not forget** to protect the wild card from the shell
     for instance by enclosing your glob pattern with simple quote. ::
 
         nextflow run -profile standard parallel_integron_finder.nf --replicons 'replicons_dir/*.fst'
 
-    Two asterisks, i.e. `**`, works like `*` but crosses directory boundaries.
+    Two asterisks, i.e. ``**``, works like ``*`` but crosses directory boundaries.
     Curly brackets specify a collection of sub-patterns. ::
 
         nextflow run -profile standard parallel_integron_finder.nf --replicons 'data/**.fa'
