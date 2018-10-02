@@ -23,7 +23,7 @@ params.linear = false
 params['topology-file'] = false
 params['keep-tmp'] = false
 params['calin-threshold'] = false
-params.out = false
+params.outdir = false
 
 gbk = params.gbk ? '--gbk' : ''
 pdf = params.pdf ? '--pdf' : ''
@@ -52,8 +52,8 @@ if (params.circ && params.linear){
     throw new Exception("The options '--linear' and '--circ' are mutually exclusive.")
 }
 
-if(params.replicons.tokenize(',').size() > 1 && params.out){
-    throw new Exception("The options '--out' cannot be set when several replicon files are provides.")
+if(params.replicons.tokenize(',').size() > 1 && params.outdir){
+    throw new Exception("The options '--outdir' cannot be set when several replicon files are provides.")
 }
 
 //replicons_file = Channel.from(params.replicons.tokenize(',')).map{it -> file(it)}
@@ -141,19 +141,14 @@ process merge{
         set val(input_id), file ("${result_dir}/*") into final_res mode flatten
         
     script:
-        res_dir_suffix = params.out ? params.out : input_id
+        res_dir_suffix = params.outdir ? params.outdir : input_id
         result_dir = "Results_Integron_Finder_${res_dir_suffix}"
         """
         integron_merge "${result_dir}" "${res_dir_suffix}" ${all_chunk_results}
         """
 }
 
-final_res.subscribe{
-    input_id, result ->
-        res_dir_suffix = params.out ? params.out : input_id
-        result_dir = "Results_Integron_Finder_${res_dir_suffix}"
-        result.copyTo("${result_dir}/" + result.name);
-}
+
 
 workflow.onComplete {
     if ( workflow.success )

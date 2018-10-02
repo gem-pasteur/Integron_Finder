@@ -226,7 +226,7 @@ to download it ::
 
     nextflow pull gem-pasteur/Integron_Finder
 
-to get the latest version or use *-r* option to specify a version::
+to get the latest version or use *-r*    option to specify a version ::
 
     nextflow pull -r release_2.0 gem-pasteur/Integron_Finder
 
@@ -238,6 +238,9 @@ to execute it directly ::
 
     nextflow run gem-pasteur/Integron_Finder -profile standard --replicons all_coli.fst --circ
 
+or
+
+    nextflow run -r release_2.0 gem-pasteur/Integron_Finder -profile standard --replicons all_coli.fst --circ
 
 
 standard profile
@@ -263,9 +266,25 @@ You can specify the number of tasks in parallel by setting the queueSize value :
 If you installed IntegronFinder with singularity, just uncomment the container line in the script, and set the proper path to the container.
 
 All options available in non parallel version are also available for the parallel one.
+except the `--replicons` option which is specific to the paralleized version.
+`--replicons` allow to specify the path of a file containing the replicons.
+
+.. note::
+    Joker as '*' can be used to analysed several files at once.
+    But **do not forget** to protect the wild card from the shell
+    for instance by enclosing your pattern with simple quote.
+
+.. warning::
+    If you specify several files as input, the option `--outdir` is not allowed.
+
+
 A typical command line will be::
 
-    ./parallel_integron_finder.nf -profile standard --replicons all_coli.fst --circ --out E_coli_all
+    ./parallel_integron_finder.nf -profile standard --replicons all_coli.fst --circ --outdir E_coli_all
+
+or ::
+
+    ./parallel_integron_finder.nf -profile standard --replicons 'replicons_dir/*.fst' --circ --outdir E_coli_all
 
 .. note::
     The options starting with one dash are for nextflow workflow engine,
@@ -275,15 +294,19 @@ A typical command line will be::
     Replicons will be considered linear by default (see above),
     here we use `--circ` to consider replicons circular.
 
-If you execute this line, 2 directories will be created. One named `work` containing lot of subdirectories this for all jobs
-launch by nextflow and a directory named `Results_Integron_Finder_E_coli_all` which contain the final results
-as in non parallel version.
+If you execute this line, 2 kinds of directories will be created.
+
+    * One named `work` containing lot of subdirectories this for all jobs
+      launch by nextflow
+    * directories named `Results_Integron_Finder_XXX` where XXX is the name of the replicon file.
+      So, one directory per replicon file will be created. These directories contain the final results
+      as in non parallel version.
 
 
 cluster profile
 """""""""""""""
 
-The cluster profile is intented to work on a cluster managed by SLURM.
+The cluster profile is intended to work on a cluster managed by SLURM.
 If You cluster is managed by an other drm change executor name by the right value
 (see `nextflow supported cluster <https://www.nextflow.io/docs/latest/executor.html>`_ )
 
@@ -331,7 +354,7 @@ With the command line below nextflow will download parallel_integron_finder from
 download the integron_finder image from the singularity-hub so you haven't to install anything except
 nextflow and singularity. ::
 
-    nextflow run gem-pasteur/Integron_Finder -profile standard_singularity --replicons all_coli.fst --circ --out E_coli_all
+    nextflow run gem-pasteur/Integron_Finder -profile standard_singularity --replicons all_coli.fst --circ --outdir E_coli_all
 
 
 You can also use the integron_finder singularity image on a cluster, for this use the profile *cluster_singularity*. ::
