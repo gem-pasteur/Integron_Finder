@@ -267,7 +267,7 @@ If you installed IntegronFinder with singularity, just uncomment the container l
 and set the proper path to the container.
 
 All options available in non parallel version are also available for the parallel one.
-except the `--outdir` which is not available and`--replicons` option which is specific to the paralleized version.
+except the `--outdir` which is not available and`--replicons` option which is specific to the parallelized version.
 
 `--replicons` allow to specify the path of a file containing the replicons.
 
