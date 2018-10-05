@@ -1,4 +1,4 @@
-## Version of emg_analyzer:
+## Version of Integron_Finder:
 
 Write here the output of integron_finder --version.
 
