@@ -29,7 +29,7 @@
 import sys
 from time import localtime, strftime
 
-__version__ = '2-{}'.format(strftime("%Y-%m-%d", localtime()))
+__version__ = '2.0rc5'
 __INTEGRON_DATA__ = '$INTEGRONDATA'
 
 
