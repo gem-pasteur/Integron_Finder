@@ -34,12 +34,10 @@ from: ubuntu:xenial
     if test -d integron_finder
     then
         cd integron_finder
-        git checkout dev
         git pull
     else
         git clone ${if_git_url} integron_finder
         cd integron_finder
-        git checkout dev
     fi
 
     if test -d dist
