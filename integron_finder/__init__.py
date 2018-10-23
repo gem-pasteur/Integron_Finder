@@ -37,6 +37,10 @@ class IntegronError(Exception):
     pass
 
 
+class EmptyFileError(IntegronError):
+    pass
+
+
 def get_version_message():
     from numpy import __version__ as np_vers
     from pandas import __version__ as pd_vers
