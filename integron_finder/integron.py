@@ -590,10 +590,7 @@ class Integron(object):
             window_end = attc_end + 200
 
         for prot in utils.read_multi_prot_fasta(prot_file):
-            if self.cfg.gembase:
-                prot_attr = utils.gembase_parser(prot.description)
-            else:
-                prot_attr = utils.non_gembase_parser(prot.description)
+            prot_attr = self.cfg.annot_parser(prot.description)
 
             s_int = (window_end - window_start) % self.replicon_size
 
