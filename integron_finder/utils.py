@@ -186,30 +186,6 @@ def get_name_from_path(path):
 SeqDesc = namedtuple('SeqDesc', ('id', 'strand', 'start', 'stop'))
 
 
-def gembase_parser(description):
-    """
-    :param description: description (1rst line without id) of sequence from gembase fasta file
-    :return: :class:`SeqDesc` object
-    """
-    desc = description.split(" ")
-    id_, strand, start, stop = desc[:2] + desc[4:6]
-    strand = 1 if desc[1] == "D" else -1
-    start = int(start)
-    stop = int(stop)
-    return SeqDesc(id_, strand, start, stop)
-
-
-def non_gembase_parser(description):
-    """
-    :param description: description (1rst line without id) of sequence from fasta file not coming a gemabse
-    :return: :class:`SeqDesc` object
-    """
-    id_, start, stop, strand, _ = description.split(" # ")
-    start = int(start)
-    stop = int(stop)
-    strand = int(strand)
-    return SeqDesc(id_, strand, start, stop)
-
 
 def log_level(verbose, quiet):
         """

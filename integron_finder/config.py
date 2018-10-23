@@ -30,7 +30,7 @@ import os
 
 from . import utils
 from . import __INTEGRON_DATA__
-
+from integron_finder.parser import load_parsers
 
 class Config(object):
     """
@@ -39,6 +39,7 @@ class Config(object):
 
     def __init__(self, args):
         self._model_len = None  # model_len cache, because it's computation is "heavy" (open file)
+        args.annot_parsers = load_parsers()
         self._args = args
 
         if __INTEGRON_DATA__ == '$' + 'INTEGRONDATA':
@@ -158,3 +159,15 @@ class Config(object):
         """
         level = utils.log_level(self._args.verbose, self._args.quiet)
         return level
+
+    @property
+    def annot_parser(self):
+        """The absolute path to the directory containing file needed for the functional annotation"""
+        if self.annot_parser_name:
+            parser = self._args.annot_parsers[self.annot_parser_name]
+        elif self.gembase:
+            parser = self._args.annot_parsers['gembase']
+        else:
+            parser = self._args.annot_parsers['prodigal_base']
+        return parser
+

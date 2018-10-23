@@ -119,7 +119,9 @@ def parse_args(args):
                         help="Use gembase formatted protein file instead of Prodigal."
                              " Folder structure must be preserved",
                         action="store_true")
-
+    parser.add_argument("--annot-parser",
+                        dest='annot_parser_name',
+                        help="the name of the parser to use to get iformation from protein file.")
     parser.add_argument('--attc-model',
                         default='attc_4.cm',
                         help='Path or file to the attc model (Covariance Matrix).')
