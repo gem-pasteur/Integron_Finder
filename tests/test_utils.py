@@ -150,21 +150,21 @@ sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 5
         self.assertEqual(utils.get_name_from_path('../foo/bar'), 'bar')
 
 
-    def test_non_gembase_parser(self):
-        desc = 'ACBA.007.P01_13_1 # 55 # 1014 # 1 # ID=1_1;partial=00;start_type=ATG;rbs_motif=None;' \
-               'rbs_spacer=None;gc_cont=0.585'
-        prot_attr = utils.non_gembase_parser(desc)
-
-        expected = utils.SeqDesc('ACBA.007.P01_13_1', 1, 55, 1014)
-        self.assertTupleEqual(expected, prot_attr)
-
-    def test_gembase_parser(self):
-        desc = 'OBAL001.B.00005.C001_00003 C ATG TAA 3317 4294 Valid AKN90_RS00015 978 ' \
-               '@WP_053105352.1@ AKN90_RS00015 1 3317 4294 | alpha-L-glutamate ligase-like protein  (translation)'
-        prot_attr = utils.gembase_parser(desc)
-
-        expected = utils.SeqDesc('OBAL001.B.00005.C001_00003', -1, 3317, 4294)
-        self.assertTupleEqual(expected, prot_attr)
+    # def test_non_gembase_parser(self):
+    #     desc = 'ACBA.007.P01_13_1 # 55 # 1014 # 1 # ID=1_1;partial=00;start_type=ATG;rbs_motif=None;' \
+    #            'rbs_spacer=None;gc_cont=0.585'
+    #     prot_attr = utils.non_gembase_parser(desc)
+    #
+    #     expected = utils.SeqDesc('ACBA.007.P01_13_1', 1, 55, 1014)
+    #     self.assertTupleEqual(expected, prot_attr)
+    #
+    # def test_gembase_parser(self):
+    #     desc = 'OBAL001.B.00005.C001_00003 C ATG TAA 3317 4294 Valid AKN90_RS00015 978 ' \
+    #            '@WP_053105352.1@ AKN90_RS00015 1 3317 4294 | alpha-L-glutamate ligase-like protein  (translation)'
+    #     prot_attr = utils.gembase_parser(desc)
+    #
+    #     expected = utils.SeqDesc('OBAL001.B.00005.C001_00003', -1, 3317, 4294)
+    #     self.assertTupleEqual(expected, prot_attr)
 
 
     def test_log_level(self):

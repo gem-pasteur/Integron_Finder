@@ -390,6 +390,7 @@ class TestIntegron(IntegronTest):
 
         args = argparse.Namespace()
         args.gembase = False
+        args.annot_parser_name = None
         cfg = Config(args)
         integron = Integron(replicon, cfg)
 

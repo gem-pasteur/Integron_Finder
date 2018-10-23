@@ -88,6 +88,7 @@ class TestFuncAnnot(IntegronTest):
         # Define integron_finder variables
         args = argparse.Namespace()
         args.gembase = False
+        args.annot_parser_name = None
         args.hmmsearch = distutils.spawn.find_executable("hmmsearch")
         args.prodigal = distutils.spawn.find_executable("prodigal")
         args.cpu = 1
