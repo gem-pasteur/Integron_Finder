@@ -5,7 +5,7 @@ from: ubuntu:xenial
     org.label-schema.maintainer Bertrand Neron
     org.label-schema.maintainer.email bneron@pasteur.fr
     org.label-schema.authors Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
-    org.label-schema.package.version 1.5.1
+    org.label-schema.package.version master
     org.label-schema.package.license GPLv3
     org.label-schema.package.homepage https://github.com/gem-pasteur/Integron_Finder/
     org.label-schema.vcs-url https://github.com/gem-pasteur/Integron_Finder/
@@ -34,12 +34,10 @@ from: ubuntu:xenial
     if test -d integron_finder
     then
         cd integron_finder
-        git checkout dev
         git pull
     else
         git clone ${if_git_url} integron_finder
         cd integron_finder
-        git checkout dev
     fi
 
     if test -d dist

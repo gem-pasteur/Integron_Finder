@@ -299,91 +299,96 @@ def find_integron_in_one_replicon(replicon, config):
     phageI_file = os.path.join(result_dir_other, replicon.id + "_phage_int.res")
     attC_default_file = os.path.join(result_dir_other, replicon.id + "_attc_table.res")
 
-    if not config.no_proteins:
-        if not os.path.isfile(intI_file) or not os.path.isfile(phageI_file):
-            find_integrase(tmp_replicon_path, replicon, prot_file, result_dir_other, config)
+    try:
+        if not config.no_proteins:
+            if not os.path.isfile(intI_file) or not os.path.isfile(phageI_file):
+                find_integrase(tmp_replicon_path, replicon, prot_file, result_dir_other, config)
+        _log.info("Starting Default search ... :")
+        if not os.path.isfile(attC_default_file):
+            find_attc(tmp_replicon_path, replicon.name, config.cmsearch, result_dir_other, config.model_attc_path,
+                      cpu=config.cpu)
 
-    _log.info("Starting Default search ... :")
-    if not os.path.isfile(attC_default_file):
-        find_attc(tmp_replicon_path, replicon.name, config.cmsearch, result_dir_other, config.model_attc_path,
-                  cpu=config.cpu)
+        _log.info("Default search done... : ")
+        integrons = find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
 
-    _log.info("Default search done... : ")
-    integrons = find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
+        #########################
+        # Search with local_max #
+        #########################
+        if config.local_max:
+            _log.info("Starting search with local_max...:")
+            if not os.path.isfile(os.path.join(result_dir_other, "integron_max.pickle")):
+                circular = True if replicon.topology == 'circ' else False
+                integron_max = find_attc_max(integrons, replicon, config.distance_threshold,
+                                             config.model_attc_path, config.max_attc_size,
+                                             circular=circular, out_dir=result_dir_other,
+                                             cpu=config.cpu)
+                integron_max.to_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
+                _log.info("Search with local_max done... :")
 
-    #########################
-    # Search with local_max #
-    #########################
-    if config.local_max:
-        _log.info("Starting search with local_max...:")
-        if not os.path.isfile(os.path.join(result_dir_other, "integron_max.pickle")):
-            circular = True if replicon.topology == 'circ' else False
-            integron_max = find_attc_max(integrons, replicon, config.distance_threshold,
-                                         config.model_attc_path, config.max_attc_size,
-                                         circular=circular, out_dir=result_dir_other,
-                                         cpu=config.cpu)
-            integron_max.to_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
-            _log.info("Search with local_max done... :")
+            else:
+                integron_max = pd.read_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
+                _log.info("Search with local_max was already done, continue... :")
 
+            integrons = find_integron(replicon, integron_max, intI_file, phageI_file, config)
+
+        ##########################
+        # Add promoters and attI #
+        ##########################
+        for integron in integrons:
+            integron_type = integron.type()
+            if integron_type != "In0":  # complete & CALIN
+                if not config.no_proteins:
+                    _log.info("Adding proteins ... :")
+                    integron.add_proteins(prot_file)
+
+            _log.info("Adding promoters and attI ... :")
+            if config.promoter_attI:
+                if integron_type == "complete":
+                    integron.add_promoter()
+                    integron.add_attI()
+                elif integron_type == "In0":
+                    integron.add_attI()
+                    integron.add_promoter()
+        #########################
+        # Functional annotation #
+        #########################
+        if is_func_annot and fa_hmm:
+            _log.info("Starting functional annotation ...:")
+            func_annot(integrons, replicon, prot_file, fa_hmm, config, result_dir_other)
+
+        #######################
+        # Writing out results #
+        #######################
+        _log.info("Writing out results for replicon {}".format(replicon.id))
+
+        if config.pdf:
+            for j, integron in enumerate(integrons, 1):
+                if integron.type() == "complete":
+                    integron.draw_integron(file=os.path.join(config.result_dir, "{}_{}.pdf".format(replicon.id, j)))
+
+        base_outfile = os.path.join(config.result_dir, replicon.id)
+        integron_file = base_outfile + ".integrons"
+        if integrons:
+            _log.debug("Writing integron_file {}".format(integron_file))
+            integrons_report = results.integrons_report(integrons)
+            integrons_report.to_csv(integron_file, sep="\t", index=False, na_rep="NA")
+
+            summary = results.summary(integrons_report)
+            summary_file = base_outfile + ".summary"
+            summary.to_csv(summary_file, sep="\t", na_rep="NA", index=False,
+                           columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+            if config.gbk:
+                add_feature(replicon, integrons_report, prot_file, config.distance_threshold)
+                SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
         else:
-            integron_max = pd.read_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
-            _log.info("Search with local_max was already done, continue... :")
-
-        integrons = find_integron(replicon, integron_max, intI_file, phageI_file, config)
-
-    ##########################
-    # Add promoters and attI #
-    ##########################
-    for integron in integrons:
-        integron_type = integron.type()
-        if integron_type != "In0":  # complete & CALIN
-            if not config.no_proteins:
-                _log.info("Adding proteins ... :")
-                integron.add_proteins(prot_file)
-
-        _log.info("Adding promoters and attI ... :")
-        if config.promoter_attI:
-            if integron_type == "complete":
-                integron.add_promoter()
-                integron.add_attI()
-            elif integron_type == "In0":
-                integron.add_attI()
-                integron.add_promoter()
-    #########################
-    # Functional annotation #
-    #########################
-    if is_func_annot and fa_hmm:
-        _log.info("Starting functional annotation ...:")
-        func_annot(integrons, replicon, prot_file, fa_hmm, config, result_dir_other)
-
-    #######################
-    # Writing out results #
-    #######################
-    _log.info("Writing out results for replicon {}".format(replicon.id))
-
-    if config.pdf:
-        for j, integron in enumerate(integrons, 1):
-            if integron.type() == "complete":
-                integron.draw_integron(file=os.path.join(config.result_dir, "{}_{}.pdf".format(replicon.id, j)))
-
-    base_outfile = os.path.join(config.result_dir, replicon.id)
-    integron_file = base_outfile + ".integrons"
-    if integrons:
-        integrons_report = results.integrons_report(integrons)
-        integrons_report.to_csv(integron_file, sep="\t", index=False, na_rep="NA")
-
-        summary = results.summary(integrons_report)
-        summary_file = base_outfile + ".summary"
-        summary.to_csv(summary_file, sep="\t", na_rep="NA", index=False,
-                       columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
-        if config.gbk:
-            add_feature(replicon, integrons_report, prot_file, config.distance_threshold)
-            SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
-    else:
-        with open(integron_file, "w") as out_f:
-            out_f.write("# No Integron found\n")
-        summary_file = None
-
+            _log.error("Writing integron_file {}".format(integron_file))
+            with open(integron_file, "w") as out_f:
+                out_f.write("# No Integron found\n")
+            summary_file = None
+    except integron_finder.EmptyFileError as err:
+        _log.warning('############ Skip replicon {} ############'.format(replicon.name))
+        integron_file = ''
+        summary_file = ''
     #########################
     # clean temporary files #
     #########################
@@ -578,7 +583,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                                                                                               sequences_db_len))
 
                 integron_res, summary = find_integron_in_one_replicon(replicon, config)
-                all_integrons.append(integron_res)
+                if integron_res:
+                    all_integrons.append(integron_res)
                 if summary:
                     all_summaries.append(summary)
             else:

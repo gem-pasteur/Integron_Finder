@@ -30,6 +30,8 @@ import os
 from subprocess import call
 import colorlog
 
+from . import EmptyFileError
+
 _log = colorlog.getLogger(__name__)
 
 
@@ -71,8 +73,8 @@ def find_integrase(replicon_path, replicon, prot_file, out_dir, cfg):
     hmm_cmd = []
     if os.path.exists(prot_file) and os.path.getsize(prot_file) == 0:
         msg = "The protein file: '{}' is empty cannot perform hmmsearch on it.".format(prot_file)
-        _log.critical(msg)
-        raise RuntimeError(msg)
+        _log.warning(msg)
+        raise EmptyFileError(msg)
     if not os.path.isfile(intI_hmm_out):
         hmm_cmd.append([cfg.hmmsearch,
                         "--cpu", str(cfg.cpu),

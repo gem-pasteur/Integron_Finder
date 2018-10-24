@@ -43,6 +43,7 @@ from integron_finder.utils import FastaIterator
 from integron_finder.topology import Topology
 from integron_finder.config import Config
 from integron_finder import integrase
+from integron_finder import EmptyFileError
 
 _call_ori = integrase.call
 
@@ -144,7 +145,7 @@ class TestFindIntegrase(IntegronTest):
 
         prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
         open(prot_file, 'w').close()
-        with self.assertRaises(RuntimeError) as ctx:
+        with self.assertRaises(EmptyFileError) as ctx:
             with self.catch_log():
                 integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
         self.assertTrue(re.match("^The protein file: '.*' is empty cannot perform hmmsearch on it.$",
