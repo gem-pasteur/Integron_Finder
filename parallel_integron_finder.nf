@@ -112,6 +112,7 @@ process integron_finder{
         but for parallelisation we split replicon files in as file as replicon so the default topology is always circular.
         To restore the same behavior we need to analyse the number of replicon per file and force the topology
         ********************************************************************************************************/
+        nb_chunks = nb_chunks as int
 
         if (params.circ){
             topo = '--circ'
@@ -122,7 +123,7 @@ process integron_finder{
         } else {
             topo = '--linear'
         }
-
+        
         """
         integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${topo} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} --mute ${one_replicon}
         """
