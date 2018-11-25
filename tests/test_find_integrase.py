@@ -104,153 +104,163 @@ class TestFindIntegrase(IntegronTest):
 
 
     def test_find_integrase_no_gembase_with_protfile(self):
-        cfg = Config(self.args)
-        self.args.gembase = False
-        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        try:
+            cfg = Config(self.args)
+            self.args.gembase = False
+            cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
-        with FastaIterator(replicon_path) as sequences_db:
-            sequences_db.topologies = topologies
-            replicon = next(sequences_db)
+            replicon_name = 'acba.007.p01.13'
+            replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+            topologies = Topology('lin')
+            with FastaIterator(replicon_path) as sequences_db:
+                sequences_db.topologies = topologies
+                replicon = next(sequences_db)
 
-        len_ori = replicon.__class__.__len__
-        replicon.__class__.__len__ = lambda x: 200
+            len_ori = replicon.__class__.__len__
+            replicon.__class__.__len__ = lambda x: 200
 
-        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
-        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
+            prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
+            shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
-        integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
-        for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
-            res = os.path.join(self.tmp_dir, replicon.id + suffix)
-            self.assertTrue(os.path.exists(res))
-        replicon.__class__.__len__ = len_ori
+            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+            for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
+                res = os.path.join(self.tmp_dir, replicon.id + suffix)
+                self.assertTrue(os.path.exists(res))
+        finally:
+            replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_no_gembase_with_protfile_empty(self):
-        cfg = Config(self.args)
-        self.args.gembase = False
-        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        try:
+            cfg = Config(self.args)
+            self.args.gembase = False
+            cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
-        with FastaIterator(replicon_path) as sequences_db:
-            sequences_db.topologies = topologies
-            replicon = next(sequences_db)
+            replicon_name = 'acba.007.p01.13'
+            replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+            topologies = Topology('lin')
+            with FastaIterator(replicon_path) as sequences_db:
+                sequences_db.topologies = topologies
+                replicon = next(sequences_db)
 
-        len_ori = replicon.__class__.__len__
-        replicon.__class__.__len__ = lambda x: 200
+            len_ori = replicon.__class__.__len__
+            replicon.__class__.__len__ = lambda x: 200
 
-        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
-        open(prot_file, 'w').close()
-        with self.assertRaises(EmptyFileError) as ctx:
-            with self.catch_log():
-                integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
-        self.assertTrue(re.match("^The protein file: '.*' is empty cannot perform hmmsearch on it.$",
-                                 str(ctx.exception)))
-        replicon.__class__.__len__ = len_ori
+            prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
+            open(prot_file, 'w').close()
+            with self.assertRaises(EmptyFileError) as ctx:
+                with self.catch_log():
+                    integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+            self.assertTrue(re.match("^The protein file: '.*' is empty cannot perform hmmsearch on it.$",
+                                     str(ctx.exception)))
+        finally:
+            replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_no_gembase_no_protfile_short_seq(self):
-        cfg = Config(self.args)
-        self.args.gembase = False
-        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        try:
+            cfg = Config(self.args)
+            self.args.gembase = False
+            cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
-        with FastaIterator(replicon_path) as sequences_db:
-            sequences_db.topologies = topologies
-            replicon = next(sequences_db)
+            replicon_name = 'acba.007.p01.13'
+            replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+            topologies = Topology('lin')
+            with FastaIterator(replicon_path) as sequences_db:
+                sequences_db.topologies = topologies
+                replicon = next(sequences_db)
 
-        len_ori = replicon.__class__.__len__
-        replicon.__class__.__len__ = lambda x: 200
+            len_ori = replicon.__class__.__len__
+            replicon.__class__.__len__ = lambda x: 200
 
-        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
+            prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
-        integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
-        for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
-            res = os.path.join(self.tmp_dir, replicon.id + suffix)
-            self.assertTrue(os.path.exists(res))
-        replicon.__class__.__len__ = len_ori
+            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+            for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
+                res = os.path.join(self.tmp_dir, replicon.id + suffix)
+                self.assertTrue(os.path.exists(res))
+        finally:
+            replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_no_gembase_no_protfile_long_seq(self):
-        cfg = Config(self.args)
-        self.args.gembase = False
-        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        try:
+            cfg = Config(self.args)
+            self.args.gembase = False
+            cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
-        with FastaIterator(replicon_path) as sequences_db:
-            sequences_db.topologies = topologies
-            replicon = next(sequences_db)
+            replicon_name = 'acba.007.p01.13'
+            replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+            topologies = Topology('lin')
+            with FastaIterator(replicon_path) as sequences_db:
+                sequences_db.topologies = topologies
+                replicon = next(sequences_db)
 
-        len_ori = replicon.__class__.__len__
-        replicon.__class__.__len__ = lambda x: 500000
+            len_ori = replicon.__class__.__len__
+            replicon.__class__.__len__ = lambda x: 500000
 
-        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
+            prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
-        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
+            shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
-        integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
-        for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
-            res = os.path.join(self.tmp_dir, replicon.id + suffix)
-            self.assertTrue(os.path.exists(res))
-        replicon.__class__.__len__ = len_ori
+            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+            for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
+                res = os.path.join(self.tmp_dir, replicon.id + suffix)
+                self.assertTrue(os.path.exists(res))
+        finally:
+            replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_no_gembase_no_protfile_no_prodigal(self):
-        self.args.hmmsearch = 'foo'
-        self.args.gembase = False
-        cfg = Config(self.args)
-        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        try:
+            self.args.hmmsearch = 'foo'
+            self.args.gembase = False
+            cfg = Config(self.args)
+            cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
-        with FastaIterator(replicon_path) as sequences_db:
-            sequences_db.topologies = topologies
-            replicon = next(sequences_db)
+            replicon_name = 'acba.007.p01.13'
+            replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+            topologies = Topology('lin')
+            with FastaIterator(replicon_path) as sequences_db:
+                sequences_db.topologies = topologies
+                replicon = next(sequences_db)
 
-        len_ori = replicon.__class__.__len__
-        replicon.__class__.__len__ = lambda x: 500000
+            len_ori = replicon.__class__.__len__
+            replicon.__class__.__len__ = lambda x: 500000
 
-        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
+            prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
-        shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
+            shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
-        with self.assertRaises(RuntimeError) as ctx:
-            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
-        self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: 'foo'", str(ctx.exception)))
-
-        replicon.__class__.__len__ = len_ori
+            with self.assertRaises(RuntimeError) as ctx:
+                integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+            self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: 'foo'", str(ctx.exception)))
+        finally:
+            replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_no_gembase_no_protfile(self):
-        cfg = Config(self.args)
-        self.args.gembase = False
-        cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        try:
+            cfg = Config(self.args)
+            self.args.gembase = False
+            cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        replicon_name = 'acba.007.p01.13'
-        replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
-        with FastaIterator(replicon_path) as sequences_db:
-            sequences_db.topologies = topologies
-            replicon = next(sequences_db)
+            replicon_name = 'acba.007.p01.13'
+            replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+            topologies = Topology('lin')
+            with FastaIterator(replicon_path) as sequences_db:
+                sequences_db.topologies = topologies
+                replicon = next(sequences_db)
 
-        len_ori = replicon.__class__.__len__
-        replicon.__class__.__len__ = lambda x: 500000
-        prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
+            len_ori = replicon.__class__.__len__
+            replicon.__class__.__len__ = lambda x: 500000
+            prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
-        with self.assertRaises(RuntimeError) as ctx:
-            integrase.find_integrase('foo', replicon,  prot_file, self.tmp_dir, cfg)
-        self.assertTrue(str(ctx.exception).endswith('failed returncode = 5'.format(cfg.prodigal)))
-
-        replicon.__class__.__len__ = len_ori
+            with self.assertRaises(RuntimeError) as ctx:
+                integrase.find_integrase('foo', replicon,  prot_file, self.tmp_dir, cfg)
+            self.assertTrue(str(ctx.exception).endswith('failed returncode = 5'.format(cfg.prodigal)))
+        finally:
+            replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_gembase_no_hmmer_no_replicon(self):
