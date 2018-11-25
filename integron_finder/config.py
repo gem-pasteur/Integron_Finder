@@ -78,6 +78,11 @@ class Config(object):
         return result_dir
 
     @property
+    def tmp_dir(self):
+        """The absolute path of the tmp results dir."""
+        return os.path.join(self.result_dir, 'tmp')
+
+    @property
     def default_topology(self):
         """The default topology
            available values are: 'circ' for circular or 'lin' for linear."""
