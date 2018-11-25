@@ -79,18 +79,19 @@ class TestUtils(IntegronTest):
         expected_seq_top = ['lin', 'lin', 'lin']
         self.assertListEqual(expected_seq_top, received_seq_top)
 
+        topologies_data ={'ACBA.007.P01_13': 'lin',
+                          'LIAN.001.C02_10': 'circ',
+                          'PSSU.001.C01_13': 'lin',
+                          }
         with tempfile.NamedTemporaryFile(mode='w') as topology_file:
-            topology_file.write("""ACBA.007.P01_13 linear
-LIAN.001.C02_10 circular
-PSSU.001.C01_13 linear
-""")
+            for rep, topo in topologies_data.items():
+                topology_file.write("{} {}\n".format(rep, topo))
             topology_file.flush()
             topologies = Topology('lin', topology_file=topology_file.name)
             with utils.FastaIterator(replicon_path) as seq_db:
                 seq_db.topologies = topologies
-                received_seq_top = sorted([seq.topology for seq in seq_db])
-            expected_seq_top = sorted(['lin', 'circ', 'lin'])
-            self.assertListEqual(expected_seq_top, received_seq_top)
+                received_seq_top = {seq.id: seq.topology for seq in seq_db}
+            self.assertDictEqual(topologies_data, received_seq_top)
 
         file_name = 'acba_short'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
