@@ -59,7 +59,7 @@ def make_multi_fasta_reader(alphabet):
     return fasta_iterator
 
 
-read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.protein)
+read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.extended_protein)
 
 
 class FastaIterator(object):
@@ -91,6 +91,12 @@ class FastaIterator(object):
         self.dist_threshold = dist_threshold
 
     def _set_topologies(self, topologies):
+        """
+
+        :param topologies:
+        :type topologies: :class:`integron_finder.Topology` onject
+        :return:
+        """
         self._topologies = topologies
 
     topologies = property(fset=_set_topologies)
