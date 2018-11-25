@@ -35,7 +35,7 @@ from . import EmptyFileError
 _log = colorlog.getLogger(__name__)
 
 
-def build_protein_from_gembase():
+def build_protein_from_gembase(replicon, replicon_path, out_dir, cfg):
     pass
 
 
