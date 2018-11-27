@@ -95,7 +95,7 @@ def read_hmm(replicon_id, infile, cfg, evalue=1., coverage=0.5):
     :param str infile: the hmm output (in tabulated format) to parse
     :param cfg: the config
     :type cfg: :class:`integron_finder.config.Config` object.
-    :param float evalue: filter out hitst with evalue greater tha evalue.
+    :param float evalue: filter out hits with evalue greater tha evalue.
     :param float coverage: filter out hits with coverage under coverage (% of the profile aligned)
     :returns: data Frame with columns:
 
