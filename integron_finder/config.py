@@ -30,7 +30,7 @@ import os
 
 from . import utils
 from . import __INTEGRON_DATA__
-from integron_finder.parser import load_parsers
+
 
 class Config(object):
     """
@@ -39,7 +39,6 @@ class Config(object):
 
     def __init__(self, args):
         self._model_len = None  # model_len cache, because it's computation is "heavy" (open file)
-        args.annot_parsers = load_parsers()
         self._args = args
 
         if __INTEGRON_DATA__ == '$' + 'INTEGRONDATA':
