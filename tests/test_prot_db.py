@@ -31,6 +31,7 @@ import argparse
 import tempfile
 import distutils.spawn
 import shutil
+import re
 
 from Bio import SeqIO, Seq
 
@@ -40,6 +41,7 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
+from integron_finder import IntegronError
 from integron_finder.config import Config
 from integron_finder.utils import FastaIterator, read_multi_prot_fasta
 from integron_finder.prot_db import GembaseDB, ProdigalDB, SeqDesc
@@ -81,107 +83,171 @@ class TestGemBase(IntegronTest):
 
             seq_db = FastaIterator(replicon_path)
             replicon = next(seq_db)
-            db = GembaseDB(replicon, cfg)
+            with self.catch_log():
+                db = GembaseDB(replicon, cfg)
             self.assertTrue(db.replicon.id, replicon.id)
 
 
+    def test_gembase_sniffer(self):
+        file_names = (('ACBA.0917.00019', 'Draft'), ('ESCO001.C.00001.C001', 'Complet'))
+        for file_name, gem_type in file_names:
+            lst_path = self.find_data(os.path.join('Gembase', 'LSTINFO', file_name + '.lst'))
+            type_recieved = GembaseDB.gembase_sniffer(lst_path)
+            self.assertEqual(type_recieved, gem_type)
 
-    # def test_make_protfile(self):
-    #     file_name = 'ACBA.0917.00019'
-    #     replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-    #     self.args.replicon = replicon_path
-    #     cfg = Config(self.args)
-    #     os.makedirs(cfg.tmp_dir)
-    #
-    #     seq_db = FastaIterator(replicon_path)
-    #     replicon = next(seq_db)
-    #
-    #     db = ProdigalDB(replicon, cfg)
-    #     for seq_nb, seqs in enumerate(zip(
-    #             read_multi_prot_fasta(self.find_data(os.path.join('Proteins', file_name +'.prt'))),
-    #             read_multi_prot_fasta(db.protfile)), 1):
-    #         expected, test = seqs
-    #         self.assertEqual(expected.id, test.id)
-    #     self.assertEqual(seq_nb, 23)
+    def test_gembase_complete_parser(self):
+        replicon_id = 'ESCO001.C.00001.C001'
+        lst_path = self.find_data(os.path.join('Gembase', 'LSTINFO', replicon_id + '.lst'))
+        prots_info = GembaseDB.gembase_complete_parser(lst_path, replicon_id)
+        columns = ['start', 'end', 'strand', 'type', 'seq_id', 'valid', 'gene_name', 'description']
+        self.assertListEqual(list(prots_info.columns), columns)
+        self.assertEqual(prots_info.shape, (4139, len(columns)))
+        first_row = [190, 255, 'D', 'CDS', 'ESCO001.C.00001.C001_00001', 'Valid', 'thrL',
+                     '@b0001@NP_414542.1@ b0001 1 190 255 | leader; Amino acid biosynthesis:'
+                     ' Threonine thr operon leader peptide | ..']
+
+        recieved_first_row = prots_info.iloc[0].values.tolist()
+        self.assertListEqual(first_row, recieved_first_row)
+
+        last_row = [4640942, 4641628, 'D', 'CDS', 'ESCO001.C.00001.C001_04495', 'Valid', 'yjtD',
+                    '@b4403@NP_418820.1@ b4403 1 4640942 4641628 | putative methyltransferase | ..']
+        recieved_last_row = prots_info.iloc[len(prots_info) - 1].values.tolist()
+        self.assertListEqual(last_row, recieved_last_row)
 
 
-    # def test_protfile(self):
-    #     file_name = 'acba.007.p01.13'
-    #     prot_name = 'ACBA.007.P01_13.prt'
-    #     replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-    #     self.args.replicon = replicon_path
-    #     cfg = Config(self.args)
-    #     os.makedirs(cfg.tmp_dir)
-    #
-    #     seq_db = FastaIterator(replicon_path)
-    #     replicon = next(seq_db)
-    #
-    #     db = ProdigalDB(replicon, cfg)
-    #     self.assertEqual(os.path.join(cfg.tmp_dir, prot_name), db.protfile)
-    #
-    #
-    # def test_getitem(self):
-    #     file_name = 'acba.007.p01.13'
-    #     prot_name = 'ACBA.007.P01_13.prt'
-    #     replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-    #     self.args.replicon = replicon_path
-    #     cfg = Config(self.args)
-    #     os.makedirs(cfg.tmp_dir)
-    #
-    #     seq_db = FastaIterator(replicon_path)
-    #     replicon = next(seq_db)
-    #
-    #     db = ProdigalDB(replicon, cfg)
-    #     exp = read_multi_prot_fasta(self.find_data(os.path.join('Proteins', prot_name)))
-    #     for prot_expected in exp:
-    #         prot_received = db[prot_expected.id]
-    #         self.assertEqual(prot_received.id,
-    #                          prot_expected.id)
-    #         self.assertEqual(prot_received.seq,
-    #                          prot_expected.seq)
-    #     with self.assertRaises(KeyError) as ctx:
-    #         db['nimport_naoik']
-    #     self.assertEqual(str(ctx.exception), "'nimport_naoik'")
-    #
-    #
-    # def test_iter(self):
-    #     file_name = 'acba.007.p01.13'
-    #     prot_name = 'ACBA.007.P01_13.prt'
-    #     replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-    #     self.args.replicon = replicon_path
-    #     cfg = Config(self.args)
-    #     os.makedirs(cfg.tmp_dir)
-    #
-    #     seq_db = FastaIterator(replicon_path)
-    #     replicon = next(seq_db)
-    #
-    #     db = ProdigalDB(replicon, cfg)
-    #     idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta',
-    #                       alphabet=Seq.IUPAC.extended_protein)
-    #     for exp_seq_id, get_seq_id in zip(idx, db):
-    #         self.assertEqual(exp_seq_id, get_seq_id)
-    #
-    #
-    # def test_get_description(self):
-    #     # SeqDesc(id, strand, strat, stop)
-    #     file_name = 'acba.007.p01.13'
-    #     replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-    #     self.args.replicon = replicon_path
-    #     cfg = Config(self.args)
-    #     os.makedirs(cfg.tmp_dir)
-    #
-    #     seq_db = FastaIterator(replicon_path)
-    #     replicon = next(seq_db)
-    #
-    #     db = ProdigalDB(replicon, cfg)
-    #
-    #     descriptions = {'ACBA.007.P01_13_23': SeqDesc('ACBA.007.P01_13_23', -1, 19721, 20254),
-    #                     'ACBA.007.P01_13_1': SeqDesc('ACBA.007.P01_13_1', 1, 55, 1014)}
-    #     for seq_id, desc in descriptions.items():
-    #         self.assertEqual(desc, db.get_description(seq_id))
-    #     with self.assertRaises(KeyError) as ctx:
-    #         db.get_description('nimport_naoik')
-    #     self.assertEqual(str(ctx.exception), "'nimport_naoik'")
+    def test_gembase_draft_parser(self):
+        replicon_name = 'ACBA.0917.00019'
+        replicon_id = 'ACBA.0917.00019.0001'
+        lst_path = self.find_data(os.path.join('Gembase', 'LSTINFO', replicon_name + '.lst'))
+        prots_info = GembaseDB.gembase_draft_parser(lst_path, replicon_id)
+        columns = ['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description']
+        self.assertListEqual(list(prots_info.columns), columns)
+        self.assertEqual(prots_info.shape, (3870, len(columns)))
+        first_row = [266, 1480, 'C', 'CDS', 'ACBA.0917.00019.b0001_00001', 'tyrS',
+                     '| Tyrosine--tRNA ligase | 6.1.1.1 | similar to AA sequence:UniProtKB:P41256']
+
+        recieved_first_row = prots_info.iloc[0].values.tolist()
+        self.assertListEqual(first_row, recieved_first_row)
+
+        last_row = [4043755, 4044354, 'C', 'CDS', 'ACBA.0917.00019.i0001_03957', 'yfcG_3',
+                    '| Disulfide-bond oxidoreductase YfcG | 1.8.4.- | similar to AA sequence:UniProtKB:P77526']
+        recieved_last_row = prots_info.iloc[len(prots_info) - 1].values.tolist()
+        self.assertListEqual(last_row, recieved_last_row)
+
+
+    def test_make_protfile(self):
+        file_name = (('ACBA.0917.00019', '.fna', 3870), ('ESCO001.C.00001.C001', '.fst', 3870))
+        for seq_name, ext, seq_nb in file_name:
+            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+            self.args.replicon = replicon_path
+            cfg = Config(self.args)
+            os.makedirs(cfg.tmp_dir)
+
+            seq_db = FastaIterator(replicon_path)
+            replicon = next(seq_db)
+            with self.catch_log():
+                db = GembaseDB(replicon, cfg)
+            for seq_nb, seqs in enumerate(zip(
+                    read_multi_prot_fasta(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt'))),
+                    read_multi_prot_fasta(db.protfile)), 1):
+                expected, test = seqs
+                self.assertEqual(expected.id, test.id)
+            self.assertEqual(seq_nb, seq_nb)
+
+
+    def test_protfile(self):
+        file_name = (('ACBA.0917.00019', '.fna'), ('ESCO001.C.00001.C001', '.fst'))
+        for seq_name, ext in file_name:
+            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+            self.args.replicon = replicon_path
+            cfg = Config(self.args)
+            os.makedirs(cfg.tmp_dir)
+
+            seq_db = FastaIterator(replicon_path)
+            replicon = next(seq_db)
+            with self.catch_log():
+                db = GembaseDB(replicon, cfg)
+            self.assertEqual(os.path.join(cfg.tmp_dir, replicon.id + '.prt'), db.protfile)
+
+
+    def test_getitem(self):
+        file_name = (('ACBA.0917.00019', '.fna'), ('ESCO001.C.00001.C001', '.fst'))
+        for seq_name, ext in file_name:
+            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+            self.args.replicon = replicon_path
+            cfg = Config(self.args)
+            os.makedirs(cfg.tmp_dir)
+
+            seq_db = FastaIterator(replicon_path)
+            replicon = next(seq_db)
+            with self.catch_log():
+                db = GembaseDB(replicon, cfg)
+            exp = read_multi_prot_fasta(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')))
+
+            specie, date, strain, contig = replicon.id.split('.')
+            pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
+
+            for prot_expected in exp:
+                if re.match(pattern, prot_expected.id):
+                    prot_received = db[prot_expected.id]
+                    self.assertEqual(prot_received.id,
+                                     prot_expected.id)
+                    self.assertEqual(prot_received.seq,
+                                     prot_expected.seq)
+        with self.assertRaises(KeyError) as ctx:
+            db['nimport_naoik']
+        self.assertEqual(str(ctx.exception), "'nimport_naoik'")
+
+
+    def test_iter(self):
+        file_name = (('ACBA.0917.00019', '.fna'), ('ESCO001.C.00001.C001', '.fst'))
+        for seq_name, ext in file_name:
+            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+            self.args.replicon = replicon_path
+            cfg = Config(self.args)
+            os.makedirs(cfg.tmp_dir)
+
+            seq_db = FastaIterator(replicon_path)
+            replicon = next(seq_db)
+
+            db = GembaseDB(replicon, cfg)
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
+                              alphabet=Seq.IUPAC.extended_protein)
+
+            specie, date, strain, contig = replicon.id.split('.')
+            pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
+            self.assertListEqual(sorted([i for i in idx if re.match(pattern, i)]), sorted([i for i in db]))
+
+
+    def test_get_description(self):
+        # SeqDesc(id, strand, strat, stop)
+        file_name = {('ACBA.0917.00019', '.fna'):
+                         {'ACBA.0917.00019.b0001_00001': SeqDesc('ACBA.0917.00019.b0001_00001', -1, 266, 1480),
+                          'ACBA.0917.00019.i0001_03957': SeqDesc('ACBA.0917.00019.i0001_03957', -1, 4043755, 4044354)},
+                     }
+
+        for seq_name, ext in file_name:
+            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+            self.args.replicon = replicon_path
+            cfg = Config(self.args)
+            os.makedirs(cfg.tmp_dir)
+
+            seq_db = FastaIterator(replicon_path)
+            replicon = next(seq_db)
+
+            db = GembaseDB(replicon, cfg)
+
+            descriptions = file_name[(seq_name, ext)]
+            for seq_id, desc in descriptions.items():
+                self.assertEqual(desc, db.get_description(seq_id))
+
+        with self.assertRaises(IntegronError) as ctx:
+            db.get_description('nimport_naoik')
+        self.assertEqual(str(ctx.exception), "'nimport_naoik' is not a valid Gembase protein identifier.")
+
+        with self.assertRaises(KeyError) as ctx:
+            db.get_description('FOO.BAR.00019.i0001_03924')
+        self.assertEqual(str(ctx.exception), "'FOO.BAR.00019.i0001_03924'")
 
 
 class TestProdigalDB(IntegronTest):
@@ -222,6 +288,20 @@ class TestProdigalDB(IntegronTest):
         self.assertTrue(db.replicon.id, replicon.id)
 
 
+    def test_ProteinDB_no_prodigal(self):
+        file_name = 'acba.007.p01.13'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
+        os.makedirs(cfg.tmp_dir)
+
+        seq_db = FastaIterator(replicon_path)
+        replicon = next(seq_db)
+        self.args.prodigal = None
+        with self.assertRaises(RuntimeError) as ctx:
+            ProdigalDB(replicon, cfg)
+
+
     def test_make_protfile(self):
         file_name = 'acba.007.p01.13'
         prot_name = 'ACBA.007.P01_13.prt'
@@ -240,6 +320,7 @@ class TestProdigalDB(IntegronTest):
             expected, test = seqs
             self.assertEqual(expected.id, test.id)
         self.assertEqual(seq_nb, 23)
+
 
     def test_protfile(self):
         file_name = 'acba.007.p01.13'
@@ -315,6 +396,3 @@ class TestProdigalDB(IntegronTest):
                         'ACBA.007.P01_13_1':  SeqDesc('ACBA.007.P01_13_1', 1, 55, 1014)}
         for seq_id, desc in descriptions.items():
             self.assertEqual(desc, db.get_description(seq_id))
-        with self.assertRaises(KeyError) as ctx:
-            db.get_description('nimport_naoik')
-        self.assertEqual(str(ctx.exception), "'nimport_naoik'")

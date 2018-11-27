@@ -36,6 +36,9 @@ from Bio import SeqIO, Seq
 
 _log = colorlog.getLogger(__name__)
 
+from integron_finder import IntegronError
+
+
 """Sequence description with fields: id strand start stop"""
 SeqDesc = namedtuple('SeqDesc', ('id', 'strand', 'start', 'stop'))
 
@@ -120,7 +123,7 @@ class GembaseDB(ProteinDB):
         # but one file can contains several contig
         # the sequence id contains the contig number
         # for instance ACBA.0917.00019 vs ACBA.0917.00019.0001
-        # the filenames are bsed on replicon id
+        # the filenames are based on replicon id
         # but in code the replicon id contains the contig number
         # for gembase complete both filename and seq_id contains contig number
         self._replicon_name = os.path.splitext(os.path.basename(self.cfg.replicon_path))[0]
@@ -141,16 +144,82 @@ class GembaseDB(ProteinDB):
         all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._replicon_name + '.prt')
         all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
         prot_file_path = os.path.join(self.cfg.tmp_dir, self.replicon.id + '.prt')
-        with open(prot_file_path, 'w') as prot_file, open('prot_error.txt', 'w') as err:
+        with open(prot_file_path, 'w') as prot_file:
             for seq_id in self._info['seq_id']:
                 try:
                     seq = all_prots[seq_id]
                     SeqIO.write(seq, prot_file, 'fasta')
                 except KeyError:
-                    #_log.warning('Sequence describe in lst file {} is not present {}'.format(seq_id, all_prot_path))
-                    _log.warning('{}'.format(seq_id))
-                    print(seq_id, file=err)
+                    _log.warning('Sequence describe in LSTINFO file {} is not present in {}'.format(seq_id, all_prot_path))
         return prot_file_path
+
+
+    @staticmethod
+    def gembase_sniffer(lst_path):
+        """
+
+        :param lst_path:
+        :return:
+        """
+        with open(lst_path) as lst_file:
+            line = lst_file.readline()
+        if line.split()[5] in ('Valid', 'Invalid_Size', 'Pseudo'):
+            return 'Complet'
+        else:
+            return 'Draft'
+
+    @staticmethod
+    def gembase_complete_parser(lst_path, replicon_id):
+        """
+
+        :param str lst_path:
+        :param str replicon_id:
+        :return:
+        """
+        dtype = {'start': 'int',
+                 'end': 'int',
+                 'strand': 'str',
+                 'type': 'str',
+                 'seq_id': 'str',
+                 'valid': 'str',
+                 'gene_name': 'str',
+                 'description': 'str'}
+
+        with open(lst_path) as lst_file:
+            lst_data = []
+            for line in lst_file:
+                start, end, strand, gene_type, seq_id, valid, gene_name, *description = line.strip().split()
+                row = [start, end, strand, gene_type, seq_id, valid, gene_name, ' '.join(description)]
+                lst_data.append(row)
+
+            lst = pd.DataFrame(lst_data,
+                               columns=['start', 'end', 'strand', 'type', 'seq_id', 'valid', 'gene_name', 'description']
+                               )
+            lst = lst.astype(dtype)
+            specie, date, strain, contig = replicon_id.split('.')
+            pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
+            genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
+            prots_info = genome_info.loc[(genome_info['type'] == 'CDS') & (genome_info['valid'] == 'Valid')]
+            return prots_info
+
+    @staticmethod
+    def gembase_draft_parser(lst_path, replicon_id):
+        lst = pd.read_table(lst_path,
+                            header=None,
+                            names=['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description'],
+                            dtype={'start': 'int',
+                                   'end': 'int',
+                                   'strand': 'str',
+                                   'type': 'str',
+                                   'seq_id': 'str',
+                                   'gene_name': 'str',
+                                   'description': 'str'},
+                            )
+        specie, date, strain, contig_gene = replicon_id.split('.')
+        pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig_gene)
+        genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
+        prots_info = genome_info.loc[genome_info['type'] == 'CDS']
+        return prots_info
 
 
     def _parse_lst(self):
@@ -158,24 +227,13 @@ class GembaseDB(ProteinDB):
 
         :return:
         """
-
-        lst_file = os.path.join(self._gembase_path, 'LSTINFO',
+        lst_path = os.path.join(self._gembase_path, 'LSTINFO',
                                 os.path.splitext(os.path.basename(self.cfg.replicon_path))[0] + '.lst')
-        lst = pd.read_table(lst_file,
-                            header=None,
-                            names=['start', 'end', 'strand', 'type', 'seq_id'],
-                            usecols=(0, 1, 2, 3, 4),
-                            dtype={'start': 'int',
-                                   'end': 'int',
-                                   'strand': 'str',
-                                   'type': 'str',
-                                   'seq_id': 'str'},
-                            sep='\s+'
-                            )
-        specie, date, strain, contig = self.replicon.id.split('.')
-        pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
-        genome_info = lst[lst['seq_id'].str.contains(pattern, regex=True)]
-        prots_info = genome_info[genome_info['type'] == 'CDS']
+        gembase_type = self.gembase_sniffer(lst_path)
+        if gembase_type == 'Draft':
+            prots_info = self.gembase_draft_parser(lst_path, self.replicon.id)
+        else:
+            prots_info = self.gembase_complete_parser(lst_path, self.replicon.id)
         return prots_info
 
 
@@ -202,16 +260,23 @@ class GembaseDB(ProteinDB):
 
         :param str gene_id: a protein/gene identifier
         :return: SeqDesc object
+        :raise IntegronError: when gene_id is not a valid Gembase gene identifier
+        :raise KeyError: if gene_id is not found in GembaseDB instance
         """
-        specie, date, strain, contig, gene = gene_id.split('.')
-        pattern = '{}\.{}\.{}\.\w?{}.{}'.format(specie, date, strain, contig, gene)
+        try:
+            specie, date, strain, contig_gene = gene_id.split('.')
+        except ValueError:
+            raise IntegronError("'{}' is not a valid Gembase protein identifier.".format(gene_id))
+        pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig_gene)
         seq_info = self._info.loc[self._info['seq_id'].str.contains(pattern, regex=True)]
-        return SeqDesc(seq_info.seq_id.values[0],
-                       1 if seq_info.strand.values[0] == "D" else -1,
-                       seq_info.start.values[0],
-                       seq_info.stop.values[0],
-                       )
-
+        if not seq_info.empty:
+            return SeqDesc(seq_info.seq_id.values[0],
+                           1 if seq_info.strand.values[0] == "D" else -1,
+                           seq_info.start.values[0],
+                           seq_info.end.values[0],
+                           )
+        else:
+            raise KeyError(gene_id)
 
 class ProdigalDB(ProteinDB):
     """
@@ -245,13 +310,13 @@ class ProdigalDB(ProteinDB):
         return prot_file_path
 
 
-    def __getitem__(self, seq_id):
+    def __getitem__(self, gene_id):
         """
 
         :param str gene_id: a protein/gene identifier
         :return: SeqDesc object
         """
-        return self._prot_db[seq_id]
+        return self._prot_db[gene_id]
 
 
     def __iter__(self):
@@ -262,11 +327,18 @@ class ProdigalDB(ProteinDB):
         return (seq_id for seq_id in self._prot_db)
 
 
-    def get_description(self, seq_id):
-        seq = self[seq_id]
-        id_, start, stop, strand, *_ = seq.description.split(" # ")
+    def get_description(self, gene_id):
+        """
+
+        :param gene_id:
+        :return:
+        """
+        seq = self[gene_id]
+        try:
+            id_, start, stop, strand, *_ = seq.description.split(" # ")
+        except ValueError:
+            raise IntegronError("'{}' is not a valid Prodigal protein identifier.".format(gene_id))
         start = int(start)
         stop = int(stop)
         strand = int(strand)
         return SeqDesc(id_, strand, start, stop)
-
