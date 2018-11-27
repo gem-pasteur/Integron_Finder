@@ -57,7 +57,7 @@ from integron_finder.integrase import find_integrase
 from integron_finder.attc import find_attc, find_attc_max
 from integron_finder.integron import find_integron
 from integron_finder.annotation import func_annot, add_feature
-
+from integron_finder.prot_db import GembaseDB, ProdigalDB
 
 def parse_args(args):
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -288,8 +288,9 @@ def find_integron_in_one_replicon(replicon, config):
 
     if config.gembase:
         replicon_name = utils.get_name_from_path(config.replicon_path)
-        prot_file = os.path.join(in_dir, "..", "Proteins", replicon_name + ".prt")
+        protein_db = GembaseDB(replicon, config)
     else:
+        protein_db = ProdigalDB(replicon, config)
         prot_file = os.path.join(result_dir_other, replicon.id + ".prt")
 
     ##################
