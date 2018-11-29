@@ -182,7 +182,7 @@ def parse_args(args):
                                 action='store_true',
                                 default=False,
                                 help='keep intermediate results. '
-                                     'This results are stored in directory named other_<replicon id>')
+                                     'This results are stored in directory named tmp_<replicon id>')
     output_options.add_argument('--split-results',
                                 action='store_true',
                                 default=False,
@@ -259,12 +259,12 @@ def find_integron_in_one_replicon(replicon, config):
     :rtype: tuple (str integron_file, str summary_file) or (str integron_file, None)
     """
     in_dir, sequence_file = os.path.split(config.replicon_path)
-    result_dir_other = os.path.join(config.result_dir, "other_{}".format(replicon.id))
+    result_tmp_dir = config.tmp_dir(replicon.id)
     try:
-        os.mkdir(result_dir_other)
+        os.mkdir(result_tmp_dir)
     except OSError:
         pass
-    tmp_replicon_path = os.path.join(result_dir_other, replicon.id + '.fst')
+    tmp_replicon_path = os.path.join(result_tmp_dir, replicon.id + '.fst')
     SeqIO.write(replicon, tmp_replicon_path, "fasta")
 
     if config.func_annot and not config.no_proteins and not config.path_func_annot:
@@ -287,26 +287,24 @@ def find_integron_in_one_replicon(replicon, config):
         _log.warning("No hmm profiles for functional annotation detected, skip functional annotation step.")
 
     if config.gembase:
-        replicon_name = utils.get_name_from_path(config.replicon_path)
         protein_db = GembaseDB(replicon, config)
     else:
         protein_db = ProdigalDB(replicon, config)
-        prot_file = os.path.join(result_dir_other, replicon.id + ".prt")
 
     ##################
     # Default search #
     ##################
-    intI_file = os.path.join(result_dir_other, replicon.id + "_intI.res")
-    phageI_file = os.path.join(result_dir_other, replicon.id + "_phage_int.res")
-    attC_default_file = os.path.join(result_dir_other, replicon.id + "_attc_table.res")
+    intI_file = os.path.join(result_tmp_dir, replicon.id + "_intI.res")
+    phageI_file = os.path.join(result_tmp_dir, replicon.id + "_phage_int.res")
+    attC_default_file = os.path.join(result_tmp_dir, replicon.id + "_attc_table.res")
 
     try:
         if not config.no_proteins:
             if not os.path.isfile(intI_file) or not os.path.isfile(phageI_file):
-                find_integrase(tmp_replicon_path, replicon, prot_file, result_dir_other, config)
+                find_integrase(replicon.id, protein_db.protfile, result_tmp_dir, config)
         _log.info("Starting Default search ... :")
         if not os.path.isfile(attC_default_file):
-            find_attc(tmp_replicon_path, replicon.name, config.cmsearch, result_dir_other, config.model_attc_path,
+            find_attc(tmp_replicon_path, replicon.name, config.cmsearch, result_tmp_dir, config.model_attc_path,
                       cpu=config.cpu)
 
         _log.info("Default search done... : ")
@@ -317,17 +315,17 @@ def find_integron_in_one_replicon(replicon, config):
         #########################
         if config.local_max:
             _log.info("Starting search with local_max...:")
-            if not os.path.isfile(os.path.join(result_dir_other, "integron_max.pickle")):
+            if not os.path.isfile(os.path.join(result_tmp_dir, "integron_max.pickle")):
                 circular = True if replicon.topology == 'circ' else False
                 integron_max = find_attc_max(integrons, replicon, config.distance_threshold,
                                              config.model_attc_path, config.max_attc_size,
-                                             circular=circular, out_dir=result_dir_other,
+                                             circular=circular, out_dir=result_tmp_dir,
                                              cpu=config.cpu)
-                integron_max.to_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
+                integron_max.to_pickle(os.path.join(result_tmp_dir, "integron_max.pickle"))
                 _log.info("Search with local_max done... :")
 
             else:
-                integron_max = pd.read_pickle(os.path.join(result_dir_other, "integron_max.pickle"))
+                integron_max = pd.read_pickle(os.path.join(result_tmp_dir, "integron_max.pickle"))
                 _log.info("Search with local_max was already done, continue... :")
 
             integrons = find_integron(replicon, integron_max, intI_file, phageI_file, config)
@@ -340,7 +338,7 @@ def find_integron_in_one_replicon(replicon, config):
             if integron_type != "In0":  # complete & CALIN
                 if not config.no_proteins:
                     _log.info("Adding proteins ... :")
-                    integron.add_proteins(prot_file)
+                    integron.add_proteins(protein_db)
 
             _log.info("Adding promoters and attI ... :")
             if config.promoter_attI:
@@ -355,7 +353,7 @@ def find_integron_in_one_replicon(replicon, config):
         #########################
         if is_func_annot and fa_hmm:
             _log.info("Starting functional annotation ...:")
-            func_annot(integrons, replicon, prot_file, fa_hmm, config, result_dir_other)
+            func_annot(integrons, replicon, protein_db, fa_hmm, config, result_tmp_dir)
 
         #######################
         # Writing out results #
@@ -379,7 +377,7 @@ def find_integron_in_one_replicon(replicon, config):
             summary.to_csv(summary_file, sep="\t", na_rep="NA", index=False,
                            columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
             if config.gbk:
-                add_feature(replicon, integrons_report, prot_file, config.distance_threshold)
+                add_feature(replicon, integrons_report, protein_db, config.distance_threshold)
                 SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
         else:
             _log.error("Writing integron_file {}".format(integron_file))
@@ -396,9 +394,9 @@ def find_integron_in_one_replicon(replicon, config):
 
     if not config.keep_tmp:
         try:
-            shutil.rmtree(result_dir_other)
+            shutil.rmtree(result_tmp_dir)
         except Exception as err:
-            _log.warning("Cannot remove temporary results : '{} : {}'".format(result_dir_other, str(err)))
+            _log.warning("Cannot remove temporary results : '{} : {}'".format(result_tmp_dir, str(err)))
 
     return integron_file, summary_file
 

@@ -52,6 +52,7 @@ from integron_finder.config import Config
 from integron_finder.utils import FastaIterator
 from integron_finder.topology import Topology
 from integron_finder.attc import find_attc_max
+from integron_finder.prot_db import ProdigalDB
 
 
 class TestFindAttCMax(IntegronTest):
@@ -80,6 +81,7 @@ class TestFindAttCMax(IntegronTest):
 
         replicon_name = 'OBAL001.B.00005.C001'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+
         topologies = Topology('lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -262,6 +264,7 @@ class TestFindAttCMax(IntegronTest):
     def test_find_attc_max_In0(self):
         replicon_name = 'ESCO001.B.00018.P002'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+
         topologies = Topology('circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies

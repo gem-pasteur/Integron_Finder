@@ -81,7 +81,7 @@ class TestReadInfernal(IntegronTest):
         no hit kept, should return an empty dataframe.
         """
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "other_{}".format(self.replicon_id),
+                                               "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, evalue=1e-10)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
@@ -95,7 +95,7 @@ class TestReadInfernal(IntegronTest):
         dataframe corresponding to it.
         """
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "other_{}".format(self.replicon_id),
+                                               "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
@@ -122,7 +122,7 @@ class TestReadInfernal(IntegronTest):
         Test that the filter by a minimum attc size works.
         """
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "other_{}".format(self.replicon_id),
+                                               "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_min_attc=60)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
@@ -145,7 +145,7 @@ class TestReadInfernal(IntegronTest):
         Test that the filter by a maximum attc size works.
         """
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "other_{}".format(self.replicon_id),
+                                               "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_max_attc=100)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
@@ -168,7 +168,7 @@ class TestReadInfernal(IntegronTest):
         Test that the filter by a maximum attc size works.
         """
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "other_{}".format(self.replicon_id),
+                                               "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, evalue=1e-8)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
@@ -241,7 +241,7 @@ class TestReadInfernal(IntegronTest):
         Test that the filter by a minimum attc size works.
         """
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "other_{}".format(self.replicon_id),
+                                               "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_min_attc=60)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
@@ -264,7 +264,7 @@ class TestReadInfernal(IntegronTest):
         Test that the filter by a maximum attc size works.
         """
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "other_{}".format(self.replicon_id),
+                                               "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_max_attc=100)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
@@ -287,7 +287,7 @@ class TestReadInfernal(IntegronTest):
         Test that the filter by a maximum attc size works.
         """
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "other_{}".format(self.replicon_id),
+                                               "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, evalue=1e-8)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",

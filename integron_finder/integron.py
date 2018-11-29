@@ -196,7 +196,7 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
 
     elif intI_ac.pos_end.values.size == 0 and attc_ac:  # If attC only
         for attc_array in attc_ac:
-            integrons.append(Integron(replicon, cfg))
+            integrons.append(Integron(replicon,  cfg))
             for a_tmp in attc_array.values:
                 integrons[-1].add_attC(a_tmp[4],
                                        a_tmp[5],
@@ -244,7 +244,6 @@ class Integron(object):
 
     def __init__(self, replicon, cfg):
         """
-
         :param replicon: The replicon where integrons has been found
         :type replicon: a :class:`Bio.Seq.SeqRecord` object
         :param cfg: the configuration
@@ -568,9 +567,10 @@ class Integron(object):
                     self.attI = self.attI.append(tmp_df)
 
 
-    def add_proteins(self, prot_file):
+    def add_proteins(self, prot_db):
         """
-        :param str prot_file: The path to the protein file in fasta format.
+        :param prot_db: The protein db corresponding to the translation of the replicon
+        :type prot_db: :class:`integron.prot_db.ProteinDB` object.
         """
         attc_start = self.attC.pos_beg.values[0]
         attc_end = self.attC.pos_end.values[-1]
@@ -589,8 +589,8 @@ class Integron(object):
             window_start = attc_start - 200
             window_end = attc_end + 200
 
-        for prot in utils.read_multi_prot_fasta(prot_file):
-            prot_attr = self.cfg.annot_parser(prot.description)
+        for prot_id in prot_db:
+            prot_attr = prot_db.get_description(prot_id)
 
             s_int = (window_end - window_start) % self.replicon_size
 

@@ -27,6 +27,7 @@
 ####################################################################################
 
 import os
+import argparse
 import pandas as pd
 import numpy as np
 
@@ -39,6 +40,8 @@ except ImportError as err:
 from integron_finder.annotation import add_feature
 from integron_finder.utils import FastaIterator
 from integron_finder.topology import Topology
+from integron_finder.config import Config
+from integron_finder.prot_db import ProdigalDB
 
 class TestAddFeature(IntegronTest):
 
@@ -54,8 +57,11 @@ class TestAddFeature(IntegronTest):
             self.seq = next(sequences_db)
 
         self.prot_file = self.find_data(os.path.join("Results_Integron_Finder_acba.007.p01.13",
-                                                     "other_{}".format(self.replicon_id),
+                                                     "tmp_{}".format(self.replicon_id),
                                                      "{}.prt".format(self.replicon_id)))
+        args = argparse.Namespace()
+        cfg = Config(args)
+        self.prot_db = ProdigalDB(self.seq, cfg, prot_file=self.prot_file)
         self.dist_threshold = 4000
 
 
@@ -64,19 +70,7 @@ class TestAddFeature(IntegronTest):
         To do after each test. remove output directory if it was generated
         """
         pass
-    # def test_blabla(self):
-    #     """
-    #     Test blabla
-    #     """
-    #     # add_feature(df, sequence)
-    #     # sequence is     SEQUENCE = SeqIO.read(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna) -> sequence du replicon donné en entrée
-    #     # df is :
-    #     # pour chaque integron, tous les éléments de l'integron (integrase, attC, attI, promoteur, proteins)
-    #     associate an integron number to each integron, sorted by start position of all proteins -> replace ID_integron
-    #     reorder columns, and put evalue column to float type
-    #     sort all elements by ID_integron, pos_beg, evalue
 
-    #     first case : integron contains only 1 element
 
     def test_integron_1elem_prot(self):
         """
@@ -103,7 +97,7 @@ class TestAddFeature(IntegronTest):
         start_seq = self.seq.seq
         start_id = self.seq.id
 
-        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_db, self.dist_threshold)
 
         # Translation should be protein ACBA.007.P01_13_20 in
         # tests/data/Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.prt
@@ -158,7 +152,7 @@ class TestAddFeature(IntegronTest):
         start_seq = self.seq.seq
         start_id = self.seq.id
 
-        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_db, self.dist_threshold)
 
         # Translation should be protein ACBA.007.P01_13_1 in
         # tests/data/Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.prt
@@ -328,7 +322,7 @@ class TestAddFeature(IntegronTest):
         tr_prot = ("MKGWLFLVIAIVGEVIATSALKSSEGFTKLAPSAVVIIGYGIAFYFLSLVLKSIPVGVAY"
                    "AVWSGLGVVIITAIAWLLHGQKLDAWGFVGMGLIIAAFLLARSPSWKSLRRPTPW*")
 
-        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_db, self.dist_threshold)
 
         # Check that there are 5 features (integron, promoter, integrase, protein, attC)
         self.assertEqual(len(self.seq.features), 5)
@@ -465,7 +459,7 @@ class TestAddFeature(IntegronTest):
         tr_prot = ("MKGWLFLVIAIVGEVIATSALKSSEGFTKLAPSAVVIIGYGIAFYFLSLVLKSIPVGVAY"
                    "AVWSGLGVVIITAIAWLLHGQKLDAWGFVGMGLIIAAFLLARSPSWKSLRRPTPW*")
 
-        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_db, self.dist_threshold)
 
         # Check that there are 6 features (integron1, promoter, integrase, protein,
         #                                  integron2, attC)
@@ -548,7 +542,7 @@ class TestAddFeature(IntegronTest):
         seq_name = self.seq.name
         self.seq.name = "abcdefgh" + seq_name
 
-        add_feature(self.seq, df, self.prot_file, self.dist_threshold)
+        add_feature(self.seq, df, self.prot_db, self.dist_threshold)
 
         # Translation should be protein ACBA.007.P01_13_20 in
         # tests/data/Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.prt

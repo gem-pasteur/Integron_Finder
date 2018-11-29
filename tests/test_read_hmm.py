@@ -76,7 +76,7 @@ class TestReadHMM(IntegronTest):
         Test that the hmm hits are well read
         """
         infile = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.rep_name),
-                                             "other_{}".format(self.replicon_id),
+                                             "tmp_{}".format(self.replicon_id),
                                              "{}_intI.res".format(self.replicon_id)))
         df = read_hmm(self.rep_name, infile, self.cfg)
         exp = pd.DataFrame(data={"Accession_number": self.rep_name, "query_name": "intI_Cterm",
@@ -121,7 +121,7 @@ class TestReadHMM(IntegronTest):
         given threshold.
         """
         infile = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.rep_name),
-                                             "other_{}".format(self.replicon_id),
+                                             "tmp_{}".format(self.replicon_id),
                                              "{}_intI.res".format(self.replicon_id)))
         df1 = read_hmm(self.rep_name, infile, self.cfg, evalue=1.95e-25)
         exp1 = pd.DataFrame(data={"Accession_number": self.rep_name, "query_name": "intI_Cterm",
@@ -169,7 +169,7 @@ class TestReadHMM(IntegronTest):
         given threshold.
         """
         infile = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.rep_name),
-                                             "other_{}".format(self.replicon_id),
+                                             "tmp_{}".format(self.replicon_id),
                                              "{}_intI.res".format(self.replicon_id)))
         df1 = read_hmm(self.rep_name, infile, self.cfg, coverage=0.945)
         exp1 = pd.DataFrame(data={"Accession_number": self.rep_name, "query_name": "intI_Cterm",

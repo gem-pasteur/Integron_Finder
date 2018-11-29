@@ -41,7 +41,7 @@ from .hmm import read_hmm
 _log = colorlog.getLogger(__name__)
 
 
-def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', evalue=10, coverage=0.5):
+def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue=10, coverage=0.5):
     """
     | Call hmmmer to annotate CDS associated with the integron.
     | Use Resfams per default (Gibson et al, ISME J.,  2014)
@@ -50,8 +50,8 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
     :type integrons: list of :class:`integron_finder.integron.Integron` objects.
     :param replicon: replicon where the integrons were found (genomic fasta file)
     :type replicon: :class:`Bio.Seq.SeqRecord` object
-    :param str prot_file: the path to a fasta file containing the sequence proteins of the replicon
-                          these proteins constitute the bank scanned by hmmsearch
+    :param prot_db: the protein database corresponding to the replicon translation
+    :type prot_db: :class:`integron.prot_db.ProteinDB` object.
     :param hmm_files: List of path of hmm profiles to use to scan the prot_file
     :type hmm_files: List[str]
     :param cfg: the configuration for this analyse
@@ -83,12 +83,9 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
                                                       "pos_beg", "pos_end", "evalue"])
 
             prot_to_annotate = []
-            # It's protein file, fasta_reader is dedicated fr dna
-            all_prots = read_multi_prot_fasta(prot_file)
-
-            for prot_nb, prot in enumerate(all_prots, 1):
-                if prot.id in integron.proteins.index:
-                    prot_to_annotate.append(prot)
+            for prot_nb, prot_id in enumerate(prot_db, 1):
+                if prot_id in integron.proteins.index:
+                    prot_to_annotate.append(prot_db[prot_id])
 
             SeqIO.write(prot_to_annotate, prot_tmp, "fasta")
             for hmm in hmm_files:
@@ -121,7 +118,7 @@ def func_annot(integrons, replicon, prot_file, hmm_files, cfg, out_dir='.', eval
             integron.proteins = integron.proteins.astype(dtype=integron.dtype)
 
 
-def add_feature(replicon, integron_desc, prot_file, dist_threshold):
+def add_feature(replicon, integron_desc, prot_db, dist_threshold):
     """
     Add integron annotation to the replicon.
 
@@ -129,7 +126,8 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
     :type replicon: a :class:`Bio.Seq.SeqRecord` object.
     :param integron_desc: integron description
     :type integron_desc: a :class:`pandas.DataFrame`
-    :param str prot_file: the path to the fasta file containing the translation of the replicon.
+    :param prot_db: the path to the fasta file containing the translation of the replicon.
+    :type prot_db: a :class:`integron_finder.prot_db.ProteinDB` object.
     :param int dist_threshold: Two elements are aggregated if they are distant of dist_threshold or less.
     """
     integron_desc = integron_desc.set_index("ID_integron").copy()
@@ -155,9 +153,8 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
                                                         "gene": integron_desc.loc[i].annotation,
                                                         "model": integron_desc.loc[i].model}
                                             )
-
-                tmp.qualifiers["translation"] = [prt for prt in SeqIO.parse(prot_file, "fasta")
-                                                 if prt.id == integron_desc.loc[i].element][0].seq
+                tmp.qualifiers["translation"] = [prot_db[prt_id] for prt_id in prot_db
+                                                 if prt_id == integron_desc.loc[i].element][0].seq
                 replicon.features.append(tmp)
 
             else:
@@ -210,9 +207,8 @@ def add_feature(replicon, integron_desc, prot_file, dist_threshold):
                                                             "gene": r[1].annotation,
                                                             "model": r[1].model}
                                                 )
-
-                    tmp.qualifiers["translation"] = [prt for prt in SeqIO.parse(prot_file, "fasta")
-                                                     if prt.id == r[1].element][0].seq
+                    tmp.qualifiers["translation"] = [prot_db[prt_id] for prt_id in prot_db
+                                                     if prt_id == r[1].element][0].seq
                     replicon.features.append(tmp)
                 else:
                     tmp = SeqFeature.SeqFeature(location=SeqFeature.FeatureLocation(int(r[1].pos_beg) - 1,

@@ -76,10 +76,10 @@ class Config(object):
         result_dir = os.path.join(self.outdir, "Results_Integron_Finder_" + file_name)
         return result_dir
 
-    @property
-    def tmp_dir(self):
+
+    def tmp_dir(self, replicon_id):
         """The absolute path of the tmp results dir."""
-        return os.path.join(self.result_dir, 'tmp')
+        return os.path.join(self.result_dir, 'tmp_{}'.format(replicon_id))
 
     @property
     def default_topology(self):
@@ -164,14 +164,4 @@ class Config(object):
         level = utils.log_level(self._args.verbose, self._args.quiet)
         return level
 
-    @property
-    def annot_parser(self):
-        """The absolute path to the directory containing file needed for the functional annotation"""
-        if self.annot_parser_name:
-            parser = self._args.annot_parsers[self.annot_parser_name]
-        elif self.gembase:
-            parser = self._args.annot_parsers['gembase']
-        else:
-            parser = self._args.annot_parsers['prodigal_base']
-        return parser
 

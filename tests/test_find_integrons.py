@@ -104,7 +104,7 @@ class TestFindIntegons(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
         replicon_results_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
-                                                            'other_{}'.format(replicon.id)))
+                                                            'tmp_{}'.format(replicon.id)))
         attc_file = os.path.join(replicon_results_path, '{}_attc_table.res'.format(replicon.id))
         intI_file = os.path.join(replicon_results_path, '{}_intI.res'.format(replicon.id))
         phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon.id))
@@ -164,7 +164,7 @@ class TestFindIntegons(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
         replicon_results_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
-                                                            'other_{}'.format(replicon.id)))
+                                                            'tmp_{}'.format(replicon.id)))
         attc_file = os.path.join(replicon_results_path, '{}_attc_table.res'.format(replicon.id))
         intI_file = os.path.join(replicon_results_path, '{}_intI.res'.format(replicon.id))
         phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon.id))
@@ -208,14 +208,14 @@ class TestFindIntegons(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
 
         intI_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_intI.res'.format(replicon.id)))
         phageI_file = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
-                                                  'other_{}'.format(replicon.id),
+                                                  'tmp_{}'.format(replicon.id),
                                                   '{}_phage_int.res'.format(replicon.id)))
 
         args = argparse.Namespace()
@@ -284,13 +284,13 @@ class TestFindIntegons(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
         attc_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
         intI_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_intI.res'.format(replicon.id)))
         phageI_file = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
-                                                  'other_{}'.format(replicon.id),
+                                                  'tmp_{}'.format(replicon.id),
                                                   '{}_phage_int.res'.format(replicon.id)))
         args = argparse.Namespace()
         args.no_proteins = False
@@ -372,13 +372,13 @@ class TestFindIntegons(IntegronTest):
             replicon = next(sequences_db)
         exp_result_dir = 'Results_Integron_Finder_acba.007.p01.13.linear'
         attc_file = self.find_data(os.path.join(exp_result_dir,
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
         intI_file = self.find_data(os.path.join(exp_result_dir,
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_intI.res'.format(replicon.id)))
         phageI_file = self.find_data(os.path.join(exp_result_dir,
-                                                  'other_{}'.format(replicon.id),
+                                                  'tmp_{}'.format(replicon.id),
                                                   '{}_phage_int.res'.format(replicon.id)))
         args = argparse.Namespace()
         args.no_proteins = False
@@ -464,13 +464,13 @@ class TestFindIntegons(IntegronTest):
             replicon = next(sequences_db)
         exp_result_dir = 'Results_Integron_Finder_acba.007.p01.13.circular'
         attc_file = self.find_data(os.path.join(exp_result_dir,
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
         intI_file = self.find_data(os.path.join(exp_result_dir,
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_intI.res'.format(replicon.id)))
         phageI_file = self.find_data(os.path.join(exp_result_dir,
-                                                  'other_{}'.format(replicon.id),
+                                                  'tmp_{}'.format(replicon.id),
                                                   '{}_phage_int.res'.format(replicon.id)))
         args = argparse.Namespace()
         args.no_proteins = False
@@ -551,13 +551,13 @@ class TestFindIntegons(IntegronTest):
             replicon = next(sequences_db)
         result_dir = 'Results_Integron_Finder_{}.union'.format(replicon_name)
         attc_file = self.find_data(os.path.join(result_dir,
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_attc_table.res'.format(replicon.id)))
         intI_file = self.find_data(os.path.join(result_dir,
-                                                'other_{}'.format(replicon.id),
+                                                'tmp_{}'.format(replicon.id),
                                                 '{}_intI.res'.format(replicon.id)))
         phageI_file = self.find_data(os.path.join(result_dir,
-                                                  'other_{}'.format(replicon.id),
+                                                  'tmp_{}'.format(replicon.id),
                                                   '{}_phage_int.res'.format(replicon.id)))
         args = argparse.Namespace()
         args.evalue_attc = 1.

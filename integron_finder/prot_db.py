@@ -115,7 +115,7 @@ class GembaseDB(ProteinDB):
     """
 
 
-    def __init__(self, replicon, cfg):
+    def __init__(self, replicon, cfg, prot_file=None):
         self.cfg = cfg
         self._gembase_path = os.path.dirname(os.path.dirname(self.cfg.replicon_path))
         self.replicon = replicon
@@ -128,7 +128,10 @@ class GembaseDB(ProteinDB):
         # for gembase complete both filename and seq_id contains contig number
         self._replicon_name = os.path.splitext(os.path.basename(self.cfg.replicon_path))[0]
         self._info = self._parse_lst()
-        self._prot_file = self._make_protfile()
+        if prot_file is None:
+            self._prot_file = self._make_protfile()
+        else:
+            self.protfile = prot_file
         self._prot_db = self._make_db()
 
 
@@ -143,7 +146,9 @@ class GembaseDB(ProteinDB):
         """
         all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._replicon_name + '.prt')
         all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
-        prot_file_path = os.path.join(self.cfg.tmp_dir, self.replicon.id + '.prt')
+        if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
+            os.makedirs(self.cfg.tmp_dir(self.replicon.id))
+        prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')
         with open(prot_file_path, 'w') as prot_file:
             for seq_id in self._info['seq_id']:
                 try:
@@ -283,6 +288,16 @@ class ProdigalDB(ProteinDB):
     Creates proteins from Replicon/contig using prodigal and provide facilities to access them.
     """
 
+    def __init__(self, replicon, cfg, prot_file=None):
+        self.cfg = cfg
+        self.replicon = replicon
+        if prot_file is not None:
+            self._prot_file = prot_file
+        else:
+            self._prot_file = self._make_protfile()
+        self._prot_db = self._make_db()
+
+
     def _make_protfile(self):
         """
         Use `prodigal` to generate proteins corresponding to the replicon
@@ -290,7 +305,9 @@ class ProdigalDB(ProteinDB):
         :return: the path of the created protfile
         :rtype: str
         """
-        prot_file_path = os.path.join(self.cfg.tmp_dir, self.replicon.id + ".prt")
+        if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
+            os.makedirs(self.cfg.tmp_dir(self.replicon.id))
+        prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + ".prt")
         if not os.path.isfile(prot_file_path):
             prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q ".format(
                 prodigal=self.cfg.prodigal,

@@ -45,7 +45,7 @@ from integron_finder.config import Config
 from integron_finder.utils import FastaIterator
 from integron_finder.topology import Topology
 from integron_finder.integron import Integron
-
+from integron_finder.prot_db import ProdigalDB
 
 class TestIntegron(IntegronTest):
 
@@ -409,8 +409,8 @@ class TestIntegron(IntegronTest):
         attC = attC.astype(dtype=self.dtype)
 
         integron.attC = attC
-
-        integron.add_proteins(prot_file)
+        prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
+        integron.add_proteins(prot_db)
 
         exp_proteins = pd.DataFrame({'pos_beg': [3071974, 3072950, 3074243, 3076720],
                                      'pos_end': [3072855, 3073468, 3075055, 3077511],

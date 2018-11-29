@@ -27,6 +27,7 @@
 ####################################################################################
 
 import os
+
 import pandas as pd
 import pandas.util.testing as pdt
 
@@ -54,7 +55,6 @@ class TestSearchAttc(IntegronTest):
         self.dist_threshold = 4000  # (4kb at least between 2 different arrays)
         self.replicon_size = 20301  # size of acba.007.p01.13
 
-
     def test_search_attc_empty(self):
         """
         Test that when there are no attC sites detected, the attc array is empty.
@@ -74,7 +74,7 @@ class TestSearchAttc(IntegronTest):
         on the same strand and separated by less than 4kb each.
         """
         attc_file = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                                "other_{}".format(self.replicon_id),
+                                                "tmp_{}".format(self.replicon_id),
                                                 "{}_attc_table.res".format(self.replicon_id)))
         # Construct attC dataframe (read from infernal file)
         attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
@@ -127,7 +127,7 @@ class TestSearchAttc(IntegronTest):
         on the same strand and 1 on the other strand, all separated by less than 4kb each.
         """
         attc_file = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                                "other_{}".format(self.replicon_id),
+                                                "tmp_{}".format(self.replicon_id),
                                                 "{}_attc_table.res".format(self.replicon_id)))
         # Construct attC dataframe (read from infernal file)
         attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
@@ -203,7 +203,7 @@ class TestSearchAttc(IntegronTest):
         others by more than 4kb.
         """
         attc_file = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                                "other_{}".format(self.replicon_id),
+                                                "tmp_{}".format(self.replicon_id),
                                                 "{}_attc_table.res".format(self.replicon_id)))
         # Construct attC dataframe (read from infernal file)
         attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
@@ -281,7 +281,7 @@ class TestSearchAttc(IntegronTest):
         - 1 other attC site , also on strand +, but separated by more than 4kb.
         """
         attc_file = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                                "other_{}".format(self.replicon_id),
+                                                "tmp_{}".format(self.replicon_id),
                                                 "{}_attc_table.res".format(self.replicon_id)))
         # Construct attC dataframe (read from infernal file)
         attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)

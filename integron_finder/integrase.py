@@ -35,39 +35,12 @@ from . import EmptyFileError
 _log = colorlog.getLogger(__name__)
 
 
-def build_protein_from_gembase(replicon, replicon_path, out_dir, cfg):
-    pass
-
-
-def build_protein_from_dna(replicon, replicon_path, out_dir, cfg):
-    # Test whether the protein file exist to avoid new annotation for each run on the same replicon
-    prot_tr_path = os.path.join(out_dir, replicon.id + ".prt")
-    if not os.path.isfile(prot_tr_path):
-        prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q ".format(
-            prodigal=cfg.prodigal,
-            meta='' if len(replicon) > 200000 else '-p meta',
-            replicon=replicon_path,
-            prot=prot_tr_path,
-            out=os.devnull,
-        )
-        try:
-            _log.debug("run prodigal: {}".format(prodigal_cmd))
-            returncode = call(prodigal_cmd.split())
-        except Exception as err:
-            raise RuntimeError("{0} failed : {1}".format(prodigal_cmd, err))
-        if returncode != 0:
-            raise RuntimeError("{0} failed returncode = {1}".format(prodigal_cmd, returncode))
-
-
 def find_integrase(replicon_id, prot_file, out_dir, cfg):
     """
     Call Prodigal for Gene annotation and hmmer to find integrase, either with phage_int
     HMM profile or with intI profile.
 
-    :param replicon_path: the path of the replicon to analyse
-    :type replicon_path: string
-    :param replicon: The Replicon to search integrase into
-    :type replicon: a :class:`Bio.Seq.SeqRecord` object.
+    :param str replicon_id: The Replicon identifier to search integrase into
     :param str prot_file: the path to the fasta file containing the translation of the replicon.
     :param str out_dir: the relative path to the directory where prodigal outputs will be stored
     :param cfg: the configuration
@@ -77,10 +50,15 @@ def find_integrase(replicon_id, prot_file, out_dir, cfg):
 
     intI_hmm_out = os.path.join(out_dir, replicon_id + "_intI.res")
     hmm_cmd = []
-    if os.path.exists(prot_file) and os.path.getsize(prot_file) == 0:
+    if not os.path.exists(prot_file):
+        msg = "The protein file: '{}' does not exists cannot perform hmmsearch on it.".format(prot_file)
+        _log.warning(msg)
+        raise RuntimeError(msg)
+    elif os.path.getsize(prot_file) == 0:
         msg = "The protein file: '{}' is empty cannot perform hmmsearch on it.".format(prot_file)
         _log.warning(msg)
         raise EmptyFileError(msg)
+
     if not os.path.isfile(intI_hmm_out):
         hmm_cmd.append([cfg.hmmsearch,
                         "--cpu", str(cfg.cpu),

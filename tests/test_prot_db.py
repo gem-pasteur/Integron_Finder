@@ -79,10 +79,10 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', file_name))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            os.makedirs(cfg.tmp_dir)
-
             seq_db = FastaIterator(replicon_path)
             replicon = next(seq_db)
+            os.makedirs(cfg.tmp_dir(replicon.id))
+
             with self.catch_log():
                 db = GembaseDB(replicon, cfg)
             self.assertTrue(db.replicon.id, replicon.id)
@@ -141,10 +141,10 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            os.makedirs(cfg.tmp_dir)
-
             seq_db = FastaIterator(replicon_path)
             replicon = next(seq_db)
+            os.makedirs(cfg.tmp_dir(replicon.id))
+
             with self.catch_log():
                 db = GembaseDB(replicon, cfg)
             for seq_nb, seqs in enumerate(zip(
@@ -161,13 +161,13 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            os.makedirs(cfg.tmp_dir)
-
             seq_db = FastaIterator(replicon_path)
             replicon = next(seq_db)
+            os.makedirs(cfg.tmp_dir(replicon.id))
+
             with self.catch_log():
                 db = GembaseDB(replicon, cfg)
-            self.assertEqual(os.path.join(cfg.tmp_dir, replicon.id + '.prt'), db.protfile)
+            self.assertEqual(os.path.join(cfg.tmp_dir(replicon.id), replicon.id + '.prt'), db.protfile)
 
 
     def test_getitem(self):
@@ -176,10 +176,10 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            os.makedirs(cfg.tmp_dir)
-
             seq_db = FastaIterator(replicon_path)
             replicon = next(seq_db)
+            os.makedirs(cfg.tmp_dir(replicon.id))
+
             with self.catch_log():
                 db = GembaseDB(replicon, cfg)
             exp = read_multi_prot_fasta(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')))
@@ -205,12 +205,10 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            os.makedirs(cfg.tmp_dir)
-
             seq_db = FastaIterator(replicon_path)
             replicon = next(seq_db)
-
             db = GembaseDB(replicon, cfg)
+
             idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
                               alphabet=Seq.IUPAC.extended_protein)
 
@@ -230,10 +228,9 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            os.makedirs(cfg.tmp_dir)
-
             seq_db = FastaIterator(replicon_path)
             replicon = next(seq_db)
+            os.makedirs(cfg.tmp_dir(replicon.id))
 
             db = GembaseDB(replicon, cfg)
 
@@ -280,10 +277,10 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        os.makedirs(cfg.tmp_dir)
-
         seq_db = FastaIterator(replicon_path)
         replicon = next(seq_db)
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
         db = ProdigalDB(replicon, cfg)
         self.assertTrue(db.replicon.id, replicon.id)
 
@@ -293,10 +290,10 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        os.makedirs(cfg.tmp_dir)
-
         seq_db = FastaIterator(replicon_path)
         replicon = next(seq_db)
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
         self.args.prodigal = None
         with self.assertRaises(RuntimeError) as ctx:
             ProdigalDB(replicon, cfg)
@@ -308,10 +305,9 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        os.makedirs(cfg.tmp_dir)
-
         seq_db = FastaIterator(replicon_path)
         replicon = next(seq_db)
+        os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
         for seq_nb, seqs in enumerate(zip(
@@ -328,13 +324,12 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        os.makedirs(cfg.tmp_dir)
-
         seq_db = FastaIterator(replicon_path)
         replicon = next(seq_db)
+        os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
-        self.assertEqual(os.path.join(cfg.tmp_dir, prot_name), db.protfile)
+        self.assertEqual(os.path.join(cfg.tmp_dir(replicon.id), prot_name), db.protfile)
 
 
     def test_getitem(self):
@@ -343,10 +338,9 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        os.makedirs(cfg.tmp_dir)
-
         seq_db = FastaIterator(replicon_path)
         replicon = next(seq_db)
+        os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
         exp = read_multi_prot_fasta(self.find_data(os.path.join('Proteins', prot_name)))
@@ -367,10 +361,9 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        os.makedirs(cfg.tmp_dir)
-
         seq_db = FastaIterator(replicon_path)
         replicon = next(seq_db)
+        os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
         idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta',
@@ -385,10 +378,9 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        os.makedirs(cfg.tmp_dir)
-
         seq_db = FastaIterator(replicon_path)
         replicon = next(seq_db)
+        os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
 

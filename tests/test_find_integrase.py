@@ -96,7 +96,7 @@ class TestFindIntegrase(IntegronTest):
 
         shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
-        integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+        integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
 
         for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
             res = os.path.join(self.tmp_dir, replicon.id + suffix)
@@ -122,7 +122,7 @@ class TestFindIntegrase(IntegronTest):
             prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
             shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
-            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+            integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
             for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
                 res = os.path.join(self.tmp_dir, replicon.id + suffix)
                 self.assertTrue(os.path.exists(res))
@@ -150,7 +150,7 @@ class TestFindIntegrase(IntegronTest):
             open(prot_file, 'w').close()
             with self.assertRaises(EmptyFileError) as ctx:
                 with self.catch_log():
-                    integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+                    integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
             self.assertTrue(re.match("^The protein file: '.*' is empty cannot perform hmmsearch on it.$",
                                      str(ctx.exception)))
         finally:
@@ -165,6 +165,9 @@ class TestFindIntegrase(IntegronTest):
 
             replicon_name = 'acba.007.p01.13'
             replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+            prot_name = 'ACBA.007.P01_13'
+            prot_path = self.find_data(os.path.join('Proteins', prot_name + '.prt'))
+
             topologies = Topology('lin')
             with FastaIterator(replicon_path) as sequences_db:
                 sequences_db.topologies = topologies
@@ -174,8 +177,9 @@ class TestFindIntegrase(IntegronTest):
             replicon.__class__.__len__ = lambda x: 200
 
             prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
+            shutil.copyfile(prot_path, prot_file)
 
-            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+            integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
             for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
                 res = os.path.join(self.tmp_dir, replicon.id + suffix)
                 self.assertTrue(os.path.exists(res))
@@ -203,7 +207,7 @@ class TestFindIntegrase(IntegronTest):
 
             shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
-            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+            integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
             for suffix in ('_intI.res', '_intI_table.res', '_phage_int.res', '_phage_int_table.res'):
                 res = os.path.join(self.tmp_dir, replicon.id + suffix)
                 self.assertTrue(os.path.exists(res))
@@ -233,7 +237,7 @@ class TestFindIntegrase(IntegronTest):
             shutil.copyfile(self.find_data(os.path.join('Proteins', replicon.id + ".prt")), prot_file)
 
             with self.assertRaises(RuntimeError) as ctx:
-                integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+                integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
             self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: 'foo'", str(ctx.exception)))
         finally:
             replicon.__class__.__len__ = len_ori
@@ -254,11 +258,12 @@ class TestFindIntegrase(IntegronTest):
 
             len_ori = replicon.__class__.__len__
             replicon.__class__.__len__ = lambda x: 500000
-            prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
-            with self.assertRaises(RuntimeError) as ctx:
-                integrase.find_integrase('foo', replicon,  prot_file, self.tmp_dir, cfg)
-            self.assertTrue(str(ctx.exception).endswith('failed returncode = 5'.format(cfg.prodigal)))
+            prot_file = os.path.join(self.tmp_dir, "foo.prt")
+            open(prot_file, 'w').close()
+            with self.catch_log():
+                with self.assertRaises(EmptyFileError) as ctx:
+                    integrase.find_integrase(replicon.id,  prot_file, self.tmp_dir, cfg)
         finally:
             replicon.__class__.__len__ = len_ori
 
@@ -278,10 +283,11 @@ class TestFindIntegrase(IntegronTest):
 
         prot_file = os.path.join(self.tmp_dir, replicon.id + ".prt")
 
-        with self.assertRaises(RuntimeError) as ctx:
-            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
-        self.assertTrue(re.match("^foo .* failed : \[Errno 2\] No such file or directory: 'foo'",
-                                 str(ctx.exception)))
+        with self.catch_log():
+            with self.assertRaises(RuntimeError) as ctx:
+                integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
+            self.assertEqual("The protein file: '{}' does not exists cannot perform hmmsearch on it.".format(prot_file),
+                             str(ctx.exception))
 
 
     def test_find_integrase_gembase_hmmer_error(self):
@@ -301,5 +307,5 @@ class TestFindIntegrase(IntegronTest):
         shutil.copyfile(os.path.join(self._data_dir, 'Proteins', replicon.id + ".prt"),
                         prot_file)
         with self.assertRaises(RuntimeError) as ctx:
-            integrase.find_integrase(replicon_path, replicon, prot_file, self.tmp_dir, cfg)
+            integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
         self.assertTrue(str(ctx.exception).endswith('failed return code = 1'))

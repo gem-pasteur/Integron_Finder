@@ -75,17 +75,17 @@ class TestConfig(IntegronTest):
         self.assertEqual(cf.result_dir, exp_result_dir)
 
     def test_tmp_dir(self):
-        replicon = '../foo.fasta'
+        replicon_id = 'foo'
+        replicon_path = '../{}.fasta'.format(replicon_id)
         outdir = 'outdir'
-        self.args.replicon = replicon
+        self.args.replicon = replicon_path
         self.args.outdir = outdir
         cf = config.Config(self.args)
         exp_result_tmp_dir = os.path.abspath(os.path.join(outdir,
-                                                          "Results_Integron_Finder_" +
-                                                          os.path.splitext(os.path.split(replicon)[1])[0],
-                                                          "tmp")
+                                                          "Results_Integron_Finder_{}".format(replicon_id),
+                                                          "tmp_{}".format(replicon_id))
                                              )
-        self.assertEqual(cf.tmp_dir, exp_result_tmp_dir)
+        self.assertEqual(cf.tmp_dir(replicon_id), exp_result_tmp_dir)
 
     def test_default_topology(self):
         self.args.circular = True

@@ -220,7 +220,7 @@ def main(args=None, log_level=None):
     merge_summary(summary_file_out, *parsed_args.results)
     copy_file(outdir, '.gbk', *parsed_args.results)
     copy_file(outdir, '.pdf', *parsed_args.results)
-    copy_dir(outdir, 'other_*', *parsed_args.results)
+    copy_dir(outdir, 'tmp_*', *parsed_args.results)
 
 
 if __name__ == '__main__':
