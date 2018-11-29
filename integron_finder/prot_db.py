@@ -50,10 +50,13 @@ class ProteinDB(ABC):
     to the replicon/contig CDS.
     """
 
-    def __init__(self, replicon, cfg):
+    def __init__(self, replicon, cfg, prot_file=None):
         self.cfg = cfg
         self.replicon = replicon
-        self._prot_file = self._make_protfile()
+        if prot_file is None:
+            self._prot_file = self._make_protfile()
+        else:
+            self._prot_file = prot_file
         self._prot_db = self._make_db()
 
     def __getitem__(self, seq_id):
@@ -287,15 +290,6 @@ class ProdigalDB(ProteinDB):
     """
     Creates proteins from Replicon/contig using prodigal and provide facilities to access them.
     """
-
-    def __init__(self, replicon, cfg, prot_file=None):
-        self.cfg = cfg
-        self.replicon = replicon
-        if prot_file is not None:
-            self._prot_file = prot_file
-        else:
-            self._prot_file = self._make_protfile()
-        self._prot_db = self._make_db()
 
 
     def _make_protfile(self):
