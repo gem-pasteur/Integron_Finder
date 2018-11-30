@@ -86,12 +86,14 @@ def scan_hmm_bank(path):
         raise IOError("{} no such file or directory".format(path))
 
 
-def read_hmm(replicon_id, infile, cfg, evalue=1., coverage=0.5):
+def read_hmm(replicon_id, prot_db, infile, cfg, evalue=1., coverage=0.5):
     """
     Function that parse hmmer --out output and returns a pandas DataFrame
     filter output by evalue and coverage. (Being % of the profile aligned)
 
     :param str replicon_id: the id of the replicon
+    :param prot_db: The protein database corresponding to the replicon translation
+    :type prot_db: :class:`integron_finder.prot_db.ProteinDB` object.
     :param str infile: the hmm output (in tabulated format) to parse
     :param cfg: the config
     :type cfg: :class:`integron_finder.config.Config` object.
@@ -108,6 +110,7 @@ def read_hmm(replicon_id, infile, cfg, evalue=1., coverage=0.5):
                                "ID_prot", "strand", "pos_beg", "pos_end",
                                "evalue", "hmmfrom", "hmmto", "alifrom",
                                "alito", "len_profile"])
+    _log.debug("Parse {}".format(infile))
     gen = SearchIO.parse(infile, 'hmmer3-text')
     for idx, query_result in enumerate(gen):
         len_profile = query_result.seq_len
@@ -119,13 +122,8 @@ def read_hmm(replicon_id, infile, cfg, evalue=1., coverage=0.5):
             id_query = "-"
         for idx2, hit in enumerate(query_result.hits):
             id_prot = hit.id
-            if not cfg.gembase:
-                pos_beg, pos_end, strand = [x.strip() for x in hit.description_all[0].split('#') if x][:-1]
-            else:
-                desc = [j for j in hit.description_all[0].split(" ")]
-                strand = 1 if desc[0] == "D" else -1
-                pos_beg = int(desc[3])
-                pos_end = int(desc[4])
+
+            _, strand, pos_beg, pos_end = prot_db.get_description(hit.id)
 
             evalue_tmp = []
             hmmfrom = []
@@ -145,9 +143,9 @@ def read_hmm(replicon_id, infile, cfg, evalue=1., coverage=0.5):
 
             df.loc[idx+idx2, "ID_prot"] = id_prot
             df.loc[idx+idx2, "ID_query"] = id_query  # "-"  # remnant of ancient parsing function to keep data structure
-            df.loc[idx+idx2, "pos_beg"] = int(pos_beg)
-            df.loc[idx+idx2, "pos_end"] = int(pos_end)
-            df.loc[idx+idx2, "strand"] = int(strand)
+            df.loc[idx+idx2, "pos_beg"] = pos_beg
+            df.loc[idx+idx2, "pos_end"] = pos_end
+            df.loc[idx+idx2, "strand"] = strand
             df.loc[idx+idx2, "evalue"] = evalue_tmp[best_evalue]   # i-evalue
             df.loc[idx+idx2, "hmmfrom"] = hmmfrom[best_evalue]   # hmmfrom
             df.loc[idx+idx2, "hmmto"] = hmmto[best_evalue]     # hmm to
