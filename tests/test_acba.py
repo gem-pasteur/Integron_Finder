@@ -124,7 +124,6 @@ class TestAcba(IntegronTest):
                                                                                        replicon_filename + '.fna')
                                                                                    )
                                                                                    )
-
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 

@@ -51,6 +51,7 @@ from integron_finder.config import Config
 from integron_finder.utils import FastaIterator
 from integron_finder.topology import Topology
 from integron_finder.infernal import read_infernal
+from integron_finder.prot_db import ProdigalDB, GembaseDB
 
 
 class TestFindIntegons(IntegronTest):
@@ -98,7 +99,9 @@ class TestFindIntegons(IntegronTest):
 
     def test_find_integron(self):
         replicon_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        prot_file = self.find_data(os.path.join('Proteins', prot_name + '.prt'))
         topologies = Topology('lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -108,7 +111,6 @@ class TestFindIntegons(IntegronTest):
         attc_file = os.path.join(replicon_results_path, '{}_attc_table.res'.format(replicon.id))
         intI_file = os.path.join(replicon_results_path, '{}_intI.res'.format(replicon.id))
         phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon.id))
-
 
         args = argparse.Namespace()
         args.no_proteins = True
@@ -121,13 +123,14 @@ class TestFindIntegons(IntegronTest):
         args.calin_threshold = 2
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         exp_msg = """In replicon {}, there are:
 - 0 complete integron(s) found with a total 0 attC site(s)
 - 1 CALIN element(s) found with a total of 3 attC site(s)
 - 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
-            integrons = find_integron(replicon, attc_file, intI_file, phageI_file, cfg)
+            integrons = find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg)
             catch_msg = log.get_value().strip()
 
         self.assertEqual(catch_msg, exp_msg)
@@ -159,6 +162,7 @@ class TestFindIntegons(IntegronTest):
     def test_find_integron_calin_threshold(self):
         replicon_name = 'ESCO001.B.00018.P002'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        prot_file = self.find_data(os.path.join('Proteins', replicon_name + '.prt'))
         topologies = Topology('circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -184,9 +188,10 @@ class TestFindIntegons(IntegronTest):
 
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         with self.catch_log() as log:
-            integrons = find_integron(replicon, attc_file, intI_file, phageI_file, cfg)
+            integrons = find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg)
 
         self.assertEqual(len(integrons), 2)
 
@@ -195,7 +200,7 @@ class TestFindIntegons(IntegronTest):
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         with self.catch_log() as log:
-            integrons = find_integron(replicon, attc_file, intI_file, phageI_file, cfg)
+            integrons = find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg)
         self.assertEqual(len(integrons), 1)
 
 
@@ -203,6 +208,7 @@ class TestFindIntegons(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
         topologies = Topology('lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -229,6 +235,7 @@ class TestFindIntegons(IntegronTest):
         args.calin_threshold = 2
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+
         len_model_attc = 47  # length in 'CLEN' (value for model attc_4.cm)
 
         attc_file = read_infernal(attc_file, replicon_name,
@@ -236,6 +243,7 @@ class TestFindIntegons(IntegronTest):
                                   evalue=cfg.evalue_attc,
                                   size_max_attc=cfg.max_attc_size,
                                   size_min_attc=cfg.min_attc_size)
+        prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         exp_msg = """In replicon {}, there are:
 - 0 complete integron(s) found with a total 0 attC site(s)
@@ -243,6 +251,7 @@ class TestFindIntegons(IntegronTest):
 - 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
             integrons = find_integron(replicon,
+                                      prot_db,
                                       attc_file,
                                       intI_file,
                                       phageI_file,
@@ -279,6 +288,7 @@ class TestFindIntegons(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
         topologies = Topology('circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -311,6 +321,7 @@ class TestFindIntegons(IntegronTest):
         args.calin_threshold = 2
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         exp_msg = """In replicon {}, there are:
 - 1 complete integron(s) found with a total 3 attC site(s)
@@ -318,6 +329,7 @@ class TestFindIntegons(IntegronTest):
 - 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
             integrons = find_integron(replicon,
+                                      prot_db,
                                       attc_file,
                                       intI_file,
                                       phageI_file,
@@ -366,6 +378,7 @@ class TestFindIntegons(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
         topologies = Topology('lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -399,6 +412,7 @@ class TestFindIntegons(IntegronTest):
         args.calin_threshold = 2
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+        prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         exp_msg = """In replicon {}, there are:
 - 0 complete integron(s) found with a total 0 attC site(s)
@@ -406,6 +420,7 @@ class TestFindIntegons(IntegronTest):
 - 1 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
             integrons = find_integron(replicon,
+                                      prot_db,
                                       attc_file,
                                       intI_file,
                                       phageI_file,
@@ -458,6 +473,7 @@ class TestFindIntegons(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
         topologies = Topology('circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -492,12 +508,14 @@ class TestFindIntegons(IntegronTest):
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
+        prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
         exp_msg = """In replicon {}, there are:
 - 1 complete integron(s) found with a total 3 attC site(s)
 - 0 CALIN element(s) found with a total of 0 attC site(s)
 - 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
             integrons = find_integron(replicon,
+                                      prot_db,
                                       attc_file,
                                       intI_file,
                                       phageI_file,
@@ -541,10 +559,12 @@ class TestFindIntegons(IntegronTest):
         pdt.assert_frame_equal(integron.attI, exp)
         pdt.assert_frame_equal(integron.proteins, exp)
 
+
     def test_find_integron_proteins_n_union_integrase(self):
         replicon_name = 'OBAL001.B.00005.C001'
         replicon_id = 'OBAL001.B.00005.C001'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
+        prot_file = self.find_data(os.path.join('Proteins', replicon_name + '.prt'))
         topologies = Topology('lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -573,12 +593,14 @@ class TestFindIntegons(IntegronTest):
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
+        prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
         exp_msg = """In replicon {}, there are:
 - 3 complete integron(s) found with a total 4 attC site(s)
 - 0 CALIN element(s) found with a total of 0 attC site(s)
 - 2 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
             integrons = find_integron(replicon,
+                                      prot_db,
                                       attc_file,
                                       intI_file,
                                       phageI_file,
