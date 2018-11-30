@@ -43,7 +43,6 @@ from Bio import motifs
 from .hmm import read_hmm
 from .infernal import read_infernal
 from .attc import search_attc
-from . import utils
 
 _log = colorlog.getLogger(__name__)
 

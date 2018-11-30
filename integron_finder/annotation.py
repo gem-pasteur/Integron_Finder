@@ -35,7 +35,7 @@ import pandas as pd
 from Bio import SeqFeature
 from Bio import SeqIO
 
-from .utils import get_name_from_path, read_multi_prot_fasta
+from .utils import get_name_from_path
 from .hmm import read_hmm
 
 _log = colorlog.getLogger(__name__)

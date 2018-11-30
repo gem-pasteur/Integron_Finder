@@ -286,6 +286,7 @@ class GembaseDB(ProteinDB):
         else:
             raise KeyError(gene_id)
 
+
 class ProdigalDB(ProteinDB):
     """
     Creates proteins from Replicon/contig using prodigal and provide facilities to access them.
