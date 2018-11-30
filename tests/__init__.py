@@ -30,6 +30,7 @@ import os
 import sys
 import unittest
 import platform
+import functools
 import colorlog
 from io import StringIO
 from contextlib import contextmanager
@@ -181,6 +182,25 @@ class LoggerWrapper(object):
     def get_value(self):
         return self.logger.handlers[0].stream.getvalue()
 
+
+def hide_executable(bin_2_hide):
+    """
+    This a decorator maker, it return a decorator which can be used to decorate a "which" like function
+    the decorator call the "which" like function except for value of bin_2_hide in this case it return None
+    to simulate that the "which" like function does not find any corresponding executable.
+
+    :param bin_2_hide: the name of the binary to hide
+    :return: a decorator
+    """
+    def find_executable(func):
+        @functools.wraps(func)
+        def wrapper(exe):
+            if exe == bin_2_hide:
+                return None
+            else:
+                return func(exe)
+        return wrapper
+    return find_executable
 
 def which(name, flags=os.X_OK):
     """

@@ -29,7 +29,6 @@
 import os
 import shutil
 import tempfile
-import functools
 import argparse
 import unittest
 
@@ -43,6 +42,7 @@ from Bio import SeqIO
 
 try:
     from tests import IntegronTest
+    from tests import hide_executable
 except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
@@ -498,21 +498,4 @@ class TestAcba(IntegronTest):
         self.assertEqual(err_msg, str(ctx.exception))
 
 
-def hide_executable(bin_2_hide):
-    """
-    This a decorator maker, it return a decorator which can be used to decorate a "which" like function
-    the decorator call the "which" like function except for value of bin_2_hide in this case it return None
-    to simulate that the "which" like function does not find any corresponding executable.
 
-    :param bin_2_hide: the name of the binary to hide
-    :return: a decorator
-    """
-    def find_executable(func):
-        @functools.wraps(func)
-        def wrapper(exe):
-            if exe == bin_2_hide:
-                return None
-            else:
-                return func(exe)
-        return wrapper
-    return find_executable
