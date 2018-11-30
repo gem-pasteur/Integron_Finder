@@ -200,21 +200,47 @@ class TestGemBase(IntegronTest):
 
 
     def test_iter(self):
-        file_name = (('ACBA.0917.00019', '.fna'), ('ESCO001.C.00001.C001', '.fst'))
-        for seq_name, ext in file_name:
-            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
-            self.args.replicon = replicon_path
-            cfg = Config(self.args)
-            seq_db = FastaIterator(replicon_path)
-            replicon = next(seq_db)
+        # test Gembase Draft
+        seq_name = 'ACBA.0917.00019'
+        ext = '.fna'
+        replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
+        seq_db = FastaIterator(replicon_path)
+        replicon = next(seq_db)
+        db = GembaseDB(replicon, cfg)
+
+        idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
+                          alphabet=Seq.IUPAC.extended_protein)
+
+        specie, date, strain, contig = replicon.id.split('.')
+        pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
+        self.assertListEqual(sorted([i for i in idx if re.match(pattern, i)]), sorted([i for i in db]))
+
+        # test Gembase Complet
+        seq_name = 'ESCO001.C.00001.C001'
+        ext = '.fst'
+        replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
+        seq_db = FastaIterator(replicon_path)
+        replicon = next(seq_db)
+        with self.catch_log():
             db = GembaseDB(replicon, cfg)
 
-            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
-                              alphabet=Seq.IUPAC.extended_protein)
+        idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
+                          alphabet=Seq.IUPAC.extended_protein)
 
-            specie, date, strain, contig = replicon.id.split('.')
-            pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
-            self.assertListEqual(sorted([i for i in idx if re.match(pattern, i)]), sorted([i for i in db]))
+        specie, date, strain, contig = replicon.id.split('.')
+        pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
+        seqid_from_gembase_protfile = set([i for i in idx if re.match(pattern, i)])
+        seqid_from_if = set([i for i in db])
+        non_common_seq = seqid_from_gembase_protfile ^ seqid_from_if
+        # in Gembase complete the annotation from lstinfo provided from genbank
+        # it appear some times that some CDS are not translate in proteins
+        # So in data I have 3 genes from LSTINFO are not in .prt file
+        diff = {'ESCO001.C.00001.C001_03974', 'ESCO001.C.00001.C001_01509', 'ESCO001.C.00001.C001_04162'}
+        self.assertSetEqual(non_common_seq, diff)
 
 
     def test_get_description(self):
