@@ -24,8 +24,11 @@
 # If not, see <http://www.gnu.org/licenses/>.                                      #
 ####################################################################################
 
+import colorlog
 import pandas as pd
 from pandas.io.common import EmptyDataError
+
+_log = colorlog.getLogger(__name__)
 
 """
 utilities to manage results
@@ -73,6 +76,7 @@ def merge_results(*results_file):
              if there is no results to merge, return an empty DataFrame.
     :rtype: a :class:`pandas.DataFrame` object.
     """
+    _log.debug("merging_results " + ' '.join(results_file))
     all_res = []
     for one_result in results_file:
         try:
