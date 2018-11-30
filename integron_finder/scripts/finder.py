@@ -59,6 +59,7 @@ from integron_finder.integron import find_integron
 from integron_finder.annotation import func_annot, add_feature
 from integron_finder.prot_db import GembaseDB, ProdigalDB
 
+
 def parse_args(args):
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("replicon",
@@ -308,7 +309,7 @@ def find_integron_in_one_replicon(replicon, config):
                       cpu=config.cpu)
 
         _log.info("Default search done... : ")
-        integrons = find_integron(replicon, attC_default_file, intI_file, phageI_file, config)
+        integrons = find_integron(replicon, protein_db, attC_default_file, intI_file, phageI_file, config)
 
         #########################
         # Search with local_max #
@@ -328,7 +329,7 @@ def find_integron_in_one_replicon(replicon, config):
                 integron_max = pd.read_pickle(os.path.join(result_tmp_dir, "integron_max.pickle"))
                 _log.info("Search with local_max was already done, continue... :")
 
-            integrons = find_integron(replicon, integron_max, intI_file, phageI_file, config)
+            integrons = find_integron(replicon, protein_db, integron_max, intI_file, phageI_file, config)
 
         ##########################
         # Add promoters and attI #
@@ -367,8 +368,8 @@ def find_integron_in_one_replicon(replicon, config):
 
         base_outfile = os.path.join(config.result_dir, replicon.id)
         integron_file = base_outfile + ".integrons"
+        _log.debug("Writing integron_file {}".format(integron_file))
         if integrons:
-            _log.debug("Writing integron_file {}".format(integron_file))
             integrons_report = results.integrons_report(integrons)
             integrons_report.to_csv(integron_file, sep="\t", index=False, na_rep="NA")
 
@@ -380,7 +381,6 @@ def find_integron_in_one_replicon(replicon, config):
                 add_feature(replicon, integrons_report, protein_db, config.distance_threshold)
                 SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
         else:
-            _log.error("Writing integron_file {}".format(integron_file))
             with open(integron_file, "w") as out_f:
                 out_f.write("# No Integron found\n")
             summary_file = None

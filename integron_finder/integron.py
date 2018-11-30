@@ -48,7 +48,7 @@ from . import utils
 _log = colorlog.getLogger(__name__)
 
 
-def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
+def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
     """
     Function that looks for integrons given rules :
         * presence of intI
@@ -62,7 +62,9 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
     attc_file : Accession_number    attC    cm_debut    cm_fin    pos_beg    pos_end    sens    evalue
 
     :param replicon: the name of the replicon
-    :type replicon:
+    :type replicon: :class:`Bio.Seq.SeqRecord` object
+    :param prot_db: the protein database corresponding to the replicon translation
+    :type prot_db: a :class:`integron_finder.prot_db.ProteinDB` object.
     :param attc_file: the output of cmsearch or the result of parsing of this file by read_infernal
     :type attc_file: path to cmsearch output or :class:`pd.Dataframe`
     :param str intI_file: the output of hmmsearch with the integrase model
@@ -73,10 +75,10 @@ def find_integron(replicon, attc_file, intI_file, phageI_file, cfg):
     :retype: list of :class:`Integron` object
     """
     if not cfg.no_proteins:
-        intI = read_hmm(replicon.id, intI_file, cfg)
+        intI = read_hmm(replicon.id, prot_db, intI_file, cfg)
         intI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-        phageI = read_hmm(replicon.id, phageI_file, cfg)
+        phageI = read_hmm(replicon.id, prot_db, phageI_file, cfg)
         phageI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
         tmp = intI[intI.ID_prot.isin(phageI.ID_prot)].copy()
