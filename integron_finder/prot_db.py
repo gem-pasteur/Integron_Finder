@@ -134,7 +134,7 @@ class GembaseDB(ProteinDB):
         if prot_file is None:
             self._prot_file = self._make_protfile()
         else:
-            self.protfile = prot_file
+            self._prot_file = prot_file
         self._prot_db = self._make_db()
 
 
