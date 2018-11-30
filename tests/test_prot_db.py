@@ -344,6 +344,37 @@ class TestProdigalDB(IntegronTest):
         self.assertEqual(seq_nb, 23)
 
 
+    def test_make_protfile_no_dir(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
+        seq_db = FastaIterator(replicon_path)
+        replicon = next(seq_db)
+
+        db = ProdigalDB(replicon, cfg)
+        for seq_nb, seqs in enumerate(zip(
+                read_multi_prot_fasta(self.find_data(os.path.join('Proteins', prot_name))),
+                read_multi_prot_fasta(db.protfile)), 1):
+            expected, test = seqs
+            self.assertEqual(expected.id, test.id)
+        self.assertEqual(seq_nb, 23)
+
+
+    def test_make_protfile_no_prodigal(self):
+        file_name = 'acba.007.p01.13'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        self.args.replicon = replicon_path
+        self.args.prodigal = 'foo_bar'
+        cfg = Config(self.args)
+        seq_db = FastaIterator(replicon_path)
+        replicon = next(seq_db)
+
+        with self.assertRaises(RuntimeError) as ctx:
+            ProdigalDB(replicon, cfg)
+
+
     def test_protfile(self):
         file_name = 'acba.007.p01.13'
         prot_name = 'ACBA.007.P01_13.prt'
