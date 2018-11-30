@@ -303,7 +303,7 @@ class ProdigalDB(ProteinDB):
         if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
             os.makedirs(self.cfg.tmp_dir(self.replicon.id))
         prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + ".prt")
-        if not os.path.isfile(prot_file_path):
+        if not os.path.exists(prot_file_path):
             prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q ".format(
                 prodigal=self.cfg.prodigal,
                 meta='' if len(self.replicon) > 200000 else '-p meta',
