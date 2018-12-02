@@ -53,7 +53,9 @@ Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
 2. Set up channels ::
 
     conda config --add channels defaults
+    
     conda config --add channels conda-forge
+    
     conda config --add channels bioconda
 
 3. install integron_finder ::
