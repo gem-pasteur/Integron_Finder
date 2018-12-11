@@ -56,3 +56,9 @@ Singularity/*.simg
 .nextflow.log*
 .nextflow
 work/
+
+#####################
+# MacOS hidden file #
+#####################
+.DS_Store
+
