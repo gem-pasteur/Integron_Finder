@@ -161,7 +161,10 @@ class TestFuncAnnot(IntegronTest):
                                         "ACBA.007.P01_13_22", "ACBA.007.P01_13_23"])
         proteins = proteins[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
                              "model", "distance_2attC", "annotation"]]
-        pdt.assert_frame_equal(proteins, integron1.proteins)
+        # we need to sort the dataframe
+        # as protein file is parse using biopython and index
+        # the order os sequences is not guarantee
+        pdt.assert_frame_equal(proteins.sort_index(), integron1.proteins.sort_index())
 
         # Annotate proteins
 
@@ -175,7 +178,10 @@ class TestFuncAnnot(IntegronTest):
         proteins.loc["ACBA.007.P01_13_20"] = [17375, 17722, -1, 4.5e-31, "protein", "RF0066", np.nan, "emrE"]
         proteins.loc["ACBA.007.P01_13_21"] = [17886, 18665, -1, 7.4e-168, "protein", "RF0027", np.nan, "ANT3"]
         proteins.loc["ACBA.007.P01_13_23"] = [19721, 20254, -1, 6.2e-110, "protein", "RF0003", np.nan, "AAC3-I"]
-        pdt.assert_frame_equal(proteins, integron1.proteins)
+        # we need to sort the dataframe
+        # as protein file is parse using biopython and index
+        # the order os sequences is not guarantee
+        pdt.assert_frame_equal(proteins.sort_index(), integron1.proteins.sort_index())
 
 
     def test_annot_calin_empty(self):
@@ -345,7 +351,10 @@ class TestFuncAnnot(IntegronTest):
         expected_proteins = [proteins1, proteins2, proteins3, proteins4]
 
         for inte, exp_prot in zip(integrons, expected_proteins):
-            pdt.assert_frame_equal(inte.proteins, exp_prot)
+            # we need to sort the dataframe
+            # as protein file is parse using biopython and index
+            # the order os sequences is not guarantee
+            pdt.assert_frame_equal(inte.proteins.sort_index(), exp_prot.sort_index())
 
         # Annotate proteins with evalue threshold
         func_annot(integrons, self.replicon, self.prot_db, self.hmm_files, self.cfg, self.tmp_dir, evalue=1e-32)
@@ -362,7 +371,10 @@ class TestFuncAnnot(IntegronTest):
         proteins4.loc["ACBA.007.P01_13_23"] = [19721, 20254, -1, 6.2e-110, "protein",
                                                "RF0003", np.nan, "AAC3-I"]
         for inte, prots in zip(integrons, expected_proteins):
-            pdt.assert_frame_equal(inte.proteins, prots)
+            # we need to sort the dataframe
+            # as protein file is parse using biopython and index
+            # the order os sequences is not guarantee
+            pdt.assert_frame_equal(inte.proteins.sort_index(), prots.sort_index())
 
         # Annotate proteins with default evalue (1 more annotation)
         with self.catch_io(out=True):
@@ -370,7 +382,7 @@ class TestFuncAnnot(IntegronTest):
         proteins4.loc["ACBA.007.P01_13_20"] = [17375, 17722, -1, 4.5e-31, "protein",
                                                "RF0066", np.nan, "emrE"]
         for inte, prots in zip(integrons, expected_proteins):
-            pdt.assert_frame_equal(inte.proteins, prots)
+            pdt.assert_frame_equal(inte.proteins.sort_index(), prots.sort_index())
 
         # Annotate proteins with lower coverage threshold (1 more annotation)
         with self.catch_io(out=True):
@@ -379,7 +391,7 @@ class TestFuncAnnot(IntegronTest):
         proteins2.loc["ACBA.007.P01_13_12"] = [7710, 8594, -1, 1.6e-5, "protein",
                                                "RF0033", np.nan, "APH3"]
         for inte, prots in zip(integrons, expected_proteins):
-            pdt.assert_frame_equal(inte.proteins, prots)
+            pdt.assert_frame_equal(inte.proteins.sort_index(), prots.sort_index())
 
 
     def test_annot_wrong_hmm(self):

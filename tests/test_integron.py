@@ -425,7 +425,7 @@ class TestIntegron(IntegronTest):
                                     columns=self.columns
                                     )
         exp_proteins = exp_proteins.astype(dtype=self.dtype)
-        pdt.assert_frame_equal(exp_proteins, integron.proteins)
+        pdt.assert_frame_equal(exp_proteins.sort_index(), integron.proteins.sort_index())
 
 
     def test_describe(self):
