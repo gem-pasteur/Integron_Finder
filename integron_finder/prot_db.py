@@ -273,6 +273,7 @@ class GembaseDB(ProteinDB):
         """
         try:
             specie, date, strain, contig_gene = gene_id.split('.')
+            contig_gene = contig_gene[1:] #remove the first letter b/i
         except ValueError:
             raise IntegronError("'{}' is not a valid Gembase protein identifier.".format(gene_id))
         pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig_gene)
