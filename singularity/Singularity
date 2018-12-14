@@ -93,7 +93,7 @@ A folder name `Results_<input_file>`, inside there are different files :
 - *.pdf : representation of complete integrons detected (with integrase (redish) and at least one attc (blueish)).
   If a protein has a hit with an antibiotic resistance gene, it's yellow, otherwise grey. (if --pdf is set)
 
- and one folder by replicon, `other_<replicon_id>`, containing the different outputs of the different steps
+ and one folder by replicon, `tmp_<replicon_id>`, containing the different outputs of the different steps
  of the program for this replicon. (if --keep-tmp is set)
 
 # Galaxy
