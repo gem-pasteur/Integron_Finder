@@ -41,7 +41,7 @@ except ImportError as err:
 from integron_finder.config import Config
 from integron_finder.hmm import read_hmm
 from integron_finder.prot_db import GembaseDB, ProdigalDB
-from integron_finder.utils import FastaIterator
+from integron_finder.utils import read_multi_prot_fasta
 
 
 class TestReadHMM(IntegronTest):
@@ -63,8 +63,8 @@ class TestReadHMM(IntegronTest):
         args.replicon = replicon_path
         cfg = Config(args)
 
-        with FastaIterator(replicon_path) as sequences_db:
-            replicon = next(sequences_db)
+        sequences_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data(os.path.join("fictive_results", "{}_intI-empty.res".format(replicon_id)))
@@ -95,8 +95,8 @@ class TestReadHMM(IntegronTest):
         args.replicon = replicon_path
         cfg = Config(args)
 
-        with FastaIterator(replicon_path) as sequences_db:
-            replicon = next(sequences_db)
+        sequences_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data(os.path.join("Results_Integron_Finder_{}".format(rep_name),
@@ -130,8 +130,8 @@ class TestReadHMM(IntegronTest):
         args.replicon = replicon_path
         cfg = Config(args)
 
-        with FastaIterator(replicon_path) as sequences_db:
-            replicon = next(sequences_db)
+        sequences_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(sequences_db)
         prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
 
         df = read_hmm(contig_id, prot_db, infile, cfg)
@@ -166,8 +166,8 @@ class TestReadHMM(IntegronTest):
         args.replicon = replicon_path
         cfg = Config(args)
 
-        with FastaIterator(replicon_path) as sequences_db:
-            replicon = next(sequences_db)
+        sequences_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data(os.path.join("Results_Integron_Finder_{}".format(rep_name),
@@ -210,8 +210,8 @@ class TestReadHMM(IntegronTest):
         args.replicon = replicon_path
         cfg = Config(args)
 
-        with FastaIterator(replicon_path) as sequences_db:
-            replicon = next(sequences_db)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data(os.path.join("fictive_results", "{}_intI.res".format(replicon_id)))
@@ -246,8 +246,8 @@ class TestReadHMM(IntegronTest):
         args.replicon = replicon_path
         cfg = Config(args)
 
-        with FastaIterator(replicon_path) as sequences_db:
-            replicon = next(sequences_db)
+        sequences_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data(os.path.join("Results_Integron_Finder_{}".format(rep_name),
@@ -288,8 +288,8 @@ class TestReadHMM(IntegronTest):
         args.replicon = replicon_path
         cfg = Config(args)
 
-        with FastaIterator(replicon_path) as sequences_db:
-            replicon = next(sequences_db)
+        sequences_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data(os.path.join("fictive_results", "{}_intI.res".format(replicon_id)))
@@ -326,8 +326,8 @@ class TestReadHMM(IntegronTest):
         args.replicon = replicon_path
         cfg = Config(args)
 
-        with FastaIterator(replicon_path) as sequences_db:
-            replicon = next(sequences_db)
+        sequences_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(sequences_db)
         prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data(os.path.join('fictive_results', "{}_intI_multi.res".format(contig_id)))
