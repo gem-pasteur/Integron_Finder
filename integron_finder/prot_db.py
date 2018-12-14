@@ -232,7 +232,7 @@ class GembaseDB(ProteinDB):
 
     def _parse_lst(self):
         """
-
+        Parse the LSTINFO file and extract information specific to the replicon
         :return:
         """
         lst_path = os.path.join(self._gembase_path, 'LSTINFO',
