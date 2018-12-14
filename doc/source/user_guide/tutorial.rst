@@ -44,7 +44,7 @@ It will perform a search, and outputs the results in a directory called
 - mysequences_X.pdf
    For each complete integron, a simple graphic of the region is depicted
    generated only if ``--pdf`` option is set
-- other
+- tmp
    A folder containing outputs of the different step in the program. It includes
    notably the protein file in fasta (mysequences.prt).
    This directory is available only if option ``--keep-tmp`` is set.
@@ -101,7 +101,7 @@ Keep intermediate results
 -------------------------
 
 Integrons finder needs some intermediate results, It includes notably the protein file in fasta (mysequences.prt).
-A folder containing these outputs is generated for each replicon and have name ``other_<replicon_id>``
+A folder containing these outputs is generated for each replicon and have name ``tmp_<replicon_id>``
 This directory is remove at the end. You can keep this directory to see analyse each ``integron_finder`` steps
 with the option ``--keep-tmp``.
 

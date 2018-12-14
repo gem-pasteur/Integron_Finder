@@ -80,7 +80,7 @@ and do a loop over replicon and run :func:`intgeron_finder.scripts/find_integron
 
 all results are store in a directory named ``Results_Integron_Finder_<replicon_file_name>`` this directory is created by
 :func:`intgeron_finder.scripts/find_integron_in_one_replicon` store results in this directory
-or in a subdirectory call other_<replicon_id> these subdirectories will be keep only if ``--keep-tmp`` option
+or in a subdirectory call tmp_<replicon_id> these subdirectories will be keep only if ``--keep-tmp`` option
 is set, otherwise they are removed at the end of the :func:`intgeron_finder.scripts/find_integron_in_one_replicon`
 
 when all replicons are computed the ``main`` function call :func:`integron_finder.utils.merge_results` to gather
