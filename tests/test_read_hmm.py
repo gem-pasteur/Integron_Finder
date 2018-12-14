@@ -308,8 +308,6 @@ class TestReadHMM(IntegronTest):
         pdt.assert_frame_equal(df1, exp1)
 
 
-
-
     def test_read_multi(self):
         """
         Test reading hmm results when there are multiple hits: 2 hits on the same protein: keep
