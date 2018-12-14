@@ -96,9 +96,11 @@ class ProteinDB(ABC):
     @abstractmethod
     def get_description(self, gene_id):
         """
-
-        :param str gene_id: a proteine/gene identifier
-        :return: SeqDesc object
+        :param str gene_id: a protein/gene identifier
+        :return: The description of the protein corresponding to the gene_id
+        :rtype: :class:`SeqDesc` namedtuple object
+        :raise IntegronError: when gene_id is not a valid Gembase gene identifier
+        :raise KeyError: if gene_id is not found in GembaseDB instance
         """
         pass
 
@@ -165,9 +167,9 @@ class GembaseDB(ProteinDB):
     @staticmethod
     def gembase_sniffer(lst_path):
         """
-
-        :param lst_path:
-        :return:
+        Detect the type of gembase
+        :param str lst_path: the path to the LSTINFO file corresponding to the nucleic sequence
+        :returns: either 'Complet' or 'Draft'
         """
         with open(lst_path) as lst_file:
             line = lst_file.readline()
@@ -177,12 +179,12 @@ class GembaseDB(ProteinDB):
             return 'Draft'
 
     @staticmethod
-    def gembase_complete_parser(lst_path, replicon_id):
+    def gembase_complete_parser(lst_path, sequence_id):
         """
-
-        :param str lst_path:
-        :param str replicon_id:
-        :return:
+        :param str lst_path: the path of of the LSTINFO file Gembase Complet
+        :param str sequence_id: the id of the genomic sequence to analyse
+        :return: the information related to the 'valid' CDS corresponding to the sequence_id
+        :rtype: `class`:pandas.DataFrame` object
         """
         dtype = {'start': 'int',
                  'end': 'int',
@@ -204,7 +206,7 @@ class GembaseDB(ProteinDB):
                                columns=['start', 'end', 'strand', 'type', 'seq_id', 'valid', 'gene_name', 'description']
                                )
             lst = lst.astype(dtype)
-            specie, date, strain, contig = replicon_id.split('.')
+            specie, date, strain, contig = sequence_id.split('.')
             pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
             genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
             prots_info = genome_info.loc[(genome_info['type'] == 'CDS') & (genome_info['valid'] == 'Valid')]
@@ -212,6 +214,12 @@ class GembaseDB(ProteinDB):
 
     @staticmethod
     def gembase_draft_parser(lst_path, replicon_id):
+        """
+        :param str lst_path: the path of of the LSTINFO file from a Gembase Draft
+        :param str sequence_id: the id of the genomic sequence to analyse
+        :return: the information related to the 'valid' CDS corresponding to the sequence_id
+        :rtype: `class`:pandas.DataFrame` object
+        """
         lst = pd.read_table(lst_path,
                             header=None,
                             names=['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description'],
@@ -247,7 +255,6 @@ class GembaseDB(ProteinDB):
 
     def __getitem__(self, prot_seq_id):
         """
-
         :param str prot_seq_id: the id of a protein sequence
         :return: The Sequence corresponding to the prot_seq_id.
         :rtype: :class:`Bio.SeqRecord` object
@@ -265,9 +272,9 @@ class GembaseDB(ProteinDB):
 
     def get_description(self, gene_id):
         """
-
         :param str gene_id: a protein/gene identifier
-        :return: SeqDesc object
+        :return: The description of the protein corresponding to the gene_id
+        :rtype: :class:`SeqDesc` namedtuple object
         :raise IntegronError: when gene_id is not a valid Gembase gene identifier
         :raise KeyError: if gene_id is not found in GembaseDB instance
         """
@@ -323,13 +330,13 @@ class ProdigalDB(ProteinDB):
         return prot_file_path
 
 
-    def __getitem__(self, gene_id):
+    def __getitem__(self, prot_seq_id):
         """
-
-        :param str gene_id: a protein/gene identifier
-        :return: SeqDesc object
+        :param str prot_seq_id: the id of a protein sequence
+        :return: The Sequence corresponding to the prot_seq_id.
+        :rtype: :class:`Bio.SeqRecord` object
         """
-        return self._prot_db[gene_id]
+        return self._prot_db[prot_seq_id]
 
 
     def __iter__(self):
@@ -342,9 +349,11 @@ class ProdigalDB(ProteinDB):
 
     def get_description(self, gene_id):
         """
-
-        :param gene_id:
-        :return:
+        :param str gene_id: a protein/gene identifier
+        :returns: The description of the protein corresponding to the gene_id
+        :rtype: :class:`SeqDesc` namedtuple object
+        :raise IntegronError: when gene_id is not a valid Gembase gene identifier
+        :raise KeyError: if gene_id is not found in ProdigalDB instance
         """
         seq = self[gene_id]
         try:
