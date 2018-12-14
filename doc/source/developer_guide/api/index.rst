@@ -16,5 +16,7 @@ Integron_finder API Reference
    infernal
    integrase
    integron
+   prot_db
+   results
    topology
    utils
