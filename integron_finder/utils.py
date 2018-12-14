@@ -68,7 +68,7 @@ class FastaIterator(object):
 
     .. warning::
 
-        The sequences order is not guarantee.
+        **The sequences order is not guarantee.**
 
     """
 
