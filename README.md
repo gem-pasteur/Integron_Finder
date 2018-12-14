@@ -168,7 +168,7 @@ Output options:
   --gbk                 generate a GenBank file with the sequence annotated
                         with the same annotations than .integrons file.
   --keep-tmp            keep intermediate results. This results are stored in
-                        directory named other_<replicon id>
+                        directory named tmp_<replicon id>
   --split-results       Instead of merging integron results from all replicon
                         in one file, keep them in separated files.
 
