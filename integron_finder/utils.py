@@ -72,7 +72,7 @@ class FastaIterator(object):
 
     """
 
-    def __init__(self, path, alphabet=Seq.IUPAC.unambiguous_dna, replicon_name=None, dist_threshold=4000):
+    def __init__(self, path, alphabet=Seq.IUPAC.ambiguous_dna, replicon_name=None, dist_threshold=4000):
         """
 
         :param str path: The path to the file containing the sequences.
