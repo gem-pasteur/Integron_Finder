@@ -87,7 +87,7 @@ def parse_args(args):
                         default=4000,
                         action='store',
                         type=int,
-                        help='Two elements are aggregated if they are distant of DISTANCE_THRESH [4kb] or less')
+                        help='Two elements are aggregated if they are distant of DISTANCE_THRESH [4000]bp or less')
 
     parser.add_argument('--outdir',
                         default=".",
