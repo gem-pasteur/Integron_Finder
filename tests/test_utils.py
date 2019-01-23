@@ -111,14 +111,15 @@ class TestUtils(IntegronTest):
 
         file_name = 'replicon_bad_char'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-        expected_warning = "sequence seq_3 contains invalid characters, the sequence is skipped."
+        expected_warning = """sequence seq_(3|4) contains invalid characters, the sequence is skipped.
+sequence seq_(3|4) contains invalid characters, the sequence is skipped."""
         with utils.FastaIterator(replicon_path) as seq_db:
-            # 1 sequences is rejected so 1 message is produced (for seq 3)
+            # 2 sequences are rejected so 2 message is produced (for seq 3 and seq 4)
             with self.catch_log() as log:
                 received_seq_id = sorted([seq.id for seq in seq_db if seq])
                 got_warning = log.get_value().strip()
         self.assertRegex(got_warning, expected_warning)
-        expected_seq_id = sorted(['seq_1', 'seq_2', 'seq_4'])
+        expected_seq_id = sorted(['seq_1', 'seq_2'])
         self.assertListEqual(expected_seq_id, received_seq_id)
 
         file_name = 'replicon_too_short'
@@ -130,6 +131,7 @@ sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 5
             with self.catch_log() as log:
                 received_seq_id = sorted([seq.id for seq in seq_db if seq])
                 got_warning = log.get_value().strip()
+
         self.assertRegex(got_warning, expected_warning)
         expected_seq_id = sorted(['seq_1', 'seq_3'])
         self.assertListEqual(expected_seq_id, received_seq_id)
@@ -179,4 +181,3 @@ sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 5
     def test_log_level(self):
         for v, q, l in [(0, 0, 20), (0, 2, 40), (0, 5, 50), (1, 0, 10), (3, 0, 10), (2, 2, 20)]:
             self.assertEqual(utils.log_level(v, q), l)
-
