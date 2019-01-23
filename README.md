@@ -15,16 +15,14 @@ See Documentation for how to use it:
 
 ### For user
 
-     pip install integron_finder
+    pip install integron_finder
 
-for more installation options, for developer see documentation
-
-or use a container
+for more installation options, or for developer installation see documentation
 
 #### Singularity container
 
 For reproducibility and easy way to use integron_finder without installing 
-third party software (hmmsearch, ...) or libraries we provides containers based on singularity
+third party software (hmmsearch, ...) or libraries, we provide containers based on singularity
 
 [![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1314)
 
@@ -50,20 +48,20 @@ Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
 (The advantage with this solution is that it will install prodigal, hmmer, and infernal too.)
 
 1. install conda
-2. Set up channels ::
+2. Set up channels:
 
-    conda config --add channels defaults
-    conda config --add channels conda-forge
-    conda config --add channels bioconda
+        conda config --add channels defaults
+        conda config --add channels conda-forge
+        conda config --add channels bioconda
 
-3. install integron_finder ::
+3. install integron_finder:
 
-    conda install integron_finder
+        conda install integron_finder
 
 ### For developer
 
 If you want to develop or submit a patch on this software you are welcome.
-See `Developer installation <https://integronfinder.readthedocs.io/en/latest/developer_guide/dev_guide.html#developer-installation>`_ in documentation.
+See [Developer installation](https://integronfinder.readthedocs.io/en/latest/developer_guide/dev_guide.html#developer-installation) in documentation.
 
 
 ## Licence:
@@ -95,9 +93,10 @@ usage: integron_finder [-h] [--local-max] [--func-annot] [--cpu CPU]
                        [--union-integrases] [--cmsearch CMSEARCH]
                        [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
                        [--path-func-annot PATH_FUNC_ANNOT] [--gembase]
+                       [--annot-parser ANNOT_PARSER_NAME]
                        [--attc-model ATTC_MODEL] [--evalue-attc EVALUE_ATTC]
                        [--calin-threshold CALIN_THRESHOLD]
-                       [--keep-palindromes] [--no-proteins]
+                       [--keep-palindromes] [--no-proteins] [--promoter-attI]
                        [--max-attc-size MAX_ATTC_SIZE]
                        [--min-attc-size MIN_ATTC_SIZE] [--eagle-eyes] [--pdf]
                        [--gbk] [--keep-tmp] [--split-results]
@@ -118,7 +117,7 @@ optional arguments:
   --cpu CPU             Number of CPUs used by INFERNAL and HMMER
   -dt DISTANCE_THRESHOLD, --distance-thresh DISTANCE_THRESHOLD
                         Two elements are aggregated if they are distant of
-                        DISTANCE_THRESH [4kb] or less
+                        DISTANCE_THRESH [4000]bp or less
   --outdir OUTDIR       Set the output directory (default: current)
   --union-integrases    Instead of taking intersection of hits from Phage_int
                         profile (Tyr recombinases) and integron_integrase
@@ -135,29 +134,34 @@ optional arguments:
                         line)
   --gembase             Use gembase formatted protein file instead of
                         Prodigal. Folder structure must be preserved
+  --annot-parser ANNOT_PARSER_NAME
+                        the name of the parser to use to get information from
+                        protein file.
   --attc-model ATTC_MODEL
-                        path or file to the attc model (Covariance Matrix)
+                        Path or file to the attc model (Covariance Matrix).
   --evalue-attc EVALUE_ATTC
-                        set evalue threshold to filter out hits above it
+                        Set evalue threshold to filter out hits above it
                         (default: 1)
   --calin-threshold CALIN_THRESHOLD
                         keep 'CALIN' only if attC sites nuber >= calin-
-                        threshold (default: 2
-  --keep-palindromes    for a given hit, if the palindromic version is found,
-                        don't remove the one with highest evalue
+                        threshold (default: 2)
+  --keep-palindromes    For a given hit, if the palindromic version is found,
+                        don't remove the one with highest evalue.
   --no-proteins         Don't annotate CDS and don't find integrase, just look
                         for attC sites.
+  --promoter-attI       Search also for promoter and attI sites. (default
+                        False)
   --max-attc-size MAX_ATTC_SIZE
-                        set maximum value fot the attC size (default: 200bp)
+                        Set maximum value fot the attC size (default: 200bp)
   --min-attc-size MIN_ATTC_SIZE
                         set minimum value fot the attC size (default: 40bp)
   --eagle-eyes          Synonym of --local-max. Like a soaring eagle in the
                         sky, catching rabbits (or attC sites) by surprise.
-  --circ                Set the default topology for replicons to 'cirular'
+  --circ                Set the default topology for replicons to 'circular'
   --linear              Set the default topology for replicons to 'linear'
   --topology-file TOPOLOGY_FILE
                         The path to a file where the topology for each
-                        replicon is specified
+                        replicon is specified.
   -V, --version         show program's version number and exit
   --mute                mute the log on stdout.(continue to log on
                         integron_finder.out)
@@ -179,19 +183,23 @@ Output options:
 
 ### Example
 
-    integron_finder --local_max --func_annot myfastafile.fst
+    integron_finder --local_max --func_annot mysequences.fst
 
 ### Output :
 
-A folder name `Results_<id_genome>`, inside there are different files :
+By default, integron_finder will output 3 files under Results_Integron_Finder_mysequences:
 
-- ***.integrons** : contain list of all element detected (attc, protein near attC, integrase, Pc, attI, Pint) with position, 
-  strand, evalue, etc...
-- ***.gbk** : contains the input sequence with all integrons and features found (if --gbk option is set).
-- ***.pdf** : representation of complete integrons detected (with integrase (redish) and at least one attc (blueish) (if --pdf option is set)).
-  If a protein has a hit with an antibiotic resistance gene, it's yellow, otherwise grey.
+- `mysequences.integrons` : A file with all integrons and their elements detected in all sequences in the input file.
+- `mysequences.summary` : A summary file with the number and type of integrons per sequence.
+- `integron_finder.out` : A copy standard output. The stdout can be silenced with the argument --mute
 
- and one folder, `other`, containing the different outputs of the different steps of the program (if --keep-tmp is set).
+The amount of log in the standard output can be controlled with `--verbose` for more or `--quiet` for less, and both are cumulative arguments, eg. `-vv` or `-qq`.
+
+Other files can be created on demand:
+
+- `--gbk`: Creates a Genbank files with all the annotations found (present in the .integrons file)
+- `--pdf`: Creates a simple pdf graphic with complete integrons
+- `--keep-tmp`: Keep temporary files. See Keep intermediate files for more.
 
 # Galaxy
 
