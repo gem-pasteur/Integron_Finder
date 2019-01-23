@@ -471,10 +471,10 @@ Clustering of elements
 ----------------------
 
 *attC* sites are clustered together if they are on the same strand and if they
-are less than 4 kb apart. To cluster an array of *attC* sites and an integron
+are less than 4 kb apart (`-dt 4000` by default). To cluster an array of *attC* sites and an integron
 integrase, they also must be less than 4 kb apart. This value has been
 empirically estimated and is consistent with previous observations showing that
-biggest gene cassettes are about 2 kb long. This value of 4 kb can be modify
+biggest gene cassettes are about 2 kb long. This value of 4 kb can be modified
 though::
 
     integron_finder mysequences.fst --distance-thresh 10000
