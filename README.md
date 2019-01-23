@@ -1,14 +1,14 @@
 [![install](https://img.shields.io/github/downloads/gem-pasteur/Integron_finder/total.svg)](https://github.com/gem-pasteur/Integron_Finder/releases/latest) [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest) [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) [![Build Status](https://travis-ci.org/gem-pasteur/Integron_Finder.svg?branch=dev)](https://travis-ci.org/gem-pasteur/Integron_Finder)
-  
+
 # Integron Finder
 
 Finds integrons in DNA sequences
 
-You can use it in command line, see *installation* below, 
-or you can use it online on the 
+You can use it in command line, see *installation* below,
+or you can use it online on the
 [Galaxy Pasteur](https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F1.5.1).
 
-See Documentation for how to use it: 
+See Documentation for how to use it:
 [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest)
 
 ## Installation
@@ -23,24 +23,24 @@ or use a container
 
 #### Singularity container
 
-For reproducibility and easy way to use integron_finder without installing 
+For reproducibility and easy way to use integron_finder without installing
 third party software (hmmsearch, ...) or libraries we provides containers based on singularity
 
 [![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1314)
 
 So you just have to install singularity (https://github.com/singularityware/singularity)
 
-then 
+then
 
     singularity run shub:gem-pasteur/Integron_Finder -h
-    
-to run the last version (from master branch) 
-if you prefer download a specific version (with renaming the container on the fly) 
+
+to run the last version (from master branch)
+if you prefer download a specific version (with renaming the container on the fly)
 
     singularity pull --name integron_finder shub:gem-pasteur/Integron_Finder:2.0
-    
+
 when you have the image in local you can use it as if integron_finder has been installed
-    
+
     ./integron_finder -h
 
 #### Conda installation
@@ -70,9 +70,9 @@ See `Developer installation <https://integronfinder.readthedocs.io/en/latest/dev
 
 Integron Finder developed and released under [open source licence GPLv3](https://opensource.org/licenses/GPL-3.0)
 
-## Contributing 
+## Contributing
 
-We encourage contributions, bug report, enhancement ... 
+We encourage contributions, bug report, enhancement ...
 
 But before to do that we encourage to read [the contributing guide](CONTRIBUTING.md).
 
@@ -95,9 +95,10 @@ usage: integron_finder [-h] [--local-max] [--func-annot] [--cpu CPU]
                        [--union-integrases] [--cmsearch CMSEARCH]
                        [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
                        [--path-func-annot PATH_FUNC_ANNOT] [--gembase]
+                       [--annot-parser ANNOT_PARSER_NAME]
                        [--attc-model ATTC_MODEL] [--evalue-attc EVALUE_ATTC]
                        [--calin-threshold CALIN_THRESHOLD]
-                       [--keep-palindromes] [--no-proteins]
+                       [--keep-palindromes] [--no-proteins] [--promoter-attI]
                        [--max-attc-size MAX_ATTC_SIZE]
                        [--min-attc-size MIN_ATTC_SIZE] [--eagle-eyes] [--pdf]
                        [--gbk] [--keep-tmp] [--split-results]
@@ -118,7 +119,7 @@ optional arguments:
   --cpu CPU             Number of CPUs used by INFERNAL and HMMER
   -dt DISTANCE_THRESHOLD, --distance-thresh DISTANCE_THRESHOLD
                         Two elements are aggregated if they are distant of
-                        DISTANCE_THRESH [4kb] or less
+                        DISTANCE_THRESH [4000]bp or less
   --outdir OUTDIR       Set the output directory (default: current)
   --union-integrases    Instead of taking intersection of hits from Phage_int
                         profile (Tyr recombinases) and integron_integrase
@@ -135,29 +136,34 @@ optional arguments:
                         line)
   --gembase             Use gembase formatted protein file instead of
                         Prodigal. Folder structure must be preserved
+  --annot-parser ANNOT_PARSER_NAME
+                        the name of the parser to use to get information from
+                        protein file.
   --attc-model ATTC_MODEL
-                        path or file to the attc model (Covariance Matrix)
+                        Path or file to the attc model (Covariance Matrix).
   --evalue-attc EVALUE_ATTC
-                        set evalue threshold to filter out hits above it
+                        Set evalue threshold to filter out hits above it
                         (default: 1)
   --calin-threshold CALIN_THRESHOLD
                         keep 'CALIN' only if attC sites nuber >= calin-
-                        threshold (default: 2
-  --keep-palindromes    for a given hit, if the palindromic version is found,
-                        don't remove the one with highest evalue
+                        threshold (default: 2)
+  --keep-palindromes    For a given hit, if the palindromic version is found,
+                        don't remove the one with highest evalue.
   --no-proteins         Don't annotate CDS and don't find integrase, just look
                         for attC sites.
+  --promoter-attI       Search also for promoter and attI sites. (default
+                        False)
   --max-attc-size MAX_ATTC_SIZE
-                        set maximum value fot the attC size (default: 200bp)
+                        Set maximum value fot the attC size (default: 200bp)
   --min-attc-size MIN_ATTC_SIZE
                         set minimum value fot the attC size (default: 40bp)
   --eagle-eyes          Synonym of --local-max. Like a soaring eagle in the
                         sky, catching rabbits (or attC sites) by surprise.
-  --circ                Set the default topology for replicons to 'cirular'
+  --circ                Set the default topology for replicons to 'circular'
   --linear              Set the default topology for replicons to 'linear'
   --topology-file TOPOLOGY_FILE
                         The path to a file where the topology for each
-                        replicon is specified
+                        replicon is specified.
   -V, --version         show program's version number and exit
   --mute                mute the log on stdout.(continue to log on
                         integron_finder.out)
@@ -185,7 +191,7 @@ Output options:
 
 A folder name `Results_<id_genome>`, inside there are different files :
 
-- ***.integrons** : contain list of all element detected (attc, protein near attC, integrase, Pc, attI, Pint) with position, 
+- ***.integrons** : contain list of all element detected (attc, protein near attC, integrase, Pc, attI, Pint) with position,
   strand, evalue, etc...
 - ***.gbk** : contains the input sequence with all integrons and features found (if --gbk option is set).
 - ***.pdf** : representation of complete integrons detected (with integrase (redish) and at least one attc (blueish) (if --pdf option is set)).
@@ -203,24 +209,24 @@ You can use this program without installing it, through the pasteur galaxy webse
 
 The paper is published in Nucleic Acid Research.
 
-**Identification and analysis of integrons and cassette arrays in bacterial genomes**  
-Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha  
+**Identification and analysis of integrons and cassette arrays in bacterial genomes**
+Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
 *Nucleic Acids Research 2016; [doi: 10.1093/nar/gkw319](http://nar.oxfordjournals.org/cgi/content/full/gkw319)*
 
  Please cite also the following articles:
 
- - Nawrocki, E.P. and Eddy, S.R. (2013)  
-   **Infernal 1.1: 100-fold faster RNA homology searches.**  
+ - Nawrocki, E.P. and Eddy, S.R. (2013)
+   **Infernal 1.1: 100-fold faster RNA homology searches.**
    *Bioinformatics, 29, 2933-2935.*
- - Eddy, S.R. (2011)  
-   **Accelerated Profile HMM Searches.**  
+ - Eddy, S.R. (2011)
+   **Accelerated Profile HMM Searches.**
    *PLoS Comput Biol, 7, e1002195.*
- - Hyatt, D., Chen, G.L., Locascio, P.F., Land, M.L., Larimer, F.W. and Hauser, L.J. (2010)  
-   **Prodigal: prokaryotic gene recognition and translation initiation site identification.**  
+ - Hyatt, D., Chen, G.L., Locascio, P.F., Land, M.L., Larimer, F.W. and Hauser, L.J. (2010)
+   **Prodigal: prokaryotic gene recognition and translation initiation site identification.**
    *BMC Bioinformatics, 11, 119.*
 
 and if you use the function `--func_annot` which uses Resfams:
 
- - Gibson, M.K., Forsberg, K.J. and Dantas, G. (2015)  
-   **Improved annotation of antibiotic resistance determinants reveals microbial resistomes cluster by ecology.**  
+ - Gibson, M.K., Forsberg, K.J. and Dantas, G. (2015)
+   **Improved annotation of antibiotic resistance determinants reveals microbial resistomes cluster by ecology.**
    *ISME J, 9, 207-216.*

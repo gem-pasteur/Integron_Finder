@@ -123,7 +123,7 @@ def parse_args(args):
                         action="store_true")
     parser.add_argument("--annot-parser",
                         dest='annot_parser_name',
-                        help="the name of the parser to use to get iformation from protein file.")
+                        help="the name of the parser to use to get information from protein file.")
     parser.add_argument('--attc-model',
                         default='attc_4.cm',
                         help='Path or file to the attc model (Covariance Matrix).')
@@ -350,8 +350,8 @@ def find_integron_in_one_replicon(replicon, config):
                     _log.info("Adding proteins ... :")
                     integron.add_proteins(protein_db)
 
-            _log.info("Adding promoters and attI ... :")
             if config.promoter_attI:
+                _log.info("Adding promoters and attI ... :")
                 if integron_type == "complete":
                     integron.add_promoter()
                     integron.add_attI()

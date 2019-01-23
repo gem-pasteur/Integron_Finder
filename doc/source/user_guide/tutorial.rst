@@ -61,6 +61,21 @@ found, but will be as fast if nothing is detected.
 
     integron_finder mysequences.fst --local-max
 
+.. _calin_threshold:
+
+CALIN detection
+---------------
+
+By default CALIN are reported if they are composed of at least 2 *attC* sites, in order to avoid false positives.
+This value was chosen as CALIN with 2 attC sites were unlikely to be false positive.
+The probability of a false CALIN with at least 2 attC sites within 4kb was estimated between 4.10^-6 and 7.10^-9).
+However, one can modify this value with the option `--calin-threshold` and use a lower or higher value depending on the risk one is willing to take::
+
+    integron_finder mysequences.fst --calin-threshold 1
+
+.. note::
+    By default, `local_max` will not run around CALINs with a single *attC* site.
+
 .. _func_annot:
 
 Functional annotation
@@ -90,8 +105,8 @@ line, and you can comment out a line ::
 Here, annotation will be made using Pfam-A et Resfams, but not Pfam-B. If a
 protein is hit by 2 different profiles, the one with the best e-value will be kept.
 
-Search for promoter and AttI sites
-----------------------------------
+Search for promoter and *attI* sites
+------------------------------------
 
 By default ``integron_finder`` look for *attC* sites and site-specific integron integrase,,
 If you want to search for known promoters (integrase, Pc-int1 and Pc-int3) and AttI sites
@@ -465,6 +480,14 @@ cpu and memory used. For further details see https://www.nextflow.io/docs/latest
 For integron diggers
 ====================
 
+Many options are set to prevent false positives.
+However, one may want higher sensitivity at the expense of having potentially false positives.
+Ultimately, only experimental experiments will tell whether a given *attC* sites or integrase is functional.
+
+Also, note that because of how local_max works (ie. around already detected elements), true *attC* sites
+may be found thanks to false *attC* sites, because false *attC* sites may trigger local_max around them. 
+
+
 .. _distance_threshold:
 
 Clustering of elements
@@ -521,6 +544,18 @@ Here is a plot of how the sensitivity and false positive rate evolve as a functi
       :align: middle
       :width: 400px
       :alt: attC evalue
+
+.. note::
+    If one wants to have maximum sensitivity, use a high evalue (max is 10), and then
+    integron_finder can be run again on the same data with a lower evalue. It won't work
+    the other way around (starting with low evalue), as attC sites are not searched again.
+
+*attC* size
+-----------
+
+By default, *attC* sites' size ranges from 40 to 200bp. This can be changed with the `--min-attc-size` or `--max-attc-size` parameters::
+
+    integron_finder mysequences.fst --min-attc-size 50 --max-attc-size 100
 
 
 Palindromes
