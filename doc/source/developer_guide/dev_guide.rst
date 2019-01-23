@@ -24,7 +24,7 @@ activate you virtualenv::
 
 then install integron_finder in developer mode::
 
-    pip install -e git+https://github.com/gem-pasteur/Integron_Finder#egg=integron_finder[dev]
+    pip install -e "git+https://github.com/gem-pasteur/Integron_Finder#egg=integron_finder[dev]"
 
 or clone your repository manually, then install it ::
 
@@ -32,10 +32,10 @@ or clone your repository manually, then install it ::
     cd src
     git clone https://github.com/gem-pasteur/Integron_Finder
     cd Integron_Finder
-    pip install -e .[dev]
+    pip install -e ".[dev]"
 
-It install the requirements and create a directory in the virtualenv src/integron_finder
-and create links in the virtualenv. So integron finder is runnable and you can modify the sources and run it again
+It installs the requirements and create a directory in the virtualenv src/integron_finder
+and create links in the virtualenv. So ``integron_finder`` is runnable and you can modify the sources and run it again
 without to reinstall the project.
 
 .. note::
@@ -141,4 +141,3 @@ To generate the documentation in *html* format or ::
 to generate the documentation in pdf format (for this option you need to have latex installed on your compute)
 
 You can complete them.
-
