@@ -33,7 +33,7 @@ from subprocess import call
 import numpy as np
 import pandas as pd
 
-from .infernal import local_max, expand
+from .infernal import local_max, expand, find_attc
 
 _log = colorlog.getLogger(__name__)
 
@@ -41,7 +41,7 @@ _log = colorlog.getLogger(__name__)
 def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     """
     Parse the attc data set (sorted along start site) for the given replicon and return list of arrays.
-    One array is composed of attC sites on the same strand and separated by a distance less than 5kb.
+    One array is composed of attC sites on the same strand and separated by a distance less than dist_threshold.
 
     :param attc_df:
     :type attc_df: :class:`pandas.DataFrame`
@@ -115,39 +115,11 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
             a["evalue"] = a["evalue"].astype(float)
     return attc_array
 
-
-def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, cpu=1):
-    """
-    Call cmsearch to find attC sites in a single replicon.
-
-    :param str replicon_path: the path of the fasta file representing the replicon to analyse.
-    :param str replicon_id: the id of the replicon to analyse.
-    :param str cmsearch_path: the path to the cmsearch executable.
-    :param str out_dir: the path to the directory where cmsearch outputs will be stored.
-    :param str model_attc: path to the attc model (Covariance Matrix).
-    :param int cpu: the number of cpu used by cmsearch.
-    :returns: None, the results are written on the disk.
-    :raises RuntimeError: when cmsearch run failed.
-    """
-    cmsearch_cmd = [cmsearch_path,
-                    "--cpu", str(cpu),
-                    "-A", os.path.join(out_dir, replicon_id + "_attc.res"),
-                    "--tblout", os.path.join(out_dir, replicon_id + "_attc_table.res"),
-                    "-E", "10",
-                    model_attc,
-                    replicon_path]
-    try:
-        _log.debug("run cmsearch: {}".format(' '.join(cmsearch_cmd)))
-        with open(os.devnull, 'w') as dev_null:
-            returncode = call(cmsearch_cmd, stdout=dev_null)
-    except Exception as err:
-        raise RuntimeError("{0} failed : {1}".format(' '.join(cmsearch_cmd), err))
-    if returncode != 0:
-        raise RuntimeError("{0} failed returncode = {1}".format(' '.join(cmsearch_cmd), returncode))
-
-
 def find_attc_max(integrons, replicon, distance_threshold,
-                  model_attc_path, max_attc_size, circular=True, out_dir='.', cpu=1):
+                  model_attc_path,
+                  max_attc_size, min_attc_size,
+                  evalue_attc=1.,
+                  circular=True, out_dir='.', cpu=1):
     """
     Look for attC site with cmsearch --max option which remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
@@ -175,8 +147,9 @@ def find_attc_max(integrons, replicon, distance_threshold,
     :param replicon: replicon where the integrons were found (genomic fasta file).
     :type replicon: :class:`Bio.Seq.SeqRecord` object.
     :param int distance_threshold: the maximal distance between 2 elements to aggregate them.
+    :param float evalue_attc: evalue threshold to filter out hits above it.
     :param str model_attc_path: path to the attc model (Covariance Matrix).
-    :param int max_attc_size: maximum value fot the attC size.
+    :param int max_attc_size: maximum value for the attC size.
     :param bool circular: True if replicon is circular, False otherwise.
     :param str out_dir: The directory where to write results
                         used indirectly by some called functions as :func:`infernal.local_lmax` or `infernal.expand`.
@@ -197,7 +170,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
     for i in integrons:
         max_elt = pd.DataFrame(columns=columns)
         max_elt = max_elt.astype(dtype=data_type)
-        full_element = i.describe()
+        full_element = i.describe() # dataframe
 
         if all(full_element.type == "complete"):
             # Where is the integrase compared to the attc sites (no matter the strand) :
@@ -228,7 +201,10 @@ def find_attc_max(integrons, replicon, distance_threshold,
             strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
             df_max = local_max(replicon, window_beg, window_end, model_attc_path,
                                strand_search=strand, out_dir=out_dir,
-                               cpu_nb=cpu)
+                               cpu_nb=cpu,
+                               evalue_attc=evalue_attc,
+                               max_attc_size=max_attc_size,
+                               min_attc_size=min_attc_size,)
             max_elt = pd.concat([max_elt, df_max])
 
             # If we find new attC after the last found with default algo and if the integrase is on the left
@@ -241,8 +217,11 @@ def find_attc_max(integrons, replicon, distance_threshold,
                         ) % size_replicon < distance_threshold and integrase_is_left
             max_elt = expand(replicon,
                              window_beg, window_end, max_elt, df_max,
-                             circular, distance_threshold, max_attc_size,
+                             circular, distance_threshold,
                              model_attc_path,
+                             max_attc_size=max_attc_size,
+                             min_attc_size=min_attc_size,
+                             evalue_attc=evalue_attc,
                              search_left=go_left, search_right=go_right,
                              out_dir=out_dir, cpu=cpu)
 
@@ -261,7 +240,10 @@ def find_attc_max(integrons, replicon, distance_threshold,
                 df_max = local_max(replicon, window_beg, window_end,
                                    model_attc_path,
                                    strand_search=strand,
-                                   out_dir=out_dir, cpu_nb=cpu)
+                                   out_dir=out_dir, cpu_nb=cpu,
+                                   evalue_attc=evalue_attc,
+                                   max_attc_size=max_attc_size,
+                                   min_attc_size=min_attc_size,)
                 max_elt = pd.concat([max_elt, df_max])
 
                 if not df_max.empty:  # Max can sometimes find bigger attC than permitted
@@ -271,8 +253,11 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                 ) % size_replicon < distance_threshold
                     max_elt = expand(replicon,
                                      window_beg, window_end, max_elt, df_max,
-                                     circular, distance_threshold, max_attc_size,
+                                     circular, distance_threshold,
                                      model_attc_path,
+                                     max_attc_size=max_attc_size,
+                                     min_attc_size=min_attc_size,
+                                     evalue_attc=evalue_attc,
                                      search_left=go_left, search_right=go_right,
                                      out_dir=out_dir, cpu=cpu)
 
@@ -289,13 +274,19 @@ def find_attc_max(integrons, replicon, distance_threshold,
                 df_max = local_max(replicon,
                                    window_beg, window_end,
                                    model_attc_path,
-                                   out_dir=out_dir, cpu_nb=cpu)
+                                   out_dir=out_dir, cpu_nb=cpu,
+                                   evalue_attc=evalue_attc,
+                                   max_attc_size=max_attc_size,
+                                   min_attc_size=min_attc_size)
                 max_elt = pd.concat([max_elt, df_max])
                 if not max_elt.empty:
                     max_elt = expand(replicon,
                                      window_beg, window_end, max_elt, df_max,
-                                     circular, distance_threshold, max_attc_size,
+                                     circular, distance_threshold,
                                      model_attc_path,
+                                     max_attc_size=max_attc_size,
+                                     min_attc_size=min_attc_size,
+                                     evalue_attc=evalue_attc,
                                      search_left=True, search_right=True,
                                      out_dir=out_dir, cpu=cpu)
 

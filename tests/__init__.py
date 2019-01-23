@@ -44,7 +44,8 @@ from integron_finder import IntegronError, logger_set_level
 class IntegronTest(unittest.TestCase):
 
     _data_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "data"))
-
+    maxDiff = None
+    
     @classmethod
     def find_data(cls, name):
         data_path = os.path.join(cls._data_dir, name)
@@ -129,7 +130,7 @@ class IntegronTest(unittest.TestCase):
 
 
     def assertFileEqual(self, f1, f2, msg=None):
-        self.maxDiff = None
+        #self.maxDiff = None
         with open(f1) as fh1, open(f2) as fh2:
             self.assertMultiLineEqual(fh1.read(), fh2.read(), msg=msg)
 

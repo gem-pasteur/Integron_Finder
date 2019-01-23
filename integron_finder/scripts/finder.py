@@ -54,7 +54,8 @@ from integron_finder.topology import Topology
 from integron_finder.config import Config
 from integron_finder.hmm import scan_hmm_bank
 from integron_finder.integrase import find_integrase
-from integron_finder.attc import find_attc, find_attc_max
+from integron_finder.attc import find_attc_max
+from integron_finder.infernal import find_attc
 from integron_finder.integron import find_integron
 from integron_finder.annotation import func_annot, add_feature
 from integron_finder.prot_db import GembaseDB, ProdigalDB
@@ -305,7 +306,9 @@ def find_integron_in_one_replicon(replicon, config):
                 find_integrase(replicon.id, protein_db.protfile, result_tmp_dir, config)
         _log.info("Starting Default search ... :")
         if not os.path.isfile(attC_default_file):
+            # find attc with cmsearch
             find_attc(tmp_replicon_path, replicon.name, config.cmsearch, result_tmp_dir, config.model_attc_path,
+                      incE=config.evalue_attc,
                       cpu=config.cpu)
 
         _log.info("Default search done... : ")
@@ -319,14 +322,20 @@ def find_integron_in_one_replicon(replicon, config):
             if not os.path.isfile(os.path.join(result_tmp_dir, "integron_max.pickle")):
                 circular = True if replicon.topology == 'circ' else False
                 integron_max = find_attc_max(integrons, replicon, config.distance_threshold,
-                                             config.model_attc_path, config.max_attc_size,
+                                             config.model_attc_path,
+                                             max_attc_size=config.max_attc_size,
+                                             min_attc_size=config.min_attc_size,
                                              circular=circular, out_dir=result_tmp_dir,
-                                             cpu=config.cpu)
+                                             cpu=config.cpu,
+                                             evalue_attc=config.evalue_attc)
                 integron_max.to_pickle(os.path.join(result_tmp_dir, "integron_max.pickle"))
                 _log.info("Search with local_max done... :")
 
             else:
                 integron_max = pd.read_pickle(os.path.join(result_tmp_dir, "integron_max.pickle"))
+                integron_max = integron_max[(integron_max.evalue < config.evalue_attc) &
+                                            (abs(integron_max.pos_end - integron_max.pos_beg) < config.max_attc_size) &
+                                            (config.min_attc_size < abs(integron_max.pos_end - integron_max.pos_beg))]
                 _log.info("Search with local_max was already done, continue... :")
 
             integrons = find_integron(replicon, protein_db, integron_max, intI_file, phageI_file, config)

@@ -104,6 +104,7 @@ class TestExpand(IntegronTest):
         dist_threshold = 4000
         replicon_name = 'lian.001.c02.10'
         max_attc_size = 200
+        min_attc_size = 40
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         topologies = Topology('lin')
@@ -116,8 +117,9 @@ class TestExpand(IntegronTest):
         max_elt_expected = pd.read_csv(os.path.join(self._data_dir, 'max_elt_output_lian_right.csv'))
         max_eat_received = infernal.expand(replicon,
                                            934689, 943099, max_elt_input, df_max_input,
-                                           circular, dist_threshold, max_attc_size,
+                                           circular, dist_threshold,
                                            self.model_attc_path,
+                                           max_attc_size, min_attc_size,
                                            search_left=False, search_right=True)
         pdt.assert_frame_equal(max_elt_expected, max_eat_received)
 
@@ -127,6 +129,7 @@ class TestExpand(IntegronTest):
         dist_threshold = 4000
         replicon_name = 'lian.001.c02.10'
         max_attc_size = 200
+        min_attc_size = 40
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         topologies = Topology('lin')
@@ -139,8 +142,9 @@ class TestExpand(IntegronTest):
         max_elt_expected = pd.read_csv(os.path.join(self._data_dir, 'max_elt_output_lian_left.csv'))
         max_eat_received = infernal.expand(replicon,
                                            934689, 943099, max_elt_input, df_max_input,
-                                           circular, dist_threshold, max_attc_size,
+                                           circular, dist_threshold,
                                            self.model_attc_path,
+                                            max_attc_size, min_attc_size,
                                            search_left=True, search_right=False)
         pdt.assert_frame_equal(max_elt_expected, max_eat_received)
 
@@ -150,6 +154,7 @@ class TestExpand(IntegronTest):
         dist_threshold = 4000
         replicon_name = 'lian.001.c02.10'
         max_attc_size = 200
+        min_attc_size = 40
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         topologies = Topology('lin')
@@ -162,8 +167,9 @@ class TestExpand(IntegronTest):
         max_elt_expected = pd.read_csv(os.path.join(self._data_dir, 'max_elt_output_lian_right.csv'))
         max_eat_received = infernal.expand(replicon,
                                            934689, 943099, max_elt_input, df_max_input,
-                                           circular, dist_threshold, max_attc_size,
+                                           circular, dist_threshold,
                                            self.model_attc_path,
+                                           max_attc_size, min_attc_size,
                                            search_left=False, search_right=True)
         pdt.assert_frame_equal(max_elt_expected, max_eat_received)
 
@@ -173,6 +179,7 @@ class TestExpand(IntegronTest):
         dist_threshold = 4000
         replicon_name = 'lian.001.c02.10'
         max_attc_size = 200
+        min_attc_size = 40
 
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         topologies = Topology('lin')
@@ -185,7 +192,8 @@ class TestExpand(IntegronTest):
         max_elt_expected = pd.read_csv(os.path.join(self._data_dir, 'max_elt_output_lian_left.csv'))
         max_eat_received = infernal.expand(replicon,
                                            934689, 943099, max_elt_input, df_max_input,
-                                           circular, dist_threshold, max_attc_size,
+                                           circular, dist_threshold,
                                            self.model_attc_path,
+                                           max_attc_size, min_attc_size,
                                            search_left=True, search_right=False)
         pdt.assert_frame_equal(max_elt_expected, max_eat_received)

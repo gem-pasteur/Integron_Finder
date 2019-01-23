@@ -72,7 +72,8 @@ class TestFindAttCMax(IntegronTest):
 
         args = argparse.Namespace()
         args.attc_model = 'attc_4.cm'
-        args.max_attc_size = 40
+        args.max_attc_size = 200
+        args.min_attc_size = 40
         args.distance_threshold = 4000  # (4kb at least between 2 different arrays)
         args.eagle_eyes = False
         args.local_max = False
@@ -150,7 +151,7 @@ class TestFindAttCMax(IntegronTest):
 
         max_final = find_attc_max(integrons, self.replicon,
                                   self.cfg.distance_threshold, self.cfg.model_attc_path,
-                                  self.cfg.max_attc_size,
+                                  self.cfg.max_attc_size, self.cfg.min_attc_size,
                                   circular=False,
                                   out_dir=self.tmp_dir)
 
@@ -202,7 +203,7 @@ class TestFindAttCMax(IntegronTest):
 
         max_final = find_attc_max(integrons, self.replicon,
                                   self.cfg.distance_threshold, self.cfg.model_attc_path,
-                                  self.cfg.max_attc_size,
+                                  self.cfg.max_attc_size, self.cfg.min_attc_size,
                                   circular=True,
                                   out_dir=self.tmp_dir)
 
@@ -241,7 +242,7 @@ class TestFindAttCMax(IntegronTest):
 
         max_final = find_attc_max(integrons, self.replicon,
                                   self.cfg.distance_threshold, self.cfg.model_attc_path,
-                                  self.cfg.max_attc_size,
+                                  self.cfg.max_attc_size, self.cfg.min_attc_size,
                                   circular=True,
                                   out_dir=self.tmp_dir)
 
@@ -289,7 +290,7 @@ class TestFindAttCMax(IntegronTest):
 
         max_final = find_attc_max(integrons, replicon,
                                   self.cfg.distance_threshold, self.cfg.model_attc_path,
-                                  self.cfg.max_attc_size,
+                                  self.cfg.max_attc_size, self.cfg.min_attc_size,
                                   circular=True,
                                   out_dir=self.tmp_dir)
 

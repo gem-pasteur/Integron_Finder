@@ -71,8 +71,11 @@ def read_infernal(infile, replicon_id, len_model_attc,
     # seq to(8), strand(9), E-value(15)
     df.columns = ["cm_attC", "cm_debut", "cm_fin", "pos_beg_tmp", "pos_end_tmp", "sens", "evalue"]
     df["Accession_number"] = replicon_id
+    _log.debug("Before filtering on evalue {}, there were {} attC sites".format(evalue, len(df)))
     df = df[df.evalue < evalue]  # filter on evalue
+    _log.debug("After filtering on evalue {}, there are now {} attC sites".format(evalue, len(df)))
     df = df[(abs(df.pos_end_tmp - df.pos_beg_tmp) < size_max_attc) & (size_min_attc < abs(df.pos_end_tmp - df.pos_beg_tmp))]
+    _log.debug("After filtering on size max: {} and size min: {}, there are now {} attC sites".format(size_max_attc, size_min_attc, len(df)))
     if not df.empty:
         df.sort_values(['pos_end_tmp', 'evalue'], inplace=True)
         df.index = list(range(0, len(df)))
@@ -87,6 +90,37 @@ def read_infernal(infile, replicon_id, len_model_attc,
     else:
         return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
+
+def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, incE=1., cpu=1):
+    """
+    Call cmsearch to find attC sites in a single replicon.
+
+    :param str replicon_path: the path of the fasta file representing the replicon to analyse.
+    :param str replicon_id: the id of the replicon to analyse.
+    :param str cmsearch_path: the path to the cmsearch executable.
+    :param str out_dir: the path to the directory where cmsearch outputs will be stored.
+    :param str model_attc: path to the attc model (Covariance Matrix).
+    :param float incE: consider sequences <= this E-value threshold as significant (to get the alignment with -A)
+    :param int cpu: the number of cpu used by cmsearch.
+    :returns: None, the results are written on the disk.
+    :raises RuntimeError: when cmsearch run failed.
+    """
+    cmsearch_cmd = [cmsearch_path,
+                    "--cpu", str(cpu),
+                    "-A", os.path.join(out_dir, replicon_id + "_attc.res"),
+                    "--tblout", os.path.join(out_dir, replicon_id + "_attc_table.res"),
+                    "-E", "10",
+                    "--incE", str(incE),
+                    model_attc,
+                    replicon_path]
+    try:
+        _log.debug("run cmsearch: {}".format(' '.join(cmsearch_cmd)))
+        with open(os.devnull, 'w') as dev_null:
+            returncode = call(cmsearch_cmd, stdout=dev_null)
+    except Exception as err:
+        raise RuntimeError("{0} failed : {1}".format(' '.join(cmsearch_cmd), err))
+    if returncode != 0:
+        raise RuntimeError("{0} failed returncode = {1}".format(' '.join(cmsearch_cmd), returncode))
 
 
 def local_max(replicon,
@@ -143,29 +177,29 @@ def local_max(replicon,
                                                                                                   win_end=window_end))
 
     cmsearch_cmd = \
-        "{bin} -Z {size} {strand} --max --cpu {cpu} -o {out} --tblout {tblout} -E 10 {mod_attc_path} {infile}".format(
+        "{bin} -Z {size} {strand} --max --cpu {cpu} -A {out} --tblout {tblout} -E 10 --incE {incE} {mod_attc_path} {infile}".format(
             bin=cmsearch_bin,
             size=replicon_size / 1000000.,
             strand={"both": "", "top": "--toponly", "bottom": "--bottomonly"}[strand_search],
             cpu=cpu_nb,
             out=output_path,
             tblout=tblout_path,
+            incE=evalue_attc,
             mod_attc_path=model_attc_path,
             infile=infile_path)
     try:
         _log.debug("run cmsearch: {}".format(cmsearch_cmd))
-        returncode = call(cmsearch_cmd.split())
+        with open(os.devnull, 'w') as dev_null:
+            returncode = call(cmsearch_cmd.split(), stdout=dev_null)
     except Exception as err:
         raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd, err))
     if returncode != 0:
         raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd, returncode))
-
     df_max = read_infernal(tblout_path,
                            replicon.id, model_len(model_attc_path),
                            evalue=evalue_attc,
                            size_max_attc=max_attc_size,
                            size_min_attc=min_attc_size)
-
     # if replicon is linear
     # df_max.pos_beg + window_beg is always < replicon_size
     # (df_max.pos_beg + window_beg) % replicon_size = (df_max.pos_beg + window_beg)
@@ -183,11 +217,10 @@ def local_max(replicon,
                     (abs(df_max.pos_end - df_max.pos_beg) < max_attc_size)]
     return df_max
 
-
 def expand(replicon,
            window_beg, window_end, max_elt, df_max,
-           circular, dist_threshold, max_attc_size,
-           model_attc_path,
+           circular, dist_threshold, model_attc_path,
+           max_attc_size=200, min_attc_size=40, evalue_attc=1.,
            search_left=False, search_right=False,
            out_dir='.', cpu=1):
     """
@@ -216,10 +249,12 @@ def expand(replicon,
     :type df_max: :class:`pandas.DataFrame` object
     :param bool circular: True if replicon topology is circular otherwise False.
     :param int dist_threshold: Two elements are aggregated if they are distant of dist_threshold [4kb] or less
-    :param int max_attc_size: The maximum value fot the attC size
+    :param int max_attc_size: The maximum value for the attC size
+    :param int min_attc_size: The minimum value for the attC size
     :param str model_attc_path: the path to the attc model file
-    :param bool search_left: need to search on right of ???
-    :param bool search_right: need to search on right of ???
+    :param float evalue_attc: evalue threshold to filter out hits above it
+    :param bool search_left: trigger the local_max search on the left of the already detected element
+    :param bool search_right: trigger the local_max search on the right of the already detected element
     :param str out_dir: The path to directory where to write results
     :param int cpu: the number of cpu use by expand
     :return: a copy of max_elt with attC hits
@@ -227,8 +262,8 @@ def expand(replicon,
 
     """
     replicon_size = len(replicon)
-    # for a given element, we can search on the left hand side (if integrase is on the right for instance)
-    # or right hand side (opposite situation) or both side (only integrase or only attC sites)
+    # for a given element, we can search on the left hand side of it (if the integrase is on the right and attC sites on the left for instance),
+    # on the right hand side of it (opposite situation), or on both sides (only integrase or only attC sites)
     wb = window_beg
     we = window_end
 
@@ -249,8 +284,11 @@ def expand(replicon,
             df_max = local_max(replicon,
                                window_beg, window_end,
                                model_attc_path,
+                               max_attc_size=max_attc_size,
+                               min_attc_size=min_attc_size,
                                strand_search=searched_strand,
-                               out_dir=out_dir, cpu_nb=cpu
+                               out_dir=out_dir, cpu_nb=cpu,
+                               evalue_attc=evalue_attc
                                )
             max_elt = pd.concat([max_elt, df_max])
 
@@ -281,9 +319,12 @@ def expand(replicon,
             df_max = local_max(replicon,
                                window_beg, window_end,
                                model_attc_path,
+                               max_attc_size=max_attc_size,
+                               min_attc_size=min_attc_size,
                                strand_search=searched_strand,
                                out_dir=out_dir,
-                               cpu_nb=cpu)
+                               cpu_nb=cpu,
+                               evalue_attc=evalue_attc)
             max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
 
             if circular:
@@ -296,4 +337,3 @@ def expand(replicon,
     max_elt.drop_duplicates(inplace=True)
     max_elt.index = list(range(len(max_elt)))
     return max_elt
-
