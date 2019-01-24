@@ -15,16 +15,14 @@ See Documentation for how to use it:
 
 ### For user
 
-     pip install integron_finder
+    pip install integron_finder
 
-for more installation options, for developer see documentation
-
-or use a container
+for more installation options, or for developer installation see documentation
 
 #### Singularity container
 
 For reproducibility and easy way to use integron_finder without installing
-third party software (hmmsearch, ...) or libraries we provides containers based on singularity
+third party software (hmmsearch, ...) or libraries, we provide containers based on singularity
 
 [![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1314)
 
@@ -50,20 +48,20 @@ Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
 (The advantage with this solution is that it will install prodigal, hmmer, and infernal too.)
 
 1. install conda
-2. Set up channels ::
+2. Set up channels:
 
-    conda config --add channels defaults
-    conda config --add channels conda-forge
-    conda config --add channels bioconda
+        conda config --add channels defaults
+        conda config --add channels conda-forge
+        conda config --add channels bioconda
 
-3. install integron_finder ::
+3. install integron_finder:
 
-    conda install integron_finder
+        conda install integron_finder
 
 ### For developer
 
 If you want to develop or submit a patch on this software you are welcome.
-See `Developer installation <https://integronfinder.readthedocs.io/en/latest/developer_guide/dev_guide.html#developer-installation>`_ in documentation.
+See [Developer installation](https://integronfinder.readthedocs.io/en/latest/developer_guide/dev_guide.html#developer-installation) in documentation.
 
 
 ## Licence:
@@ -185,19 +183,23 @@ Output options:
 
 ### Example
 
-    integron_finder --local_max --func_annot myfastafile.fst
+    integron_finder --local_max --func_annot mysequences.fst
 
 ### Output :
 
-A folder name `Results_<id_genome>`, inside there are different files :
+By default, integron_finder will output 3 files under Results_Integron_Finder_mysequences:
 
-- ***.integrons** : contain list of all element detected (attc, protein near attC, integrase, Pc, attI, Pint) with position,
-  strand, evalue, etc...
-- ***.gbk** : contains the input sequence with all integrons and features found (if --gbk option is set).
-- ***.pdf** : representation of complete integrons detected (with integrase (redish) and at least one attc (blueish) (if --pdf option is set)).
-  If a protein has a hit with an antibiotic resistance gene, it's yellow, otherwise grey.
+- `mysequences.integrons` : A file with all integrons and their elements detected in all sequences in the input file.
+- `mysequences.summary` : A summary file with the number and type of integrons per sequence.
+- `integron_finder.out` : A copy standard output. The stdout can be silenced with the argument --mute
 
- and one folder, `other`, containing the different outputs of the different steps of the program (if --keep-tmp is set).
+The amount of log in the standard output can be controlled with `--verbose` for more or `--quiet` for less, and both are cumulative arguments, eg. `-vv` or `-qq`.
+
+Other files can be created on demand:
+
+- `--gbk`: Creates a Genbank files with all the annotations found (present in the .integrons file)
+- `--pdf`: Creates a simple pdf graphic with complete integrons
+- `--keep-tmp`: Keep temporary files. See Keep intermediate files for more.
 
 # Galaxy
 
