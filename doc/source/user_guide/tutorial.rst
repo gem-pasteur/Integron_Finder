@@ -86,13 +86,14 @@ CALIN detection
 
 By default CALIN are reported if they are composed of at least 2 *attC* sites, in order to avoid false positives.
 This value was chosen as CALIN with 2 attC sites were unlikely to be false positive.
-The probability of a false CALIN with at least 2 attC sites within 4kb was estimated between 4.10^-6 and 7.10^-9).
+The probability of a false CALIN with at least 2 attC sites within 4kb was estimated between 4.10^-6 and 7.10^-9.
 However, one can modify this value with the option `--calin-threshold` and use a lower or higher value depending on the risk one is willing to take::
 
     integron_finder mysequences.fst --calin-threshold 1
 
 .. note::
-    By default, `local_max` will not run around CALINs with a single *attC* site.
+    If ``--local-max`` is called, it will run around CALINs with single attC sites, even if ``--calin-threshold`` is 2.
+    The filtering step is done after the search with local max in that case.
 
 .. _func_annot:
 
