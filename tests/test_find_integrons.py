@@ -121,6 +121,7 @@ class TestFindIntegons(IntegronTest):
         args.max_attc_size = 200
         args.min_attc_size = 40
         args.calin_threshold = 2
+        args.local_max = False
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
@@ -233,6 +234,7 @@ class TestFindIntegons(IntegronTest):
         args.min_attc_size = 40
         args.distance_threshold = 4000
         args.calin_threshold = 2
+        args.local_max = False
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -319,6 +321,7 @@ class TestFindIntegons(IntegronTest):
         args.union_integrases = False
         args.keep_palindromes = True
         args.calin_threshold = 2
+        args.local_max = False
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
@@ -410,6 +413,8 @@ class TestFindIntegons(IntegronTest):
         args.union_integrases = False
         args.keep_palindromes = True
         args.calin_threshold = 2
+        args.local_max = False
+
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
@@ -505,6 +510,8 @@ class TestFindIntegons(IntegronTest):
         args.union_integrases = False
         args.keep_palindromes = True
         args.calin_threshold = 2
+        args.local_max = False
+
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -590,6 +597,7 @@ class TestFindIntegons(IntegronTest):
         args.keep_palindromes = True
         args.union_integrases = True
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
+        args.local_max = False
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -659,4 +667,3 @@ class TestFindIntegons(IntegronTest):
             pdt.assert_frame_equal(integron.promoter, empty)
             pdt.assert_frame_equal(integron.attI, empty)
             pdt.assert_frame_equal(integron.proteins, empty)
-

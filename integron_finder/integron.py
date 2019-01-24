@@ -95,12 +95,14 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                         "ID_prot", "strand", "pos_beg", "pos_end",
                                         "evalue", "hmmfrom", "hmmto", "alifrom",
                                         "alito", "len_profile"])
-
+    # if attc_file is integron_max
     if isinstance(attc_file, pd.DataFrame):
+        local_max_done = True
         attc = attc_file
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
-
+    # else it the call after default search
     else:
+        local_max_done = False
         attc = read_infernal(attc_file, replicon.id, cfg.model_len,
                              evalue=cfg.evalue_attc,
                              size_max_attc=cfg.max_attc_size,
@@ -217,8 +219,10 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
     #########################################
     # filter CALIN integron on attc number  #
     #########################################
-    _log.debug("filter out 'CALIN' with less attC sites than {}".format(cfg.calin_threshold))
-    integrons = [i for i in integrons if i.type() != 'CALIN' or len(i.attC) >= cfg.calin_threshold]
+    # Only after local_max if it will be called
+    if (cfg.local_max and local_max_done) or not cfg.local_max:
+        _log.debug("filter out 'CALIN' with less attC sites than {}".format(cfg.calin_threshold))
+        integrons = [i for i in integrons if i.type() != 'CALIN' or len(i.attC) >= cfg.calin_threshold]
 
     ###############
     # log summary #
