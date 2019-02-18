@@ -26,14 +26,11 @@
 # If not, see <http://www.gnu.org/licenses/>.                                      #
 ####################################################################################
 
-import os
 import colorlog
-from subprocess import call
-
 import numpy as np
 import pandas as pd
 
-from .infernal import local_max, expand, find_attc
+from .infernal import local_max, expand
 
 _log = colorlog.getLogger(__name__)
 
@@ -114,6 +111,7 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
             a[intcols] = a[intcols].astype(int)
             a["evalue"] = a["evalue"].astype(float)
     return attc_array
+
 
 def find_attc_max(integrons, replicon, distance_threshold,
                   model_attc_path,
