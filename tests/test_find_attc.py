@@ -43,9 +43,9 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder import attc
+from integron_finder import infernal
 
-_call_ori = attc.call
+_call_ori = infernal.call
 
 
 class TestFindAttc(IntegronTest):
@@ -67,17 +67,19 @@ class TestFindAttc(IntegronTest):
         self.model_attc = self.find_data(os.path.join('Models', 'attc_4.cm'))
         self.replicon_name = 'acba.007.p01.13'
         self.replicon_path = self.find_data(os.path.join('Replicons', self.replicon_name + '.fst'))
-        attc.call = self.mute_call(_call_ori)
+        infernal.call = self.mute_call(_call_ori)
+
 
     def tearDown(self):
         try:
             shutil.rmtree(self.tmp_dir)
         except:
             pass
-        attc.call = _call_ori
+        infernal.call = _call_ori
+
 
     def test_find_attc(self):
-        attc.find_attc(self.replicon_path, self.replicon_name, self.cmsearch_path, self.tmp_dir, self.model_attc)
+        infernal.find_attc(self.replicon_path, self.replicon_name, self.cmsearch_path, self.tmp_dir, self.model_attc)
         for suffix in ('_attc.res', '_attc_table.res'):
             res = os.path.join(self.tmp_dir, self.replicon_name + suffix)
             self.assertTrue(os.path.exists(res))
@@ -87,12 +89,12 @@ class TestFindAttc(IntegronTest):
         replicon_name = 'acba.007.p01.13'
         replicon_path = os.path.join(self._data_dir, 'Replicons', replicon_name + '.fst')
         with self.assertRaises(RuntimeError) as ctx:
-            attc.find_attc(replicon_path, self.replicon_name, cmsearch_bin, self.tmp_dir, self.model_attc)
+            infernal.find_attc(replicon_path, self.replicon_name, cmsearch_bin, self.tmp_dir, self.model_attc)
         self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: 'foo'", str(ctx.exception)),
                         msg=str(ctx.exception))
 
     def test_find_attc_no_model(self):
         model_attc = 'foo'
         with self.assertRaises(RuntimeError) as ctx:
-            attc.find_attc(self.replicon_path, self.replicon_name, self.cmsearch_path, self.tmp_dir, model_attc)
+            infernal.find_attc(self.replicon_path, self.replicon_name, self.cmsearch_path, self.tmp_dir, model_attc)
         self.assertTrue(str(ctx.exception).endswith('failed returncode = 1'))
