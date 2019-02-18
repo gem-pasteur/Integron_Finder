@@ -96,7 +96,12 @@ If you want to remove the program just remove the virtual environment.
 
 Create a virtual environment::
 
+    python3 -m venv Integron_Finder
+
+or on some systems::
+
     virtualenv -p python3 Integron_Finder
+
 
 activate you virtualenv::
 
