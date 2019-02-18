@@ -258,7 +258,12 @@ class TestLocalMax(IntegronTest):
         self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: '{}'".format(cmsearch_bin),
                         str(ctx.exception)))
 
-        infernal.call = lambda x: 1
+
+    def test_local_max_cmsearch_bad_rc(self):
+        win_beg = 942899
+        win_end = 947099
+        strand_search = 'top'
+        infernal.call = lambda x, stdout=None: 1
         with self.assertRaises(RuntimeError) as ctx:
             _ = infernal.local_max(self.replicon,
                                    win_beg, win_end,
@@ -266,6 +271,6 @@ class TestLocalMax(IntegronTest):
                                    strand_search=strand_search,
                                    evalue_attc=self.evalue_attc,
                                    max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
-                                   cmsearch_bin=cmsearch_bin, out_dir=self.out_dir, cpu_nb=self.cpu_nb
+                                   out_dir=self.out_dir, cpu_nb=self.cpu_nb
                                    )
         self.assertTrue(str(ctx.exception).endswith("failed returncode = {}".format(infernal.call(None))))
