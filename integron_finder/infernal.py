@@ -74,8 +74,10 @@ def read_infernal(infile, replicon_id, len_model_attc,
     _log.debug("Before filtering on evalue {}, there were {} attC sites".format(evalue, len(df)))
     df = df[df.evalue < evalue]  # filter on evalue
     _log.debug("After filtering on evalue {}, there are now {} attC sites".format(evalue, len(df)))
-    df = df[(abs(df.pos_end_tmp - df.pos_beg_tmp) < size_max_attc) & (size_min_attc < abs(df.pos_end_tmp - df.pos_beg_tmp))]
-    _log.debug("After filtering on size max: {} and size min: {}, there are now {} attC sites".format(size_max_attc, size_min_attc, len(df)))
+    df = df[(abs(df.pos_end_tmp - df.pos_beg_tmp) < size_max_attc) &
+            (size_min_attc < abs(df.pos_end_tmp - df.pos_beg_tmp))]
+    _log.debug("After filtering on size max: {} and size min: {}, "
+               "there are now {} attC sites".format(size_max_attc, size_min_attc, len(df)))
     if not df.empty:
         df.sort_values(['pos_end_tmp', 'evalue'], inplace=True)
         df.index = list(range(0, len(df)))
@@ -91,6 +93,7 @@ def read_infernal(infile, replicon_id, len_model_attc,
         return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
 
+
 def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, incE=1., cpu=1):
     """
     Call cmsearch to find attC sites in a single replicon.
@@ -105,22 +108,26 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, in
     :returns: None, the results are written on the disk.
     :raises RuntimeError: when cmsearch run failed.
     """
-    cmsearch_cmd = [cmsearch_path,
-                    "--cpu", str(cpu),
-                    "-A", os.path.join(out_dir, replicon_id + "_attc.res"),
-                    "--tblout", os.path.join(out_dir, replicon_id + "_attc_table.res"),
-                    "-E", "10",
-                    "--incE", str(incE),
-                    model_attc,
-                    replicon_path]
+    cmsearch_cmd = "{cmsearch} --cpu {cpu} -A {out} --tblout {tblout_path} " \
+                   "-E 10 --incE {incE} {mod_attc} {infile}".format(
+                                                                    cmsearch=cmsearch_path,
+                                                                    cpu=cpu,
+                                                                    out=os.path.join(out_dir,
+                                                                                     replicon_id + "_attc.res"),
+                                                                    tblout_path=os.path.join(out_dir,
+                                                                                             replicon_id +
+                                                                                             "_attc_table.res"),
+                                                                    incE=incE,
+                                                                    mod_attc=model_attc,
+                                                                    infile=replicon_path)
     try:
-        _log.debug("run cmsearch: {}".format(' '.join(cmsearch_cmd)))
+        _log.debug("run cmsearch: {}".format(cmsearch_cmd))
         with open(os.devnull, 'w') as dev_null:
-            returncode = call(cmsearch_cmd, stdout=dev_null)
+            returncode = call(cmsearch_cmd.split(), stdout=dev_null)
     except Exception as err:
-        raise RuntimeError("{0} failed : {1}".format(' '.join(cmsearch_cmd), err))
+        raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd, err))
     if returncode != 0:
-        raise RuntimeError("{0} failed returncode = {1}".format(' '.join(cmsearch_cmd), returncode))
+        raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd, returncode))
 
 
 def local_max(replicon,
@@ -177,16 +184,19 @@ def local_max(replicon,
                                                                                                   win_end=window_end))
 
     cmsearch_cmd = \
-        "{bin} -Z {size} {strand} --max --cpu {cpu} -A {out} --tblout {tblout} -E 10 --incE {incE} {mod_attc_path} {infile}".format(
-            bin=cmsearch_bin,
-            size=replicon_size / 1000000.,
-            strand={"both": "", "top": "--toponly", "bottom": "--bottomonly"}[strand_search],
-            cpu=cpu_nb,
-            out=output_path,
-            tblout=tblout_path,
-            incE=evalue_attc,
-            mod_attc_path=model_attc_path,
-            infile=infile_path)
+        "{bin} -Z {size} {strand} --max --cpu {cpu} -A {out} --tblout {tblout} -E 10 " \
+        "--incE {incE} {mod_attc_path} {infile}".format(
+                                                        bin=cmsearch_bin,
+                                                        size=replicon_size / 1000000.,
+                                                        strand={"both": "",
+                                                                "top": "--toponly",
+                                                                "bottom": "--bottomonly"}[strand_search],
+                                                        cpu=cpu_nb,
+                                                        out=output_path,
+                                                        tblout=tblout_path,
+                                                        incE=evalue_attc,
+                                                        mod_attc_path=model_attc_path,
+                                                        infile=infile_path)
     try:
         _log.debug("run cmsearch: {}".format(cmsearch_cmd))
         with open(os.devnull, 'w') as dev_null:
@@ -216,6 +226,7 @@ def local_max(replicon,
     df_max = df_max[(abs(df_max.pos_end - df_max.pos_beg) > min_attc_size) &
                     (abs(df_max.pos_end - df_max.pos_beg) < max_attc_size)]
     return df_max
+
 
 def expand(replicon,
            window_beg, window_end, max_elt, df_max,
@@ -262,7 +273,8 @@ def expand(replicon,
 
     """
     replicon_size = len(replicon)
-    # for a given element, we can search on the left hand side of it (if the integrase is on the right and attC sites on the left for instance),
+    # for a given element, we can search on the left hand side of it
+    # (if the integrase is on the right and attC sites on the left for instance),
     # on the right hand side of it (opposite situation), or on both sides (only integrase or only attC sites)
     wb = window_beg
     we = window_end
