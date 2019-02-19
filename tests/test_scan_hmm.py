@@ -58,7 +58,7 @@ class TestScanHmmBank(IntegronTest):
         """
         mypath = self.find_data("hmm_files")
         files = scan_hmm_bank(mypath)
-        exp_files = ["Resfam.hmm", "integrase.hmm", "phage_int.hmm"]
+        exp_files = ["integrase.hmm", "phage_int.hmm"]
         exp_files = [os.path.abspath(os.path.join(mypath, myfile)) for myfile in exp_files]
         self.assertEqual(set(exp_files), set(files))
 
@@ -105,7 +105,7 @@ class TestScanHmmBank(IntegronTest):
             files = scan_hmm_bank("list_hmm2.txt")
             catch_msg = log.get_value().strip()
         # Write expected list of hmm files
-        exp_files1 = ["Resfam.hmm", "integrase.hmm", "phage_int.hmm"]
+        exp_files1 = ["integrase.hmm", "phage_int.hmm"]
         exp_files1 = [os.path.abspath(os.path.join(path1, myfile)) for myfile in exp_files1]
         exp_files2 = ["integron_integrase.hmm", "phage-int.hmm"]
         exp_files2 = [os.path.abspath(os.path.join(path2, myfile)) for myfile in exp_files2]

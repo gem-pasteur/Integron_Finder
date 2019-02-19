@@ -33,6 +33,7 @@ import argparse
 import glob
 import tempfile
 import re
+import unittest
 
 import numpy as np
 import pandas as pd
@@ -54,6 +55,7 @@ from integron_finder.annotation import func_annot
 from integron_finder import annotation
 
 _annot_call_ori = annotation.call
+
 
 class TestFuncAnnot(IntegronTest):
 
@@ -84,8 +86,10 @@ class TestFuncAnnot(IntegronTest):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
 
-        self.hmm_files = [self.find_data(os.path.join("Functional_annotation", "Resfams.hmm"))]
-
+        #
+        self.hmm_files = [os.path.normpath(
+            os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")
+        )]
         # Define integron_finder variables
         args = argparse.Namespace()
         args.gembase = False
@@ -134,6 +138,9 @@ class TestFuncAnnot(IntegronTest):
             pass
         annotation.call = _annot_call_ori
 
+    @unittest.skipIf(not os.path.exists(
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
+                     "Resfams not found")
     def test_annot_calin(self):
         """
         Test func_annot when the integron is a CALIN (attC but no integrase), with 4 proteins:
@@ -183,7 +190,9 @@ class TestFuncAnnot(IntegronTest):
         # the order os sequences is not guarantee
         pdt.assert_frame_equal(proteins.sort_index(), integron1.proteins.sort_index())
 
-
+    @unittest.skipIf(not os.path.exists(
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
+                     "Resfams not found")
     def test_annot_calin_empty(self):
         """
         Test func_annot when the integron is a CALIN (attC but no integrase), without any protein:
@@ -221,7 +230,9 @@ class TestFuncAnnot(IntegronTest):
         # Check proteins after annotation
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
-
+    @unittest.skipIf(not os.path.exists(
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
+                     "Resfams not found")
     def test_annot_in0(self):
         """
         Test func_annot when the integron is a in0: only an integrase. There are no proteins
@@ -257,7 +268,9 @@ class TestFuncAnnot(IntegronTest):
         # check proteins after annotation
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
-
+    @unittest.skipIf(not os.path.exists(
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
+                     "Resfams not found")
     def test_annot_multi(self):
         """
         Test func_annot when there are 4 integrons:
@@ -393,7 +406,9 @@ class TestFuncAnnot(IntegronTest):
         for inte, prots in zip(integrons, expected_proteins):
             pdt.assert_frame_equal(inte.proteins.sort_index(), prots.sort_index())
 
-
+    @unittest.skipIf(not os.path.exists(
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
+                     "Resfams not found")
     def test_annot_wrong_hmm(self):
         """
         Test that when the given hmm file does not exist, it returns an error specifying that
