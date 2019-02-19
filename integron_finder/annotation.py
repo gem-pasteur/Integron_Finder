@@ -104,9 +104,9 @@ def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue
                     _log.debug("run hmmsearch: {}".format(' '.join(hmm_cmd)))
                     returncode = call(hmm_cmd)
                 except Exception as err:
-                    raise RuntimeError("{0} failed : {1}".format(hmm_cmd[0], err))
+                    raise RuntimeError("{0} failed : {1}".format(' '.join(hmm_cmd), err))
                 if returncode != 0:
-                    raise RuntimeError("{0} failed return code = {1}".format(hmm_cmd[0], returncode))
+                    raise RuntimeError("{0} failed return code = {1}".format(' '.join(hmm_cmd), returncode))
                 hmm_in = read_hmm(replicon.id, prot_db, hmm_out, cfg, evalue=evalue, coverage=coverage
                                   ).sort_values("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
