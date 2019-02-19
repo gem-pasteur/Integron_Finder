@@ -10,7 +10,7 @@ LABEL publications="https://doi.org/10.1093/nar/gkw319"
 
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG IF_VERS="2.0rc4"
+ARG IF_VERS="2.0rc6"
 
 RUN apt-get update -y &&\
     apt-get install -y --no-install-recommends python3.6  python3-pip git hmmer infernal prodigal &&\
