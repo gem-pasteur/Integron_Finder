@@ -86,7 +86,8 @@ class TestFuncAnnot(IntegronTest):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
 
-        #
+        # Resfams is too big to bee in tests/data
+        # search directly in data
         self.hmm_files = [os.path.normpath(
             os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")
         )]
