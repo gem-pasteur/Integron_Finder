@@ -71,14 +71,14 @@ class TestSplit(IntegronTest):
                     self.assertEqual(s.description, ref_seq.description)
                     self.assertEqual(s.seq, ref_seq.seq)
 
-    def test_split_avoid_ovewriting(self):
+    def test_split_avoid_overwriting(self):
         replicon_path = self.find_data(os.path.join('Replicons', 'ESCO001.B.00018.P002.fst'))
         chunk_names = split.split(replicon_path, outdir=self.out_dir)
         files_expected = [os.path.join(self.out_dir, 'ESCO001.B.00018.P002.fst')]
         self.assertListEqual(files_expected, chunk_names)
 
         chunk_names = split.split(replicon_path, outdir=self.out_dir)
-        files_expected = [os.path.join(self.out_dir, 'ESCO001.B.00018.P002_(1).fst')]
+        files_expected = [os.path.join(self.out_dir, 'ESCO001.B.00018.P002_chunk_1.fst')]
         self.assertListEqual(files_expected, chunk_names)
 
     def test_split_w_chunk(self):
@@ -97,7 +97,6 @@ class TestSplit(IntegronTest):
                     self.assertEqual(s.id, ref_seq.id)
                     self.assertEqual(s.description, ref_seq.description)
                     self.assertEqual(s.seq, ref_seq.seq)
-
 
 
 class TestParseArgs(IntegronTest):

@@ -107,10 +107,10 @@ def split(replicon_path, chunk=None, outdir='.'):
                 while os.path.exists(chunk_name):
                     root, ext = os.path.splitext(chunk_name)
                     i += 1
-                    match = re.search("_\(\d+\)$", root)
+                    match = re.search("_chunk_\d+$", root)
                     if match:
                         root = root[:match.start()]
-                    chunk_name = "{}_({}){}".format(root, i, ext)
+                    chunk_name = "{}_chunk_{}{}".format(root, i, ext)
 
                 _log.info("writing chunk '{}'".format(chunk_name))
                 SeqIO.write(chunk_out, chunk_name, "fasta")
