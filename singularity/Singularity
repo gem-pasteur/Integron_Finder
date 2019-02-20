@@ -48,7 +48,8 @@ from: ubuntu:xenial
     # to avoid ugly warning message
     # '/usr/lib/python3.5/importlib/_bootstrap.py:222: RuntimeWarning: numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88'
     # image build on singularity-hub add --no-binary
-    pip3 install --no-binary numpy --no-binary pandas dist/integron_finder-*.tar.gz
+    pip3 install --no-binary numpy --no-binary pandas
+    pip3 install dist/integron_finder-*.tar.gz
 
 %help
 
