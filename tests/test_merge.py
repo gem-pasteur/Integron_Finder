@@ -78,21 +78,21 @@ class TestMerge(IntegronTest):
     def test_merge_integrons(self):
         outfile = os.path.join(self.out_dir, 'merged.integrons')
         merge.merge_integrons(outfile, *self.res_dirs)
-        agg_results = pd.read_table(outfile, sep="\t")
+        agg_results = pd.read_csv(outfile, sep="\t")
 
         expe_result_file = self.find_data('acba_lian_pssu_merged.integrons')
-        expected_results = pd.read_table(expe_result_file, sep="\t")
+        expected_results = pd.read_csv(expe_result_file, sep="\t")
         pdt.assert_frame_equal(agg_results, expected_results)
 
     def test_merge_summary(self):
         outfile = os.path.join(self.out_dir, 'merged.summary')
         merge.merge_summary(outfile, *self.res_dirs)
-        agg_results = pd.read_table(outfile, sep="\t")
+        agg_results = pd.read_csv(outfile, sep="\t")
         agg_results.sort_values(by=['ID_replicon', 'ID_integron'], inplace=True)
         agg_results.reset_index(inplace=True, drop=True)
 
         expe_result_file = self.find_data('acba_lian_pssu_merged.summary')
-        expected_results = pd.read_table(expe_result_file, sep="\t")
+        expected_results = pd.read_csv(expe_result_file, sep="\t")
         expected_results.sort_values(by=['ID_replicon', 'ID_integron'], inplace=True)
         expected_results.reset_index(inplace=True, drop=True)
 
@@ -193,10 +193,10 @@ class TestMain(IntegronTest):
 
         integron_file = os.path.join(self.out_dir, outfile)
         merge.merge_integrons(integron_file, *self.res_dirs)
-        agg_results = pd.read_table(integron_file, sep="\t")
+        agg_results = pd.read_csv(integron_file, sep="\t")
 
         expe_result_file = self.find_data('acba_lian_pssu_merged.integrons')
-        expected_results = pd.read_table(expe_result_file, sep="\t")
+        expected_results = pd.read_csv(expe_result_file, sep="\t")
 
         pdt.assert_frame_equal(agg_results, expected_results)
 
@@ -226,10 +226,10 @@ class TestMain(IntegronTest):
 
         integron_file = os.path.join(out_dir, outfile)
         merge.merge_integrons(integron_file, *self.res_dirs)
-        agg_results = pd.read_table(integron_file, sep="\t")
+        agg_results = pd.read_csv(integron_file, sep="\t")
 
         expe_result_file = self.find_data('acba_lian_pssu_merged.integrons')
-        expected_results = pd.read_table(expe_result_file, sep="\t")
+        expected_results = pd.read_csv(expe_result_file, sep="\t")
 
         pdt.assert_frame_equal(agg_results, expected_results)
 

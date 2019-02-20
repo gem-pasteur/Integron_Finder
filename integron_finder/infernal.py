@@ -58,12 +58,12 @@ def read_infernal(infile, replicon_id, len_model_attc,
         infile, replicon_id, len_model_attc, evalue, size_max_attc, size_min_attc
     ))
     try:
-        _ = pd.read_table(infile, comment="#")
+        _ = pd.read_csv(infile, comment="#", sep="\t")
     except Exception:
         return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
 
-    df = pd.read_table(infile, sep="\s+", engine="python",  header=None,
+    df = pd.read_csv(infile, sep="\s+", engine="python",  header=None,
                        skipfooter=10, skiprows=2, usecols=[2, 5, 6, 7, 8, 9, 15])
     # some line can have different number of columns due to difference in description
     # we do not use this columns so we must parse only cols we need

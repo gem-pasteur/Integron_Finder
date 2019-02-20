@@ -135,8 +135,8 @@ class IntegronTest(unittest.TestCase):
             self.assertMultiLineEqual(fh1.read(), fh2.read(), msg=msg)
 
     def assertIntegronResultEqual(self, f1, f2):
-        df1 = pd.read_table(f1, sep="\t")
-        df2 = pd.read_table(f2, sep="\t")
+        df1 = pd.read_csv(f1, sep="\t")
+        df2 = pd.read_csv(f2, sep="\t")
         pdt.assert_frame_equal(df1, df2)
 
 

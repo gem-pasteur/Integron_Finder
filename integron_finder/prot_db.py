@@ -220,17 +220,18 @@ class GembaseDB(ProteinDB):
         :return: the information related to the 'valid' CDS corresponding to the sequence_id
         :rtype: `class`:pandas.DataFrame` object
         """
-        lst = pd.read_table(lst_path,
-                            header=None,
-                            names=['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description'],
-                            dtype={'start': 'int',
-                                   'end': 'int',
-                                   'strand': 'str',
-                                   'type': 'str',
-                                   'seq_id': 'str',
-                                   'gene_name': 'str',
-                                   'description': 'str'},
-                            )
+        lst = pd.read_csv(lst_path,
+                          header=None,
+                          names=['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description'],
+                          dtype={'start': 'int',
+                                 'end': 'int',
+                                 'strand': 'str',
+                                 'type': 'str',
+                                 'seq_id': 'str',
+                                 'gene_name': 'str',
+                                 'description': 'str'},
+                          sep="\t"
+                          )
         specie, date, strain, contig_gene = replicon_id.split('.')
         pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig_gene)
         genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]

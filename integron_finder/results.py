@@ -80,7 +80,7 @@ def merge_results(*results_file):
     all_res = []
     for one_result in results_file:
         try:
-            res = pd.read_table(one_result, sep="\t", comment='#')
+            res = pd.read_csv(one_result, sep="\t", comment='#')
         except EmptyDataError:
             continue
         all_res.append(res)
@@ -124,7 +124,7 @@ def filter_calin(result, threshold=2):
     :rtype: :class:`pandas.dataFrame` object
     """
     #     In [87]: %%timeit
-    #     ...: d = pd.read_table('Results_Integron_Finder_multi_fasta/multi_fasta.integrons', sep='\t')
+    #     ...: d = pd.read_csv('Results_Integron_Finder_multi_fasta/multi_fasta.integrons', sep='\t')
     #     ...: d.set_index(['ID_integron', 'ID_replicon'], inplace=True)
     #     ...: idx = d[(d.type_elt=='attC') & (d.type=='CALIN')].groupby(level=['ID_replicon', 'ID_integron']).filter(lambda x: x['type'].size<=1).index
     #     ...: d.loc[d.index.difference(idx)].drop_duplicates()
@@ -132,7 +132,7 @@ def filter_calin(result, threshold=2):
     # 10 loops, best of 3: 30.4 ms per loop
 
     # In [88]: %%timeit
-    #     ...: d = pd.read_table('Results_Integron_Finder_multi_fasta/multi_fasta.integrons', sep='\t')
+    #     ...: d = pd.read_csv('Results_Integron_Finder_multi_fasta/multi_fasta.integrons', sep='\t')
     #     ...: d['ID'] = d.ID_replicon + '_' + d.ID_integron
     #     ...: idx = d[(d.type_elt=='attC') & (d.type=='CALIN')].groupby('ID').filter(lambda x: x['type'].size<2).ID
     #     ...: d[~d.ID.isin(idx)]

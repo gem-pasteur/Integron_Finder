@@ -109,9 +109,9 @@ class TestAcba(IntegronTest):
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(
             os.path.join('Results_Integron_Finder_acba.007.p01.13.linear', summary_file_name))
-        exp_summary = pd.read_table(exp_summary_path)
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t")
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_table(test_summary_path)
+        test_summary = pd.read_csv(test_summary_path, sep="\t")
         pdt.assert_frame_equal(exp_summary, test_summary)
 
 
@@ -139,9 +139,9 @@ class TestAcba(IntegronTest):
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(
             os.path.join('Results_Integron_Finder_{}.gembase'.format(replicon_filename), summary_file_name))
-        exp_summary = pd.read_table(exp_summary_path)
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t")
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_table(test_summary_path)
+        test_summary = pd.read_csv(test_summary_path, sep="\t")
         pdt.assert_frame_equal(exp_summary, test_summary)
 
 
@@ -168,9 +168,9 @@ class TestAcba(IntegronTest):
 
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13', summary_file_name))
-        exp_summary = pd.read_table(exp_summary_path)
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t")
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_table(test_summary_path)
+        test_summary = pd.read_csv(test_summary_path, sep="\t")
         pdt.assert_frame_equal(exp_summary, test_summary)
 
         gbk = '{}.gbk'.format(replicon_filename)
