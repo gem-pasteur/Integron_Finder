@@ -169,7 +169,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
     for i in integrons:
         max_elt = pd.DataFrame(columns=columns)
         max_elt = max_elt.astype(dtype=data_type)
-        full_element = i.describe() # dataframe
+        full_element = i.describe()  # dataframe
 
         if all(full_element.type == "complete"):
             # Where is the integrase compared to the attc sites (no matter the strand) :

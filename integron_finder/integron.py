@@ -199,7 +199,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
 
     elif intI_ac.pos_end.values.size == 0 and attc_ac:  # If attC only
         for attc_array in attc_ac:
-            integrons.append(Integron(replicon,  cfg))
+            integrons.append(Integron(replicon, cfg))
             for a_tmp in attc_array.values:
                 integrons[-1].add_attC(a_tmp[4],
                                        a_tmp[5],
@@ -341,7 +341,7 @@ class Integron(object):
                                          self.attC.iloc[attC_len - 2].pos_end) % len(self.replicon))
         self.attC["distance_2attC"] = self.sizes_cassettes
 
-        # self.attC.sort_values(["pos_beg"], inplace = True)
+        # self.attC.sort_values(["pos_beg"], inplace = True)G669
         self.attC.index = ["attc_%03i" % int(j + 1) for j in self.attC.index]
 
 

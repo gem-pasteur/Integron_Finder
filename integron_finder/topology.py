@@ -29,7 +29,7 @@
 from collections import defaultdict
 
 
-class Topology(object):
+class Topology:
     """Class to parse and handle replicons topologies"""
 
     def __init__(self, default, topology_file=None):

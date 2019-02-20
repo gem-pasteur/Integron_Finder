@@ -28,14 +28,14 @@
 
 import os
 import glob
-import colorlog
+import warnings
 
+import colorlog
 import numpy as np
 import pandas as pd
 
 # display warning only for non installed integron_finder
 from Bio import BiopythonExperimentalWarning
-import warnings
 warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 from Bio import SearchIO

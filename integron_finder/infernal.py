@@ -109,8 +109,7 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, in
     :raises RuntimeError: when cmsearch run failed.
     """
     cmsearch_cmd = "{cmsearch} --cpu {cpu} -A {out} --tblout {tblout_path} " \
-                   "-E 10 --incE {incE} {mod_attc} {infile}".format(
-                                                                    cmsearch=cmsearch_path,
+                   "-E 10 --incE {incE} {mod_attc} {infile}".format(cmsearch=cmsearch_path,
                                                                     cpu=cpu,
                                                                     out=os.path.join(out_dir,
                                                                                      replicon_id + "_attc.res"),
@@ -185,8 +184,7 @@ def local_max(replicon,
 
     cmsearch_cmd = \
         "{bin} -Z {size} {strand} --max --cpu {cpu} -A {out} --tblout {tblout} -E 10 " \
-        "--incE {incE} {mod_attc_path} {infile}".format(
-                                                        bin=cmsearch_bin,
+        "--incE {incE} {mod_attc_path} {infile}".format(bin=cmsearch_bin,
                                                         size=replicon_size / 1000000.,
                                                         strand={"both": "",
                                                                 "top": "--toponly",

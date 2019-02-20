@@ -32,7 +32,7 @@ from . import utils
 from . import __INTEGRON_DATA__
 
 
-class Config(object):
+class Config:
     """
     Config object hold values issue from command lines
     """
@@ -107,6 +107,7 @@ class Config(object):
 
     @property
     def model_phage_int(self):
+        """The absolute path to the phage-integrase model file"""
         return os.path.join(self.model_dir, "phage-int.hmm")
 
     @property
@@ -167,5 +168,3 @@ class Config(object):
         """
         level = utils.log_level(self._args.verbose, self._args.quiet)
         return level
-
-

@@ -27,7 +27,6 @@
 ####################################################################################
 
 import os
-from collections import namedtuple
 
 import colorlog
 from Bio import Seq
@@ -51,7 +50,7 @@ def make_multi_fasta_reader(alphabet):
         :rtype: :class:`Bio.SeqRecord.SeqRecord` object.
         """
         name = get_name_from_path(path)
-        seq_it = SeqIO.parse(path, "fasta",  alphabet=alphabet)
+        seq_it = SeqIO.parse(path, "fasta", alphabet=alphabet)
         for seq in seq_it:
             seq.name = name
             yield seq
@@ -62,7 +61,7 @@ def make_multi_fasta_reader(alphabet):
 read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.extended_protein)
 
 
-class FastaIterator(object):
+class FastaIterator:
     """
     Allow to parse over a multi fasta file, and iterate over it
 
@@ -189,12 +188,12 @@ def get_name_from_path(path):
 
 
 def log_level(verbose, quiet):
-        """
-        :return: the level to apply to loggers. 0 <= level <=50
-        :rtype: int
-        """
-        default = 20  # info
-        level = default - (10 * verbose) + (10 * quiet)
-        level = max(10, level)
-        level = min(50, level)
-        return level
+    """
+    :return: the level to apply to loggers. 0 <= level <=50
+    :rtype: int
+    """
+    default = 20  # info
+    level = default - (10 * verbose) + (10 * quiet)
+    level = max(10, level)
+    level = min(50, level)
+    return level

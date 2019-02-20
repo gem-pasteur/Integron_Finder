@@ -29,8 +29,8 @@
 from abc import ABC, abstractmethod
 import os
 from subprocess import call
-import colorlog
 from collections import namedtuple
+import colorlog
 import pandas as pd
 from Bio import SeqIO, Seq
 from integron_finder import IntegronError
