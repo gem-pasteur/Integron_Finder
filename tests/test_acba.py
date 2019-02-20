@@ -72,6 +72,9 @@ class TestAcba(IntegronTest):
         os.makedirs(self.out_dir)
         integrase.call = self.mute_call(_prodigal_call)
         self.find_executable_ori = finder.distutils.spawn.find_executable
+        self.resfams_dir = os.path.normpath(
+            os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation")
+        )
 
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
@@ -140,7 +143,6 @@ class TestAcba(IntegronTest):
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
         test_summary = pd.read_table(test_summary_path)
         pdt.assert_frame_equal(exp_summary, test_summary)
-
 
 
     def test_acba_simple_no_gbk_no_pdf(self):
@@ -235,7 +237,6 @@ class TestAcba(IntegronTest):
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
 
-
     def test_acba_simple_with_pdf(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
@@ -255,17 +256,20 @@ class TestAcba(IntegronTest):
         self.assertTrue(os.path.exists(pdf_test))
 
 
+    @unittest.skipIf(not os.path.exists(
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
+                     "Resfams not found")
     def test_acba_annot(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
         command = "integron_finder --outdir {out_dir} --func-annot --path-func-annot {annot_bank} --promoter-attI " \
                   "--gbk --keep-tmp " \
                   "{replicon}".format(out_dir=self.out_dir,
-                                      annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
+                                      annot_bank=self.resfams_dir,
                                       replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
                                       )
 
-        with self.catch_io(out=True, err=True):
+        with self.catch_io(out=True, err=False):
             main(command.split()[1:], loglevel='WARNING')
 
         result_dir = os.path.join(self.out_dir, 'Results_Integron_Finder_{}'.format(replicon_filename))
@@ -290,13 +294,16 @@ class TestAcba(IntegronTest):
         self.assertHmmEqual(expected_result_path, test_result_path)
 
 
+    @unittest.skipIf(not os.path.exists(
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
+                     "Resfams not found")
     def test_acba_local_max(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
         command = "integron_finder --outdir {out_dir} --func-annot --path-func-annot {annot_bank} --local-max --gbk " \
                   "--keep-tmp --promoter-attI {replicon}".format(
                                     out_dir=self.out_dir,
-                                    annot_bank=os.path.normpath(self.find_data('Functional_annotation')),
+                                    annot_bank=self.resfams_dir,
                                     replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
                                 )
         with self.catch_io(out=True, err=True):

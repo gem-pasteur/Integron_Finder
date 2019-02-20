@@ -27,6 +27,8 @@
 ####################################################################################
 
 import os
+import tempfile
+import shutil
 
 try:
     from tests import IntegronTest
@@ -42,6 +44,14 @@ class TestScanHmmBank(IntegronTest):
 
     def setUp(self):
         logger_set_level('INFO')
+        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        if os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
+        os.makedirs(self.tmp_dir)
+
+    def tearDown(self):
+        if os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
 
     def test_wrong_path(self):
         """
@@ -84,14 +94,21 @@ class TestScanHmmBank(IntegronTest):
         it returns the names of all hmm files contained in the directories + given
         """
         path1 = self.find_data("hmm_files")
-        path2 = os.path.join("data", "Models")
+        path2 = self.find_data(os.path.join("Models"))
         hmm_paths = [os.path.join(path1, "*.hmm"),
                      os.path.join(path2, "*.hmm"),
-                     self.find_data(os.path.join("Functional_annotation", "Resfams.hmm"))]
+                     ]
+        # if resfasm is not distributed by us
+        resfams = os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")
+        if not os.path.exists(resfams):
+            resfams = os.path.join(self.tmp_dir, 'Resfams.hmm')
+            open(resfams, 'w').close()
+        hmm_paths.append(resfams)
         # Get all paths to include into the hmm_bank file
         abs_hmm = [os.path.abspath(path) for path in hmm_paths]
         # Write the hmm_bank file
-        with open("list_hmm2.txt", "w") as lhmm:
+        bank_file = os.path.join(self.tmp_dir, "list_hmm2.txt")
+        with open(bank_file, "w") as lhmm:
             lhmm.write("# Directories containing hmm files:\n")
             lhmm.write(abs_hmm[0] + "\n")
             lhmm.write(abs_hmm[1] + "\n")
@@ -102,7 +119,7 @@ class TestScanHmmBank(IntegronTest):
             lhmm.write("# " + hmm_paths[2] + ".hmm\n")
         # Read hmm_bank file and get list of all files found
         with self.catch_log() as log:
-            files = scan_hmm_bank("list_hmm2.txt")
+            files = scan_hmm_bank(bank_file)
             catch_msg = log.get_value().strip()
         # Write expected list of hmm files
         exp_files1 = ["integrase.hmm", "phage_int.hmm"]
@@ -115,5 +132,3 @@ class TestScanHmmBank(IntegronTest):
         out_stderr = ["the hmm {} will be used for functional annotation".format(path)
                       for path in exp_files]
         self.assertEqual(set(catch_msg.split("\n")), set(out_stderr))
-        # Remove hmm_bank file
-        os.remove("list_hmm2.txt")
