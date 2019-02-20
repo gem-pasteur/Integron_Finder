@@ -130,6 +130,7 @@ class TestFuncAnnot(IntegronTest):
         self.integrases = find_integrase(self.replicon.id, self.prot_file, self.tmp_dir, self.cfg)
         annotation.call = self.mute_call(_annot_call_ori)
 
+
     def tearDown(self):
         """
         To do after each test. remove output directory if it was generated
@@ -138,6 +139,7 @@ class TestFuncAnnot(IntegronTest):
             shutil.rmtree(self.tmp_dir)
             pass
         annotation.call = _annot_call_ori
+
 
     @unittest.skipIf(not os.path.exists(
         os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
@@ -175,7 +177,6 @@ class TestFuncAnnot(IntegronTest):
         pdt.assert_frame_equal(proteins.sort_index(), integron1.proteins.sort_index())
 
         # Annotate proteins
-
         func_annot(integrons, self.replicon, self.prot_db, self.hmm_files, self.cfg, self.tmp_dir)
 
         # Check that all files generated are as expected
