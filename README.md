@@ -70,18 +70,12 @@ See [Developer installation](https://integronfinder.readthedocs.io/en/latest/dev
   (see COPYING file)
 * *Resfams* is provided with the courtesy of Dantas, Gautam http://www.dantaslab.org/resfams
 * The other data files:
-    <ul>
-        <li><em>attc_4.cm</em></li>
-        <li><em>integron_integrase.hmm</em></li>
-        <li><em>phage-int.hmm</em></li>
-    </ul>
-    are licensed under a 
-    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
-    <br />
-    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
-      <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
-</a>
-
+    * *attc_4.cm*
+    * *integron_integrase.hmm*
+    * *phage-int.hmm*     
+  are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/)
+   [![CC BY-NC-SA](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
+   
 ## Contributing
 
 We encourage contributions, bug report, enhancement ...
