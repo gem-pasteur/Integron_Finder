@@ -80,8 +80,7 @@ def scan_hmm_bank(path):
                         _log.warning("func_annot '{}' does not match any files.".format(bank_path))
                         if wrong_lines > 10:
                             msg = "Too many lines with no hmm file in {}.\nIs there right file?" \
-                                  "\nsee https://integronfinder.readthedocs.io/en/latest/user_guide/tutorial.html#" \
-                                  "functional-annotation".format(real_path)
+                                  "\nsee documentation tutorial functional annotation".format(real_path)
                             _log.error(msg)
                             raise ValueError(msg)
                     else:
