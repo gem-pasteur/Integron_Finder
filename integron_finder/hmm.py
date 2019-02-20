@@ -61,6 +61,7 @@ def scan_hmm_bank(path):
             files = glob.glob(os.path.join(real_path, '*.hmm'))
         elif os.path.isfile(real_path):
             with open(real_path) as hmm_bank:
+                wrong_lines = 0
                 for bank_path in hmm_bank:
                     bank_path = bank_path.strip()
                     if bank_path.startswith('#'):
@@ -75,7 +76,14 @@ def scan_hmm_bank(path):
                         bank_path = os.path.normpath(os.path.join(prefix, bank_path))
                     bank_files = glob.glob(os.path.expanduser(bank_path))
                     if not bank_files:
+                        wrong_lines += 1
                         _log.warning("func_annot '{}' does not match any files.".format(bank_path))
+                        if wrong_lines > 10:
+                            msg = "Too many lines with no hmm file in {}.\nIs there right file?" \
+                                  "\nsee https://integronfinder.readthedocs.io/en/latest/user_guide/tutorial.html#" \
+                                  "functional-annotation".format(real_path)
+                            _log.error(msg)
+                            raise ValueError(msg)
                     else:
                         for path in bank_files:
                             _log.warning("the hmm {} will be used for functional annotation".format(path))

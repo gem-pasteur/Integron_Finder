@@ -86,6 +86,21 @@ class TestScanHmmBank(IntegronTest):
         self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(files, [])
 
+
+    def test_scan_file_wrong_content(self):
+        """
+        Test that when the given path is a file, containing something else than path to hmm file
+        it raise a ValueError
+        """
+        mypath = os.path.normpath(
+            os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")
+        )
+        with self.catch_log() as log:
+            with self.assertRaises(ValueError) as ctx:
+                _ = scan_hmm_bank(mypath)
+            self.assertTrue(str(ctx.exception).startswith("Too many lines with no hmm file in {}.".format(mypath)))
+
+
     def test_scan_file_names(self):
         """
         Test that when the given path is a file, containing:
