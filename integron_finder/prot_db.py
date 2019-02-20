@@ -33,10 +33,9 @@ import colorlog
 from collections import namedtuple
 import pandas as pd
 from Bio import SeqIO, Seq
+from integron_finder import IntegronError
 
 _log = colorlog.getLogger(__name__)
-
-from integron_finder import IntegronError
 
 
 """Sequence description with fields: id strand start stop"""
@@ -59,7 +58,7 @@ class ProteinDB(ABC):
             self._prot_file = prot_file
         self._prot_db = self._make_db()
 
-    def __getitem__(self, seq_id):
+    def __getitem__(self, prot_seq_id):
         """
 
         :param str prot_seq_id: the id of a protein sequence
@@ -281,7 +280,7 @@ class GembaseDB(ProteinDB):
         """
         try:
             specie, date, strain, contig_gene = gene_id.split('.')
-            contig_gene = contig_gene[1:] #remove the first letter b/i
+            contig_gene = contig_gene[1:]  # remove the first letter b/i
         except ValueError:
             raise IntegronError("'{}' is not a valid Gembase protein identifier.".format(gene_id))
         pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig_gene)

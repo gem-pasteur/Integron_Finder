@@ -64,7 +64,7 @@ def read_infernal(infile, replicon_id, len_model_attc,
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
 
     df = pd.read_csv(infile, sep="\s+", engine="python",  header=None,
-                       skipfooter=10, skiprows=2, usecols=[2, 5, 6, 7, 8, 9, 15])
+                     skipfooter=10, skiprows=2, usecols=[2, 5, 6, 7, 8, 9, 15])
     # some line can have different number of columns due to difference in description
     # we do not use this columns so we must parse only cols we need
     # Keep only columns: query_name(2), mdl from(5), mdl to(6), seq from(7),

@@ -148,6 +148,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
     :param float evalue_attc: evalue threshold to filter out hits above it.
     :param str model_attc_path: path to the attc model (Covariance Matrix).
     :param int max_attc_size: maximum value for the attC size.
+    :param int min_attc_size: minimum value for the attC size.
     :param bool circular: True if replicon is circular, False otherwise.
     :param str out_dir: The directory where to write results
                         used indirectly by some called functions as :func:`infernal.local_max` or `infernal.expand`.

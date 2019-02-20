@@ -115,7 +115,6 @@ def split(replicon_path, chunk=None, outdir='.'):
                 _log.info("writing chunk '{}'".format(chunk_name))
                 SeqIO.write(chunk_out, chunk_name, "fasta")
                 all_chunk_name.append(chunk_name)
-
     return all_chunk_name
 
 

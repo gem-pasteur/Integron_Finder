@@ -624,5 +624,4 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
 
 
 if __name__ == "__main__":
-
     main()

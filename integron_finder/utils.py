@@ -188,11 +188,6 @@ def get_name_from_path(path):
     return os.path.splitext(os.path.split(path)[1])[0]
 
 
-"""Sequence description with fields: id strand start stop"""
-SeqDesc = namedtuple('SeqDesc', ('id', 'strand', 'start', 'stop'))
-
-
-
 def log_level(verbose, quiet):
         """
         :return: the level to apply to loggers. 0 <= level <=50
