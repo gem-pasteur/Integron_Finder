@@ -55,7 +55,7 @@ import integron_finder.scripts.finder as finder
 _prodigal_call = integrase.call
 
 
-class TestEMptyProt(IntegronTest):
+class TestEmptyProt(IntegronTest):
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
