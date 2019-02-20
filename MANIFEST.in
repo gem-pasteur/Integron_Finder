@@ -2,7 +2,7 @@
 include data/Functional_annotation/*
 include data/Models/*
 exclude data/Pfam-B.hmm
-exclude data/Replicons/*
+recursive-exclude data/Replicons/ *
 
 recursive-include tests/ *
 recursive-exclude tests/data/Results_Integron_Finder_pssu.001.c01.13/ *
