@@ -188,35 +188,9 @@ def expand_data(data_to_expand):
                 data_struct.append((base_dest_dir, [one_src]))
     return data_struct
 
-#####################
-# for the pypi site #
-#####################
 
-# pypi use long_description in rst to generate the package page
-# but github or gitlab use markdown
-# to generate the package and push it on pypi we need
-# pandoc to convert on the fly the READmE.md => rst
-
-try:
-    from pypandoc import convert
-    def read_md(f):
-        try:
-            return convert(f, 'rst')
-        except OSError as err:
-            if str(err).startswith('No pandoc was found:'):
-                warnings.warn("'pypandoc' module do not found 'pandoc' lib.\n"
-                              "Please install pandoc to convert Markdown to RST",
-                              RuntimeWarning)
-                return open(f, 'r').read()
-        else:
-            raise err
-except ImportError:
-    import sys
-    warnings.warn("WARNING: pypandoc module not found.\nCould not convert Markdown to RST",
-                  ImportWarning)
-
-    def read_md(f):
-        return open(f, 'r').read()
+def read_md(f):
+    return open(f, 'r').read()
 
 ###################################################
 # the configuration of the installer start bellow #
@@ -229,7 +203,7 @@ setup(name='integron_finder',
       author="Jean Cury",
       author_email="jean.cury@normalesup.org",
       url="https://github.com/gem-pasteur/Integron_Finder/",
-      download_url='https://github.com/gem-pasteur/Integron_Finder/archive/v2.0.tar.gz',
+      download_url='https://github.com/gem-pasteur/Integron_Finder/archive/v2.0rc6.tar.gz',
       license="GPLv3",
       classifiers=[
           'Development Status :: 5 - Production/Stable',
