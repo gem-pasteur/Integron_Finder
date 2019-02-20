@@ -151,7 +151,11 @@ class Config(object):
 
     @property
     def func_annot_path(self):
-        """The absolute path to the directory containing file needed for the functional annotation"""
+        """
+        The canonical absolute path to the directory containing
+        file needed for the functional annotation.
+        It does not take in account the argument passed via the command line.
+        """
         return os.path.join(self._prefix_data, "Functional_annotation")
 
 
