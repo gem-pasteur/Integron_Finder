@@ -2,9 +2,9 @@
 
 .. _hmm:
 
-
+***
 hmm
-===
+***
 
 .. automodule:: integron_finder.hmm
    :members:
