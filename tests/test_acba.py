@@ -86,7 +86,6 @@ class TestAcba(IntegronTest):
 
     def test_acba_simple_linear(self):
         replicon_filename = 'acba.007.p01.13'
-        replicon_id = 'ACBA.007.P01_13'
         output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
         command = "integron_finder --outdir {out_dir} --linear {replicon}".format(out_dir=self.out_dir,
@@ -113,6 +112,51 @@ class TestAcba(IntegronTest):
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
         test_summary = pd.read_csv(test_summary_path, sep="\t")
         pdt.assert_frame_equal(exp_summary, test_summary)
+
+
+    def test_acba_sequential_eq_isolate(self):
+        """
+        test if we find the same results if we run IF in sequential as isolated on each seq
+        ACBA.0917.00019 contains 2 contigs 0001 and 0002.
+        0002 does not contains integrons
+        :return:
+        """
+        seq_replicon_filename = 'ACBA.0917.00019'
+        seq_output_dir = 'Results_Integron_Finder_{}'.format(seq_replicon_filename)
+        seq_test_result_dir = os.path.join(self.out_dir, seq_output_dir)
+        seq_cmd = "integron_finder --outdir {out_dir} " \
+                  "--keep-tmp {replicon}".format(out_dir=self.out_dir,
+                                                 replicon=self.find_data(
+                                                          os.path.join('Gembase',
+                                                                       'Replicons',
+                                                                       seq_replicon_filename + '.fna')
+                                                          )
+                                                 )
+        with self.catch_io(out=True, err=True):
+            main(seq_cmd.split()[1:], loglevel='WARNING')
+
+        contig_name = 'ACBA.0917.00019.0001'
+        iso_output_dir = 'Results_Integron_Finder_{}'.format(contig_name)
+        iso_test_result_dir = os.path.join(self.out_dir, iso_output_dir)
+        iso_cmd = "integron_finder --outdir {out_dir} " \
+                  "--keep-tmp --lin {replicon}".format(out_dir=self.out_dir,
+                                                 replicon=self.find_data(
+                                                          os.path.join('Replicons',
+                                                                        contig_name + '.fst')
+                                                          )
+                                                 )
+        with self.catch_io(out=True, err=True):
+            main(iso_cmd.split()[1:], loglevel='WARNING')
+
+        seq_integron_result_path = os.path.join(seq_test_result_dir, seq_replicon_filename + '.integrons')
+        iso_integron_result_path = os.path.join(iso_test_result_dir, contig_name + '.integrons')
+        self.assertIntegronResultEqual(seq_integron_result_path, iso_integron_result_path)
+
+        seq_summary_result_path = os.path.join(seq_test_result_dir, seq_replicon_filename + '.summary')
+        iso_summary_result_path = os.path.join(iso_test_result_dir, contig_name + '.summary')
+        seq_summary = pd.read_csv(seq_summary_result_path, sep="\t")
+        iso_summary = pd.read_csv(iso_summary_result_path, sep="\t")
+        pdt.assert_frame_equal(seq_summary, iso_summary)
 
 
     def test_acba_simple_gembase(self):
@@ -428,7 +472,6 @@ class TestAcba(IntegronTest):
                 main(command.split()[1:])
         err_msg = "cannot find 'cmsearch' in PATH.\n" \
                   "Please install infernal package or setup 'cmsearch' binary path with --cmsearch option"
-
         self.assertEqual(err_msg, str(ctx.exception))
 
 
@@ -450,7 +493,6 @@ class TestAcba(IntegronTest):
                 # I need to catch stdout as log are write on
                 main(command.split()[1:])
         err_msg = "outdir '{}' already exists and is not a directory".format(bad_out_dir)
-
         self.assertEqual(err_msg, str(ctx.exception))
 
 
@@ -476,8 +518,8 @@ class TestAcba(IntegronTest):
                 # I need to catch stdout as log are write on
                 main(command.split()[1:])
         err_msg = "result dir '{}' already exists and is not a directory".format(self.out_dir)
-
         self.assertEqual(err_msg, str(ctx.exception))
+
 
     @unittest.skipIf(os.getuid() == 0, "root have always permission to write")
     def test_resultdir_not_writable(self):
@@ -501,7 +543,6 @@ class TestAcba(IntegronTest):
                 # I need to catch stdout as log are write on
                 main(command.split()[1:])
         err_msg = "result dir '{}' already exists and is not writable".format(self.out_dir)
-
         self.assertEqual(err_msg, str(ctx.exception))
 
 
