@@ -44,7 +44,7 @@ class TestParseArgs(IntegronTest):
     def test_replicon(self):
         replicon = 'foo'
         cfg = parse_args([replicon])
-        self.assertEqual(cfg.replicon_path, os.path.abspath(replicon))
+        self.assertEqual(cfg.input_seq_path, os.path.abspath(replicon))
 
     def test_wo_replicon(self):
         real_exit = sys.exit

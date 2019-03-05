@@ -260,7 +260,6 @@ def find_integron_in_one_replicon(replicon, config):
               if there is no integron the summary file is None
     :rtype: tuple (str integron_file, str summary_file) or (str integron_file, None)
     """
-    in_dir, sequence_file = os.path.split(config.replicon_path)
     result_tmp_dir = config.tmp_dir(replicon.id)
     try:
         os.mkdir(result_tmp_dir)
@@ -561,7 +560,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     log_header.propagate = False
     log_header.info(header(args))
 
-    with utils.FastaIterator(config.replicon_path, dist_threshold=config.distance_threshold) as sequences_db:
+    with utils.FastaIterator(config.input_seq_path, dist_threshold=config.distance_threshold) as sequences_db:
         ################
         # set topology #
         ################
@@ -591,7 +590,6 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                 _log.info("############ Processing replicon {} ({}/{}) ############\n".format(replicon.id,
                                                                                               rep_no,
                                                                                               sequences_db_len))
-
                 integron_res, summary = find_integron_in_one_replicon(replicon, config)
                 if integron_res:
                     all_integrons.append(integron_res)
@@ -605,7 +603,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         _log.info("Merging integrons results.\n")
         agg_integrons = results.merge_results(*all_integrons)
         agg_summary = results.merge_results(*all_summaries)
-        outfile_base_name = os.path.join(config.result_dir, utils.get_name_from_path(config.replicon_path))
+        outfile_base_name = os.path.join(config.result_dir, utils.get_name_from_path(config.input_seq_path))
         merged_integron_file = outfile_base_name + ".integrons"
         if not agg_integrons.empty:
             agg_integrons.to_csv(merged_integron_file, sep="\t", index=False, na_rep="NA")

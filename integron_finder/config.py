@@ -54,14 +54,14 @@ class Config:
             raise AttributeError("config object has no attribute '{}'".format(item))
 
     @property
-    def replicon_path(self):
-        """The absolute path to the replicon"""
+    def input_seq_path(self):
+        """The absolute path to the input file"""
         return os.path.abspath(self._args.replicon)
 
     @property
     def input_dir(self):
         """The absolute path to the directory where is located the replicon"""
-        in_dir, sequence_file = os.path.split(self.replicon_path)
+        in_dir, sequence_file = os.path.split(self.input_seq_path)
         return in_dir
 
     @property
@@ -72,7 +72,7 @@ class Config:
     @property
     def result_dir(self):
         """The absolute path to results directory"""
-        file_name = utils.get_name_from_path(self.replicon_path)
+        file_name = utils.get_name_from_path(self.input_seq_path)
         result_dir = os.path.join(self.outdir, "Results_Integron_Finder_" + file_name)
         return result_dir
 

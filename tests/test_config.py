@@ -47,7 +47,7 @@ class TestConfig(IntegronTest):
         self.args.replicon = 'foo'
         self.args.bar = 'baz'
         cf = config.Config(self.args)
-        self.assertEqual(cf.replicon_path, os.path.abspath('foo'))
+        self.assertEqual(cf.input_seq_path, os.path.abspath('foo'))
         self.assertEqual(cf.bar, 'baz')
         with self.assertRaises(AttributeError) as ctx:
             self.assertEqual(cf.foobar, 'foobar')
@@ -56,7 +56,7 @@ class TestConfig(IntegronTest):
     def test_replicon_path(self):
         self.args.replicon = '../foo'
         cf = config.Config(self.args)
-        self.assertEqual(cf.replicon_path, os.path.abspath('../foo'))
+        self.assertEqual(cf.input_seq_path, os.path.abspath('../foo'))
 
     def test_input_dir(self):
         self.args.replicon = '../foo.fasta'
