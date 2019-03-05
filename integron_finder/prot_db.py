@@ -50,6 +50,12 @@ class ProteinDB(ABC):
     """
 
     def __init__(self, replicon, cfg, prot_file=None):
+        """
+
+        :param replicon:
+        :param cfg:
+        :param prot_file:
+        """
         self.cfg = cfg
         self.replicon = replicon
         if prot_file is None:
@@ -120,8 +126,22 @@ class GembaseDB(ProteinDB):
 
 
     def __init__(self, replicon, cfg, prot_file=None):
+        """
+
+        :param replicon: The replicon used to create ProteinDB (protein files and extra information)
+        :type replicon: :class:`Bio.SeqRecord` object with a extra attribute path
+        :param cfg: The integron_finder configuration
+        :type cfg: :class:`integron_finder.config.Config` object
+        :param prot_file: The path to a protein file in fasta format
+                          which is the translation of the replicon
+
+        .. warning::
+            The replicon is a modified Bio.SeqRecord object.
+            The attribute *path* must be injected in the object
+            This attribute represent the path to a fasta file representing this replicon
+        """
         self.cfg = cfg
-        self._gembase_path = os.path.dirname(os.path.dirname(self.cfg.replicon_path))
+        self._gembase_path = os.path.dirname(os.path.dirname(self.cfg.input_seq_path))
         self.replicon = replicon
         # in GemBase Draft the files ar based on replicon id
         # but one file can contains several contig
@@ -130,7 +150,7 @@ class GembaseDB(ProteinDB):
         # the filenames are based on replicon id
         # but in code the replicon id contains the contig number
         # for gembase complete both filename and seq_id contains contig number
-        self._replicon_name = os.path.splitext(os.path.basename(self.cfg.replicon_path))[0]
+        self._replicon_name = os.path.splitext(os.path.basename(self.cfg.input_seq_path))[0]
         self._info = self._parse_lst()
         if prot_file is None:
             self._prot_file = self._make_protfile()
@@ -244,7 +264,7 @@ class GembaseDB(ProteinDB):
         :return:
         """
         lst_path = os.path.join(self._gembase_path, 'LSTINFO',
-                                os.path.splitext(os.path.basename(self.cfg.replicon_path))[0] + '.lst')
+                                os.path.splitext(os.path.basename(self.cfg.input_seq_path))[0] + '.lst')
         gembase_type = self.gembase_sniffer(lst_path)
         if gembase_type == 'Draft':
             prots_info = self.gembase_draft_parser(lst_path, self.replicon.id)
@@ -315,7 +335,7 @@ class ProdigalDB(ProteinDB):
             prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q ".format(
                 prodigal=self.cfg.prodigal,
                 meta='' if len(self.replicon) > 200000 else '-p meta',
-                replicon=self.cfg.replicon_path,
+                replicon=self.replicon.path,
                 prot=prot_file_path,
                 out=os.devnull,
             )

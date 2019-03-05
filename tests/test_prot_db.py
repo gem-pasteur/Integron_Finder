@@ -66,8 +66,7 @@ class TestGemBase(IntegronTest):
 
     def tearDown(self):
         try:
-            #shutil.rmtree(self.tmp_dir)
-            pass
+            shutil.rmtree(self.tmp_dir)
         except:
             pass
 
@@ -81,6 +80,7 @@ class TestGemBase(IntegronTest):
             cfg = Config(self.args)
             seq_db = read_multi_prot_fasta(replicon_path)
             replicon = next(seq_db)
+            replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
 
             with self.catch_log():
@@ -143,6 +143,7 @@ class TestGemBase(IntegronTest):
             cfg = Config(self.args)
             seq_db = read_multi_prot_fasta(replicon_path)
             replicon = next(seq_db)
+            replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
 
             with self.catch_log():
@@ -163,6 +164,7 @@ class TestGemBase(IntegronTest):
             cfg = Config(self.args)
             seq_db = read_multi_prot_fasta(replicon_path)
             replicon = next(seq_db)
+            replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
 
             with self.catch_log():
@@ -208,6 +210,7 @@ class TestGemBase(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
         db = GembaseDB(replicon, cfg)
 
         idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
@@ -225,6 +228,7 @@ class TestGemBase(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
         with self.catch_log():
             db = GembaseDB(replicon, cfg)
 
@@ -256,6 +260,7 @@ class TestGemBase(IntegronTest):
             cfg = Config(self.args)
             seq_db = read_multi_prot_fasta(replicon_path)
             replicon = next(seq_db)
+            replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
 
             db = GembaseDB(replicon, cfg)
@@ -305,6 +310,7 @@ class TestProdigalDB(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
@@ -318,6 +324,7 @@ class TestProdigalDB(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         self.args.prodigal = None
@@ -328,11 +335,13 @@ class TestProdigalDB(IntegronTest):
     def test_make_protfile(self):
         file_name = 'acba.007.p01.13'
         prot_name = 'ACBA.007.P01_13.prt'
+
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
@@ -352,6 +361,7 @@ class TestProdigalDB(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
 
         db = ProdigalDB(replicon, cfg)
         for seq_nb, seqs in enumerate(zip(
@@ -370,6 +380,7 @@ class TestProdigalDB(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
 
         with self.assertRaises(RuntimeError) as ctx:
             ProdigalDB(replicon, cfg)
@@ -383,6 +394,7 @@ class TestProdigalDB(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
@@ -397,6 +409,7 @@ class TestProdigalDB(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
@@ -420,6 +433,7 @@ class TestProdigalDB(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
@@ -437,6 +451,7 @@ class TestProdigalDB(IntegronTest):
         cfg = Config(self.args)
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
+        replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)

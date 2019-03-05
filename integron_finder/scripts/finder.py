@@ -267,6 +267,9 @@ def find_integron_in_one_replicon(replicon, config):
         pass
     tmp_replicon_path = os.path.join(result_tmp_dir, replicon.id + '.fst')
     SeqIO.write(replicon, tmp_replicon_path, "fasta")
+    # create attr path
+    # used to generate protein file with prodigal
+    replicon.path = tmp_replicon_path
 
     # func_annot_path is the canonical path for Functional_annotation
     # path_func_annot is the path provide on the command line
