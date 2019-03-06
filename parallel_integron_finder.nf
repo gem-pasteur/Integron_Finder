@@ -23,6 +23,9 @@ params.linear = false
 params['topology-file'] = false
 params['keep-tmp'] = false
 params['calin-threshold'] = false
+params.gembase = false
+params['gembase-path'] = false
+params.debug = false
 
 gbk = params.gbk ? '--gbk' : ''
 pdf = params.pdf ? '--pdf' : ''
@@ -43,12 +46,17 @@ linear = params.linear ? '--linear' : ''
 topology_file = params['topology-file'] ? "--topology-file ${params['topology-file']}" : ''
 keep_tmp = params['keep-tmp'] ? '--keep-tmp' : ''
 calin_threshold = params['calin-threshold'] ? "--calin-threshold ${params['calin-threshold']}" : ''
+gembase_path = params['gembase-path'] ? "--gembase-path ${params['gembase-path']}" : ''
+debug = params.debug ? '-vv' : ''
 
 if (! params.replicons){
     throw new Exception("The option '--replicons' is mandatory.")
 }
 if (params.circ && params.linear){
     throw new Exception("The options '--linear' and '--circ' are mutually exclusive.")
+}
+if (params.gembase){
+    throw new Exception("The options '--gembase' is not available for parallel_integron_finder. Use ''--gembase-path' instead")
 }
 
 
@@ -58,7 +66,6 @@ if (params.replicons.contains(',')){
 } else {
     replicons_file = Channel.fromPath(params.replicons)
 }
-
 
 /****************************************
  *           The workflow               *
@@ -101,6 +108,8 @@ process integron_finder{
         val min_attc_size
         val keep_tmp
         val calin_threshold
+        val gembase_path
+        val debug
     output:
         set val(id_input), file("Results_Integron_Finder_${one_replicon.baseName}") into all_chunk_results_dir
 
@@ -125,7 +134,7 @@ process integron_finder{
         }
         
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${topo} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} --mute ${one_replicon}
+        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${topo} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} ${gembase_path} --mute ${debug} ${one_replicon}
         """
 }
 

@@ -30,6 +30,8 @@ from abc import ABC, abstractmethod
 import os
 from subprocess import call
 from collections import namedtuple
+import re
+
 import colorlog
 import pandas as pd
 from Bio import SeqIO, Seq
@@ -125,7 +127,7 @@ class GembaseDB(ProteinDB):
     """
 
 
-    def __init__(self, replicon, cfg, prot_file=None):
+    def __init__(self, replicon, cfg, gembase_path=None, prot_file=None):
         """
 
         :param replicon: The replicon used to create ProteinDB (protein files and extra information)
@@ -140,8 +142,12 @@ class GembaseDB(ProteinDB):
             The attribute *path* must be injected in the object
             This attribute represent the path to a fasta file representing this replicon
         """
+        _log.debug("call GembaseDB with gembase_path= {}".format(gembase_path))
         self.cfg = cfg
-        self._gembase_path = os.path.dirname(os.path.dirname(self.cfg.input_seq_path))
+        if gembase_path is None:
+            self._gembase_path = os.path.dirname(os.path.dirname(os.path.realpath(self.cfg.input_seq_path)))
+        else:
+            self._gembase_path = os.path.realpath(gembase_path)
         self.replicon = replicon
         # in GemBase Draft the files ar based on replicon id
         # but one file can contains several contig
@@ -151,12 +157,59 @@ class GembaseDB(ProteinDB):
         # but in code the replicon id contains the contig number
         # for gembase complete both filename and seq_id contains contig number
         self._replicon_name = os.path.splitext(os.path.basename(self.cfg.input_seq_path))[0]
+        self._gembase_file_basename = self._find_gembase_file_basename(self._gembase_path, self.cfg.input_seq_path)
         self._info = self._parse_lst()
         if prot_file is None:
             self._prot_file = self._make_protfile()
         else:
             self._prot_file = prot_file
         self._prot_db = self._make_db()
+
+
+    def _find_gembase_file_basename(self, gembase_path, input_seq_path):
+        """
+        from the input file name, try to retrieve the basename which is used in gembase
+        This specially useful when IF is run in parallel. The input sequence is split
+        in chunks and treat in parallel. But in this case the name of the chunk does not math
+        neither the lstinfo file nor the protein file.
+        So this method try retrieve the original basename without extension
+        for instance: ::
+
+            ACBA.0917.00019.fna               => ACBA.0917.00019
+            ACBA.0917.00019.0001.fna          => ACBA.0917.00019
+            ESCO001.C.00001.C001.fst          => ESCO001.C.00001.C001
+            ESCO001.C.00001.C001_chunk_1.fst  => ESCO001.C.00001.C001
+
+        :return: the gemabse basename corresponding to the input file
+        :rtype: string
+        """
+        lst_dir_path = os.path.join(gembase_path, 'LSTINFO')
+        gembase_file_basename = os.path.splitext(os.path.basename(input_seq_path))[0]
+        # when IF is run through nextflow & parallel_integron_finder
+        # the input data is split the name of the chunks can vary
+        # it can be
+        # the name of input file with suffix _chunk_<id>
+        # it can be the name of the contig
+        # so wee need to find the original name to find the
+        # - lstinfo file
+        # - protein file
+        match = re.search("_chunk_\d+$", gembase_file_basename)
+        if match:
+            gembase_file_basename = gembase_file_basename[:match.start()]
+
+        lst_path = os.path.join(lst_dir_path, gembase_file_basename + '.lst')
+        if os.path.exists(lst_path):
+            # it is a complete genome
+            return gembase_file_basename
+        else:
+            # it is a contig
+            # let's find the draft genome lst file
+            gembase_file_basename = os.path.splitext(os.path.basename(gembase_file_basename))[0]
+            lst_path = os.path.join(lst_dir_path, gembase_file_basename + '.lst')
+            if os.path.exists(lst_path):
+                return gembase_file_basename
+            else:
+                raise FileNotFoundError("cannot find lst file matching {} sequence".format(self.cfg.input_seq_path))
 
 
     def _make_protfile(self):
@@ -168,7 +221,7 @@ class GembaseDB(ProteinDB):
         :return: the path of the created protein file
         :rtype: str
         """
-        all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._replicon_name + '.prt')
+        all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._gembase_file_basename + '.prt')
         all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
         if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
             os.makedirs(self.cfg.tmp_dir(self.replicon.id))
@@ -196,6 +249,7 @@ class GembaseDB(ProteinDB):
             return 'Complet'
         else:
             return 'Draft'
+
 
     @staticmethod
     def gembase_complete_parser(lst_path, sequence_id):
@@ -231,6 +285,7 @@ class GembaseDB(ProteinDB):
             prots_info = genome_info.loc[(genome_info['type'] == 'CDS') & (genome_info['valid'] == 'Valid')]
             return prots_info
 
+
     @staticmethod
     def gembase_draft_parser(lst_path, replicon_id):
         """
@@ -263,8 +318,8 @@ class GembaseDB(ProteinDB):
         Parse the LSTINFO file and extract information specific to the replicon
         :return:
         """
-        lst_path = os.path.join(self._gembase_path, 'LSTINFO',
-                                os.path.splitext(os.path.basename(self.cfg.input_seq_path))[0] + '.lst')
+
+        lst_path = os.path.join(self._gembase_path, 'LSTINFO', self._gembase_file_basename + '.lst')
         gembase_type = self.gembase_sniffer(lst_path)
         if gembase_type == 'Draft':
             prots_info = self.gembase_draft_parser(lst_path, self.replicon.id)

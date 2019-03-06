@@ -87,6 +87,73 @@ class TestGemBase(IntegronTest):
                 db = GembaseDB(replicon, cfg)
             self.assertTrue(db.replicon.id, replicon.id)
 
+    def test_find_gembase_file_basename(self):
+        """
+        test if find_gembase_file_basename get the the right basename
+        for files in gembase
+        """
+        gembase_path = self.find_data('Gembase')
+        file_names = ('ACBA.0917.00019.fna', 'ESCO001.C.00001.C001.fst')
+        for file_name in file_names:
+            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', file_name))
+            self.args.replicon = replicon_path
+            cfg = Config(self.args)
+            seq_db = read_multi_prot_fasta(replicon_path)
+            replicon = next(seq_db)
+            replicon.path = replicon_path
+            os.makedirs(cfg.tmp_dir(replicon.id))
+
+            with self.catch_log():
+                db = GembaseDB(replicon, cfg)
+            self.assertTrue(db._find_gembase_file_basename(gembase_path, replicon_path),
+                            os.path.splitext(file_name)[0])
+
+
+    def test_find_gembase_file_basename_file_not_in_gembase(self):
+        """
+        test if find_gembase_file_basename get the the right basename
+        for files not located in gembase and file name is the output of split operation
+        a file containing one contig
+        a file representing a chunk
+        """
+        gembase_path = self.find_data('Gembase')
+
+        file_names = {'ACBA.0917.00019': self.find_data(os.path.join('Replicons', 'ACBA.0917.00019.0001.fst')),
+                      'ESCO001.C.00001.C001.fst': os.path.join(self.tmp_dir, 'ESCO001.C.00001.C001_chunk_1.fst')
+                      }
+
+        shutil.copyfile(os.path.join(gembase_path, 'Replicons', 'ESCO001.C.00001.C001.fst'),
+                        file_names['ESCO001.C.00001.C001.fst'])
+
+        for base_file_name, replicon_path in file_names.items():
+            self.args.replicon = replicon_path
+            self.args.gembase_path = gembase_path
+            cfg = Config(self.args)
+            seq_db = read_multi_prot_fasta(replicon_path)
+            replicon = next(seq_db)
+            replicon.path = replicon_path
+            os.makedirs(cfg.tmp_dir(replicon.id))
+
+            with self.catch_log():
+                db = GembaseDB(replicon, cfg, gembase_path=gembase_path)
+            self.assertTrue(db._find_gembase_file_basename(gembase_path, replicon_path),
+                            base_file_name)
+
+        replicon_path = self.find_data(os.path.join('Replicons', 'acba.007.p01.13.fst'))
+        self.args.replicon = replicon_path
+        self.args.gembase_path = gembase_path
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        with self.assertRaises(FileNotFoundError) as ctx:
+            with self.catch_log():
+                GembaseDB(replicon, cfg, gembase_path=gembase_path)
+        self.assertEqual(str(ctx.exception),
+                         'cannot find lst file matching {} sequence'.format(replicon_path))
+
 
     def test_gembase_sniffer(self):
         file_names = (('ACBA.0917.00019', 'Draft'), ('ESCO001.C.00001.C001', 'Complet'))

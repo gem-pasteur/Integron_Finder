@@ -121,6 +121,9 @@ def parse_args(args):
                         help="Use gembase formatted protein file instead of Prodigal."
                              " Folder structure must be preserved",
                         action="store_true")
+    parser.add_argument("--gembase-path",
+                        help="path to the gembase root directory (needed only if the replicon file is not located"
+                             "in gembase-path)")
     parser.add_argument("--annot-parser",
                         dest='annot_parser_name',
                         help="the name of the parser to use to get information from protein file.")
@@ -294,6 +297,8 @@ def find_integron_in_one_replicon(replicon, config):
 
     if config.gembase:
         protein_db = GembaseDB(replicon, config)
+    elif config.gembase_path:
+        protein_db = GembaseDB(replicon, config, gembase_path=config.gembase_path)
     else:
         protein_db = ProdigalDB(replicon, config)
 
