@@ -3,7 +3,7 @@ FROM ubuntu:bionic
 LABEL maintainer="Bertrand Neron"
 LABEL maintainer.email="bneron@pasteur.fr"
 LABEL authors="Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha"
-LABEL package.version="2.0"
+LABEL package.version="2.0rc6"
 LABEL package.license="GPLv3"
 LABEL package.homepage="https://github.com/gem-pasteur/Integron_Finder/"
 LABEL publications="https://doi.org/10.1093/nar/gkw319"
