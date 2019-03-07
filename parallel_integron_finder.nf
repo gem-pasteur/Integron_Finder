@@ -56,10 +56,17 @@ if (params.circ && params.linear){
     throw new Exception("The options '--linear' and '--circ' are mutually exclusive.")
 }
 if (params.gembase){
-    throw new Exception("The options '--gembase' is not available for parallel_integron_finder. Use ''--gembase-path' instead")
+    throw new Exception("The options '--gembase' is not available for parallel_integron_finder. Use '--gembase-path' instead")
 }
-
-
+if (params['gembase-path']){
+    // need to compute the abspath to gembase
+    // the integron_finder step will be compute in the work subdirectory
+    file = new File(params['gembase-path'])
+    gembase_path = file.getCanonicalPath();
+    gembase_path = "--gembase-path ${gembase_path}"
+} else {
+    gembase_path = ''
+}
 if (params.replicons.contains(',')){
     paths = params.replicons.tokenize(',')
     replicons_file = Channel.fromPath(paths)
