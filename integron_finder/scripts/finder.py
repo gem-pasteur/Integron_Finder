@@ -295,10 +295,10 @@ def find_integron_in_one_replicon(replicon, config):
     if is_func_annot and not fa_hmm:
         _log.warning("No hmm profiles for functional annotation detected, skip functional annotation step.")
 
-    if config.gembase:
-        protein_db = GembaseDB(replicon, config)
-    elif config.gembase_path:
+    if config.gembase_path:
         protein_db = GembaseDB(replicon, config, gembase_path=config.gembase_path)
+    elif config.gembase:
+        protein_db = GembaseDB(replicon, config)
     else:
         protein_db = ProdigalDB(replicon, config)
 
