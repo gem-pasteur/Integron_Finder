@@ -14,13 +14,15 @@ ARG IF_GIT_URL="https://github.com/gem-pasteur/Integron_Finder.git"
 
 RUN apt-get update -y &&\
     apt-get install -y --no-install-recommends python3.6 python3-pip python3-setuptools git hmmer infernal prodigal &&\
-    apt-get install -y python3-numpy python3-pandas
+    apt-get install -y python3-numpy python3-pandas &&\
+    apt-get clean -y
 
 RUN cd /usr/local &&\
     git clone ${IF_GIT_URL} integron_finder &&\
     cd integron_finder &&\
     python3 setup.py sdist &&\
-    pip3 install dist/integron_finder-*.tar.gz
+    pip3 install dist/integron_finder-*.tar.gz &&\
+    rm dist/integron_finder-*.tar.gz
 
 ENV DEBIAN_FRONTEND teletype
 ENV PYTHONIOENCODING UTF-8
