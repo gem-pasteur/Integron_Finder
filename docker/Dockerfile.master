@@ -1,0 +1,30 @@
+FROM ubuntu:bionic
+
+LABEL maintainer="Bertrand Neron"
+LABEL maintainer.email="bneron@pasteur.fr"
+LABEL authors="Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha"
+LABEL package.version="2.0"
+LABEL package.license="GPLv3"
+LABEL package.homepage="https://github.com/gem-pasteur/Integron_Finder/"
+LABEL publications="https://doi.org/10.1093/nar/gkw319"
+
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG IF_GIT_URL="https://github.com/gem-pasteur/Integron_Finder.git"
+
+RUN apt-get update -y &&\
+    apt-get install -y --no-install-recommends python3.6 python3-pip python3-setuptools git hmmer infernal prodigal &&\
+    apt-get install -y python3-numpy python3-pandas
+
+RUN cd /usr/local &&\
+    git clone ${IF_GIT_URL} integron_finder &&\
+    cd integron_finder &&\
+    python3 setup.py sdist &&\
+    pip3 install dist/integron_finder-*.tar.gz
+
+ENV DEBIAN_FRONTEND teletype
+ENV PYTHONIOENCODING UTF-8
+
+ENTRYPOINT ["/usr/local/bin/integron_finder"]
+
+CMD ['-h']
