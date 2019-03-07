@@ -27,6 +27,16 @@ params.gembase = false
 params['gembase-path'] = false
 params.debug = false
 
+/****************************************
+*  parameter not really used in the wf  *
+*  used to improve UI                   *
+*****************************************/
+params.help = false
+params.profile = false
+
+/****************************************
+*             real parameters           *
+*****************************************/
 gbk = params.gbk ? '--gbk' : ''
 pdf = params.pdf ? '--pdf' : ''
 local_max = params['local-max'] ? '--local-max' : ''
@@ -49,6 +59,41 @@ calin_threshold = params['calin-threshold'] ? "--calin-threshold ${params['calin
 gembase_path = params['gembase-path'] ? "--gembase-path ${params['gembase-path']}" : ''
 debug = params.debug ? '-vv' : ''
 
+
+if (params.help){
+   msg = '''
+parallel_integron_finder available options:
+
+ --gbk
+ --pdf
+ --local-max
+ --func-annot
+ --distance-threshold
+ --union-integrases
+ --path-func-annot
+ --attc-model
+ --evalue-attc
+ --keep-palindrome
+ --no-proteins
+ --promoter-attI
+ --max-attc-size
+ --min-attc-size
+ --circ
+ --linear
+ --topology-file
+ --keep-tmp
+ --calin-threshold
+ --gembase-path
+ --replicons
+
+Please refer to the integron_finder documentation for the meaning of each options.
+'''
+    println(msg)
+    System.exit(0)
+}
+if (params.profile){
+    throw new Exception("The integron_finder option '--profile' does not exists. May be you want to use the nextflow option '-profile'.")
+}
 if (! params.replicons){
     throw new Exception("The option '--replicons' is mandatory.")
 }
