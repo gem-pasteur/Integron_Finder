@@ -191,7 +191,7 @@ Output options:
 
 ### Example
 
-    integron_finder --local_max --func_annot mysequences.fst
+    integron_finder --local-max --func-annot mysequences.fst
 
 ### Output :
 
