@@ -13,7 +13,12 @@ See Documentation for how to use it:
 
 ## Installation
 
-### For user
+*Nota Bene*: version 2.0 isn't fully released yet. The pip installation below is for the version 1.5 with python2.7. 
+If you want the version 2.0, you can install it with pip, but there are still a few minor bugs around (see issues). 
+
+    pip install git+https://github.com/gem-pasteur/Integron_Finder/#egg=integron_finder
+
+### For user (version 1.5)
 
     pip install integron_finder
 
@@ -41,7 +46,7 @@ when you have the image in local you can use it as if integron_finder has been i
 
     ./integron_finder -h
 
-#### Conda installation
+#### Conda installation [not yet available]
 
 From 2.0 version, Integron_Finder is available as [conda](https://conda.io/docs/index.html) package.
 Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
