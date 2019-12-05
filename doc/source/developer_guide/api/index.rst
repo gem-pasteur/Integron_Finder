@@ -7,7 +7,7 @@ Integron_finder API Reference
 *****************************
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    annotation
    attc
