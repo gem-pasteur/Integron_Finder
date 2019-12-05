@@ -136,7 +136,7 @@ def local_max(replicon,
               evalue_attc=1., max_attc_size=200, min_attc_size=40,
               cmsearch_bin='cmsearch', out_dir='.', cpu_nb=1):
     """
-    :param replicon: The name of replicon (without suffix)
+    :param replicon: The replicon to analyse
     :type replicon: :class:`Bio.Seq.SeqRecord` object.
     :param int window_beg: Start of window to search for attc (position of protein).
     :param int window_end: End of window to search for attc (position of protein).
@@ -216,8 +216,15 @@ def local_max(replicon,
     # (df_max.pos_beg + window_beg) % replicon_size is position on replicon
     # for instance with pos = 100 and replicon size = 90
     # 100 % 90 = 10
-    df_max.pos_beg = (df_max.pos_beg + window_beg) % replicon_size
-    df_max.pos_end = (df_max.pos_end + window_beg) % replicon_size
+    print("### df_max", df_max)
+    if replicon.topology == 'circ':
+        df_max.pos_beg = (df_max.pos_beg + window_beg) % replicon_size
+        df_max.pos_end = (df_max.pos_end + window_beg) % replicon_size
+    else:
+        df_max.pos_beg = min((int(df_max.pos_beg) + window_beg), replicon_size)
+        df_max.pos_end = max((int(df_max.pos_end) + window_beg), replicon_size)
+    print("### df_max", df_max)
+
     df_max.to_csv(os.path.join(out_dir, replicon.id + "_subseq_attc_table_end.res"),
                   sep="\t", index=0, mode="a", header=0)
     # filter on size
