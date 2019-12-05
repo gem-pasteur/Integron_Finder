@@ -89,7 +89,7 @@ def merge_results(*results_file):
     else:
         agg_results = pd.DataFrame(columns=['ID_integron', 'ID_replicon', 'element',
                                             'pos_beg', 'pos_end', 'strand', 'evalue',
-                                            'type_elt annotation', 'model', 'type', 'default',
+                                            'type_elt', 'annotation', 'model', 'type', 'default',
                                             'distance_2attC', 'considered_topology'])
     return agg_results
 

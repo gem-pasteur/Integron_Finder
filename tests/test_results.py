@@ -225,7 +225,7 @@ class TestUtils(IntegronTest):
         res = results.merge_results()
         expected_res = pd.DataFrame(columns=['ID_integron', 'ID_replicon', 'element',
                                              'pos_beg', 'pos_end', 'strand', 'evalue',
-                                             'type_elt annotation', 'model', 'type', 'default',
+                                             'type_elt', 'annotation', 'model', 'type', 'default',
                                              'distance_2attC', 'considered_topology'])
         pdt.assert_frame_equal(expected_res, res)
 
