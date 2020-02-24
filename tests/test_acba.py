@@ -78,7 +78,7 @@ class TestAcba(IntegronTest):
 
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
-            shutil.rmtree(self.out_dir)
+            #shutil.rmtree(self.out_dir)
             pass
         integrase.call = _prodigal_call
         finder.distutils.spawn.find_executable = self.find_executable_ori
@@ -108,9 +108,9 @@ class TestAcba(IntegronTest):
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(
             os.path.join('Results_Integron_Finder_acba.007.p01.13.linear', summary_file_name))
-        exp_summary = pd.read_csv(exp_summary_path, sep="\t")
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment="#")
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_csv(test_summary_path, sep="\t")
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment="#")
         pdt.assert_frame_equal(exp_summary, test_summary)
 
 
@@ -164,13 +164,14 @@ class TestAcba(IntegronTest):
         contig_id = 'ACBA.0917.00019.0001'
         output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
-        command = "integron_finder --outdir {out_dir} --gembase {replicon}".format(out_dir=self.out_dir,
-                                                                                   replicon=self.find_data(
-                                                                                       os.path.join('Gembase',
-                                                                                                    'Replicons',
-                                                                                       replicon_filename + '.fna')
-                                                                                   )
-                                                                                   )
+        command = "integron_finder --outdir {out_dir} --keep-tmp " \
+                  "--promoter-attI --gembase {replicon}".format(out_dir=self.out_dir,
+                                                                replicon=self.find_data(
+                                                                   os.path.join('Gembase',
+                                                                                'Replicons',
+                                                                                replicon_filename + '.fna')
+                                                                )
+                                                                )
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 

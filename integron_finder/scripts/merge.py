@@ -78,9 +78,7 @@ def merge_summary(out_file, *in_dirs):
         summaries_files.extend(in_files)
     if summaries_files:
         agg_file = results.merge_results(*summaries_files)
-        agg_file.to_csv(out_file, sep="\t", na_rep="NA",
-                        columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'],
-                        index=False)
+        agg_file.to_csv(out_file, sep="\t")
         return out_file
 
 

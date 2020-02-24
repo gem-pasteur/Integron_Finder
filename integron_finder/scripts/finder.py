@@ -38,7 +38,7 @@ import distutils.spawn
 import shutil
 
 import pandas as pd
-
+pd.options.mode.chained_assignment = 'raise'
 import integron_finder
 
 # must be done after import 'integron_finder'
@@ -393,8 +393,7 @@ def find_integron_in_one_replicon(replicon, config):
 
             summary = results.summary(integrons_report)
             summary_file = base_outfile + ".summary"
-            summary.to_csv(summary_file, sep="\t", na_rep="NA", index=False,
-                           columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+            summary.to_csv(summary_file, sep="\t")
             if config.gbk:
                 add_feature(replicon, integrons_report, protein_db, config.distance_threshold)
                 SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
@@ -620,8 +619,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                 out_f.write("# No Integron found\n")
         merged_summary_file = outfile_base_name + ".summary"
         if not agg_integrons.empty:
-            agg_summary.to_csv(merged_summary_file, sep="\t", index=False, na_rep="NA",
-                               columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+            agg_summary.to_csv(merged_summary_file, sep="\t")
 
         for _file in all_integrons + all_summaries:
             if _file != merged_integron_file and _file != merged_summary_file:

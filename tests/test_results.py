@@ -48,7 +48,7 @@ from integron_finder.config import Config
 from integron_finder import results
 
 
-class TestUtils(IntegronTest):
+class TestResults(IntegronTest):
 
     def setUp(self):
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
@@ -233,35 +233,31 @@ class TestUtils(IntegronTest):
     def test_merge_summary(self):
         f1 = os.path.join(self.tmp_dir, 'f1')
         dtype = {'ID_replicon': 'str',
-                 'ID_integron': 'str',
                  'complete': 'int',
                  'In0': 'int',
                  'CALIN': 'int'
                  }
         res1 = pd.DataFrame({'ID_replicon': ['ACBA.007.P01_13'],
-                             'ID_integron': ['integron_01'],
                              'complete': [1],
                              'In0': [0],
                              'CALIN': [0],
-                             }, columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+                             }, columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
         res1 = res1.astype(dtype=dtype)
-        res1.to_csv(f1, sep="\t", na_rep="NA", index=False,
-                    columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+        res1 = res1.set_index('ID_replicon')
+        res1.to_csv(f1, sep="\t")\
 
         f2 = os.path.join(self.tmp_dir, 'f2')
-        res2 = pd.DataFrame({'ID_replicon': ['LIAN.001.C02_10'] * 6,
-                             'ID_integron': ['integron_0{}'.format(i) for i in range(1,7)],
-                             'complete': [0, 1, 0, 0, 0, 0],
-                             'In0': [0] * 6,
-                             'CALIN': [1, 0, 1, 1, 1, 1],
-                             }, columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+        res2 = pd.DataFrame({'ID_replicon': ['LIAN.001.C02_10'],
+                             'complete': [1],
+                             'In0': [0],
+                             'CALIN': [5],
+                             }, columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
         res2 = res2.astype(dtype=dtype)
-        res2.to_csv(f2, sep="\t", na_rep="NA", index=False,
-                    columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+        res2 = res2.set_index('ID_replicon')
+        res2.to_csv(f2, sep="\t")
 
         expected_res = pd.concat([res1, res2])
         res = results.merge_results(f1, f2)
-
         pdt.assert_frame_equal(expected_res, res)
 
 
@@ -269,30 +265,29 @@ class TestUtils(IntegronTest):
         acba_res = self.find_data('Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.integrons')
         acba_df = pd.read_csv(acba_res, sep="\t")
         summary = results.summary(acba_df)
-        dtype = {'ID_replicon': 'str',
-                 'ID_integron': 'str',
-                 'complete': 'int',
+        dtype = {'complete': 'int',
                  'In0': 'int',
                  'CALIN': 'int'
                  }
-        exp = pd.DataFrame({'ID_replicon': ['ACBA.007.P01_13'],
-                             'ID_integron': ['integron_01'],
+        exp = pd.DataFrame({ 'ID_replicon': ['ACBA.007.P01_13'],
                              'complete': [1],
                              'In0': [0],
                              'CALIN': [0],
-                            }, columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+                            }, columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
         exp = exp.astype(dtype=dtype)
+        exp = exp.set_index('ID_replicon')
+        pdt.assert_frame_equal(exp, summary)
 
         lian_res = self.find_data('lian.001.c02.10_simple.integrons')
         lian_df = pd.read_csv(lian_res, sep="\t")
         summary = results.summary(lian_df)
-        exp = pd.DataFrame({'ID_replicon': ['LIAN.001.C02_10'] * 6,
-                             'ID_integron': ['integron_0{}'.format(i) for i in range(1, 7)],
-                             'complete': [0, 1, 0, 0, 0, 0],
-                             'In0': [0] * 6,
-                             'CALIN': [1, 0, 1, 1, 1, 1],
-                            }, columns=['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN'])
+        exp = pd.DataFrame({'ID_replicon': ['LIAN.001.C02_10'],
+                            'complete': [1],
+                            'In0': [0],
+                            'CALIN': [5],
+                            }, columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
         exp = exp.astype(dtype=dtype)
+        exp = exp.set_index('ID_replicon')
         pdt.assert_frame_equal(exp, summary)
 
 
