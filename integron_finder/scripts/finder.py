@@ -611,18 +611,22 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         agg_integrons = results.merge_results(*all_integrons)
         agg_summary = results.merge_results(*all_summaries)
         outfile_base_name = os.path.join(config.result_dir, utils.get_name_from_path(config.input_seq_path))
-        merged_integron_file = outfile_base_name + ".integrons"
+        merged_integron_path = outfile_base_name + ".integrons"
         if not agg_integrons.empty:
-            agg_integrons.to_csv(merged_integron_file, sep="\t", index=False, na_rep="NA")
+            with open(merged_integron_path, 'w') as merged_integron_file:
+                merged_integron_file.write(f"# cmd: integron_finder {' '.join(args)}\n")
+                agg_integrons.to_csv(merged_integron_file, sep="\t", index=False, na_rep="NA")
         else:
-            with open(merged_integron_file, "w") as out_f:
-                out_f.write("# No Integron found\n")
-        merged_summary_file = outfile_base_name + ".summary"
+            with open(merged_integron_path, "w") as merged_integron_file:
+                merged_integron_file.write("# No Integron found\n")
+        merged_summary_path = outfile_base_name + ".summary"
         if not agg_integrons.empty:
-            agg_summary.to_csv(merged_summary_file, sep="\t")
+            with open(merged_summary_path, 'w') as merged_summary_file:
+                merged_summary_file.write(f"# cmd: integron_finder {' '.join(args)}\n")
+                agg_summary.to_csv(merged_summary_file, sep="\t")
 
         for _file in all_integrons + all_summaries:
-            if _file != merged_integron_file and _file != merged_summary_file:
+            if _file != merged_integron_path and _file != merged_summary_path:
                 # in special case where the merged file has the same name that a replicon result file
                 os.unlink(_file)
 

@@ -151,7 +151,7 @@ class TestResults(IntegronTest):
             self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_name),
                                         '{}.integrons'.format(replicon_name)
                                         )),
-            sep="\t"
+            sep="\t", comment="#"
         )
         exp_report = exp_report.astype(dtype=dtype)
         pdt.assert_frame_equal(exp_report, report)
@@ -263,7 +263,7 @@ class TestResults(IntegronTest):
 
     def test_summary(self):
         acba_res = self.find_data('Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.integrons')
-        acba_df = pd.read_csv(acba_res, sep="\t")
+        acba_df = pd.read_csv(acba_res, sep="\t", comment="#")
         summary = results.summary(acba_df)
         dtype = {'complete': 'int',
                  'In0': 'int',
@@ -279,7 +279,7 @@ class TestResults(IntegronTest):
         pdt.assert_frame_equal(exp, summary)
 
         lian_res = self.find_data('lian.001.c02.10_simple.integrons')
-        lian_df = pd.read_csv(lian_res, sep="\t")
+        lian_df = pd.read_csv(lian_res, sep="\t", comment="#")
         summary = results.summary(lian_df)
         exp = pd.DataFrame({'ID_replicon': ['LIAN.001.C02_10'],
                             'complete': [1],
@@ -293,7 +293,7 @@ class TestResults(IntegronTest):
 
     def test_filter_calin(self):
         lian_res = self.find_data('lian.001.c02.10_simple.integrons')
-        lian_df = pd.read_csv(lian_res, sep="\t")
+        lian_df = pd.read_csv(lian_res, sep="\t", comment="#")
         filtered = results.filter_calin(lian_df, 4)
         exp = lian_df[lian_df.ID_integron != 'integron_03']
         pdt.assert_frame_equal(exp, filtered)

@@ -154,8 +154,8 @@ class TestAcba(IntegronTest):
 
         seq_summary_result_path = os.path.join(seq_test_result_dir, seq_replicon_filename + '.summary')
         iso_summary_result_path = os.path.join(iso_test_result_dir, contig_name + '.summary')
-        seq_summary = pd.read_csv(seq_summary_result_path, sep="\t")
-        iso_summary = pd.read_csv(iso_summary_result_path, sep="\t")
+        seq_summary = pd.read_csv(seq_summary_result_path, sep="\t", comment='#')
+        iso_summary = pd.read_csv(iso_summary_result_path, sep="\t", comment='#')
         pdt.assert_frame_equal(seq_summary, iso_summary)
 
 
@@ -184,9 +184,9 @@ class TestAcba(IntegronTest):
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(
             os.path.join('Results_Integron_Finder_{}.gembase'.format(replicon_filename), summary_file_name))
-        exp_summary = pd.read_csv(exp_summary_path, sep="\t")
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_csv(test_summary_path, sep="\t")
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
         pdt.assert_frame_equal(exp_summary, test_summary)
 
 
@@ -213,9 +213,9 @@ class TestAcba(IntegronTest):
 
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13', summary_file_name))
-        exp_summary = pd.read_csv(exp_summary_path, sep="\t")
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_csv(test_summary_path, sep="\t")
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
         pdt.assert_frame_equal(exp_summary, test_summary)
 
         gbk = '{}.gbk'.format(replicon_filename)
