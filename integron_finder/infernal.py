@@ -211,20 +211,18 @@ def local_max(replicon,
     # if replicon is linear
     # df_max.pos_beg + window_beg is always < replicon_size
     # (df_max.pos_beg + window_beg) % replicon_size = (df_max.pos_beg + window_beg)
+    #
     # if replicon is circular and attc site overlap origin
     # df_max.pos_beg + window_beg  > replicon_size
     # (df_max.pos_beg + window_beg) % replicon_size is position on replicon
     # for instance with pos = 100 and replicon size = 90
     # 100 % 90 = 10
-    print("### df_max", df_max)
     if replicon.topology == 'circ':
         df_max.pos_beg = (df_max.pos_beg + window_beg) % replicon_size
         df_max.pos_end = (df_max.pos_end + window_beg) % replicon_size
     else:
-        df_max.pos_beg = min((int(df_max.pos_beg) + window_beg), replicon_size)
-        df_max.pos_end = max((int(df_max.pos_end) + window_beg), replicon_size)
-    print("### df_max", df_max)
-
+        df_max.pos_beg = (df_max.pos_beg + window_beg).clip(lower=0, upper=replicon_size)
+        df_max.pos_end = (df_max.pos_end + window_beg).clip(lower=0, upper=replicon_size)
     df_max.to_csv(os.path.join(out_dir, replicon.id + "_subseq_attc_table_end.res"),
                   sep="\t", index=0, mode="a", header=0)
     # filter on size
