@@ -1,0 +1,5 @@
+# cmd: integron_finder --outdir /tmp/integron_acba_test tests/data/Replicons/empty_prot_file.fna
+ID_replicon	CALIN	complete	In0
+KLPN.1018.01438.0001	0	0	0
+KLPN.1018.01438.0003	0	0	0
+KLPN.1018.01438.0004	0	0	0

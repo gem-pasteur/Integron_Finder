@@ -1,1 +1,2 @@
+# cmd: integron_finder --outdir /tmp/integron_acba_test /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Replicons/fake_seq.fst
 # No Integron found

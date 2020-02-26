@@ -19,5 +19,5 @@ ACBA.0917.00019.i0001_01756 -          Phage_integrase      PF00589.16   2.8e-07
 # Target file:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_ACBA.0917.00019/tmp_ACBA.0917.00019.0001/ACBA.0917.00019.0001.prt
 # Option settings: /usr/bin/hmmsearch -o /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_ACBA.0917.00019/tmp_ACBA.0917.00019.0001/ACBA.0917.00019.0001_phage_int.res --tblout /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_ACBA.0917.00019/tmp_ACBA.0917.00019.0001/ACBA.0917.00019.0001_phage_int_table.res --cpu 1 /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/phage-int.hmm /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_ACBA.0917.00019/tmp_ACBA.0917.00019.0001/ACBA.0917.00019.0001.prt 
 # Current dir:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder
-# Date:            Fri Nov 30 15:28:07 2018
+# Date:            Mon Feb 24 15:14:56 2020
 # [ok]

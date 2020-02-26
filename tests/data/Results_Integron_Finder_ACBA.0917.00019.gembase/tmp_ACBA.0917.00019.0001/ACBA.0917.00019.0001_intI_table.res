@@ -10,5 +10,5 @@ ACBA.0917.00019.i0001_00298 -          intI_Cterm           -              2e-23
 # Target file:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_ACBA.0917.00019/tmp_ACBA.0917.00019.0001/ACBA.0917.00019.0001.prt
 # Option settings: /usr/bin/hmmsearch -o /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_ACBA.0917.00019/tmp_ACBA.0917.00019.0001/ACBA.0917.00019.0001_intI.res --tblout /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_ACBA.0917.00019/tmp_ACBA.0917.00019.0001/ACBA.0917.00019.0001_intI_table.res --cpu 1 /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/integron_integrase.hmm /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_ACBA.0917.00019/tmp_ACBA.0917.00019.0001/ACBA.0917.00019.0001.prt 
 # Current dir:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder
-# Date:            Fri Nov 30 15:28:07 2018
+# Date:            Mon Feb 24 15:14:56 2020
 # [ok]

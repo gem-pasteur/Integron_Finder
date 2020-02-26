@@ -7,8 +7,8 @@ ACBA.007.P01_13_1    -          intI_Cterm           -            1.1e-25   79.7
 # Version:         3.1b2 (February 2015)
 # Pipeline mode:   SEARCH
 # Query file:      /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/integron_integrase.hmm
-# Target file:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other_ACBA.007.P01_13/ACBA.007.P01_13.prt
-# Option settings: /usr/bin/hmmsearch -o /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other_ACBA.007.P01_13/ACBA.007.P01_13_intI.res --tblout /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other_ACBA.007.P01_13/ACBA.007.P01_13_intI_table.res --cpu 1 /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/integron_integrase.hmm /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other_ACBA.007.P01_13/ACBA.007.P01_13.prt 
+# Target file:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13.prt
+# Option settings: /usr/bin/hmmsearch -o /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_intI.res --tblout /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_intI_table.res --cpu 1 /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/integron_integrase.hmm /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13.prt 
 # Current dir:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder
-# Date:            Mon Apr 30 09:15:24 2018
+# Date:            Mon Feb 24 15:38:44 2020
 # [ok]

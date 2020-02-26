@@ -85,7 +85,9 @@ def merge_results(*results_file):
             continue
         all_res.append(res)
     if all_res:
-        agg_results = pd.concat(all_res)
+        agg_results = pd.concat(all_res, sort=False)
+        if agg_results.shape[1] == 4:  # it's a summary file
+            agg_results = agg_results.set_index('ID_replicon')
     else:
         agg_results = pd.DataFrame(columns=['ID_integron', 'ID_replicon', 'element',
                                             'pos_beg', 'pos_end', 'strand', 'evalue',
@@ -110,7 +112,10 @@ def summary(result):
         summary[empty_col] = 0
     summary = summary.reset_index()
     summary.columns.name = None
-    return summary[['ID_replicon', 'ID_integron', 'complete', 'In0', 'CALIN']]
+    aggregate = summary.groupby('ID_replicon').sum()
+
+    aggregate = aggregate.reindex(['CALIN', 'complete', 'In0'], axis=1)
+    return aggregate
 
 
 def filter_calin(result, threshold=2):

@@ -1,0 +1,13 @@
+---
+language: Nextflow
+name: parallel integron finder
+description: Integron_Finder for big dataset
+url: https://github.com/gem-pasteur/Integron_Finder/blob/master/parallel_integron_finder.nf
+categories: [Genome Annotation]
+authors:
+  - firstname: Jean
+    lastname: Cury
+    email: jean.cury@normalesup.org
+  - firstname: Bertrand
+    lastname: Néron
+    email: bneron@pasteur.fr
