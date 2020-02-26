@@ -387,21 +387,21 @@ def find_integron_in_one_replicon(replicon, config):
         base_outfile = os.path.join(config.result_dir, replicon.id)
         integron_file = base_outfile + ".integrons"
         _log.debug("Writing integron_file {}".format(integron_file))
+        summary_file = base_outfile + ".summary"
         if integrons:
             integrons_report = results.integrons_report(integrons)
             integrons_report.to_csv(integron_file, sep="\t", index=False, na_rep="NA")
             summary = results.summary(integrons_report)
-            summary_file = base_outfile + ".summary"
-            summary.to_csv(summary_file, sep="\t")
             if config.gbk:
                 add_feature(replicon, integrons_report, protein_db, config.distance_threshold)
                 SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
         else:
             with open(integron_file, "w") as out_f:
                 out_f.write("# No Integron found\n")
-            summary_file = None
-            #integrons_report = pd.DataFrame(columns=[])
-
+            summary = pd.DataFrame([[replicon.id, 0, 0, 0]],
+                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
+            summary = summary.set_index(['ID_replicon'])
+        summary.to_csv(summary_file, sep="\t", na_rep="NA")
 
     except integron_finder.EmptyFileError as err:
         _log.warning('############ Skip replicon {} ############'.format(replicon.name))
@@ -600,27 +600,17 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                                                                                               rep_no,
                                                                                               sequences_db_len))
                 integron_res, summary = find_integron_in_one_replicon(replicon, config)
-                print("********************************")
-                print(summary)
-                print("********************************")
                 if integron_res:
                     all_integrons.append(integron_res)
-                if summary is None:
-                    summary = pd.DataFrame([[0, 0, 0]],
-                                 columns=['CALIN', 'complete', 'In0'],
-                                 index=[replicon.id])
-                all_summaries.append(summary)
+                if summary:
+                    all_summaries.append(summary)
             else:
                 _log.warning("############ Skipping replicon {}/{} ############".format(rep_no,
                                                                                         sequences_db_len))
-
     if not config.split_results:
         _log.info("Merging integrons results.\n")
         agg_integrons = results.merge_results(*all_integrons)
         agg_summary = results.merge_results(*all_summaries)
-        print("@@@@@@@@@@@@@@@@@@")
-        print(agg_summary)
-        print("@@@@@@@@@@@@@@@@@@")
         outfile_base_name = os.path.join(config.result_dir, utils.get_name_from_path(config.input_seq_path))
         merged_integron_path = outfile_base_name + ".integrons"
         if not agg_integrons.empty:
@@ -633,14 +623,9 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
                 merged_integron_file.write("# No Integron found\n")
 
         merged_summary_path = outfile_base_name + ".summary"
-        if not agg_integrons.empty:
-            with open(merged_summary_path, 'w') as merged_summary_file:
-                merged_summary_file.write(f"# cmd: integron_finder {' '.join(args)}\n")
-                agg_summary.to_csv(merged_summary_file, sep="\t")
-        else:
-            print("##############")
-            print(agg_summary)
-            print("##############")
+        with open(merged_summary_path, 'w') as merged_summary_file:
+            merged_summary_file.write(f"# cmd: integron_finder {' '.join(args)}\n")
+            agg_summary.to_csv(merged_summary_file, sep="\t")
 
         for _file in all_integrons + all_summaries:
             if _file != merged_integron_path and _file != merged_summary_path:

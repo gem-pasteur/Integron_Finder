@@ -76,7 +76,7 @@ class TestEmptyProt(IntegronTest):
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
-            pass
+            #pass
         integrase.call = _prodigal_call
         finder.distutils.spawn.find_executable = self.find_executable_ori
 
@@ -97,13 +97,16 @@ class TestEmptyProt(IntegronTest):
             main(command.split()[1:], loglevel='WARNING')
 
         output_filename = '{}.integrons'.format(replicon_filename)
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_filename),
-                                                           output_filename))
+        expected_result_dir = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_filename)))
+        expected_result_path = os.path.join(expected_result_dir, output_filename)
         test_result_path = os.path.join(test_result_dir, output_filename)
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
         summary_file_name = '{}.summary'.format(replicon_filename)
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        self.assertFalse(os.path.exists(test_summary_path))
+        test_summary = pd.read_csv(test_summary_path, sep='\t', comment="#")
+        expected_summary_path = os.path.join(expected_result_dir, summary_file_name)
+        expected_summary = pd.read_csv(expected_summary_path, sep='\t', comment="#")
+        pdt.assert_frame_equal(test_summary, expected_summary)
 
 

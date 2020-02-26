@@ -290,14 +290,6 @@ class TestResults(IntegronTest):
         exp = exp.set_index('ID_replicon')
         pdt.assert_frame_equal(exp, summary)
 
-        import io
-        no_integrons = io.StringIO(
-            """# cmd: integron_finder fake_input
-# No integrons found
-"""
-        )
-        empty_df = pd.read_csv(no_integrons, sep="\t", comment="#")
-
 
     def test_filter_calin(self):
         lian_res = self.find_data('lian.001.c02.10_simple.integrons')
