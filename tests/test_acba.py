@@ -79,7 +79,6 @@ class TestAcba(IntegronTest):
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
-            pass
         integrase.call = _prodigal_call
         finder.distutils.spawn.find_executable = self.find_executable_ori
 
@@ -108,9 +107,9 @@ class TestAcba(IntegronTest):
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(
             os.path.join('Results_Integron_Finder_acba.007.p01.13.linear', summary_file_name))
-        exp_summary = pd.read_csv(exp_summary_path, sep="\t")
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment="#")
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_csv(test_summary_path, sep="\t")
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment="#")
         pdt.assert_frame_equal(exp_summary, test_summary)
 
 
@@ -119,6 +118,9 @@ class TestAcba(IntegronTest):
         test if we find the same results if we run IF in sequential as isolated on each seq
         ACBA.0917.00019 contains 2 contigs 0001 and 0002.
         0002 does not contains integrons
+
+        .integrons file should be identical
+        .summary file should contains the 001 contig and 0 calin, 0 complete and 0 in0
         :return:
         """
         seq_replicon_filename = 'ACBA.0917.00019'
@@ -154,23 +156,36 @@ class TestAcba(IntegronTest):
 
         seq_summary_result_path = os.path.join(seq_test_result_dir, seq_replicon_filename + '.summary')
         iso_summary_result_path = os.path.join(iso_test_result_dir, contig_name + '.summary')
-        seq_summary = pd.read_csv(seq_summary_result_path, sep="\t")
-        iso_summary = pd.read_csv(iso_summary_result_path, sep="\t")
-        pdt.assert_frame_equal(seq_summary, iso_summary)
+        seq_summary = pd.read_csv(seq_summary_result_path, sep="\t", comment='#')
+        iso_summary = pd.read_csv(iso_summary_result_path, sep="\t", comment='#')
+        summary_first_contig = seq_summary.loc[seq_summary['ID_replicon'] == 'ACBA.0917.00019.0001']
+        pdt.assert_frame_equal(summary_first_contig, iso_summary)
 
+        summary_2nd_contig = seq_summary.loc[seq_summary['ID_replicon'] == 'ACBA.0917.00019.0002']
+        # the index are different 0/1 so I fix this by indexing by 'ID_replicon'
+        summary_2nd_contig.set_index(['ID_replicon'], inplace=True)
+        iso_summary = pd.DataFrame([['ACBA.0917.00019.0002', 0, 0, 0]],
+                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
+        iso_summary.set_index(['ID_replicon'], inplace=True)
+        pdt.assert_frame_equal(summary_2nd_contig, iso_summary)
 
     def test_acba_simple_gembase(self):
+        """
+        ACBA.0917.00019 contains 2 contigs 0001 and 0002.
+        0002 does not contains integrons
+        """
         replicon_filename = 'ACBA.0917.00019'
         contig_id = 'ACBA.0917.00019.0001'
         output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
-        command = "integron_finder --outdir {out_dir} --gembase {replicon}".format(out_dir=self.out_dir,
-                                                                                   replicon=self.find_data(
-                                                                                       os.path.join('Gembase',
-                                                                                                    'Replicons',
-                                                                                       replicon_filename + '.fna')
-                                                                                   )
-                                                                                   )
+        command = "integron_finder --outdir {out_dir} --keep-tmp " \
+                  "--promoter-attI --gembase {replicon}".format(out_dir=self.out_dir,
+                                                                replicon=self.find_data(
+                                                                   os.path.join('Gembase',
+                                                                                'Replicons',
+                                                                                replicon_filename + '.fna')
+                                                                )
+                                                                )
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
@@ -183,9 +198,9 @@ class TestAcba(IntegronTest):
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(
             os.path.join('Results_Integron_Finder_{}.gembase'.format(replicon_filename), summary_file_name))
-        exp_summary = pd.read_csv(exp_summary_path, sep="\t")
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_csv(test_summary_path, sep="\t")
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
         pdt.assert_frame_equal(exp_summary, test_summary)
 
 
@@ -212,9 +227,9 @@ class TestAcba(IntegronTest):
 
         summary_file_name = '{}.summary'.format(replicon_filename)
         exp_summary_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13', summary_file_name))
-        exp_summary = pd.read_csv(exp_summary_path, sep="\t")
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_csv(test_summary_path, sep="\t")
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
         pdt.assert_frame_equal(exp_summary, test_summary)
 
         gbk = '{}.gbk'.format(replicon_filename)
@@ -401,10 +416,12 @@ class TestAcba(IntegronTest):
             main(command.split()[1:], loglevel='WARNING')
 
         output_filename = 'fake_seq.integrons'
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_fake_seq',
-                                                           output_filename))
         test_result_path = os.path.join(test_result_dir, output_filename)
-        self.assertFileEqual(expected_result_path, test_result_path)
+        with open(test_result_path) as tested_file:
+            test_line = next(tested_file)
+            self.assertTrue(test_line.startswith('# cmd: integron_finder'))
+            test_line = next(tested_file)
+            self.assertEqual(test_line.strip(), '# No Integron found')
 
 
     def test_acba_no_hmmer(self):
@@ -544,6 +561,4 @@ class TestAcba(IntegronTest):
                 main(command.split()[1:])
         err_msg = "result dir '{}' already exists and is not writable".format(self.out_dir)
         self.assertEqual(err_msg, str(ctx.exception))
-
-
 

@@ -1,20 +1,20 @@
 
-**************************************************************************    
- ___       _                               _____ _           _           
-|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __ 
+**************************************************************************
+ ___       _                               _____ _           _
+|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __
  | || '_ \| __/ _ \/ _` | '__/ _ \| '_ \  | |_  | | '_ \ / _` |/ _ \ '__|
- | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |   
-|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|   
-                   |___/                                                 
-   
-**************************************************************************    
+ | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |
+|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|
+                   |___/
 
-integron_finder version 2-2018-11-30
+**************************************************************************
+
+integron_finder version 2-2020-02-24
 Using:    
- - Python 3.6.5 (default, Apr 21 2018, 16:27:57)  [GCC 6.4.0]
- - numpy 1.15.1
+ - Python 3.7.5 (default, Jan 29 2020, 19:38:52)  [GCC 9.2.0]
+ - numpy 1.15.2
  - pandas 0.23.4
- - matplolib 2.2.3
+ - matplolib 3.0.0
  - biopython 1.72
 
 Authors:
@@ -41,14 +41,14 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program (COPYING file).
-If not, see <http://www.gnu.org/licenses/>.     
+If not, see <http://www.gnu.org/licenses/>.
 
                      =======================
-                     
-command used: integron_finder --gembase --keep-tmp /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Replicons/ACBA.0917.00019.fna  
-  
+
+command used: integron_finder --gembase --keep-tmp --promoter-attI tests/data/Gembase/Replicons/ACBA.0917.00019.fna
+
                      =======================
-                     
+
 [0m
 INFO     : ############ Processing replicon ACBA.0917.00019.0001 (1/2) ############
 

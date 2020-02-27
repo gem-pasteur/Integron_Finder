@@ -1,21 +1,26 @@
 
-**************************************************************************    
- ___       _                               _____ _           _           
-|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __ 
+**************************************************************************
+ ___       _                               _____ _           _
+|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __
  | || '_ \| __/ _ \/ _` | '__/ _ \| '_ \  | |_  | | '_ \ / _` |/ _ \ '__|
- | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |   
-|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|   
-                   |___/                                                 
-   
-**************************************************************************    
+ | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |
+|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|
+                   |___/
 
-integron_finder version NOT packaged, it should be development version
-Python 3.6.5 (default, Apr 20 2018, 11:21:56) 
-[GCC 6.4.0]
+**************************************************************************
 
- - open-source GPLv3,
+integron_finder version 2-2020-02-24
+Using:    
+ - Python 3.7.5 (default, Jan 29 2020, 19:38:52)  [GCC 9.2.0]
+ - numpy 1.15.2
+ - pandas 0.23.4
+ - matplolib 3.0.0
+ - biopython 1.72
+
+Authors:
  - Jean Cury, Bertrand Neron, Eduardo Rocha,
- - citation:
+
+Citation:
 
  Identification and analysis of integrons and cassette arrays in bacterial genomes
  Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
@@ -36,14 +41,14 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program (COPYING file).
-If not, see <http://www.gnu.org/licenses/>.     
+If not, see <http://www.gnu.org/licenses/>.
 
                      =======================
-                     
-command used: integron_finder --gbk --pdf --keep-tmp tests/data/Replicons/acba.007.p01.13.fst  
-  
+
+command used: integron_finder --gbk --pdf --keep-tmp --promoter-attI tests/data/Replicons/acba.007.p01.13.fst
+
                      =======================
-                     
+
 [0m
 INFO     : ############ Processing replicon ACBA.007.P01_13 (1/1) ############
 
@@ -53,6 +58,7 @@ INFO     : In replicon ACBA.007.P01_13, there are:
 INFO     : - 1 complete integron(s) found with a total 3 attC site(s)
 INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
 INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Adding proteins ... :
 INFO     : Adding promoters and attI ... :
 INFO     : Writing out results for replicon ACBA.007.P01_13
 INFO     : Merging integrons results.
