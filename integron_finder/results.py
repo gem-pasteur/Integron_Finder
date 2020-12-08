@@ -26,7 +26,7 @@
 
 import colorlog
 import pandas as pd
-from pandas.io.common import EmptyDataError
+from pandas.errors import EmptyDataError
 
 _log = colorlog.getLogger(__name__)
 
