@@ -30,7 +30,7 @@ import os
 import argparse
 
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 import numpy as np
 from Bio import Seq
 from Bio.SeqRecord import SeqRecord

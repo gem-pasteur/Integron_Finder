@@ -29,12 +29,9 @@
 import os
 import shutil
 import tempfile
-import functools
-import argparse
-import unittest
 
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 
 # from Bio import BiopythonExperimentalWarning
 # import warnings

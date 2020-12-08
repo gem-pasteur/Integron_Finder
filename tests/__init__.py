@@ -36,7 +36,8 @@ from io import StringIO
 from contextlib import contextmanager
 
 import pandas as pd
-import pandas.util.testing as pdt
+
+import pandas.testing as pdt
 
 from integron_finder import IntegronError, logger_set_level
 

@@ -32,7 +32,7 @@ import shutil
 import re
 
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 
 # # display warning only for non installed integron_finder
 # from Bio import BiopythonExperimentalWarning
