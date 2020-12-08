@@ -59,7 +59,10 @@ class TestSplit(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', 'multi_fasta.fst'))
         chunk_names = split.split(replicon_path, outdir=self.out_dir)
 
-        seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        try:
+            seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        except AttributeError:
+            seq_index = SeqIO.index(replicon_path, "fasta")
         files_expected = [os.path.join(self.out_dir, r + '.fst') for r in seq_index]
         self.assertListEqual(files_expected, chunk_names)
         for one_chunk in chunk_names:
@@ -86,7 +89,10 @@ class TestSplit(IntegronTest):
         chunk = 2
         chunk_names = split.split(replicon_path, outdir=self.out_dir, chunk=chunk)
 
-        seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        try:
+            seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        except AttributeError:
+            seq_index = SeqIO.index(replicon_path, "fasta")
         files_expected = [os.path.join(self.out_dir, "multi_fasta_chunk_{}.fst".format(i)) for i in range(1, chunk + 1)]
         self.assertListEqual(files_expected, chunk_names)
         for one_chunk in chunk_names:
@@ -167,7 +173,10 @@ class TestMain(IntegronTest):
         command = 'integron_split --outdir {} {}'.format(self.out_dir, replicon_path)
         with self.catch_io(out=True, err=True):
             split.main(command.split()[1:], log_level="WARNING")
-        seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        try:
+            seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        except AttributeError:
+            seq_index = SeqIO.index(replicon_path, "fasta")
         files_expected = sorted([os.path.join(self.out_dir, r + '.fst') for r in seq_index])
         chunk_names = sorted(glob.glob(os.path.join(self.out_dir, '*.fst')))
         self.assertListEqual(files_expected, chunk_names)
@@ -187,7 +196,11 @@ class TestMain(IntegronTest):
         command = 'integron_split --outdir {} --chunk {} {}'.format(self.out_dir, chunk, replicon_path)
         with self.catch_io(out=True, err=True):
             split.main(command.split()[1:], log_level="WARNING")
-        seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        try:
+            seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
+        except AttributeError:
+            seq_index = SeqIO.index(replicon_path, "fasta")
+
         files_expected = sorted([os.path.join(self.out_dir, "multi_fasta_chunk_{}.fst".format(i))
                                  for i in range(1, chunk + 1)])
         chunk_names = sorted(glob.glob(os.path.join(self.out_dir, '*.fst')))

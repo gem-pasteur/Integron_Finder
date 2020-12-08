@@ -280,9 +280,11 @@ class TestGemBase(IntegronTest):
         replicon.path = replicon_path
         db = GembaseDB(replicon, cfg)
 
-        idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
-                          alphabet=Seq.IUPAC.extended_protein)
-
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
+                              alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta')
         specie, date, strain, contig = replicon.id.split('.')
         pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
         self.assertListEqual(sorted([i for i in idx if re.match(pattern, i)]), sorted([i for i in db]))
@@ -299,8 +301,11 @@ class TestGemBase(IntegronTest):
         with self.catch_log():
             db = GembaseDB(replicon, cfg)
 
-        idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
-                          alphabet=Seq.IUPAC.extended_protein)
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
+                              alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta')
 
         specie, date, strain, contig = replicon.id.split('.')
         pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
@@ -504,8 +509,11 @@ class TestProdigalDB(IntegronTest):
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
-        idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta',
-                          alphabet=Seq.IUPAC.extended_protein)
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta',
+                               alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta')
         for exp_seq_id, get_seq_id in zip(idx, db):
             self.assertEqual(exp_seq_id, get_seq_id)
 
