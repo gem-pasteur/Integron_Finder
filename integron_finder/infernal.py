@@ -57,11 +57,20 @@ def read_infernal(infile, replicon_id, len_model_attc,
     _log.debug("read_infernal {}, {}, {}, evalue={}, size_max_attc={}, size_min_attc={}".format(
         infile, replicon_id, len_model_attc, evalue, size_max_attc, size_min_attc
     ))
+    dtype = {"Accession_number": "str",
+             "cm_attC": "str",
+             "cm_debut": "int",
+             "cm_fin": "int",
+             "pos_beg": "int",
+             "pos_end": "int",
+             "evalue": "float",
+           }
     try:
         _ = pd.read_csv(infile, comment="#", sep="\t")
     except Exception:
-        return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
+        df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
+        return df.astype(dtype)
 
     df = pd.read_csv(infile, sep="\s+", engine="python",  header=None,
                      skipfooter=10, skiprows=2, usecols=[2, 5, 6, 7, 8, 9, 15])
@@ -88,10 +97,11 @@ def read_infernal(infile, replicon_id, len_model_attc,
         df.loc[~idx, "pos_end"] = df.loc[~idx].apply(lambda x: x["pos_end_tmp"] + (len_model_attc - x["cm_fin"]), axis=1)
         df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: x["pos_beg_tmp"] - (x["cm_debut"] - 1), axis=1)
 
-        return df[["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"]]
+        df = df[["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"]]
     else:
-        return pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
+        df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
+    return df.astype(dtype)
 
 
 def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, incE=1., cpu=1):
