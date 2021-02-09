@@ -226,7 +226,7 @@ The paper is published in Nucleic Acid Research.
 
 **Identification and analysis of integrons and cassette arrays in bacterial genomes**
 Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
-*Nucleic Acids Research 2016; [doi: 10.1093/nar/gkw319](http://nar.oxfordjournals.org/cgi/content/full/gkw319)*
+*Nucleic Acids Research 2016; [doi: 10.1093/nar/gkw319](https://academic.oup.com/nar/article/44/10/4539/2516972)*
 
  Please cite also the following articles:
 
