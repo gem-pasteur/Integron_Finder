@@ -1,4 +1,4 @@
-[![install](https://img.shields.io/github/downloads/gem-pasteur/Integron_finder/total.svg)](https://github.com/gem-pasteur/Integron_Finder/releases/latest) [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest) [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) [![Build Status](https://travis-ci.org/gem-pasteur/Integron_Finder.svg?branch=master)](https://travis-ci.org/gem-pasteur/Integron_Finder)
+[![Downloads](https://pepy.tech/badge/integron-finder)](https://github.com/gem-pasteur/Integron_Finder/releases/latest) [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest) [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) [![Build Status](https://travis-ci.org/gem-pasteur/Integron_Finder.svg?branch=master)](https://travis-ci.org/gem-pasteur/Integron_Finder)
 
 # Integron Finder
 
