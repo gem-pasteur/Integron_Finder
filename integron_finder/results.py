@@ -6,7 +6,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -26,7 +26,7 @@
 
 import colorlog
 import pandas as pd
-from pandas.io.common import EmptyDataError
+from pandas.errors import EmptyDataError
 
 _log = colorlog.getLogger(__name__)
 

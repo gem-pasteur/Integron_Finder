@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -50,7 +50,10 @@ def make_multi_fasta_reader(alphabet):
         :rtype: :class:`Bio.SeqRecord.SeqRecord` object.
         """
         name = get_name_from_path(path)
-        seq_it = SeqIO.parse(path, "fasta", alphabet=alphabet)
+        if alphabet:
+            seq_it = SeqIO.parse(path, "fasta", alphabet=alphabet)
+        else:
+            seq_it = SeqIO.parse(path, "fasta")
         for seq in seq_it:
             seq.name = name
             yield seq
@@ -58,7 +61,11 @@ def make_multi_fasta_reader(alphabet):
     return fasta_iterator
 
 
-read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.extended_protein)
+try:
+    Seq.IUPAC
+    read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.extended_protein)
+except AttributeError:
+    read_multi_prot_fasta = make_multi_fasta_reader(None)
 
 
 class FastaIterator:
@@ -71,7 +78,8 @@ class FastaIterator:
 
     """
 
-    def __init__(self, path, alphabet=Seq.IUPAC.ambiguous_dna, replicon_name=None, dist_threshold=4000):
+    def __init__(self, path, replicon_name=None, dist_threshold=4000, alphabet=None):
+        #def __init__(self, path, alphabet=Seq.IUPAC.ambiguous_dna, replicon_name=None, dist_threshold=4000):
         """
 
         :param str path: The path to the file containing the sequences.
@@ -82,8 +90,14 @@ class FastaIterator:
                                    Under this threshold even the provided topology is 'circular'
                                    the computation will be done with a 'linear' topology.
         """
-        self.alphabet = alphabet
-        self.seq_index = SeqIO.index(path, "fasta", alphabet=self.alphabet)
+        try:
+            self.alphabet = Seq.IUPAC.ambiguous_dna
+        except AttributeError as err:
+            self.alphabet = None
+        if self.alphabet:
+            self.seq_index = SeqIO.index(path, "fasta",  alphabet=self.alphabet)
+        else:
+            self.seq_index = SeqIO.index(path, "fasta")
         self.seq_gen = (self.seq_index[id_] for id_ in self.seq_index.keys())
         self._topologies = None
         self.replicon_name = replicon_name
@@ -100,6 +114,7 @@ class FastaIterator:
 
     topologies = property(fset=_set_topologies)
 
+
     def _check_seq_alphabet_compliance(self, seq):
         """
         :param seq: the sequence to check
@@ -107,7 +122,10 @@ class FastaIterator:
         :return: True if sequence letters are a subset of the alphabet, False otherwise.
         """
         seq_letters = set(str(seq).upper())
-        alphabet = set(self.alphabet.letters.upper())
+        # the Bio.Alphabet has been removed from Biopython. from v1.78
+        # I hard coded the IUPAC.ambiguous_dna
+        # for compatibilty reasons
+        alphabet = set('GATCRYWSMKHBVDN')
         return seq_letters.issubset(alphabet)
 
     def __next__(self):
@@ -137,6 +155,9 @@ class FastaIterator:
             seq.topology = topology
         else:
             seq.topology = 'circ' if len(self) == 1 else 'lin'
+
+        if self.alphabet is None:
+            seq.annotations["molecule_type"] = 'DNA'
         return seq
 
     def __iter__(self):

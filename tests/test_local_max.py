@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -32,7 +32,7 @@ import shutil
 import re
 
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 
 # # display warning only for non installed integron_finder
 # from Bio import BiopythonExperimentalWarning
@@ -159,11 +159,10 @@ class TestLocalMax(IntegronTest):
                                                 )
         local_max_expected = pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
                                            ['LIAN.001.C02_10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
-                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
+                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944472, 944598, '+', 5e-06]],
                                           columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg',
                                                    'pos_end', 'sens', 'evalue'])
         pdt.assert_frame_equal(local_max_expected, local_max_received)
-
 
     def test_no_local_max_top(self):
         win_beg = 946899
@@ -214,7 +213,7 @@ class TestLocalMax(IntegronTest):
                                                 )
         local_max_expected = pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
                                            ['LIAN.001.C02_10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
-                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
+                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944472, 944598, '+', 5e-06]],
                                           columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg',
                                                    'pos_end', 'sens', 'evalue'])
         pdt.assert_frame_equal(local_max_expected, local_max_received)
@@ -234,7 +233,7 @@ class TestLocalMax(IntegronTest):
                                                 )
         local_max_expected = pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
                                            ['LIAN.001.C02_10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
-                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944472, 944598, '+', 4.7e-06]],
+                                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 944472, 944598, '+', 5e-06]],
                                           columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg',
                                                    'pos_end', 'sens', 'evalue'])
         pdt.assert_frame_equal(local_max_expected, local_max_received)
