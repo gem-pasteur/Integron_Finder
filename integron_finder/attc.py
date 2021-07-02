@@ -57,7 +57,7 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     attc_minus = attc_df[attc_df.sens == "-"].copy()
 
     if not keep_palindromes:
-        attc_df = attc_df.sort_values(["pos_beg", "evalue"]).drop_duplicates(subset=["pos_beg", "pos_end"]).copy()
+        attc_df = attc_df.sort_values(["pos_beg", "evalue"]).drop_duplicates(subset="pos_beg", keep=False).drop_duplicates(subset="pos_end").copy()
         attc_plus = attc_df[attc_df.sens == "+"].copy()
         attc_minus = attc_df[attc_df.sens == "-"].copy()
 
