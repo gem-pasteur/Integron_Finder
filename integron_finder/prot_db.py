@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -98,7 +98,14 @@ class ProteinDB(ABC):
         """
         :return: an index of the sequence contains in protfile corresponding to the replicon
         """
-        return SeqIO.index(self._prot_file, "fasta", alphabet=Seq.IUPAC.extended_protein)
+        try:
+            alphabet = alphabet=Seq.IUPAC.extended_protein
+            idx = SeqIO.index(self._prot_file, "fasta", alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            alphabet = None
+            idx = SeqIO.index(self._prot_file, "fasta")
+        return idx
+
 
     @abstractmethod
     def get_description(self, gene_id):
@@ -222,7 +229,11 @@ class GembaseDB(ProteinDB):
         :rtype: str
         """
         all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._gembase_file_basename + '.prt')
-        all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
+        try:
+            alphabet=Seq.IUPAC.extended_protein
+            all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            all_prots = SeqIO.index(all_prot_path, "fasta")
         if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
             os.makedirs(self.cfg.tmp_dir(self.replicon.id))
         prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')

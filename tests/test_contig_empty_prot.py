@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -29,12 +29,9 @@
 import os
 import shutil
 import tempfile
-import functools
-import argparse
-import unittest
 
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 
 # from Bio import BiopythonExperimentalWarning
 # import warnings
