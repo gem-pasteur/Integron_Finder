@@ -86,7 +86,7 @@ def merge_results(*results_file):
         all_res.append(res)
     if all_res:
         agg_results = pd.concat(all_res, sort=False)
-        if agg_results.shape[1] == 4:  # it's a summary file
+        if agg_results.shape[1] == 6:  # it's a summary file
             agg_results = agg_results.set_index('ID_replicon')
     else:
         agg_results = pd.DataFrame(columns=['ID_integron', 'ID_replicon', 'element',

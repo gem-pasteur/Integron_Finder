@@ -389,18 +389,24 @@ def find_integron_in_one_replicon(replicon, config):
         _log.debug("Writing integron_file {}".format(integron_file))
         summary_file = base_outfile + ".summary"
         if integrons:
+            print("############# L393  if integrons:")
             integrons_report = results.integrons_report(integrons)
             integrons_report.to_csv(integron_file, sep="\t", index=False, na_rep="NA")
             summary = results.summary(integrons_report)
+            summary['topology'] = [replicon.topology]
+            summary['size'] = [len(replicon)]
             if config.gbk:
                 add_feature(replicon, integrons_report, protein_db, config.distance_threshold)
                 SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
         else:
+            print("############# L400  else")
             with open(integron_file, "w") as out_f:
                 out_f.write("# No Integron found\n")
-            summary = pd.DataFrame([[replicon.id, 0, 0, 0]],
-                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
+            summary = pd.DataFrame([[replicon.id, 0, 0, 0, replicon.topology, len(replicon)]],
+                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0', 'topology', 'size'])
             summary = summary.set_index(['ID_replicon'])
+        # summary_file is a temporary file
+        # all summaries are merged in results.merge_results function
         summary.to_csv(summary_file, sep="\t", na_rep="NA")
 
     except integron_finder.EmptyFileError as err:
