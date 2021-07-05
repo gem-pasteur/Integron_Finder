@@ -56,16 +56,16 @@ class TestMerge(IntegronTest):
         self.res_dirs = []
         # copy *.intgrons in tmp
         for rep in self.replicons:
-            res_dir = os.path.join(self.out_dir, 'Result_{}'.format(rep))
+            res_dir = os.path.join(self.out_dir, f'Result_{rep}')
             os.makedirs(res_dir)
             self.res_dirs.append(res_dir)
-            res_file = self.find_data("{}_local_max_lin.integrons".format(rep))
-            shutil.copyfile(res_file, os.path.join(res_dir, "{}.integrons".format(rep)))
+            res_file = self.find_data(f"{rep}_local_max_lin.integrons")
+            shutil.copyfile(res_file, os.path.join(res_dir, f"{rep}.integrons"))
         # copy *.summary *.gbk in tmp
         for _id in self.ids:
             for ext in ('gbk', 'summary'):
-                gbk_file = self.find_data("{}_local_max_lin.{}".format(_id, ext))
-                shutil.copyfile(gbk_file, os.path.join(res_dir, "{}.{}".format(_id, ext)))
+                src_file = self.find_data("{}_local_max_lin.{}".format(_id, ext))
+                shutil.copyfile(src_file, os.path.join(res_dir, "{}.{}".format(_id, ext)))
 
             pdf_file = self.find_data("{}_1_local_max_lin.pdf".format(_id))
             shutil.copyfile(pdf_file, os.path.join(res_dir, "{}_1.pdf".format(_id)))
@@ -74,6 +74,7 @@ class TestMerge(IntegronTest):
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
+            pass
         logger_set_level('INFO')
 
     def test_merge_integrons(self):
@@ -96,7 +97,6 @@ class TestMerge(IntegronTest):
         expected_results = pd.read_csv(expe_result_file, sep="\t", comment="#")
         expected_results.sort_values(by=['ID_replicon'], inplace=True)
         expected_results.reset_index(inplace=True, drop=True)
-
         pdt.assert_frame_equal(agg_results, expected_results)
 
 

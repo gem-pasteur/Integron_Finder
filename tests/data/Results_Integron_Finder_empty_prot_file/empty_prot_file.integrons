@@ -1,2 +1,2 @@
-# cmd: integron_finder --outdir /tmp/integron_acba_test tests/data/Replicons/empty_prot_file.fna
+# cmd: integron_finder --linear tests/data/Replicons/empty_prot_file.fna
 # No Integron found

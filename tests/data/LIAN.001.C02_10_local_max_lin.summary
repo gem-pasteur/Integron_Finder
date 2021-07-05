@@ -1,2 +1,3 @@
-ID_replicon	complete	In0	CALIN
-LIAN.001.C02_10	1	0	4
+# cmd: integron_finder --gbk --pdf --keep-tmp --promoter-attI --lin --local-max tests/data/Replicons/lian.001.c02.10.fst
+ID_replicon	CALIN	complete	In0	topology	size
+LIAN.001.C02_10	4	1	0	lin	988134

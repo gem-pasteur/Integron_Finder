@@ -1,4 +1,4 @@
 # cmd: integron_finder --outdir /tmp/integron_acba_test --keep-tmp --promoter-attI --gembase /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Replicons/ACBA.0917.00019.fna
-ID_replicon	CALIN	complete	In0
-ACBA.0917.00019.0001	0	1	0
-ACBA.0917.00019.0002	0	0	0
+ID_replicon	CALIN	complete	In0	topology	size
+ACBA.0917.00019.0001	0	1	0	lin	4050513
+ACBA.0917.00019.0002	0	0	0	lin	8729

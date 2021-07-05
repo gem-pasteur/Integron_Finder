@@ -124,7 +124,7 @@ class TestAcba(IntegronTest):
         :return:
         """
         seq_replicon_filename = 'ACBA.0917.00019'
-        seq_output_dir = 'Results_Integron_Finder_{}'.format(seq_replicon_filename)
+        seq_output_dir = f'Results_Integron_Finder_{seq_replicon_filename}'
         seq_test_result_dir = os.path.join(self.out_dir, seq_output_dir)
         seq_cmd = "integron_finder --outdir {out_dir} " \
                   "--keep-tmp {replicon}".format(out_dir=self.out_dir,
@@ -164,8 +164,8 @@ class TestAcba(IntegronTest):
         summary_2nd_contig = seq_summary.loc[seq_summary['ID_replicon'] == 'ACBA.0917.00019.0002']
         # the index are different 0/1 so I fix this by indexing by 'ID_replicon'
         summary_2nd_contig.set_index(['ID_replicon'], inplace=True)
-        iso_summary = pd.DataFrame([['ACBA.0917.00019.0002', 0, 0, 0]],
-                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
+        iso_summary = pd.DataFrame([['ACBA.0917.00019.0002', 0, 0, 0, 'lin', 8729]],
+                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0', 'topology', 'size'])
         iso_summary.set_index(['ID_replicon'], inplace=True)
         pdt.assert_frame_equal(summary_2nd_contig, iso_summary)
 
