@@ -1,21 +1,21 @@
 
-**************************************************************************    
- ___       _                               _____ _           _           
-|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __ 
+**************************************************************************
+ ___       _                               _____ _           _
+|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __
  | || '_ \| __/ _ \/ _` | '__/ _ \| '_ \  | |_  | | '_ \ / _` |/ _ \ '__|
- | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |   
-|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|   
-                   |___/                                                 
-   
-**************************************************************************    
+ | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |
+|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|
+                   |___/
 
-integron_finder version 2-2018-10-23
+**************************************************************************
+
+integron_finder version 2-2020-02-26
 Using:    
- - Python 3.6.5 (default, Jul 19 2018, 11:12:36)  [GCC 7.3.0]
- - numpy 1.14.2
- - pandas 0.22.0
- - matplolib 2.2.2
- - biopython 1.71
+ - Python 3.7.0 (default, Jul 27 2018, 09:58:31)  [GCC 7.3.0]
+ - numpy 1.17.4
+ - pandas 0.25.3
+ - matplolib 3.1.2
+ - biopython 1.75
 
 Authors:
  - Jean Cury, Bertrand Neron, Eduardo Rocha,
@@ -41,16 +41,138 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program (COPYING file).
-If not, see <http://www.gnu.org/licenses/>.     
+If not, see <http://www.gnu.org/licenses/>.
 
                      =======================
-                     
-command used: integron_finder -q tests/data/Replicons/empty_prot_file.fna  
-  
+
+command used: integron_finder /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Replicons/empty_prot_file.fna
+
                      =======================
-                     
+
 [0m
-WARNING  : The protein file: '/home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_empty_prot_file/other_KLPN.1018.01438.0002/KLPN.1018.01438.0002.prt' is empty cannot perform hmmsearch on it.
+INFO     : ############ Processing replicon KLPN.1018.01438.0001 (1/5) ############
+
+INFO     : Starting Default search ... :
+INFO     : Default search done... : 
+INFO     : In replicon KLPN.1018.01438.0001, there are:
+INFO     : - 0 complete integron(s) found with a total 0 attC site(s)
+INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Writing out results for replicon KLPN.1018.01438.0001
+INFO     : ############ Processing replicon KLPN.1018.01438.0002 (2/5) ############
+
+WARNING  : The protein file: '/home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_empty_prot_file/tmp_KLPN.1018.01438.0002/KLPN.1018.01438.0002.prt' is empty cannot perform hmmsearch on it.
 WARNING  : ############ Skip replicon KLPN.1018.01438.0002 ############
-WARNING  : The protein file: '/home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_empty_prot_file/other_KLPN.1018.01438.0005/KLPN.1018.01438.0005.prt' is empty cannot perform hmmsearch on it.
+INFO     : ############ Processing replicon KLPN.1018.01438.0003 (3/5) ############
+
+INFO     : Starting Default search ... :
+INFO     : Default search done... : 
+INFO     : In replicon KLPN.1018.01438.0003, there are:
+INFO     : - 0 complete integron(s) found with a total 0 attC site(s)
+INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Writing out results for replicon KLPN.1018.01438.0003
+INFO     : ############ Processing replicon KLPN.1018.01438.0004 (4/5) ############
+
+INFO     : Starting Default search ... :
+INFO     : Default search done... : 
+INFO     : In replicon KLPN.1018.01438.0004, there are:
+INFO     : - 0 complete integron(s) found with a total 0 attC site(s)
+INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Writing out results for replicon KLPN.1018.01438.0004
+INFO     : ############ Processing replicon KLPN.1018.01438.0005 (5/5) ############
+
+WARNING  : The protein file: '/home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_empty_prot_file/tmp_KLPN.1018.01438.0005/KLPN.1018.01438.0005.prt' is empty cannot perform hmmsearch on it.
 WARNING  : ############ Skip replicon KLPN.1018.01438.0005 ############
+INFO     : Merging integrons results.
+
+
+**************************************************************************
+ ___       _                               _____ _           _
+|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __
+ | || '_ \| __/ _ \/ _` | '__/ _ \| '_ \  | |_  | | '_ \ / _` |/ _ \ '__|
+ | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |
+|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|
+                   |___/
+
+**************************************************************************
+
+integron_finder version 2-2021-07-05
+Using:    
+ - Python 3.8.10 (default, Jun 24 2021, 12:40:14)  [GCC 10.3.0]
+ - numpy 1.19.4
+ - pandas 1.1.5
+ - matplolib 3.3.3
+ - biopython 1.78
+
+Authors:
+ - Jean Cury, Bertrand Neron, Eduardo Rocha,
+
+Citation:
+
+ Identification and analysis of integrons and cassette arrays in bacterial genomes
+ Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
+ Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
+ 
+
+                     =======================
+
+integron_finder is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+integron_finder is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program (COPYING file).
+If not, see <http://www.gnu.org/licenses/>.
+
+                     =======================
+
+command used: integron_finder --linear tests/data/Replicons/empty_prot_file.fna
+
+                     =======================
+
+[0m
+INFO     : ############ Processing replicon KLPN.1018.01438.0001 (1/5) ############
+
+INFO     : Starting Default search ... :
+INFO     : Default search done... : 
+INFO     : In replicon KLPN.1018.01438.0001, there are:
+INFO     : - 0 complete integron(s) found with a total 0 attC site(s)
+INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Writing out results for replicon KLPN.1018.01438.0001
+INFO     : ############ Processing replicon KLPN.1018.01438.0002 (2/5) ############
+
+WARNING  : The protein file: '/home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_empty_prot_file/tmp_KLPN.1018.01438.0002/KLPN.1018.01438.0002.prt' is empty cannot perform hmmsearch on it.
+WARNING  : ############ Skip replicon KLPN.1018.01438.0002 ############
+INFO     : ############ Processing replicon KLPN.1018.01438.0003 (3/5) ############
+
+INFO     : Starting Default search ... :
+INFO     : Default search done... : 
+INFO     : In replicon KLPN.1018.01438.0003, there are:
+INFO     : - 0 complete integron(s) found with a total 0 attC site(s)
+INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Writing out results for replicon KLPN.1018.01438.0003
+INFO     : ############ Processing replicon KLPN.1018.01438.0004 (4/5) ############
+
+INFO     : Starting Default search ... :
+INFO     : Default search done... : 
+INFO     : In replicon KLPN.1018.01438.0004, there are:
+INFO     : - 0 complete integron(s) found with a total 0 attC site(s)
+INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Writing out results for replicon KLPN.1018.01438.0004
+INFO     : ############ Processing replicon KLPN.1018.01438.0005 (5/5) ############
+
+WARNING  : The protein file: '/home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_empty_prot_file/tmp_KLPN.1018.01438.0005/KLPN.1018.01438.0005.prt' is empty cannot perform hmmsearch on it.
+WARNING  : ############ Skip replicon KLPN.1018.01438.0005 ############
+INFO     : Merging integrons results.
+
