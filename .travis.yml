@@ -13,19 +13,22 @@ before_install:
   - sudo apt-get update
   - sudo apt-get -y install python-pip python-numpy python-matplotlib python-biopython
 
-  - wget https://github.com/hyattpd/Prodigal/archive/v2.6.2.tar.gz
-  - tar -xf v2.6.2.tar.gz
-  - cd Prodigal-2.6.2 && make && sudo make install
+  - PV="2.6.3"
+  - wget https://github.com/hyattpd/Prodigal/archive/v${PV}.tar.gz
+  - tar -xf v${PV}.tar.gz
+  - cd Prodigal-${PV} && make && sudo make install
   - cd -
 
-  - wget  http://eddylab.org/software/infernal/infernal-1.1.2.tar.gz
-  - tar -xf infernal-1.1.2.tar.gz
-  - cd infernal-1.1.2 && ./configure && make && sudo make install
+  - PV="1.1.3"
+  - wget http://eddylab.org/infernal/infernal-${PV}.tar.gz
+  - tar -xf infernal-${PV}}.tar.gz
+  - cd infernal-${PV} && ./configure && make && sudo make install
   - cd -
 
-  - wget  http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2.tar.gz
-  - tar -xf hmmer-3.1b2.tar.gz
-  - cd hmmer-3.1b2 && ./configure && make && sudo make install
+  - PV="3.3.2"
+  - wget http://eddylab.org/software/hmmer/hmmer-${PV}.tar.gz
+  - tar -xf hmmer-${PV}.tar.gz
+  - cd hmmer-${PV} && ./configure && make && sudo make install
   - cd -
 
 # command to install integron_finder
