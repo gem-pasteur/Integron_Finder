@@ -132,7 +132,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                             intI_ac.query_name.values[i])
 
             else:  # we still have attC and int :
-                print("@@@@@@@@@@@@ L 135")
+                print("@@@@@@@@@@@@ integron.py L 135")
                 attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
                 attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
 
@@ -140,16 +140,19 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                     distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
                                           (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
                 else:
-                    print("@@@@@@@@@@@@@@ L 143")
+                    print("@@@@@@@@@@@@@@ integron.py L 143")
                     distances = np.array([abs(attc_left - intI_ac.pos_end.values[i]),
                                           abs(intI_ac.pos_beg.values[i] - attc_right)])
+                    print("@@@@@@@@@@@@@@ distances", distances)
                 if attc_ac:
                     # tmp = (distances /
                     #       np.array([[len(aac) for aac in attc_ac]]))
-                    print("@@@@@@@@@@@@@@@@@ L 149")
+                    print("@@@@@@@@@@@@@@@@@ integron.py L 149")
                     side, idx_attc = np.where(distances == distances.min())
-                    print("@@@@@@@ side", side)
-                    print("@@@@@@@ idx_attc", idx_attc)
+                    print("@@@@@@@@@@@@ distances.min() =", distances.min())
+                    print("@@@@@@@@@@@@ distances == distances.min() =", distances == distances.min())
+                    print("@@@@@@@ integron.py side", side)
+                    print("@@@@@@@ integron.py idx_attc", idx_attc)
                     # side : 0 <=> left; 1 <=> right
                     # index of the closest and biggest attC array to the integrase
                     # exactly tmp = dist(cluster to integrase) / size cluster
@@ -165,7 +168,11 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                     idx_attc = 0
                     side = np.argmin(distances)
 
+                print(f"@@@@@@@@@@@@ distances[side, idx_attc] distances[{side}, {idx_attc}] =", distances[side, idx_attc])
+                print(f"@@@@@@@@@@@@ distances[{side}, {idx_attc}] = {distances[side, idx_attc]} < {cfg.distance_threshold}",
+                      distances[side, idx_attc] < cfg.distance_threshold)
                 if distances[side, idx_attc] < cfg.distance_threshold:
+                    print("@@@@@@@@@@@@ integron.py L175")
                     integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
@@ -175,6 +182,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                                 intI_ac.query_name.values[i])
 
                     attc_tmp = attc_ac.pop(idx_attc)
+                    print("@@@@@@@@@@@@@@@ attc_tmp", attc_tmp)
 
                     for a_tmp in attc_tmp.values:
                         integrons[-1].add_attC(a_tmp[4],
@@ -184,6 +192,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                     n_attc_array -= 1
 
                 else:  # no array close to the integrase on both side
+                    print("@@@@@@@@@@@@ integron.py L194")
                     integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],

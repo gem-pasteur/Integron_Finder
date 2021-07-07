@@ -85,7 +85,7 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_to
             print("########## L 82")
             attc_array = []
         else:
-            print("######### L85")
+            print("######### attc.py L85")
             attc_array = [attc_df]
     else:
         if attc_plus.empty:
