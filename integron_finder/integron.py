@@ -133,9 +133,25 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
 
             else:  # we still have attC and int :
                 print("@@@@@@@@@@@@ integron.py L 135")
+                # Look for array of attC where intI would fall inside it
+                # array_2_split is a boolean with True when intI is within an array
+                array_2_split = [(aac.pos_beg.values[0] < intI_ac.pos_beg.values[i] and 
+                              intI_ac.pos_beg.values[i] < aac.pos_end.values[-1]) 
+                              for aac in attc_ac]
+                # get the index of those
+                tsplt = np.where(array_2_split)[0]
+                # for each of the attc array to split
+                # pop it, split it and add the 2 new arrays back.
+                for split in tsplt:
+                    pop = attc_ac.pop(split)
+                    whr_split = np.searchsorted(pop.pos_beg.values, intI_ac.pos_beg.values[i])
+                    attc_ac.extend([pop.iloc[:whr_split], pop.iloc[whr_split:]])
+                    n_attc_array += 1 # new attC array
+
+                print(attc_ac)
                 attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
                 attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
-
+                print(intI_ac.iloc[i])
                 if replicon.topology == 'circ':
                     distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
                                           (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
@@ -143,7 +159,9 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                     print("@@@@@@@@@@@@@@ integron.py L 143")
                     distances = np.array([abs(attc_left - intI_ac.pos_end.values[i]),
                                           abs(intI_ac.pos_beg.values[i] - attc_right)])
-                    print("@@@@@@@@@@@@@@ distances", distances)
+                    print("@@@@@@@@@@@@@@ distances")
+                    print(distances)
+
                 if attc_ac:
                     # tmp = (distances /
                     #       np.array([[len(aac) for aac in attc_ac]]))
@@ -183,6 +201,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
 
                     attc_tmp = attc_ac.pop(idx_attc)
                     print("@@@@@@@@@@@@@@@ attc_tmp", attc_tmp)
+                    print("@@@@@@@@@@@@@@@ attc_ac", attc_ac)
 
                     for a_tmp in attc_tmp.values:
                         integrons[-1].add_attC(a_tmp[4],
@@ -640,10 +659,12 @@ class Integron(object):
 
         attc_start = self.attC.pos_beg.values[0]
         attc_end = self.attC.pos_end.values[-1]
-        integrase_start = self.integrase.pos_beg.values[0]
-        integrase_end = self.integrase.pos_end.values[-1]
 
         if self.has_integrase():
+        
+            integrase_start = self.integrase.pos_beg.values[0]
+            integrase_end = self.integrase.pos_end.values[-1]
+
             if self.replicon.topology == 'circ':
                 if ((attc_start - integrase_end) % self.replicon_size >
                         (integrase_start - attc_end) % self.replicon_size):
