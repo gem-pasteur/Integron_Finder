@@ -35,7 +35,7 @@ from .infernal import local_max, expand
 _log = colorlog.getLogger(__name__)
 
 
-def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
+def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_topology):
     """
     Parse the attc data set (sorted along start site) for the given replicon and return list of arrays.
     One array is composed of attC sites on the same strand and separated by a distance less than dist_threshold.
@@ -61,8 +61,13 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
         attc_plus = attc_df[attc_df.sens == "+"].copy()
         attc_minus = attc_df[attc_df.sens == "-"].copy()
 
+    print("######### search_attc topology =", rep_topology)
+    print("###### ", attc_df)
     # can be reordered
+    print("attc_plus")
+    print(attc_plus)
     if (attc_plus.pos_beg.diff() > dist_threshold).any() or (attc_minus.pos_beg.diff() > dist_threshold).any():
+        print("########## L67")
         if not attc_plus.empty:
             bkp_plus = attc_plus[attc_plus.pos_beg.diff() > dist_threshold].index
             position_bkp_plus = [attc_plus.index.get_loc(i) for i in bkp_plus]
@@ -71,35 +76,46 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
             position_bkp_minus = [attc_minus.index.get_loc(i) for i in bkp_minus]
         ok = True
     if not attc_plus.empty and not attc_minus.empty:
+        print("########## L76")
         ok = True
 
     if not ok:
+        print("########### L80")
         if attc_df.empty:
+            print("########## L 82")
             attc_array = []
         else:
+            print("######### L85")
             attc_array = [attc_df]
     else:
         if attc_plus.empty:
             array_plus = []
         else:
+            print("########### L91")
             array_plus = np.split(attc_plus.values, position_bkp_plus)
             # array_plus is a list of np.array
             first_pos_beg = array_plus[0][0][4]
             last_pos_beg = array_plus[-1][-1][4]
-            if len(array_plus) > 1 and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
+            if len(array_plus) > 1 \
+                    and rep_topology == 'circ' \
+                    and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
+
                 array_plus[0] = np.concatenate((array_plus[-1], array_plus[0]))
                 del array_plus[-1]
 
         if attc_minus.empty:
             array_minus = []
         else:
+            print("############ L106")
             array_minus = np.split(attc_minus.values, position_bkp_minus)
             # array_minus is a list of np.array
             first_pos_beg = array_minus[0][0][4]
-            last_pos_beg = array_minus[-1][-1][4]
-            if len(array_minus) > 1 and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
+            if len(array_minus) > 1 \
+                    and rep_topology == 'circ' \
+                    and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
                 array_minus[0] = np.concatenate((array_minus[-1], array_minus[0]))
                 del array_minus[-1]
+            last_pos_beg = array_minus[-1][-1][4]
 
         tmp = array_plus + array_minus
 
