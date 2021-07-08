@@ -96,10 +96,10 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_to
         if attc_minus.empty:
             array_minus = []
         else:
-            print("############ L106")
             array_minus = np.split(attc_minus.values, position_bkp_minus)
             # array_minus is a list of np.array
             first_pos_beg = array_minus[0][0][4]
+            last_pos_beg = array_minus[-1][-1][4]
             if len(array_minus) > 1 \
                     and rep_topology == 'circ' \
                     and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
