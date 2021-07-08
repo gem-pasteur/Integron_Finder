@@ -61,13 +61,8 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_to
         attc_plus = attc_df[attc_df.sens == "+"].copy()
         attc_minus = attc_df[attc_df.sens == "-"].copy()
 
-    print("######### search_attc topology =", rep_topology)
-    print("###### ", attc_df)
     # can be reordered
-    print("attc_plus")
-    print(attc_plus)
     if (attc_plus.pos_beg.diff() > dist_threshold).any() or (attc_minus.pos_beg.diff() > dist_threshold).any():
-        print("########## L67")
         if not attc_plus.empty:
             bkp_plus = attc_plus[attc_plus.pos_beg.diff() > dist_threshold].index
             position_bkp_plus = [attc_plus.index.get_loc(i) for i in bkp_plus]
@@ -76,22 +71,17 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_to
             position_bkp_minus = [attc_minus.index.get_loc(i) for i in bkp_minus]
         ok = True
     if not attc_plus.empty and not attc_minus.empty:
-        print("########## L76")
         ok = True
 
     if not ok:
-        print("########### L80")
         if attc_df.empty:
-            print("########## L 82")
             attc_array = []
         else:
-            print("######### attc.py L85")
             attc_array = [attc_df]
     else:
         if attc_plus.empty:
             array_plus = []
         else:
-            print("########### L91")
             array_plus = np.split(attc_plus.values, position_bkp_plus)
             # array_plus is a list of np.array
             first_pos_beg = array_plus[0][0][4]
