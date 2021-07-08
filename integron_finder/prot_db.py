@@ -190,7 +190,9 @@ class GembaseDB(ProteinDB):
         :return: the gemabse basename corresponding to the input file
         :rtype: string
         """
-        lst_dir_path = os.path.join(gembase_path, 'LSTINFO')
+        lst_dir_path = os.path.join(gembase_path, 'LSTINF')
+        if not os.path.exists(lst_dir_path):
+            raise IntegronError("LSTINF directory nout found.")
         gembase_file_basename = os.path.splitext(os.path.basename(input_seq_path))[0]
         # when IF is run through nextflow & parallel_integron_finder
         # the input data is split the name of the chunks can vary
@@ -243,7 +245,7 @@ class GembaseDB(ProteinDB):
                     seq = all_prots[seq_id]
                     SeqIO.write(seq, prot_file, 'fasta')
                 except KeyError:
-                    _log.warning('Sequence describe in LSTINFO file {} is not present in {}'.format(seq_id, all_prot_path))
+                    _log.warning('Sequence describe in LSTINF file {} is not present in {}'.format(seq_id, all_prot_path))
         return prot_file_path
 
 
@@ -330,7 +332,9 @@ class GembaseDB(ProteinDB):
         :return:
         """
 
-        lst_path = os.path.join(self._gembase_path, 'LSTINFO', self._gembase_file_basename + '.lst')
+        lst_path = os.path.join(self._gembase_path, 'LSTINF', self._gembase_file_basename + '.lst')
+        if not os.path.exists(lst_path):
+            raise IntegronError("LSTINF directory nout found.")
         gembase_type = self.gembase_sniffer(lst_path)
         if gembase_type == 'Draft':
             prots_info = self.gembase_draft_parser(lst_path, self.replicon.id)

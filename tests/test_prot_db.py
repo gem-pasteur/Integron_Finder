@@ -158,13 +158,13 @@ class TestGemBase(IntegronTest):
     def test_gembase_sniffer(self):
         file_names = (('ACBA.0917.00019', 'Draft'), ('ESCO001.C.00001.C001', 'Complet'))
         for file_name, gem_type in file_names:
-            lst_path = self.find_data(os.path.join('Gembase', 'LSTINFO', file_name + '.lst'))
+            lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', file_name + '.lst'))
             type_recieved = GembaseDB.gembase_sniffer(lst_path)
             self.assertEqual(type_recieved, gem_type)
 
     def test_gembase_complete_parser(self):
         replicon_id = 'ESCO001.C.00001.C001'
-        lst_path = self.find_data(os.path.join('Gembase', 'LSTINFO', replicon_id + '.lst'))
+        lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', replicon_id + '.lst'))
         prots_info = GembaseDB.gembase_complete_parser(lst_path, replicon_id)
         columns = ['start', 'end', 'strand', 'type', 'seq_id', 'valid', 'gene_name', 'description']
         self.assertListEqual(list(prots_info.columns), columns)
@@ -185,7 +185,7 @@ class TestGemBase(IntegronTest):
     def test_gembase_draft_parser(self):
         replicon_name = 'ACBA.0917.00019'
         replicon_id = 'ACBA.0917.00019.0001'
-        lst_path = self.find_data(os.path.join('Gembase', 'LSTINFO', replicon_name + '.lst'))
+        lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', replicon_name + '.lst'))
         prots_info = GembaseDB.gembase_draft_parser(lst_path, replicon_id)
         columns = ['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description']
         self.assertListEqual(list(prots_info.columns), columns)
@@ -314,7 +314,7 @@ class TestGemBase(IntegronTest):
         non_common_seq = seqid_from_gembase_protfile ^ seqid_from_if
         # in Gembase complete the annotation from lstinfo provided from genbank
         # it appear some times that some CDS are not translate in proteins
-        # So in data I have 3 genes from LSTINFO are not in .prt file
+        # So in data I have 3 genes from LSTINF are not in .prt file
         diff = {'ESCO001.C.00001.C001_03974', 'ESCO001.C.00001.C001_01509', 'ESCO001.C.00001.C001_04162'}
         self.assertSetEqual(non_common_seq, diff)
 
