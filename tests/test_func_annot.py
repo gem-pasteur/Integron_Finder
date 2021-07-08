@@ -439,7 +439,7 @@ class TestFuncAnnot(IntegronTest):
         """
         self.cfg._args.hmmsearch = "nimportnaoik"
         # Create integron
-        integron1 = Integron(self.replicon.name, self.cfg)
+        integron1 = Integron(self.replicon, self.cfg)
         integrons = [integron1]
         # Add only attc sites (no integrase)
         integron1.add_attC(17825, 17884, -1, 7e-9, "attc_4")
