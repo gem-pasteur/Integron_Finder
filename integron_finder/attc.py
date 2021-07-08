@@ -45,6 +45,7 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_to
     :param bool keep_palindromes: True if the palindromes must be kept in attc result, False otherwise
     :param int dist_threshold: the maximal distance between 2 elements to aggregate them
     :param int replicon_size: the replicon number of base pair
+    :param str rep_topology: the replicon topology should be 'lin' or 'circ'
     :return: a list attC sites found on replicon
     :rtype: list of :class:`pandas.DataFrame` objects
     """
