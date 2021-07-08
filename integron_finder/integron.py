@@ -132,12 +132,11 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                             intI_ac.query_name.values[i])
 
             else:  # we still have attC and int :
-                print("@@@@@@@@@@@@ integron.py L 135")
                 # Look for array of attC where intI would fall inside it
                 # array_2_split is a boolean with True when intI is within an array
-                array_2_split = [(aac.pos_beg.values[0] < intI_ac.pos_beg.values[i] and 
-                              intI_ac.pos_beg.values[i] < aac.pos_end.values[-1]) 
-                              for aac in attc_ac]
+                array_2_split = [(aac.pos_beg.values[0] < intI_ac.pos_beg.values[i] and
+                                  intI_ac.pos_beg.values[i] < aac.pos_end.values[-1])
+                                  for aac in attc_ac]
                 # get the index of those
                 tsplt = np.where(array_2_split)[0]
                 # for each of the attc array to split
@@ -156,21 +155,14 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                     distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
                                           (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
                 else:
-                    print("@@@@@@@@@@@@@@ integron.py L 143")
                     distances = np.array([abs(attc_left - intI_ac.pos_end.values[i]),
                                           abs(intI_ac.pos_beg.values[i] - attc_right)])
-                    print("@@@@@@@@@@@@@@ distances")
                     print(distances)
 
                 if attc_ac:
                     # tmp = (distances /
                     #       np.array([[len(aac) for aac in attc_ac]]))
-                    print("@@@@@@@@@@@@@@@@@ integron.py L 149")
                     side, idx_attc = np.where(distances == distances.min())
-                    print("@@@@@@@@@@@@ distances.min() =", distances.min())
-                    print("@@@@@@@@@@@@ distances == distances.min() =", distances == distances.min())
-                    print("@@@@@@@ integron.py side", side)
-                    print("@@@@@@@ integron.py idx_attc", idx_attc)
                     # side : 0 <=> left; 1 <=> right
                     # index of the closest and biggest attC array to the integrase
                     # exactly tmp = dist(cluster to integrase) / size cluster
@@ -185,12 +177,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                 else:
                     idx_attc = 0
                     side = np.argmin(distances)
-
-                print(f"@@@@@@@@@@@@ distances[side, idx_attc] distances[{side}, {idx_attc}] =", distances[side, idx_attc])
-                print(f"@@@@@@@@@@@@ distances[{side}, {idx_attc}] = {distances[side, idx_attc]} < {cfg.distance_threshold}",
-                      distances[side, idx_attc] < cfg.distance_threshold)
                 if distances[side, idx_attc] < cfg.distance_threshold:
-                    print("@@@@@@@@@@@@ integron.py L175")
                     integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
@@ -200,8 +187,6 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                                 intI_ac.query_name.values[i])
 
                     attc_tmp = attc_ac.pop(idx_attc)
-                    print("@@@@@@@@@@@@@@@ attc_tmp", attc_tmp)
-                    print("@@@@@@@@@@@@@@@ attc_ac", attc_ac)
 
                     for a_tmp in attc_tmp.values:
                         integrons[-1].add_attC(a_tmp[4],
@@ -211,7 +196,6 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                     n_attc_array -= 1
 
                 else:  # no array close to the integrase on both side
-                    print("@@@@@@@@@@@@ integron.py L194")
                     integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
                                                 intI_ac.pos_end.values[i],
@@ -450,7 +434,8 @@ class Integron(object):
                         tmp_df.index = [m.name]
                         tmp_df["distance_2attC"] = [np.nan]
                         self.promoter = self.promoter.append(tmp_df)
-
+            integrase_start = int(self.integrase.pos_beg.values[0])
+            integrase_end = int(self.integrase.pos_end.values[-1])
         ######## Promoter of K7 #########
 
         # Pc-int1
@@ -459,7 +444,7 @@ class Integron(object):
         pc = SeqIO.parse(os.path.join(self.cfg.model_dir, "variants_Pc_intI1.fst"), "fasta")
         d = {}
         for seq_rec in pc:
-            seq_len  = len(seq_rec)
+            seq_len = len(seq_rec)
             d[seq_len] = d.get(seq_len, []) + [seq_rec.seq.upper()]
 
         for k, i in d.items():
@@ -475,10 +460,10 @@ class Integron(object):
         pc_intI3.name = "Pc_int3"
         motifs_Pc.append(pc_intI3)
 
-        attc_start = int(self.attC.pos_beg.values[0])
-        attc_end = int(self.attC.pos_end.values[-1])
-        integrase_start = int(self.integrase.pos_beg.values[0])
-        integrase_end = int(self.integrase.pos_end.values[-1])
+        if not self.attC.empty:
+            attc_start = int(self.attC.pos_beg.values[0])
+            attc_end = int(self.attC.pos_end.values[-1])
+
         if self.type() == "complete":
             if self.replicon.topology == 'circ':
                 if ((attc_start - integrase_end) % self.replicon_size >
@@ -563,10 +548,13 @@ class Integron(object):
 
         motif_attI = [attI1, attI2, attI3]
 
-        attc_start = self.attC.pos_beg.values[0]
-        attc_end = self.attC.pos_end.values[-1]
-        integrase_start = self.integrase.pos_beg.values[0]
-        integrase_end = self.integrase.pos_end.values[-1]
+        if self.type() in ("CALIN", "complete"):
+            attc_start = self.attC.pos_beg.values[0]
+            attc_end = self.attC.pos_end.values[-1]
+
+        if self.type() in ("complete", "In0"):
+            integrase_start = self.integrase.pos_beg.values[0]
+            integrase_end = self.integrase.pos_end.values[-1]
 
         if self.type() == "complete":
             if self.replicon.topology == 'circ':
@@ -654,8 +642,7 @@ class Integron(object):
                 return ((window_end - prot_attr.stop) % self.replicon_size < s_int) or \
                        ((prot_attr.start - window_start) % self.replicon_size < s_int)
             else:
-                s_int = (window_end - window_start)
-                return (abs(window_end - prot_attr.stop) < s_int) or (abs(prot_attr.start - window_start) < s_int)
+                return window_start < prot_attr.stop < window_end or window_start < prot_attr.start < window_end
 
         attc_start = self.attC.pos_beg.values[0]
         attc_end = self.attC.pos_end.values[-1]
@@ -674,7 +661,7 @@ class Integron(object):
                 else:
                     window_start = self.integrase.pos_end.max()
                     window_end = attc_end + 200
-            else: #replicon is linear
+            else:  # replicon is linear
                 if attc_end < integrase_start:
                     # integrase on the right of attC cluster.
                     window_start = max(attc_start - 200, 0)
@@ -683,7 +670,7 @@ class Integron(object):
                 else:
                     # integrase on the left of attC cluster.
                     window_start = self.integrase.pos_end.max()
-                    window_end = max(attc_end + 200, self.replicon_size)
+                    window_end = min(attc_end + 200, self.replicon_size)
 
         else:
             # To allow the first protein after last attC to aggregate.
@@ -703,7 +690,6 @@ class Integron(object):
             floatcols = ["evalue", "distance_2attC"]
             self.proteins[intcols] = self.proteins[intcols].astype(int)
             self.proteins[floatcols] = self.proteins[floatcols].astype(float)
-
 
     def describe(self):
         """
