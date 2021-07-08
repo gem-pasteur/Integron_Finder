@@ -54,9 +54,8 @@ def read_infernal(infile, replicon_id, len_model_attc,
             | and each row is a hit that match the attc covariance model.
     :rtype: :class:`pandas.DataFrame` object
     """
-    _log.debug("read_infernal {}, {}, {}, evalue={}, size_max_attc={}, size_min_attc={}".format(
-        infile, replicon_id, len_model_attc, evalue, size_max_attc, size_min_attc
-    ))
+    _log.debug(f"read_infernal {infile}, {replicon_id}, {len_model_attc}, "
+               f"evalue={evalue}, size_max_attc={size_max_attc}, size_min_attc={size_min_attc}")
     dtype = {"Accession_number": "str",
              "cm_attC": "str",
              "cm_debut": "int",
@@ -64,12 +63,12 @@ def read_infernal(infile, replicon_id, len_model_attc,
              "pos_beg": "int",
              "pos_end": "int",
              "evalue": "float",
-           }
+             }
     try:
         _ = pd.read_csv(infile, comment="#", sep="\t")
     except Exception:
         df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
-                                     "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
+                                   "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         return df.astype(dtype)
 
     df = pd.read_csv(infile, sep="\s+", engine="python",  header=None,
@@ -80,13 +79,13 @@ def read_infernal(infile, replicon_id, len_model_attc,
     # seq to(8), strand(9), E-value(15)
     df.columns = ["cm_attC", "cm_debut", "cm_fin", "pos_beg_tmp", "pos_end_tmp", "sens", "evalue"]
     df["Accession_number"] = replicon_id
-    _log.debug("Before filtering on evalue {}, there were {} attC sites".format(evalue, len(df)))
+    _log.debug(f"Before filtering on evalue {evalue}, there were {len(df)} attC sites")
     df = df[df.evalue < evalue]  # filter on evalue
-    _log.debug("After filtering on evalue {}, there are now {} attC sites".format(evalue, len(df)))
+    _log.debug(f"After filtering on evalue {evalue}, there are now {len(df)} attC sites")
     df = df[(abs(df.pos_end_tmp - df.pos_beg_tmp) < size_max_attc) &
             (size_min_attc < abs(df.pos_end_tmp - df.pos_beg_tmp))]
-    _log.debug("After filtering on size max: {} and size min: {}, "
-               "there are now {} attC sites".format(size_max_attc, size_min_attc, len(df)))
+    _log.debug(f"After filtering on size max: {size_max_attc} and size min: {size_min_attc}, "
+               f"there are now {len(df)} attC sites")
     if not df.empty:
         df.sort_values(['pos_end_tmp', 'evalue'], inplace=True)
         df.index = list(range(0, len(df)))
