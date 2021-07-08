@@ -62,7 +62,7 @@ class TestSearchAttc(IntegronTest):
         attc_file = self.find_data(os.path.join("fictive_results", self.replicon_id + "_attc_table-empty.res"))
         # Construct attC dataframe (read from infernal file)
         attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
-        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size)
+        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 0)
         attc_res = []
         self.assertEqual(attc_array, attc_res)
@@ -82,7 +82,7 @@ class TestSearchAttc(IntegronTest):
         # 2 attc sites are in the same array if they are on the same strand, and separated by
         # a distance less than 4kb
 
-        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size)
+        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 1)
 
         # Construct expected output:
@@ -144,7 +144,7 @@ class TestSearchAttc(IntegronTest):
         # search attC arrays, keeping palindromes
         # 2 attc sites are in the same array if they are on the same strand, and separated by
         # a distance less than 4kb
-        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size)
+        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 2)
 
         # Construct expected outputs:
@@ -221,7 +221,7 @@ class TestSearchAttc(IntegronTest):
         # search attC arrays, keeping palindromes
         # 2 attc sites are in the same array if they are on the same strand, and separated by
         # a distance less than 4kb
-        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size)
+        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 2)
 
         # Construct expected outputs:
@@ -317,7 +317,7 @@ class TestSearchAttc(IntegronTest):
         # search attC arrays, keeping palindromes
         # 2 attc sites are in the same array if they are on the same strand, and separated by
         # a distance less than 4kb
-        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size)
+        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 3)
 
         # Construct expected outputs:
@@ -439,7 +439,7 @@ class TestSearchAttc(IntegronTest):
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_df[intcols] = attc_df[intcols].astype(int)
 
-        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size)
+        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size, 'circ')
         self.assertEqual(len(attc_array), 1)
 
         # Output of search_attc is ordered as the cluster is:
@@ -499,7 +499,7 @@ class TestSearchAttc(IntegronTest):
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_df[intcols] = attc_df[intcols].astype(int)
 
-        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size)
+        attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size, 'circ')
         self.assertEqual(len(attc_array), 1)
 
         # Output of search_attc is ordered as the cluster is:
@@ -557,7 +557,7 @@ class TestSearchAttc(IntegronTest):
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_df[intcols] = attc_df[intcols].astype(int)
 
-        attc_array = attc.search_attc(attc_df, False, self.dist_threshold, self.replicon_size)
+        attc_array = attc.search_attc(attc_df, False, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 1)
 
         # Construct expected outputs:
@@ -642,7 +642,7 @@ class TestSearchAttc(IntegronTest):
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_df[intcols] = attc_df[intcols].astype(int)
 
-        attc_array = attc.search_attc(attc_df, False, self.dist_threshold, self.replicon_size)
+        attc_array = attc.search_attc(attc_df, False, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 3)
 
         # Construct expected outputs:
