@@ -147,17 +147,14 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                     attc_ac.extend([pop.iloc[:whr_split], pop.iloc[whr_split:]])
                     n_attc_array += 1 # new attC array
 
-                print(attc_ac)
                 attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
                 attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
-                print(intI_ac.iloc[i])
                 if replicon.topology == 'circ':
                     distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
                                           (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
                 else:
                     distances = np.array([abs(attc_left - intI_ac.pos_end.values[i]),
                                           abs(intI_ac.pos_beg.values[i] - attc_right)])
-                    print(distances)
 
                 if attc_ac:
                     # tmp = (distances /
@@ -759,7 +756,8 @@ class Integron(object):
         z_order = 10
         ax.barh(np.zeros(len(full)), full.pos_end-full.pos_beg,
                 height=h, left=full.pos_beg,
-                color=colors_alpha, zorder=z_order, ec=None)  # edgecolor=ec,
+                color=colors_alpha, zorder=z_order, ec=None,
+                align="edge")  # edgecolor=ec,
         xlims = ax.get_xlim()
         for c, l in zip(["#749FCD", "#DD654B", "#6BC865", "#D06CC0", "#C3B639", "#e8950e", "#d3d3d3"],
                         ["attC", "integrase", "Promoter/attI class 1",
