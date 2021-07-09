@@ -110,7 +110,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
     # attc_ac = list of Dataframe, each have a an array of attC
-    attc_ac = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, len(replicon))
+    attc_ac = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, len(replicon), replicon.topology)
     integrons = []
 
     if not intI_ac.empty and attc_ac:
@@ -132,19 +132,33 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                             intI_ac.query_name.values[i])
 
             else:  # we still have attC and int :
+                # Look for array of attC where intI would fall inside it
+                # array_2_split is a boolean with True when intI is within an array
+                array_2_split = [(aac.pos_beg.values[0] < intI_ac.pos_beg.values[i] and
+                                  intI_ac.pos_beg.values[i] < aac.pos_end.values[-1])
+                                  for aac in attc_ac]
+                # get the index of those
+                tsplt = np.where(array_2_split)[0]
+                # for each of the attc array to split
+                # pop it, split it and add the 2 new arrays back.
+                for split in tsplt:
+                    pop = attc_ac.pop(split)
+                    whr_split = np.searchsorted(pop.pos_beg.values, intI_ac.pos_beg.values[i])
+                    attc_ac.extend([pop.iloc[:whr_split], pop.iloc[whr_split:]])
+                    n_attc_array += 1 # new attC array
+
                 attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
                 attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
-
                 if replicon.topology == 'circ':
                     distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
                                           (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
                 else:
                     distances = np.array([abs(attc_left - intI_ac.pos_end.values[i]),
                                           abs(intI_ac.pos_beg.values[i] - attc_right)])
+
                 if attc_ac:
                     # tmp = (distances /
                     #       np.array([[len(aac) for aac in attc_ac]]))
-
                     side, idx_attc = np.where(distances == distances.min())
                     # side : 0 <=> left; 1 <=> right
                     # index of the closest and biggest attC array to the integrase
@@ -160,7 +174,6 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                 else:
                     idx_attc = 0
                     side = np.argmin(distances)
-
                 if distances[side, idx_attc] < cfg.distance_threshold:
                     integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
@@ -418,16 +431,19 @@ class Integron(object):
                         tmp_df.index = [m.name]
                         tmp_df["distance_2attC"] = [np.nan]
                         self.promoter = self.promoter.append(tmp_df)
-
+            integrase_start = int(self.integrase.pos_beg.values[0])
+            integrase_end = int(self.integrase.pos_end.values[-1])
         ######## Promoter of K7 #########
 
         # Pc-int1
         motifs_Pc = []
 
         pc = SeqIO.parse(os.path.join(self.cfg.model_dir, "variants_Pc_intI1.fst"), "fasta")
-        pseq = [i for i in pc]
-        d = {len(i): [] for i in pseq}
-        _ = [d[len(i)].append(i.seq.upper()) for i in pseq]
+        d = {}
+        for seq_rec in pc:
+            seq_len = len(seq_rec)
+            d[seq_len] = d.get(seq_len, []) + [seq_rec.seq.upper()]
+
         for k, i in d.items():
             motifs_Pc.append(motifs.create(i))
             motifs_Pc[-1].name = "Pc_int1"
@@ -436,33 +452,43 @@ class Integron(object):
         # Not known
 
         # Pc-int3
-
         pc_intI3 = motifs.create([Seq.Seq("TAGACATAAGCTTTCTCGGTCTGTAGGCTGTAATG"),
                                   Seq.Seq("TAGACATAAGCTTTCTCGGTCTGTAGGATGTAATG")])
         pc_intI3.name = "Pc_int3"
         motifs_Pc.append(pc_intI3)
 
+        if not self.attC.empty:
+            attc_start = int(self.attC.pos_beg.values[0])
+            attc_end = int(self.attC.pos_end.values[-1])
+
         if self.type() == "complete":
-
-            if ((self.attC.pos_beg.values[0] - self.integrase.pos_end.values[0]) % self.replicon_size >
-                    (self.integrase.pos_beg.values[0] - self.attC.pos_end.values[-1]) % self.replicon_size):
-                # if integrase after attcs (on the right)
-                left = int(self.attC.pos_end.values[-1])
-                right = int(self.integrase.pos_beg.values[0])
-            else:
-                left = int(self.integrase.pos_end.values[-1])
-                right = int(self.attC.pos_beg.values[0])
-
+            if self.replicon.topology == 'circ':
+                if ((attc_start - integrase_end) % self.replicon_size >
+                        (integrase_start - attc_end) % self.replicon_size):
+                    # if integrase after attcs (on the right)
+                    left = attc_end
+                    right = integrase_start
+                else:
+                    left = integrase_end
+                    right = attc_start
+            else: # replicon is linear
+                if attc_end < integrase_start:
+                    # integrase on the right of attC cluster.
+                    left = attc_end
+                    right = integrase_start
+                else:
+                    left = integrase_end
+                    right = attc_start
             strand_array = self.attC.strand.unique()[0]
 
         elif self.type() == "In0":
-            left = int(self.integrase.pos_beg.values[0])
-            right = int(self.integrase.pos_end.values[-1])
+            left = integrase_start
+            right = integrase_end
             strand_array = "both"
 
         elif self.type() == "CALIN":
-            left = int(self.attC.pos_beg.values[0])
-            right = int(self.attC.pos_end.values[-1])
+            left = attc_start
+            right = attc_end
             strand_array = self.attC.strand.unique()[0]
 
         if left < right:
@@ -519,16 +545,33 @@ class Integron(object):
 
         motif_attI = [attI1, attI2, attI3]
 
-        if self.type() == "complete":
-            if ((self.attC.pos_beg.values[0] - self.integrase.pos_end.values[0]) % self.replicon_size >
-                    (self.integrase.pos_beg.values[0] - self.attC.pos_end.values[-1]) % self.replicon_size):
-                # if integrase after attcs (on the right)
+        if self.type() in ("CALIN", "complete"):
+            attc_start = self.attC.pos_beg.values[0]
+            attc_end = self.attC.pos_end.values[-1]
 
-                left = int(self.attC.pos_end.values[-1])
-                right = int(self.integrase.pos_beg.values[0])
-            else:
-                left = int(self.integrase.pos_end.values[-1])
-                right = int(self.attC.pos_beg.values[0])
+        if self.type() in ("complete", "In0"):
+            integrase_start = self.integrase.pos_beg.values[0]
+            integrase_end = self.integrase.pos_end.values[-1]
+
+        if self.type() == "complete":
+            if self.replicon.topology == 'circ':
+                if ((attc_start - integrase_end) % self.replicon_size >
+                        (integrase_start - attc_end) % self.replicon_size):
+                    # if integrase after attcs (on the right)
+                    left = attc_end
+                    right = integrase_start
+                else:
+                    left = integrase_end
+                    right = attc_start
+            else: # replicon is linear
+                if attc_end < integrase_start:
+                    # integrase on the right of attC cluster.
+                    left = attc_end
+                    right = integrase_start
+                else:
+                    left = integrase_end
+                    right = attc_start
+
             strand_array = self.attC.strand.unique()[0]
 
         elif self.type() == "In0":
@@ -536,8 +579,8 @@ class Integron(object):
             right = int(self.integrase.pos_end)
             strand_array = "both"
         elif self.type() == "CALIN":
-            left = int(self.attC.pos_beg.values[0])
-            right = int(self.attC.pos_end.values[-1])
+            left = attc_start
+            right = attc_end
             strand_array = self.attC.strand.unique()[0]
 
         if left < right:
@@ -565,7 +608,7 @@ class Integron(object):
                     tmp_df["strand"] = [strand_array] if strand_array != "both" else [sa * 2 - 1]
                     tmp_df["evalue"] = [np.nan]
                     tmp_df["type_elt"] = "attI"
-                    tmp_df["annotation"] = "attI_%s" % (m.name[-1])
+                    tmp_df["annotation"] = f"attI_{m.name[-1]}"
                     tmp_df["model"] = "NA"
                     tmp_df.index = [m.name]
                     tmp_df["distance_2attC"] = [np.nan]
@@ -577,18 +620,55 @@ class Integron(object):
         :param prot_db: The protein db corresponding to the translation of the replicon
         :type prot_db: :class:`integron.prot_db.ProteinDB` object.
         """
+
+
+        def to_add(window_start, window_end, prot_attr):
+            """
+            decide if we keep the protein or not
+
+            We keep proteins (<--->) if start (<) and end (>) follows that scheme:
+
+                 ok:            <--->         <--->
+                 ok:  <--->                                    <--->
+                          ^ 200pb v                    v 200pb ^
+                                  |------integron------|
+                                window_start                 fin
+            """
+            if self.replicon.topology == 'circ':
+                s_int = (window_end - window_start) % self.replicon_size
+                return ((window_end - prot_attr.stop) % self.replicon_size < s_int) or \
+                       ((prot_attr.start - window_start) % self.replicon_size < s_int)
+            else:
+                return window_start < prot_attr.stop < window_end or window_start < prot_attr.start < window_end
+
         attc_start = self.attC.pos_beg.values[0]
         attc_end = self.attC.pos_end.values[-1]
 
         if self.has_integrase():
-            if ((attc_start - self.integrase.pos_end.values[0]) % self.replicon_size >
-                    (self.integrase.pos_beg.values[0] - attc_end) % self.replicon_size):
-                # integrase on the right of attC cluster.
-                window_start = attc_start - 200
-                window_end = self.integrase.pos_beg.min()
-            else:
-                window_start = self.integrase.pos_end.max()
-                window_end = attc_end + 200
+        
+            integrase_start = self.integrase.pos_beg.values[0]
+            integrase_end = self.integrase.pos_end.values[-1]
+
+            if self.replicon.topology == 'circ':
+                if ((attc_start - integrase_end) % self.replicon_size >
+                        (integrase_start - attc_end) % self.replicon_size):
+                    # integrase on the right of attC cluster.
+                    window_start = attc_start - 200
+                    window_end = self.integrase.pos_beg.min()
+                else:
+                    window_start = self.integrase.pos_end.max()
+                    window_end = attc_end + 200
+            else:  # replicon is linear
+                if attc_end < integrase_start:
+                    # integrase on the right of attC cluster.
+                    window_start = max(attc_start - 200, 0)
+                    window_end = self.integrase.pos_beg.min()
+
+                else:
+                    # integrase on the left of attC cluster.
+                    window_start = self.integrase.pos_end.max()
+                    window_end = min(attc_end + 200, self.replicon_size)
+
         else:
             # To allow the first protein after last attC to aggregate.
             window_start = attc_start - 200
@@ -596,30 +676,17 @@ class Integron(object):
 
         for prot_id in prot_db:
             prot_attr = prot_db.get_description(prot_id)
-
-            s_int = (window_end - window_start) % self.replicon_size
-
-            if ((window_end - prot_attr.stop) % self.replicon_size < s_int) or \
-                    ((prot_attr.start - window_start) % self.replicon_size < s_int):
-                # We keep proteins (<--->) if start (<) and end (>) follows that scheme:
-                #
-                # ok:            <--->         <--->
-                # ok:  <--->                                    <--->
-                #          ^ 200pb v                    v 200pb ^
-                #                  |------integron------|
-                #                window_start                 fin
-
+            if to_add(window_start, window_end, prot_attr):
                 prot_annot = "protein"
                 prot_evalue = np.nan
                 prot_model = "NA"
-
                 self.proteins.loc[prot_attr.id] = [prot_attr.start, prot_attr.stop, prot_attr.strand, prot_evalue,
                                                    "protein", prot_model, np.nan, prot_annot]
+
             intcols = ["pos_beg", "pos_end", "strand"]
             floatcols = ["evalue", "distance_2attC"]
             self.proteins[intcols] = self.proteins[intcols].astype(int)
             self.proteins[floatcols] = self.proteins[floatcols].astype(float)
-
 
     def describe(self):
         """
@@ -689,7 +756,8 @@ class Integron(object):
         z_order = 10
         ax.barh(np.zeros(len(full)), full.pos_end-full.pos_beg,
                 height=h, left=full.pos_beg,
-                color=colors_alpha, zorder=z_order, ec=None)  # edgecolor=ec,
+                color=colors_alpha, zorder=z_order, ec=None,
+                align="edge")  # edgecolor=ec,
         xlims = ax.get_xlim()
         for c, l in zip(["#749FCD", "#DD654B", "#6BC865", "#D06CC0", "#C3B639", "#e8950e", "#d3d3d3"],
                         ["attC", "integrase", "Promoter/attI class 1",

@@ -36,6 +36,7 @@ import integron_finder
 
 # must be done after import 'integron_finder'
 import colorlog
+_log = None
 
 from integron_finder import IntegronError, logger_set_level
 from integron_finder import utils
@@ -60,7 +61,8 @@ def merge_integrons(out_file, *in_dirs):
         return out_file
     else:
         msg = "No integrons file to merge"
-        _log.critical(msg)
+        if _log:
+            _log.critical(msg)
         raise IntegronError(msg)
 
 

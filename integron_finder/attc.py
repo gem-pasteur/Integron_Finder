@@ -35,7 +35,7 @@ from .infernal import local_max, expand
 _log = colorlog.getLogger(__name__)
 
 
-def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
+def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_topology):
     """
     Parse the attc data set (sorted along start site) for the given replicon and return list of arrays.
     One array is composed of attC sites on the same strand and separated by a distance less than dist_threshold.
@@ -45,6 +45,7 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     :param bool keep_palindromes: True if the palindromes must be kept in attc result, False otherwise
     :param int dist_threshold: the maximal distance between 2 elements to aggregate them
     :param int replicon_size: the replicon number of base pair
+    :param str rep_topology: the replicon topology should be 'lin' or 'circ'
     :return: a list attC sites found on replicon
     :rtype: list of :class:`pandas.DataFrame` objects
     """
@@ -86,7 +87,10 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
             # array_plus is a list of np.array
             first_pos_beg = array_plus[0][0][4]
             last_pos_beg = array_plus[-1][-1][4]
-            if len(array_plus) > 1 and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
+            if len(array_plus) > 1 \
+                    and rep_topology == 'circ' \
+                    and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
+
                 array_plus[0] = np.concatenate((array_plus[-1], array_plus[0]))
                 del array_plus[-1]
 
@@ -97,9 +101,12 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
             # array_minus is a list of np.array
             first_pos_beg = array_minus[0][0][4]
             last_pos_beg = array_minus[-1][-1][4]
-            if len(array_minus) > 1 and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
+            if len(array_minus) > 1 \
+                    and rep_topology == 'circ' \
+                    and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
                 array_minus[0] = np.concatenate((array_minus[-1], array_minus[0]))
                 del array_minus[-1]
+            last_pos_beg = array_minus[-1][-1][4]
 
         tmp = array_plus + array_minus
 
