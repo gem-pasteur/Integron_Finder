@@ -124,7 +124,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
                   model_attc_path,
                   max_attc_size, min_attc_size,
                   evalue_attc=1.,
-                  circular=True, out_dir='.', cpu=1):
+                  circular=True, out_dir='.',
+                  cpu=1):
     """
     Look for attC site with cmsearch --max option which remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
@@ -210,8 +211,25 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                cpu_nb=cpu,
                                evalue_attc=evalue_attc,
                                max_attc_size=max_attc_size,
-                               min_attc_size=min_attc_size,)
-            max_elt = pd.concat([max_elt, df_max])
+                               min_attc_size=min_attc_size)
+
+            if df_max.empty:
+                _log.warning("'local_max' do not found any attC. Use attC found with regular algorithm.")
+                df_max = pd.DataFrame({
+                    'Accession_number':  [replicon.id] * len(i.attC),  # Accession_number
+                    'cm_attC': i.attC.model,  # cm_attC
+                    'cm_debut': [-1] * len(i.attC),  # cm_debut not use
+                    'cm_fin': [-1] * len(i.attC),  # cm_fin  not use
+                    'pos_beg': i.attC.pos_beg,  # pos_beg
+                    'pos_end': i.attC.pos_end,  # pos_end
+                    'sens': ['-' if strand == -1 else '+' for strand in i.attC.strand],  # sens
+                    'evalue': i.attC.evalue  # evalue
+                }
+                )
+                df_max = df_max.astype(dtype=data_type)
+
+            else:
+                max_elt = pd.concat([max_elt, df_max])
 
             # If we find new attC after the last found with default algo and if the integrase is on the left
             # (We don't expand over the integrase) :
