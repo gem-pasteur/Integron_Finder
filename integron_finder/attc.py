@@ -213,34 +213,48 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                max_attc_size=max_attc_size,
                                min_attc_size=min_attc_size)
 
-            if df_max.empty:
-                _log.warning("'local_max' do not found any attC. Use attC found with regular algorithm.")
-                df_max = pd.DataFrame({
-                    'Accession_number':  [replicon.id] * len(i.attC),  # Accession_number
-                    'cm_attC': i.attC.model,  # cm_attC
-                    'cm_debut': [-1] * len(i.attC),  # cm_debut not use
-                    'cm_fin': [-1] * len(i.attC),  # cm_fin  not use
-                    'pos_beg': i.attC.pos_beg,  # pos_beg
-                    'pos_end': i.attC.pos_end,  # pos_end
-                    'sens': ['-' if strand == -1 else '+' for strand in i.attC.strand],  # sens
-                    'evalue': i.attC.evalue  # evalue
+            previous_attc = pd.DataFrame({
+                    'Accession_number':  [replicon.id] * len(i.attC),  #
+                    'cm_attC': i.attC.model,  #
+                    'cm_debut': [-1] * len(i.attC),  # not use
+                    'cm_fin': [-1] * len(i.attC),  # not use
+                    'pos_beg': i.attC.pos_beg,
+                    'pos_end': i.attC.pos_end,
+                    'sens': ['-' if strand == -1 else '+' for strand in i.attC.strand],
+                    'evalue': i.attC.evalue
                 }
                 )
-                df_max = df_max.astype(dtype=data_type)
+            previous_attc = previous_attc.astype(dtype=data_type)
 
-            else:
-                max_elt = pd.concat([max_elt, df_max])
+            all_attc = pd.concat((previous_attc, df_max))
+            print("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%% find_attc_max complete L230 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            print("previous")
+            print(previous_attc)
+            print("=============================")
+            print("df_max")
+            print(df_max)
+            print("=============================")
+            print("all_attc")
+            print(all_attc)
+            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            all_attc.drop_duplicates(subset=['pos_beg', 'pos_end', 'sens'],
+                                     ignore_index=True,
+                                     inplace=True,
+                                     keep='last'  # keep version from df_max
+                                     )
+
+            max_elt = pd.concat([max_elt, all_attc])
 
             # If we find new attC after the last found with default algo and if the integrase is on the left
             # (We don't expand over the integrase) :
             # pos_beg - pos_end so it's the same, the distance will always be > distance_threshold
 
-            go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - df_max.pos_end.values[0]
+            go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - all_attc.pos_end.values[0]
                        ) % size_replicon < distance_threshold and not integrase_is_left
-            go_right = (df_max.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
+            go_right = (all_attc.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                         ) % size_replicon < distance_threshold and integrase_is_left
             max_elt = expand(replicon,
-                             window_beg, window_end, max_elt, df_max,
+                             window_beg, window_end, max_elt, all_attc,
                              circular, distance_threshold,
                              model_attc_path,
                              max_attc_size=max_attc_size,
@@ -261,22 +275,54 @@ def find_attc_max(integrons, replicon, distance_threshold,
                     window_beg = max(0, window_beg - distance_threshold)
                     window_end = min(size_replicon, window_end + distance_threshold)
                 strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
+
                 df_max = local_max(replicon, window_beg, window_end,
                                    model_attc_path,
                                    strand_search=strand,
                                    out_dir=out_dir, cpu_nb=cpu,
                                    evalue_attc=evalue_attc,
                                    max_attc_size=max_attc_size,
-                                   min_attc_size=min_attc_size,)
-                max_elt = pd.concat([max_elt, df_max])
+                                   min_attc_size=min_attc_size, )
+
+                previous_attc = pd.DataFrame({
+                    'Accession_number': [replicon.id] * len(i.attC),  #
+                    'cm_attC': i.attC.model,  #
+                    'cm_debut': [-1] * len(i.attC),  # not use
+                    'cm_fin': [-1] * len(i.attC),  # not use
+                    'pos_beg': i.attC.pos_beg,
+                    'pos_end': i.attC.pos_end,
+                    'sens': ['-' if strand == -1 else '+' for strand in i.attC.strand],
+                    'evalue': i.attC.evalue
+                }
+                )
+                previous_attc = previous_attc.astype(dtype=data_type)
+
+                all_attc = pd.concat((previous_attc, df_max))
+                print("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% find_attc_max CALIN L301 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                print("previous")
+                print(previous_attc)
+                print("=============================")
+                print("df_max")
+                print(df_max)
+                print("=============================")
+                print("concat")
+                print(all_attc)
+                print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                all_attc.drop_duplicates(subset=['pos_beg', 'pos_end', 'sens'],
+                                         ignore_index=True,
+                                         inplace=True,
+                                         keep='last'  # keep version from df_max
+                )
+
+                max_elt = pd.concat([max_elt, all_attc])
 
                 if not df_max.empty:  # Max can sometimes find bigger attC than permitted
-                    go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - df_max.pos_end.values[0]
+                    go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - all_attc.pos_end.values[0]
                                ) % size_replicon < distance_threshold
-                    go_right = (df_max.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
+                    go_right = (all_attc.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                                 ) % size_replicon < distance_threshold
                     max_elt = expand(replicon,
-                                     window_beg, window_end, max_elt, df_max,
+                                     window_beg, window_end, max_elt, all_attc,
                                      circular, distance_threshold,
                                      model_attc_path,
                                      max_attc_size=max_attc_size,
