@@ -97,6 +97,7 @@ def read_infernal(infile, replicon_id, len_model_attc,
         df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: x["pos_beg_tmp"] - (x["cm_debut"] - 1), axis=1)
 
         df = df[["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"]]
+        df["cm_attC"] = df["cm_attC"].str.lower()
     else:
         df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                      "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
