@@ -174,6 +174,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                 else:
                     idx_attc = 0
                     side = np.argmin(distances)
+
                 if distances[side, idx_attc] < cfg.distance_threshold:
                     integrons.append(Integron(replicon, cfg))
                     integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
@@ -184,12 +185,13 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                                 intI_ac.query_name.values[i])
 
                     attc_tmp = attc_ac.pop(idx_attc)
-
                     for a_tmp in attc_tmp.values:
-                        integrons[-1].add_attC(a_tmp[4],
-                                               a_tmp[5],
-                                               1 if a_tmp[6] == "+" else -1,
-                                               a_tmp[7], cfg.model_attc_name)
+                        integrons[-1].add_attC(a_tmp[4],  # pos_beg
+                                               a_tmp[5],  # pos_end
+                                               1 if a_tmp[6] == "+" else -1,  # sens
+                                               a_tmp[7],  # evalue
+                                               cfg.model_attc_name
+                                               )
                     n_attc_array -= 1
 
                 else:  # no array close to the integrase on both side
