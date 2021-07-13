@@ -9,65 +9,65 @@ SOURCE      .
             .
 FEATURES             Location/Qualifiers
      integron        join(17375..20301,1..1014)
-                     /integron_type="complete"
                      /integron_id="integron_01"
+                     /integron_type="complete"
      Promoter        complement(25..51)
-                     /model="NA"
                      /Promoter="Pc_int1"
+                     /model="NA"
      integrase       55..1014
-                     /model="intersection_tyr_intI"
+                     /protein_id="ACBA.007.P01_13_1"
                      /gene="intI"
+                     /model="intersection_tyr_intI"
                      /translation="MKTATAPLPPLRSVKVLDQLRERIRYLHYSLRTEQAYVNWVRAFI
                      RFHGVRHPATLGSSEVEAFLSWLANERKVSVSTHRQALAALLFFYGKVLCTDLPWLQEI
                      GRPRPSRRLPVVLTPDEVVRILGFLEGEHRLFAQLLYGTGMRISEGLQLRVKDLDFDHG
                      TIIVREGKGSKDRALMLPESLAPSLREQLSRARAWWLKDQAEGRSGVALPDALERKYPR
                      AGHSWPWFWVFAQHTHSTDPRSGVVRRHHMYDQTFQRAFKRAVEGTVAKLAMRQPFVLF
                      KGLTFQKLCLPGAFRPGDHHNKMLRPGLCVVHASPQYL*"
-                     /protein_id="ACBA.007.P01_13_1"
      CDS             complement(17375..17722)
-                     /model="RF0066"
-                     /gene="emrE"
+                     /protein_id="ACBA.007.P01_13_20"
+                     /gene="SMR_qac_E-NCBIFAM"
+                     /model="NF000276.2"
                      /translation="MKGWLFLVIAIVGEVIATSALKSSEGFTKLAPSAVVIIGYGIAFY
                      FLSLVLKSIPVGVAYAVWSGLGVVIITAIAWLLHGQKLDAWGFVGMGLIIAAFLLARSP
                      SWKSLRRPTPW*"
-                     /protein_id="ACBA.007.P01_13_20"
      attC            complement(17825..17884)
-                     /model="attc_4"
                      /attC="attc_001"
+                     /model="attc_4"
      CDS             complement(17886..18665)
-                     /model="RF0027"
-                     /gene="ANT3"
+                     /protein_id="ACBA.007.P01_13_21"
+                     /gene="ANT_3pp_AadA1-NCBIFAM"
+                     /model="NF033126.1"
                      /translation="MIAEVSTQLSEVVGVIERHLEPTLLAVHLYGSAVDGGLKPHSDID
                      LLVTVTVRLDETTRRALINDLLETSASPGESEILRAVEVTIVVHDDIIPWRYPAKRELQ
                      FGEWQRNDILAGIFEPATIDIDLAILLTKAREHSVALVGPAAEELFDPVPEQDLFEALN
                      ETLTLWNSPPDWAGDERNVVLTLSRIWYSAVTGKIAPKDVAADWAMERLPAQYQPVILE
                      ARQAYLGQEEDRLASRADQLEEFVHYVKGEITKVVGK*"
-                     /protein_id="ACBA.007.P01_13_21"
      attC            complement(18681..18749)
-                     /model="attc_4"
                      /attC="attc_002"
-     attC            complement(19079..19149)
                      /model="attc_4"
+     attC            complement(19079..19149)
                      /attC="attc_003"
+                     /model="attc_4"
      CDS             complement(19090..19749)
-                     /model="NA"
+                     /protein_id="ACBA.007.P01_13_22"
                      /gene="protein"
+                     /model="NA"
                      /translation="MISTQVPPPNNSFKPRSLRGRGVVRKNCHNAAAAKRSGLTQALGN
                      KKTDMNVRTCTESDVASIAVVFTESIHVLGASHYDASQRNAWAPRPADIEAWSARLSGL
                      QTLLAIEGDAVIGFISYELSGHIEFLYTAPGSERRGVASVLYREVEKALPGVSLFTEAS
                      LVAKPFFLRHGFSVVEEQNVSRGGVMFRRYAMRKAVVAQHGAQADRPALRAVRRLS*"
-                     /protein_id="ACBA.007.P01_13_22"
      attC            complement(19618..19726)
-                     /model="attc_4"
                      /attC="attc_004"
+                     /model="attc_4"
      CDS             complement(19721..20254)
-                     /model="RF0003"
-                     /gene="AAC3-I"
+                     /protein_id="ACBA.007.P01_13_23"
+                     /gene="AAC_3_I-NCBIFAM"
+                     /model="NF033083.0"
                      /translation="MLRSSNDVTQQGSRPKTKLGGSSMGIIRTCRLGPDQVKSMRAALD
                      LFGREFGDVATYSQHQPDSDYLGNLLRSKTFIALAAFDQEAVVGALAAYVLPKFEQARS
                      EIYIYDLAVSGEHRRQGIATALINLLKHEANALGAYVIYVQADYGDDPAVALYTKLGIR
                      EEVMHFDIDPSTAT*"
-                     /protein_id="ACBA.007.P01_13_23"
 ORIGIN
         1 tgctgcttgg atgcccgagg catagactgt acaaaaaaac agtcataaca agccatgaaa
        61 accgccactg cgccgttacc accgctgcgt tcggtcaagg ttctggacca gttgcgtgag

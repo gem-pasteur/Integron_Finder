@@ -59,6 +59,7 @@ def scan_hmm_bank(path):
     if os.path.exists(real_path):
         if os.path.isdir(real_path):
             files = glob.glob(os.path.join(real_path, '*.hmm'))
+            files.extend(glob.glob(os.path.join(real_path, '*.HMM')))
         elif os.path.isfile(real_path):
             with open(real_path) as hmm_bank:
                 wrong_lines = 0

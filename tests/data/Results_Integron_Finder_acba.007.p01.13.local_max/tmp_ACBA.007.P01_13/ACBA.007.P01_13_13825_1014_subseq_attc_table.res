@@ -9,11 +9,11 @@ ACBA.007.P01_13      -         attC_4               -          cm        1      
 ACBA.007.P01_13      -         attC_4               -          cm        1       47     2449     2398      -    no    1 0.54   0.0    6.4       6.6 ?   08-JUN-2013 20301 bp Acinetobacter baumannii MDR-ZJ06 plasmid pMDR-ZJ06, complete
 #
 # Program:         cmsearch
-# Version:         1.1.2 (July 2016)
+# Version:         1.1.3 (Nov 2019)
 # Pipeline mode:   SEARCH
 # Query file:      /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/attc_4.cm
-# Target file:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_subseq.fst
-# Option settings: cmsearch -Z 0.020301 -o /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_13825_1014_subseq_attc.res --tblout /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_13825_1014_subseq_attc_table.res -E 10 --max --bottomonly --cpu 1 /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/attc_4.cm /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_subseq.fst 
+# Target file:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_subseq.fst
+# Option settings: cmsearch -Z 0.020301 -A /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_13825_1014_subseq_attc.res --tblout /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_13825_1014_subseq_attc_table.res -E 10 --incE 1.0 --max --bottomonly --cpu 1 /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/attc_4.cm /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_subseq.fst 
 # Current dir:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder
-# Date:            Mon Mar  5 14:38:01 2018
+# Date:            Tue Jul 13 19:22:10 2021
 # [ok]

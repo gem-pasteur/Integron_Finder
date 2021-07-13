@@ -79,7 +79,12 @@ Citation:
  Identification and analysis of integrons and cassette arrays in bacterial genomes
  Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
  Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
- """.format(i_f=if_vers,
+
+ If you use --func-annot in conjunction with file NCBIfam-AMRFinder.hmm please also cite
+
+ Haft, DH et al., Nucleic Acids Res. 2018 Jan 4;46(D1):D851-D860
+ PMID: 29112715
+""".format(i_f=if_vers,
             py=sys.version.replace('\n', ' '),
             np=np_vers,
             pd=pd_vers,

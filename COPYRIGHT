@@ -4,4 +4,8 @@ by finding particular features of the integron:
   - the integrase
   - and when possible attI site and promoters.
 
-Copyright © 2016-2018 Institut Pasteur (Paris) and CNRS.
+Copyright © 2016-2021 Institut Pasteur (Paris) and CNRS.
+
+
+The file NCBIfam-AMRFinder.hmm use for annotation is released by NCBI
+and is accessible here: https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/NCBIfam-AMRFinder.LIB

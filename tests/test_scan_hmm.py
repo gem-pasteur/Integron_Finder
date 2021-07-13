@@ -92,9 +92,7 @@ class TestScanHmmBank(IntegronTest):
         Test that when the given path is a file, containing something else than path to hmm file
         it raise a ValueError
         """
-        mypath = os.path.normpath(
-            os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")
-        )
+        mypath = self.find_data(os.path.join("Replicons", 'multi_fasta.fst'))
         with self.catch_log() as log:
             with self.assertRaises(ValueError) as ctx:
                 _ = scan_hmm_bank(mypath)
@@ -113,12 +111,11 @@ class TestScanHmmBank(IntegronTest):
         hmm_paths = [os.path.join(path1, "*.hmm"),
                      os.path.join(path2, "*.hmm"),
                      ]
-        # if resfasm is not distributed by us
-        resfams = os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")
-        if not os.path.exists(resfams):
-            resfams = os.path.join(self.tmp_dir, 'Resfams.hmm')
-            open(resfams, 'w').close()
-        hmm_paths.append(resfams)
+
+        annot_fam = os.path.join(self.tmp_dir, 'annot_fam.HMM')
+        open(annot_fam, 'w').close()
+        hmm_paths.append(annot_fam)
+
         # Get all paths to include into the hmm_bank file
         abs_hmm = [os.path.abspath(path) for path in hmm_paths]
         # Write the hmm_bank file

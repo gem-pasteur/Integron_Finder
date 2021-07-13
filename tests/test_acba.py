@@ -316,8 +316,8 @@ class TestAcba(IntegronTest):
 
 
     @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
-                     "Resfams not found")
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation")),
+                     "NCBIFAM profiles not found")
     def test_acba_annot(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
@@ -346,7 +346,7 @@ class TestAcba(IntegronTest):
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
-        output_filename = os.path.join('tmp_{}'.format(replicon_id), replicon_id + '_Resfams_fa_table.res')
+        output_filename = os.path.join('tmp_{}'.format(replicon_id), replicon_id + '_NCBIfam-AMRFinder_fa_table.res')
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_filename),
                                                            output_filename))
         test_result_path = os.path.join(result_dir, output_filename)
@@ -354,8 +354,8 @@ class TestAcba(IntegronTest):
 
 
     @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
-                     "Resfams not found")
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation")),
+                     "NCBIFAM profiles not found")
     def test_acba_local_max(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
@@ -383,7 +383,7 @@ class TestAcba(IntegronTest):
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
-        output_filename = os.path.join('tmp_{}'.format(replicon_id), '{}_Resfams_fa_table.res'.format(replicon_id))
+        output_filename = os.path.join('tmp_{}'.format(replicon_id), '{}_NCBIfam-AMRFinder_fa_table.res'.format(replicon_id))
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_filename),
                                                            output_filename))
 

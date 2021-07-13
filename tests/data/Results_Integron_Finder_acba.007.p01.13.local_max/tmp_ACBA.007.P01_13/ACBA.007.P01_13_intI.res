@@ -4,9 +4,10 @@
 # Freely distributed under the GNU General Public License (GPLv3).
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # query HMM file:                  /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/integron_integrase.hmm
-# target sequence database:        /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13.prt
-# output directed to file:         /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_intI.res
-# per-seq hits tabular output:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_intI_table.res
+# target sequence database:        /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13.prt
+# output directed to file:         /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_intI.res
+# per-seq hits tabular output:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_intI_table.res
+# model-specific thresholding:     GA cutoffs
 # number of worker threads:        1
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -43,7 +44,7 @@ Passed Vit filter:                         1  (0.0434783); expected 0.0 (0.001)
 Passed Fwd filter:                         1  (0.0434783); expected 0.0 (1e-05)
 Initial search space (Z):                 23  [actual number of targets]
 Domain search space  (domZ):               1  [number of targets reported over threshold]
-# CPU time: 0.00u 0.00s 00:00:00.00 Elapsed: 00:00:00.01
-# Mc/sec: 33.50
+# CPU time: 0.00u 0.00s 00:00:00.00 Elapsed: 00:00:00.00
+# Mc/sec: inf
 //
 [ok]

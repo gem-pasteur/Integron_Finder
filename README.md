@@ -73,7 +73,7 @@ See [Developer installation](https://integronfinder.readthedocs.io/en/latest/dev
 
 * Integron Finder is developed and released under [open source licence GPLv3](https://opensource.org/licenses/GPL-3.0)
   (see COPYING file)
-* *Resfams* is provided with the courtesy of Dantas, Gautam http://www.dantaslab.org/resfams
+* *NCBIfam-AMRFinder* is provided by NCBI and accessible here: https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/NCBIfam-AMRFinder.LIB
 * The other data files:
     * *attc_4.cm*
     * *integron_integrase.hmm*
@@ -89,7 +89,7 @@ But before to do that we encourage to read [the contributing guide](CONTRIBUTING
 
 ## Dependencies
 
-- Python >=3.4
+- Python >=3.6
 - Pandas >=0.22.0
 - Numpy >=1.14.2
 - Biopython >=1.70

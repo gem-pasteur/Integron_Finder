@@ -93,6 +93,7 @@ def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue
                 hmm_out = os.path.join(out_dir, "{}_fa.res".format(name_wo_ext))
                 hmm_tableout = os.path.join(out_dir, "{}_fa_table.res".format(name_wo_ext))
                 hmm_cmd = [cfg.hmmsearch,
+                           "--cut_ga",
                            "-Z", str(prot_nb),
                            "--cpu", str(cfg.cpu),
                            "--tblout", hmm_tableout,

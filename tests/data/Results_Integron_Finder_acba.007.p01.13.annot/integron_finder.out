@@ -1,0 +1,66 @@
+
+**************************************************************************
+ ___       _                               _____ _           _
+|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __
+ | || '_ \| __/ _ \/ _` | '__/ _ \| '_ \  | |_  | | '_ \ / _` |/ _ \ '__|
+ | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |
+|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|
+                   |___/
+
+**************************************************************************
+
+integron_finder version 2-2021-07-13
+Using:    
+ - Python 3.8.10 (default, Jun 24 2021, 12:40:14)  [GCC 10.3.0]
+ - numpy 1.19.4
+ - pandas 1.1.5
+ - matplolib 3.3.3
+ - biopython 1.78
+
+Authors:
+ - Jean Cury, Bertrand Neron, Eduardo Rocha,
+
+Citation:
+
+ Identification and analysis of integrons and cassette arrays in bacterial genomes
+ Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
+ Nucleic Acids Research 2016; doi: 10.1093/nar/gkw319
+ 
+
+                     =======================
+
+integron_finder is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+integron_finder is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program (COPYING file).
+If not, see <http://www.gnu.org/licenses/>.
+
+                     =======================
+
+command used: integron_finder --func-annot --promoter-attI --gbk --keep-tmp tests/data/Replicons/acba.007.p01.13.fst
+
+                     =======================
+
+[0m
+INFO     : ############ Processing replicon ACBA.007.P01_13 (1/1) ############
+
+INFO     : Starting Default search ... :
+INFO     : Default search done... : 
+INFO     : In replicon ACBA.007.P01_13, there are:
+INFO     : - 1 complete integron(s) found with a total 3 attC site(s)
+INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Adding proteins ... :
+INFO     : Adding promoters and attI ... :
+INFO     : Starting functional annotation ...:
+INFO     : Writing out results for replicon ACBA.007.P01_13
+INFO     : Merging integrons results.
+

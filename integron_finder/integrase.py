@@ -61,6 +61,7 @@ def find_integrase(replicon_id, prot_file, out_dir, cfg):
 
     if not os.path.isfile(intI_hmm_out):
         hmm_cmd.append([cfg.hmmsearch,
+                        "--cut_ga",
                         "--cpu", str(cfg.cpu),
                         "--tblout", os.path.join(out_dir, replicon_id + "_intI_table.res"),
                         "-o", intI_hmm_out,
@@ -70,6 +71,7 @@ def find_integrase(replicon_id, prot_file, out_dir, cfg):
     phage_hmm_out = os.path.join(out_dir, replicon_id + "_phage_int.res")
     if not os.path.isfile(phage_hmm_out):
         hmm_cmd.append([cfg.hmmsearch,
+                        "--cut_ga",
                         "--cpu", str(cfg.cpu),
                         "--tblout", os.path.join(out_dir, replicon_id + "_phage_int_table.res"),
                         "-o", phage_hmm_out,
