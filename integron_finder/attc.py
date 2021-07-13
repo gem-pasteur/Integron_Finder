@@ -165,6 +165,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
     :rtype: :class:`pd.DataFrame` object
 
     """
+
+
     size_replicon = len(replicon)
     columns = ['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']
     data_type = {'Accession_number': 'str', 'cm_attC': 'str',
@@ -172,7 +174,44 @@ def find_attc_max(integrons, replicon, distance_threshold,
                  'pos_beg': 'int', 'pos_end': 'int',
                  'sens': 'str', 'evalue': 'float'
                  }
+
     max_final = pd.DataFrame(columns=columns)
+
+    def merge_previous_attc_w_local_max(integron, local_max):
+        """
+
+        :param integron:
+        :param local_max:
+        :return:
+        """
+        previous_attc = pd.DataFrame({
+            'Accession_number': [replicon.id] * len(integron.attC),
+            'cm_attC': integron.attC.model,
+            'cm_debut': [-1] * len(integron.attC),  # not use
+            'cm_fin': [-1] * len(integron.attC),  # not use
+            'pos_beg': integron.attC.pos_beg,
+            'pos_end': integron.attC.pos_end,
+            'sens': ['-' if strand == -1 else '+' for strand in integron.attC.strand],
+            'evalue': integron.attC.evalue
+            }
+        )
+        previous_attc = previous_attc.astype(dtype=data_type)
+
+        all_attc = pd.concat((previous_attc, local_max))
+        all_attc.sort_values(by=["pos_beg", "pos_end", "evalue"], inplace=True)
+        attc_init = pd.DataFrame([all_attc.iloc[0]])
+        # there is only one row in attc_init
+        attc_init["pos_beg"] = attc_init["pos_beg"] - 10
+        attc_init["pos_end"] = attc_init["pos_end"] - 10
+        # I add a first row otherwise the first row is always discarded
+        # as diff return NaN
+        all_attc = pd.concat((attc_init, all_attc), ignore_index=True)
+        all_attc = all_attc.loc[((all_attc["pos_beg"].diff().abs() > 3) |
+                                 (all_attc["pos_end"].diff().abs() > 3)) &
+                                (all_attc["sens"].eq(all_attc["sens"].shift())
+                                 )].copy()
+
+        return all_attc
 
     for i in integrons:
         max_elt = pd.DataFrame(columns=columns)
@@ -213,36 +252,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                max_attc_size=max_attc_size,
                                min_attc_size=min_attc_size)
 
-            previous_attc = pd.DataFrame({
-                    'Accession_number':  [replicon.id] * len(i.attC),  #
-                    'cm_attC': i.attC.model,  #
-                    'cm_debut': [-1] * len(i.attC),  # not use
-                    'cm_fin': [-1] * len(i.attC),  # not use
-                    'pos_beg': i.attC.pos_beg,
-                    'pos_end': i.attC.pos_end,
-                    'sens': ['-' if strand == -1 else '+' for strand in i.attC.strand],
-                    'evalue': i.attC.evalue
-                }
-                )
-            previous_attc = previous_attc.astype(dtype=data_type)
-
-            all_attc = pd.concat((previous_attc, df_max))
-            print("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%% find_attc_max complete L230 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            print("previous")
-            print(previous_attc)
-            print("=============================")
-            print("df_max")
-            print(df_max)
-            print("=============================")
-            print("all_attc")
-            print(all_attc)
-            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            all_attc.drop_duplicates(subset=['pos_beg', 'pos_end', 'sens'],
-                                     ignore_index=True,
-                                     inplace=True,
-                                     keep='last'  # keep version from df_max
-                                     )
-
+            all_attc = merge_previous_attc_w_local_max(i, df_max)
             max_elt = pd.concat([max_elt, all_attc])
 
             # If we find new attC after the last found with default algo and if the integrase is on the left
@@ -284,35 +294,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                    max_attc_size=max_attc_size,
                                    min_attc_size=min_attc_size, )
 
-                previous_attc = pd.DataFrame({
-                    'Accession_number': [replicon.id] * len(i.attC),  #
-                    'cm_attC': i.attC.model,  #
-                    'cm_debut': [-1] * len(i.attC),  # not use
-                    'cm_fin': [-1] * len(i.attC),  # not use
-                    'pos_beg': i.attC.pos_beg,
-                    'pos_end': i.attC.pos_end,
-                    'sens': ['-' if strand == -1 else '+' for strand in i.attC.strand],
-                    'evalue': i.attC.evalue
-                }
-                )
-                previous_attc = previous_attc.astype(dtype=data_type)
-
-                all_attc = pd.concat((previous_attc, df_max))
-                print("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% find_attc_max CALIN L301 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                print("previous")
-                print(previous_attc)
-                print("=============================")
-                print("df_max")
-                print(df_max)
-                print("=============================")
-                print("concat")
-                print(all_attc)
-                print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                all_attc.drop_duplicates(subset=['pos_beg', 'pos_end', 'sens'],
-                                         ignore_index=True,
-                                         inplace=True,
-                                         keep='last'  # keep version from df_max
-                )
+                all_attc = merge_previous_attc_w_local_max(i, df_max)
 
                 max_elt = pd.concat([max_elt, all_attc])
 
