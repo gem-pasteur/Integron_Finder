@@ -258,7 +258,11 @@ class TestFindAttCMax(IntegronTest):
                            )
         exp = exp.astype(dtype=self.max_dtype)
 
-        pdt.assert_frame_equal(max_final, exp)
+        cols_2_compare = ['Accession_number', 'cm_attC', 'pos_beg', 'pos_end', 'sens', 'evalue']
+        # cm_debut and cm_fin can varie depending if the data are generated with
+        # local_max or get from previous regular search (in this last case cm_debut & cm_fin are dummy)
+        pdt.assert_frame_equal(max_final[cols_2_compare], exp[cols_2_compare])
+
 
     def test_find_attc_max_In0(self):
         replicon_name = 'ESCO001.B.00018.P002'
