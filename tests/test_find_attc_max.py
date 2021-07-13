@@ -155,7 +155,7 @@ class TestFindAttCMax(IntegronTest):
                                   out_dir=self.tmp_dir)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
-                            'cm_attC': ['attC_4', 'attC_4'],
+                            'cm_attC': ['attc_4', 'attc_4'],
                             'cm_debut': [4, 1],
                             'cm_fin': [44, 47],
                             'pos_beg': [1547800, 1548775],
@@ -207,7 +207,7 @@ class TestFindAttCMax(IntegronTest):
                                   out_dir=self.tmp_dir)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
-                            'cm_attC': ['attC_4', 'attC_4'],
+                            'cm_attC': ['attc_4', 'attc_4'],
                             'cm_debut': [4, 1],
                             'cm_fin': [44, 47],
                             'pos_beg': [1547800, 1548775],
@@ -223,7 +223,6 @@ class TestFindAttCMax(IntegronTest):
 
 
     def test_find_attc_max_calin(self):
-
         attC = pd.DataFrame({'pos_beg': [421689],
                              'pos_end': [421764],
                              'strand': [1],
@@ -246,7 +245,7 @@ class TestFindAttCMax(IntegronTest):
                                   out_dir=self.tmp_dir)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001'],
-                            'cm_attC': ['attC_4'],
+                            'cm_attC': ['attc_4'],
                             'cm_debut': [1],
                             'cm_fin': [47],
                             'pos_beg': [421689],
