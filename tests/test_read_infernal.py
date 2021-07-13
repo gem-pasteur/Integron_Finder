@@ -110,15 +110,15 @@ class TestReadInfernal(IntegronTest):
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
                                 "pos_end": 17884, "sens": "-", "evalue": 1e-9},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
                                 "pos_end": 19149, "sens": "-", "evalue": 1e-4},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
                                 "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
                                ignore_index=True)
@@ -135,11 +135,11 @@ class TestReadInfernal(IntegronTest):
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_min_attc=60)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
                                 "pos_end": 19149, "sens": "-", "evalue": 1e-4},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
                                 "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
                                ignore_index=True)
@@ -156,11 +156,11 @@ class TestReadInfernal(IntegronTest):
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_max_attc=100)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
                                 "pos_end": 17884, "sens": "-", "evalue": 1e-9},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
                                 "pos_end": 19149, "sens": "-", "evalue": 1e-4},
                                ignore_index=True)
@@ -177,7 +177,7 @@ class TestReadInfernal(IntegronTest):
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, evalue=1e-8)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
                                 "pos_end": 17884, "sens": "-", "evalue": 1e-9},
                                ignore_index=True)
@@ -194,15 +194,15 @@ class TestReadInfernal(IntegronTest):
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 40, "pos_beg": 17825,
                                 "pos_end": 17891, "sens": "+", "evalue": 1e-9},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
                                 "pos_end": 19149, "sens": "+", "evalue": 1e-4},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 10, "cm_fin": 47, "pos_beg": 19609,
                                 "pos_end": 19726, "sens": "+", "evalue": 1.1e-7},
                                ignore_index=True)
@@ -219,15 +219,15 @@ class TestReadInfernal(IntegronTest):
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 40, "pos_beg": 17818,
                                 "pos_end": 17884, "sens": "-", "evalue": 1e-9},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
                                 "pos_end": 19149, "sens": "-", "evalue": 1e-4},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 10, "cm_fin": 47, "pos_beg": 19618,
                                 "pos_end": 19735, "sens": "-", "evalue": 1.1e-7},
                                ignore_index=True)
@@ -244,11 +244,11 @@ class TestReadInfernal(IntegronTest):
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_min_attc=60)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
                                 "pos_end": 19149, "sens": "-", "evalue": 1e-4},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19618,
                                 "pos_end": 19726, "sens": "-", "evalue": 1.1e-7},
                                ignore_index=True)
@@ -265,11 +265,11 @@ class TestReadInfernal(IntegronTest):
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_max_attc=100)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
                                 "pos_end": 17884, "sens": "-", "evalue": 1e-9},
                                ignore_index=True)
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 19080,
                                 "pos_end": 19149, "sens": "-", "evalue": 1e-4},
                                ignore_index=True)
@@ -286,7 +286,7 @@ class TestReadInfernal(IntegronTest):
         df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, evalue=1e-8)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
-        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attC_4",
+        expect = expect.append({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
                                 "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
                                 "pos_end": 17884, "sens": "-", "evalue": 1e-9},
                                ignore_index=True)
