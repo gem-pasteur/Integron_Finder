@@ -52,7 +52,6 @@ from integron_finder.config import Config
 from integron_finder.utils import FastaIterator
 from integron_finder.topology import Topology
 from integron_finder.attc import find_attc_max
-from integron_finder.prot_db import ProdigalDB
 
 
 class TestFindAttCMax(IntegronTest):
