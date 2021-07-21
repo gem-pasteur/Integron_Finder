@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -33,7 +33,7 @@ import argparse
 
 import numpy as np
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 
 try:
     from tests import IntegronTest
@@ -235,13 +235,17 @@ class TestResults(IntegronTest):
         dtype = {'ID_replicon': 'str',
                  'complete': 'int',
                  'In0': 'int',
-                 'CALIN': 'int'
+                 'CALIN': 'int',
+                 'topology': 'str',
+                 'size': 'int'
                  }
         res1 = pd.DataFrame({'ID_replicon': ['ACBA.007.P01_13'],
                              'complete': [1],
                              'In0': [0],
                              'CALIN': [0],
-                             }, columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
+                             'topology': ['circ'],
+                             'size': [22]
+                             }, columns=['ID_replicon', 'CALIN', 'complete', 'In0', 'topology', 'size'])
         res1 = res1.astype(dtype=dtype)
         res1 = res1.set_index('ID_replicon')
         res1.to_csv(f1, sep="\t")\
@@ -251,7 +255,9 @@ class TestResults(IntegronTest):
                              'complete': [1],
                              'In0': [0],
                              'CALIN': [5],
-                             }, columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
+                             'topology': ['circ'],
+                             'size': [44]
+                             }, columns=['ID_replicon', 'CALIN', 'complete', 'In0', 'topology', 'size'])
         res2 = res2.astype(dtype=dtype)
         res2 = res2.set_index('ID_replicon')
         res2.to_csv(f2, sep="\t")
@@ -262,12 +268,15 @@ class TestResults(IntegronTest):
 
 
     def test_summary(self):
+        # BE careful below we test the results.summary method
+        # not the generation of sumary file
+        # in summary file there are 2 extra columns topology and size
         acba_res = self.find_data('Results_Integron_Finder_acba.007.p01.13/acba.007.p01.13.integrons')
         acba_df = pd.read_csv(acba_res, sep="\t", comment="#")
         summary = results.summary(acba_df)
         dtype = {'complete': 'int',
                  'In0': 'int',
-                 'CALIN': 'int'
+                 'CALIN': 'int',
                  }
         exp = pd.DataFrame({ 'ID_replicon': ['ACBA.007.P01_13'],
                              'complete': [1],

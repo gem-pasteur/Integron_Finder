@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -37,7 +37,7 @@ import unittest
 
 import numpy as np
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 
 try:
     from tests import IntegronTest
@@ -439,7 +439,7 @@ class TestFuncAnnot(IntegronTest):
         """
         self.cfg._args.hmmsearch = "nimportnaoik"
         # Create integron
-        integron1 = Integron(self.replicon.name, self.cfg)
+        integron1 = Integron(self.replicon, self.cfg)
         integrons = [integron1]
         # Add only attc sites (no integrase)
         integron1.add_attC(17825, 17884, -1, 7e-9, "attc_4")

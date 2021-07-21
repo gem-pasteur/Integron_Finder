@@ -9,7 +9,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -36,6 +36,7 @@ import integron_finder
 
 # must be done after import 'integron_finder'
 import colorlog
+_log = None
 
 from integron_finder import IntegronError, logger_set_level
 from integron_finder import utils
@@ -60,7 +61,8 @@ def merge_integrons(out_file, *in_dirs):
         return out_file
     else:
         msg = "No integrons file to merge"
-        _log.critical(msg)
+        if _log:
+            _log.critical(msg)
         raise IntegronError(msg)
 
 

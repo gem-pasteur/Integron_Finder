@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -158,13 +158,13 @@ class TestGemBase(IntegronTest):
     def test_gembase_sniffer(self):
         file_names = (('ACBA.0917.00019', 'Draft'), ('ESCO001.C.00001.C001', 'Complet'))
         for file_name, gem_type in file_names:
-            lst_path = self.find_data(os.path.join('Gembase', 'LSTINFO', file_name + '.lst'))
+            lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', file_name + '.lst'))
             type_recieved = GembaseDB.gembase_sniffer(lst_path)
             self.assertEqual(type_recieved, gem_type)
 
     def test_gembase_complete_parser(self):
         replicon_id = 'ESCO001.C.00001.C001'
-        lst_path = self.find_data(os.path.join('Gembase', 'LSTINFO', replicon_id + '.lst'))
+        lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', replicon_id + '.lst'))
         prots_info = GembaseDB.gembase_complete_parser(lst_path, replicon_id)
         columns = ['start', 'end', 'strand', 'type', 'seq_id', 'valid', 'gene_name', 'description']
         self.assertListEqual(list(prots_info.columns), columns)
@@ -185,7 +185,7 @@ class TestGemBase(IntegronTest):
     def test_gembase_draft_parser(self):
         replicon_name = 'ACBA.0917.00019'
         replicon_id = 'ACBA.0917.00019.0001'
-        lst_path = self.find_data(os.path.join('Gembase', 'LSTINFO', replicon_name + '.lst'))
+        lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', replicon_name + '.lst'))
         prots_info = GembaseDB.gembase_draft_parser(lst_path, replicon_id)
         columns = ['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description']
         self.assertListEqual(list(prots_info.columns), columns)
@@ -280,9 +280,11 @@ class TestGemBase(IntegronTest):
         replicon.path = replicon_path
         db = GembaseDB(replicon, cfg)
 
-        idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
-                          alphabet=Seq.IUPAC.extended_protein)
-
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
+                              alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta')
         specie, date, strain, contig = replicon.id.split('.')
         pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
         self.assertListEqual(sorted([i for i in idx if re.match(pattern, i)]), sorted([i for i in db]))
@@ -299,8 +301,11 @@ class TestGemBase(IntegronTest):
         with self.catch_log():
             db = GembaseDB(replicon, cfg)
 
-        idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
-                          alphabet=Seq.IUPAC.extended_protein)
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
+                              alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta')
 
         specie, date, strain, contig = replicon.id.split('.')
         pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
@@ -309,7 +314,7 @@ class TestGemBase(IntegronTest):
         non_common_seq = seqid_from_gembase_protfile ^ seqid_from_if
         # in Gembase complete the annotation from lstinfo provided from genbank
         # it appear some times that some CDS are not translate in proteins
-        # So in data I have 3 genes from LSTINFO are not in .prt file
+        # So in data I have 3 genes from LSTINF are not in .prt file
         diff = {'ESCO001.C.00001.C001_03974', 'ESCO001.C.00001.C001_01509', 'ESCO001.C.00001.C001_04162'}
         self.assertSetEqual(non_common_seq, diff)
 
@@ -504,8 +509,11 @@ class TestProdigalDB(IntegronTest):
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
-        idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta',
-                          alphabet=Seq.IUPAC.extended_protein)
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta',
+                               alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta')
         for exp_seq_id, get_seq_id in zip(idx, db):
             self.assertEqual(exp_seq_id, get_seq_id)
 

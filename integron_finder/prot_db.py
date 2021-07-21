@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -98,7 +98,14 @@ class ProteinDB(ABC):
         """
         :return: an index of the sequence contains in protfile corresponding to the replicon
         """
-        return SeqIO.index(self._prot_file, "fasta", alphabet=Seq.IUPAC.extended_protein)
+        try:
+            alphabet = alphabet=Seq.IUPAC.extended_protein
+            idx = SeqIO.index(self._prot_file, "fasta", alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            alphabet = None
+            idx = SeqIO.index(self._prot_file, "fasta")
+        return idx
+
 
     @abstractmethod
     def get_description(self, gene_id):
@@ -183,7 +190,9 @@ class GembaseDB(ProteinDB):
         :return: the gemabse basename corresponding to the input file
         :rtype: string
         """
-        lst_dir_path = os.path.join(gembase_path, 'LSTINFO')
+        lst_dir_path = os.path.join(gembase_path, 'LSTINF')
+        if not os.path.exists(lst_dir_path):
+            raise IntegronError("LSTINF directory nout found.")
         gembase_file_basename = os.path.splitext(os.path.basename(input_seq_path))[0]
         # when IF is run through nextflow & parallel_integron_finder
         # the input data is split the name of the chunks can vary
@@ -222,7 +231,11 @@ class GembaseDB(ProteinDB):
         :rtype: str
         """
         all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._gembase_file_basename + '.prt')
-        all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
+        try:
+            alphabet=Seq.IUPAC.extended_protein
+            all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            all_prots = SeqIO.index(all_prot_path, "fasta")
         if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
             os.makedirs(self.cfg.tmp_dir(self.replicon.id))
         prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')
@@ -232,7 +245,7 @@ class GembaseDB(ProteinDB):
                     seq = all_prots[seq_id]
                     SeqIO.write(seq, prot_file, 'fasta')
                 except KeyError:
-                    _log.warning('Sequence describe in LSTINFO file {} is not present in {}'.format(seq_id, all_prot_path))
+                    _log.warning('Sequence describe in LSTINF file {} is not present in {}'.format(seq_id, all_prot_path))
         return prot_file_path
 
 
@@ -319,7 +332,9 @@ class GembaseDB(ProteinDB):
         :return:
         """
 
-        lst_path = os.path.join(self._gembase_path, 'LSTINFO', self._gembase_file_basename + '.lst')
+        lst_path = os.path.join(self._gembase_path, 'LSTINF', self._gembase_file_basename + '.lst')
+        if not os.path.exists(lst_path):
+            raise IntegronError("LSTINF directory nout found.")
         gembase_type = self.gembase_sniffer(lst_path)
         if gembase_type == 'Draft':
             prots_info = self.gembase_draft_parser(lst_path, self.replicon.id)

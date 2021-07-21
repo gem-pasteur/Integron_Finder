@@ -1,2 +1,3 @@
-ID_replicon	CALIN	complete	In0
-ACBA.007.P01_13	1	0	1
+# cmd: integron_finder --linear tests/data/Replicons/acba.007.p01.13.fst --keep-tmp 
+ID_replicon	CALIN	complete	In0	topology	size
+ACBA.007.P01_13	1	0	1	lin	20301

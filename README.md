@@ -1,4 +1,4 @@
-[![install](https://img.shields.io/github/downloads/gem-pasteur/Integron_finder/total.svg)](https://github.com/gem-pasteur/Integron_Finder/releases/latest) [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest) [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) [![Build Status](https://travis-ci.org/gem-pasteur/Integron_Finder.svg?branch=master)](https://travis-ci.org/gem-pasteur/Integron_Finder)
+[![Downloads](https://pepy.tech/badge/integron-finder)](https://github.com/gem-pasteur/Integron_Finder/releases/latest) [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest) [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) [![Build Status](https://travis-ci.org/gem-pasteur/Integron_Finder.svg?branch=master)](https://travis-ci.org/gem-pasteur/Integron_Finder)
 
 # Integron Finder
 
@@ -73,7 +73,7 @@ See [Developer installation](https://integronfinder.readthedocs.io/en/latest/dev
 
 * Integron Finder is developed and released under [open source licence GPLv3](https://opensource.org/licenses/GPL-3.0)
   (see COPYING file)
-* *Resfams* is provided with the courtesy of Dantas, Gautam http://www.dantaslab.org/resfams
+* *NCBIfam-AMRFinder* is provided by NCBI and accessible here: https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/NCBIfam-AMRFinder.LIB
 * The other data files:
     * *attc_4.cm*
     * *integron_integrase.hmm*
@@ -89,7 +89,7 @@ But before to do that we encourage to read [the contributing guide](CONTRIBUTING
 
 ## Dependencies
 
-- Python >=3.4
+- Python >=3.6
 - Pandas >=0.22.0
 - Numpy >=1.14.2
 - Biopython >=1.70
@@ -226,7 +226,7 @@ The paper is published in Nucleic Acid Research.
 
 **Identification and analysis of integrons and cassette arrays in bacterial genomes**
 Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
-*Nucleic Acids Research 2016; [doi: 10.1093/nar/gkw319](http://nar.oxfordjournals.org/cgi/content/full/gkw319)*
+*Nucleic Acids Research 2016; [doi: 10.1093/nar/gkw319](https://academic.oup.com/nar/article/44/10/4539/2516972)*
 
  Please cite also the following articles:
 

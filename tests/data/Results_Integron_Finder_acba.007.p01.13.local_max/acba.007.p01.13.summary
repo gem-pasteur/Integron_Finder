@@ -1,0 +1,3 @@
+# cmd: integron_finder --func-annot --local-max --gbk --keep-tmp --promoter-attI tests/data/Replicons/acba.007.p01.13.fst
+ID_replicon	CALIN	complete	In0	topology	size
+ACBA.007.P01_13	0	1	0	circ	20301

@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -33,7 +33,7 @@ import argparse
 import unittest
 
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 
 # from Bio import BiopythonExperimentalWarning
 # import warnings
@@ -124,7 +124,7 @@ class TestAcba(IntegronTest):
         :return:
         """
         seq_replicon_filename = 'ACBA.0917.00019'
-        seq_output_dir = 'Results_Integron_Finder_{}'.format(seq_replicon_filename)
+        seq_output_dir = f'Results_Integron_Finder_{seq_replicon_filename}'
         seq_test_result_dir = os.path.join(self.out_dir, seq_output_dir)
         seq_cmd = "integron_finder --outdir {out_dir} " \
                   "--keep-tmp {replicon}".format(out_dir=self.out_dir,
@@ -164,8 +164,8 @@ class TestAcba(IntegronTest):
         summary_2nd_contig = seq_summary.loc[seq_summary['ID_replicon'] == 'ACBA.0917.00019.0002']
         # the index are different 0/1 so I fix this by indexing by 'ID_replicon'
         summary_2nd_contig.set_index(['ID_replicon'], inplace=True)
-        iso_summary = pd.DataFrame([['ACBA.0917.00019.0002', 0, 0, 0]],
-                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
+        iso_summary = pd.DataFrame([['ACBA.0917.00019.0002', 0, 0, 0, 'lin', 8729]],
+                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0', 'topology', 'size'])
         iso_summary.set_index(['ID_replicon'], inplace=True)
         pdt.assert_frame_equal(summary_2nd_contig, iso_summary)
 
@@ -316,8 +316,8 @@ class TestAcba(IntegronTest):
 
 
     @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
-                     "Resfams not found")
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation")),
+                     "NCBIFAM profiles not found")
     def test_acba_annot(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
@@ -346,7 +346,7 @@ class TestAcba(IntegronTest):
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
-        output_filename = os.path.join('tmp_{}'.format(replicon_id), replicon_id + '_Resfams_fa_table.res')
+        output_filename = os.path.join('tmp_{}'.format(replicon_id), replicon_id + '_NCBIfam-AMRFinder_fa_table.res')
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.annot'.format(replicon_filename),
                                                            output_filename))
         test_result_path = os.path.join(result_dir, output_filename)
@@ -354,8 +354,8 @@ class TestAcba(IntegronTest):
 
 
     @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
-                     "Resfams not found")
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation")),
+                     "NCBIFAM profiles not found")
     def test_acba_local_max(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
@@ -383,7 +383,7 @@ class TestAcba(IntegronTest):
         test_result_path = os.path.join(result_dir, output_filename)
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
-        output_filename = os.path.join('tmp_{}'.format(replicon_id), '{}_Resfams_fa_table.res'.format(replicon_id))
+        output_filename = os.path.join('tmp_{}'.format(replicon_id), '{}_NCBIfam-AMRFinder_fa_table.res'.format(replicon_id))
         expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.local_max'.format(replicon_filename),
                                                            output_filename))
 

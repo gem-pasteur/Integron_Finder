@@ -35,7 +35,7 @@ from .infernal import local_max, expand
 _log = colorlog.getLogger(__name__)
 
 
-def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
+def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_topology):
     """
     Parse the attc data set (sorted along start site) for the given replicon and return list of arrays.
     One array is composed of attC sites on the same strand and separated by a distance less than dist_threshold.
@@ -45,6 +45,7 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
     :param bool keep_palindromes: True if the palindromes must be kept in attc result, False otherwise
     :param int dist_threshold: the maximal distance between 2 elements to aggregate them
     :param int replicon_size: the replicon number of base pair
+    :param str rep_topology: the replicon topology should be 'lin' or 'circ'
     :return: a list attC sites found on replicon
     :rtype: list of :class:`pandas.DataFrame` objects
     """
@@ -86,7 +87,10 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
             # array_plus is a list of np.array
             first_pos_beg = array_plus[0][0][4]
             last_pos_beg = array_plus[-1][-1][4]
-            if len(array_plus) > 1 and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
+            if len(array_plus) > 1 \
+                    and rep_topology == 'circ' \
+                    and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
+
                 array_plus[0] = np.concatenate((array_plus[-1], array_plus[0]))
                 del array_plus[-1]
 
@@ -97,9 +101,12 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size):
             # array_minus is a list of np.array
             first_pos_beg = array_minus[0][0][4]
             last_pos_beg = array_minus[-1][-1][4]
-            if len(array_minus) > 1 and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
+            if len(array_minus) > 1 \
+                    and rep_topology == 'circ' \
+                    and (first_pos_beg - last_pos_beg) % replicon_size < dist_threshold:
                 array_minus[0] = np.concatenate((array_minus[-1], array_minus[0]))
                 del array_minus[-1]
+            last_pos_beg = array_minus[-1][-1][4]
 
         tmp = array_plus + array_minus
 
@@ -117,7 +124,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
                   model_attc_path,
                   max_attc_size, min_attc_size,
                   evalue_attc=1.,
-                  circular=True, out_dir='.', cpu=1):
+                  circular=True, out_dir='.',
+                  cpu=1):
     """
     Look for attC site with cmsearch --max option which remove all heuristic filters.
     As this option make the algorithm way slower, we only run it in the region around a
@@ -157,6 +165,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
     :rtype: :class:`pd.DataFrame` object
 
     """
+
+
     size_replicon = len(replicon)
     columns = ['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']
     data_type = {'Accession_number': 'str', 'cm_attC': 'str',
@@ -164,7 +174,44 @@ def find_attc_max(integrons, replicon, distance_threshold,
                  'pos_beg': 'int', 'pos_end': 'int',
                  'sens': 'str', 'evalue': 'float'
                  }
+
     max_final = pd.DataFrame(columns=columns)
+
+    def merge_previous_attc_w_local_max(integron, local_max):
+        """
+
+        :param integron:
+        :param local_max:
+        :return:
+        """
+        previous_attc = pd.DataFrame({
+            'Accession_number': [replicon.id] * len(integron.attC),
+            'cm_attC': integron.attC.model,
+            'cm_debut': [-1] * len(integron.attC),  # not use
+            'cm_fin': [-1] * len(integron.attC),  # not use
+            'pos_beg': integron.attC.pos_beg,
+            'pos_end': integron.attC.pos_end,
+            'sens': ['-' if strand == -1 else '+' for strand in integron.attC.strand],
+            'evalue': integron.attC.evalue
+            }
+        )
+        previous_attc = previous_attc.astype(dtype=data_type)
+
+        all_attc = pd.concat((previous_attc, local_max))
+        all_attc.sort_values(by=["pos_beg", "pos_end", "evalue"], inplace=True)
+        attc_init = pd.DataFrame([all_attc.iloc[0]])
+        # there is only one row in attc_init
+        attc_init["pos_beg"] = attc_init["pos_beg"] - 10
+        attc_init["pos_end"] = attc_init["pos_end"] - 10
+        # I add a first row otherwise the first row is always discarded
+        # as diff return NaN
+        all_attc = pd.concat((attc_init, all_attc), ignore_index=True)
+        all_attc = all_attc.loc[((all_attc["pos_beg"].diff().abs() > 3) |
+                                 (all_attc["pos_end"].diff().abs() > 3)) &
+                                (all_attc["sens"].eq(all_attc["sens"].shift())
+                                 )].copy()
+
+        return all_attc
 
     for i in integrons:
         max_elt = pd.DataFrame(columns=columns)
@@ -203,19 +250,21 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                cpu_nb=cpu,
                                evalue_attc=evalue_attc,
                                max_attc_size=max_attc_size,
-                               min_attc_size=min_attc_size,)
-            max_elt = pd.concat([max_elt, df_max])
+                               min_attc_size=min_attc_size)
+
+            all_attc = merge_previous_attc_w_local_max(i, df_max)
+            max_elt = pd.concat([max_elt, all_attc])
 
             # If we find new attC after the last found with default algo and if the integrase is on the left
             # (We don't expand over the integrase) :
             # pos_beg - pos_end so it's the same, the distance will always be > distance_threshold
 
-            go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - df_max.pos_end.values[0]
+            go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - all_attc.pos_end.values[0]
                        ) % size_replicon < distance_threshold and not integrase_is_left
-            go_right = (df_max.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
+            go_right = (all_attc.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                         ) % size_replicon < distance_threshold and integrase_is_left
             max_elt = expand(replicon,
-                             window_beg, window_end, max_elt, df_max,
+                             window_beg, window_end, max_elt, all_attc,
                              circular, distance_threshold,
                              model_attc_path,
                              max_attc_size=max_attc_size,
@@ -236,22 +285,26 @@ def find_attc_max(integrons, replicon, distance_threshold,
                     window_beg = max(0, window_beg - distance_threshold)
                     window_end = min(size_replicon, window_end + distance_threshold)
                 strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
+
                 df_max = local_max(replicon, window_beg, window_end,
                                    model_attc_path,
                                    strand_search=strand,
                                    out_dir=out_dir, cpu_nb=cpu,
                                    evalue_attc=evalue_attc,
                                    max_attc_size=max_attc_size,
-                                   min_attc_size=min_attc_size,)
-                max_elt = pd.concat([max_elt, df_max])
+                                   min_attc_size=min_attc_size, )
+
+                all_attc = merge_previous_attc_w_local_max(i, df_max)
+
+                max_elt = pd.concat([max_elt, all_attc])
 
                 if not df_max.empty:  # Max can sometimes find bigger attC than permitted
-                    go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - df_max.pos_end.values[0]
+                    go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - all_attc.pos_end.values[0]
                                ) % size_replicon < distance_threshold
-                    go_right = (df_max.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
+                    go_right = (all_attc.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                                 ) % size_replicon < distance_threshold
                     max_elt = expand(replicon,
-                                     window_beg, window_end, max_elt, df_max,
+                                     window_beg, window_end, max_elt, all_attc,
                                      circular, distance_threshold,
                                      model_attc_path,
                                      max_attc_size=max_attc_size,

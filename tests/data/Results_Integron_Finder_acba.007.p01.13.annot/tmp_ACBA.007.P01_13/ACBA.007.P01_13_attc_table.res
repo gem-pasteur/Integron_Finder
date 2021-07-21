@@ -5,11 +5,11 @@ ACBA.007.P01_13      -         attC_4               -          cm        1      
 ACBA.007.P01_13      -         attC_4               -          cm        1       47    19149    19080      -    no    1 0.69   0.0   26.6    0.0001 !   08-JUN-2013 20301 bp Acinetobacter baumannii MDR-ZJ06 plasmid pMDR-ZJ06, complete
 #
 # Program:         cmsearch
-# Version:         1.1.1 (July 2014)
+# Version:         1.1.3 (Nov 2019)
 # Pipeline mode:   SEARCH
-# Query file:      /home/bneron/Projects/Integron_Finder/data/Models/attc_4.cm
-# Target file:     /home/bneron/Projects/Integron_Finder/tests/data/acba.007.p01.13.fst
-# Option settings: /home/bneron/Sys/bin/cmsearch -o /tmp/integron_lian_test/Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc.res --tblout /tmp/integron_lian_test/Results_Integron_Finder_acba.007.p01.13/other/acba.007.p01.13_attc_table.res -E 10 --cpu 1 /home/bneron/Projects/Integron_Finder/data/Models/attc_4.cm /home/bneron/Projects/Integron_Finder/tests/data/acba.007.p01.13.fst 
-# Current dir:     /home/bneron/Projects/Integron_Finder
-# Date:            Thu Dec 22 10:32:04 2016
+# Query file:      /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/attc_4.cm
+# Target file:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13.fst
+# Option settings: /home/bneron/Projects/GEM/Integron_Finder/py38/bin/cmsearch -A /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_attc.res --tblout /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13_attc_table.res -E 10 --incE 1.0 --cpu 1 /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/data/Models/attc_4.cm /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/Results_Integron_Finder_acba.007.p01.13/tmp_ACBA.007.P01_13/ACBA.007.P01_13.fst 
+# Current dir:     /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder
+# Date:            Tue Jul 13 19:09:57 2021
 # [ok]

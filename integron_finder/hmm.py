@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -59,6 +59,7 @@ def scan_hmm_bank(path):
     if os.path.exists(real_path):
         if os.path.isdir(real_path):
             files = glob.glob(os.path.join(real_path, '*.hmm'))
+            files.extend(glob.glob(os.path.join(real_path, '*.HMM')))
         elif os.path.isfile(real_path):
             with open(real_path) as hmm_bank:
                 wrong_lines = 0

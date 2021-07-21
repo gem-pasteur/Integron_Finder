@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -33,7 +33,7 @@ import argparse
 
 import numpy as np
 import pandas as pd
-import pandas.util.testing as pdt
+import pandas.testing as pdt
 
 # # display warning only for non installed integron_finder
 # from Bio import BiopythonExperimentalWarning
@@ -52,7 +52,6 @@ from integron_finder.config import Config
 from integron_finder.utils import FastaIterator
 from integron_finder.topology import Topology
 from integron_finder.attc import find_attc_max
-from integron_finder.prot_db import ProdigalDB
 
 
 class TestFindAttCMax(IntegronTest):
@@ -156,7 +155,7 @@ class TestFindAttCMax(IntegronTest):
                                   out_dir=self.tmp_dir)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
-                            'cm_attC': ['attC_4', 'attC_4'],
+                            'cm_attC': ['attc_4', 'attc_4'],
                             'cm_debut': [4, 1],
                             'cm_fin': [44, 47],
                             'pos_beg': [1547800, 1548775],
@@ -208,7 +207,7 @@ class TestFindAttCMax(IntegronTest):
                                   out_dir=self.tmp_dir)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001', 'OBAL001.B.00005.C001'],
-                            'cm_attC': ['attC_4', 'attC_4'],
+                            'cm_attC': ['attc_4', 'attc_4'],
                             'cm_debut': [4, 1],
                             'cm_fin': [44, 47],
                             'pos_beg': [1547800, 1548775],
@@ -224,7 +223,6 @@ class TestFindAttCMax(IntegronTest):
 
 
     def test_find_attc_max_calin(self):
-
         attC = pd.DataFrame({'pos_beg': [421689],
                              'pos_end': [421764],
                              'strand': [1],
@@ -247,7 +245,7 @@ class TestFindAttCMax(IntegronTest):
                                   out_dir=self.tmp_dir)
 
         exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001'],
-                            'cm_attC': ['attC_4'],
+                            'cm_attC': ['attc_4'],
                             'cm_debut': [1],
                             'cm_fin': [47],
                             'pos_beg': [421689],
@@ -260,7 +258,11 @@ class TestFindAttCMax(IntegronTest):
                            )
         exp = exp.astype(dtype=self.max_dtype)
 
-        pdt.assert_frame_equal(max_final, exp)
+        cols_2_compare = ['Accession_number', 'cm_attC', 'pos_beg', 'pos_end', 'sens', 'evalue']
+        # cm_debut and cm_fin can varie depending if the data are generated with
+        # local_max or get from previous regular search (in this last case cm_debut & cm_fin are dummy)
+        pdt.assert_frame_equal(max_final[cols_2_compare], exp[cols_2_compare])
+
 
     def test_find_attc_max_In0(self):
         replicon_name = 'ESCO001.B.00018.P002'

@@ -1,2 +1,3 @@
-ID_replicon	complete	In0	CALIN
-PSSU.001.C01_13	1	0	1
+# cmd: integron_finder --gbk --pdf --keep-tmp --promoter-attI --lin --local-max tests/data/Replicons/pssu.001.c01.13.fst
+ID_replicon	CALIN	complete	In0	topology	size
+PSSU.001.C01_13	1	1	0	lin	3419049

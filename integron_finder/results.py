@@ -6,7 +6,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -26,7 +26,7 @@
 
 import colorlog
 import pandas as pd
-from pandas.io.common import EmptyDataError
+from pandas.errors import EmptyDataError
 
 _log = colorlog.getLogger(__name__)
 
@@ -86,7 +86,10 @@ def merge_results(*results_file):
         all_res.append(res)
     if all_res:
         agg_results = pd.concat(all_res, sort=False)
-        if agg_results.shape[1] == 4:  # it's a summary file
+        if agg_results.shape[1] == 6 or agg_results.shape[1] == 4:
+            # it's a summary file
+            # 4 fields old Integron finder
+            # 6 fields new Integron finder (2 new cols 'topology' and 'size')
             agg_results = agg_results.set_index('ID_replicon')
     else:
         agg_results = pd.DataFrame(columns=['ID_integron', 'ID_replicon', 'element',

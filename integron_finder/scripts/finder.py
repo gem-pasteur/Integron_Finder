@@ -9,7 +9,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -392,15 +392,19 @@ def find_integron_in_one_replicon(replicon, config):
             integrons_report = results.integrons_report(integrons)
             integrons_report.to_csv(integron_file, sep="\t", index=False, na_rep="NA")
             summary = results.summary(integrons_report)
+            summary['topology'] = [replicon.topology]
+            summary['size'] = [len(replicon)]
             if config.gbk:
                 add_feature(replicon, integrons_report, protein_db, config.distance_threshold)
                 SeqIO.write(replicon, os.path.join(config.result_dir, replicon.id + ".gbk"), "genbank")
         else:
             with open(integron_file, "w") as out_f:
                 out_f.write("# No Integron found\n")
-            summary = pd.DataFrame([[replicon.id, 0, 0, 0]],
-                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0'])
+            summary = pd.DataFrame([[replicon.id, 0, 0, 0, replicon.topology, len(replicon)]],
+                                   columns=['ID_replicon', 'CALIN', 'complete', 'In0', 'topology', 'size'])
             summary = summary.set_index(['ID_replicon'])
+        # summary_file is a temporary file
+        # all summaries are merged in results.merge_results function
         summary.to_csv(summary_file, sep="\t", na_rep="NA")
 
     except integron_finder.EmptyFileError as err:
