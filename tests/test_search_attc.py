@@ -511,11 +511,13 @@ class TestSearchAttc(IntegronTest):
         pdt.assert_frame_equal(attc_df, attc_array[0])
 
 
-    def test_search_attc_drop_pal(self):
+    def test_search_attc_drop_palindrome(self):
         """
         If there is 1 palindrome attC, check that it keeps the one with the highest evalue,
         and that clusters are then found according to it.
         """
+        # the attc sites which have more than 50% overlap be de duplicated
+        # keep one with the highest evalue
         attc_df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
                                         "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
         attc_df = attc_df.append({"Accession_number": self.replicon_id,
@@ -531,9 +533,9 @@ class TestSearchAttc(IntegronTest):
                                   "cm_attC": "attc_4",
                                   "cm_debut": 1,
                                   "cm_fin": 47,
-                                  "pos_beg": 3000,
+                                  "pos_beg": 3001,
                                   "pos_end": 4000,
-                                  "sens": "-",
+                                  "sens": "+",
                                   "evalue": 1e-4},
                                  ignore_index=True)
         attc_df = attc_df.append({"Accession_number": self.replicon_id,
@@ -552,14 +554,40 @@ class TestSearchAttc(IntegronTest):
                                   "pos_beg": 5500,
                                   "pos_end": 7000,
                                   "sens": "+",
-                                  "evalue": 1.1e-7},
+                                  "evalue": 1e-7},
+                                 ignore_index=True)
+        attc_df = attc_df.append({"Accession_number": self.replicon_id,
+                                  "cm_attC": "attc_4",
+                                  "cm_debut": 1,
+                                  "cm_fin": 47,
+                                  "pos_beg": 5500,
+                                  "pos_end": 7001,
+                                  "sens": "+",
+                                  "evalue": 1e-4},
+                                 ignore_index=True)
+        attc_df = attc_df.append({"Accession_number": self.replicon_id,
+                                  "cm_attC": "attc_4",
+                                  "cm_debut": 1,
+                                  "cm_fin": 47,
+                                  "pos_beg": 6300,
+                                  "pos_end": 7750,
+                                  "sens": "+",
+                                  "evalue": 1e-6},
+                                 ignore_index=True)
+        attc_df = attc_df.append({"Accession_number": self.replicon_id,
+                                  "cm_attC": "attc_4",
+                                  "cm_debut": 1,
+                                  "cm_fin": 47,
+                                  "pos_beg": 7000,
+                                  "pos_end": 8000,
+                                  "sens": "+",
+                                  "evalue": 1e-6},
                                  ignore_index=True)
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_df[intcols] = attc_df[intcols].astype(int)
 
         attc_array = attc.search_attc(attc_df, False, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 1)
-
         # Construct expected outputs:
         attc_res = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
                                          "pos_beg", "pos_end", "sens", "evalue"])
@@ -588,18 +616,25 @@ class TestSearchAttc(IntegronTest):
                                     "pos_beg": 5500,
                                     "pos_end": 7000,
                                     "sens": "+",
-                                    "evalue": 1.1e-7},
+                                    "evalue": 1e-7},
                                    ignore_index=True)
-
+        attc_res = attc_res.append({"Accession_number": self.replicon_id,
+                                    "cm_attC": "attc_4",
+                                    "cm_debut": 1,
+                                    "cm_fin": 47,
+                                    "pos_beg": 7000,
+                                    "pos_end": 8000,
+                                    "sens": "+",
+                                    "evalue": 1e-6},
+                                    ignore_index=True)
         attc_res[intcols] = attc_res[intcols].astype(int)
         attc_array[0].reset_index(inplace=True, drop=True)
         pdt.assert_frame_equal(attc_res, attc_array[0])
 
 
-    def test_search_attc_drop_pal_break(self):
+    def test_search_attc_cluster_according_strand(self):
         """
-        If there is 1 palindrome attC, check that it keeps the one with the highest evalue,
-        and that clusters are then found according to it.
+        tests if attc sites are clustered according the strand
         """
         attc_df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
                                         "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
@@ -627,7 +662,7 @@ class TestSearchAttc(IntegronTest):
                                   "cm_fin": 47,
                                   "pos_beg": 3000,
                                   "pos_end": 4000,
-                                  "sens": "+",
+                                  "sens": "+",  # this make that we get 3 clusters
                                   "evalue": 1e-9},
                                  ignore_index=True)
         attc_df = attc_df.append({"Accession_number": self.replicon_id,
@@ -644,7 +679,6 @@ class TestSearchAttc(IntegronTest):
 
         attc_array = attc.search_attc(attc_df, False, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 3)
-
         # Construct expected outputs:
         columns = ["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg",
                    "pos_end", "sens", "evalue"]
