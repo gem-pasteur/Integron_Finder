@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2018  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -49,6 +49,30 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_to
     :return: a list attC sites found on replicon
     :rtype: list of :class:`pandas.DataFrame` objects
     """
+    def overlap(attc1, attc2):
+        """
+        compare two attc sites (attc2 must start at smae position or after attc1)
+        and remove attc sites which overlap more than 50%
+        keep the one with lower evalue
+
+        :param attc1: the first attc to compare
+        :type attc1: pandas.Series with fields
+                     "Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"
+        :param attc2: the second attc to compare
+        :type attc2: pandas.Series with fields
+                     "Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"
+        :return: a tuple of attc (pandas Series)
+        """
+        if attc2.pos_beg >= attc1.pos_end:
+            return attc1, attc2
+        else:
+            attc_1_len = attc1.pos_end - attc1.pos_beg
+            overlap = min(attc1.pos_end, attc2.pos_end) - attc2.pos_beg # by def attc_2.pos_beg >= attc_1.pos_beg
+            ratio = overlap / attc_1_len
+            if ratio > .5:
+                return (attc1, ) if attc1.evalue < attc2.evalue else (attc2, )
+            else:
+                return attc1, attc2
     ok = False
 
     position_bkp_minus = []
@@ -58,7 +82,13 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_to
     attc_minus = attc_df[attc_df.sens == "-"].copy()
 
     if not keep_palindromes:
-        attc_df = attc_df.sort_values(["pos_beg", "evalue"]).drop_duplicates(subset="pos_beg", keep=False).drop_duplicates(subset="pos_end").copy()
+        attc_df.sort_values(by=["pos_beg", "pos_end", "evalue"], inplace=True)
+        if not attc_df.empty:
+            attc_to_keep = [attc_df.iloc[0]]
+            for row_idx in range(1, len(attc_df)):
+                previous_attc = attc_to_keep.pop()
+                attc_to_keep.extend(overlap(previous_attc, attc_df.iloc[row_idx]))
+            attc_df = pd.DataFrame(attc_to_keep)
         attc_plus = attc_df[attc_df.sens == "+"].copy()
         attc_minus = attc_df[attc_df.sens == "-"].copy()
 
