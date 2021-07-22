@@ -86,7 +86,7 @@ class TestFuncAnnot(IntegronTest):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
 
-        # Resfams is too big to bee in tests/data
+        # NCBIfam-AMRFinder is too big to bee in tests/data
         # search directly in data
         self.hmm_files = [os.path.normpath(
             os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "NCBIfam-AMRFinder.hmm")
@@ -279,13 +279,11 @@ class TestFuncAnnot(IntegronTest):
         - 1 in0
         - 1 complete with 4 proteins, 3 having a NCBIfam annotation
         """
-        # resfam pour: 16, 13, 3, 12
-
         # Create integron in0
         integron1 = Integron(self.replicon.name, self.cfg)
         integron1.add_integrase(56, 1014, "ACBA.007.P01_13_1", 1, 1.9e-25, "intersection_tyr_intI")
 
-        # Create integron CALIN with resfam proteins
+        # Create integron CALIN with NCBIfam proteins
         integron2 = Integron(self.replicon, self.cfg)
         integron2.add_attC(7400, 7650, -1, 7e-9, "attc_4")
         integron2.add_attC(8600, 8650, -1, 7e-4, "attc_4")
@@ -293,7 +291,7 @@ class TestFuncAnnot(IntegronTest):
         integron2.add_attC(10800, 10900, -1, 7e-7, "attc_4")
         integron2.add_proteins(self.prot_db)
 
-        # Create integron CALIN without any resfam proteins
+        # Create integron CALIN without any NCBIfam proteins
         integron3 = Integron(self.replicon, self.cfg)
         integron3.add_attC(4320, 4400, -1, 7e-9, "attc_4")
         integron3.add_proteins(self.prot_db)
