@@ -217,7 +217,9 @@ def find_attc_max(integrons, replicon, distance_threshold,
         max_elt = pd.DataFrame(columns=columns)
         max_elt = max_elt.astype(dtype=data_type)
         full_element = i.describe()  # dataframe
-
+        # full_element structure
+        # "pos_beg", "pos_end", "strand", "evalue", "type_elt", "model",
+        # "distance_2attC", "annotation", "considered_topology"
         if all(full_element.type == "complete"):
             # Where is the integrase compared to the attc sites (no matter the strand) :
             integrase_is_left = ((full_element[full_element.type_elt == "attC"].pos_beg.values[0] -
@@ -264,7 +266,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
             go_right = (all_attc.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                         ) % size_replicon < distance_threshold and integrase_is_left
             max_elt = expand(replicon,
-                             window_beg, window_end, max_elt, all_attc,
+                             window_beg, window_end, max_elt,
                              circular, distance_threshold,
                              model_attc_path,
                              max_attc_size=max_attc_size,
@@ -297,14 +299,13 @@ def find_attc_max(integrons, replicon, distance_threshold,
                 all_attc = merge_previous_attc_w_local_max(i, df_max)
 
                 max_elt = pd.concat([max_elt, all_attc])
-
                 if not df_max.empty:  # Max can sometimes find bigger attC than permitted
                     go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - all_attc.pos_end.values[0]
                                ) % size_replicon < distance_threshold
                     go_right = (all_attc.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                                 ) % size_replicon < distance_threshold
                     max_elt = expand(replicon,
-                                     window_beg, window_end, max_elt, all_attc,
+                                     window_beg, window_end, max_elt,
                                      circular, distance_threshold,
                                      model_attc_path,
                                      max_attc_size=max_attc_size,
@@ -333,7 +334,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                 max_elt = pd.concat([max_elt, df_max])
                 if not max_elt.empty:
                     max_elt = expand(replicon,
-                                     window_beg, window_end, max_elt, df_max,
+                                     window_beg, window_end, max_elt,
                                      circular, distance_threshold,
                                      model_attc_path,
                                      max_attc_size=max_attc_size,

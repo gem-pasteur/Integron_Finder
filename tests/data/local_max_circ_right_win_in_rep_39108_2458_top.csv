@@ -1,0 +1,5 @@
+Accession_number,cm_attC,cm_debut,cm_fin,pos_beg,pos_end,sens,evalue
+NZ_CP016323.1,attc_4,1,47,39724,39849,+,4.5e-07
+NZ_CP016323.1,attc_4,1,47,40195,40321,+,1.5e-06
+NZ_CP016323.1,attc_4,1,47,1733,1859,+,0.00026000000000000003
+NZ_CP016323.1,attc_4,1,47,2331,2457,+,7.699999999999999e-06
