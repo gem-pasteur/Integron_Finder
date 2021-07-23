@@ -44,7 +44,8 @@ _log = colorlog.getLogger(__name__)
 def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue=10, coverage=0.5):
     """
     | Call hmmmer to annotate CDS associated with the integron.
-    | Use Resfams per default (Gibson et al, ISME J.,  2014)
+    | Use NCBIfam-AMRFinder.LIB available here https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/
+    | check for the appropriate version
 
     :param integrons: integrons list to annotate
     :type integrons: list of :class:`integron_finder.integron.Integron` objects.

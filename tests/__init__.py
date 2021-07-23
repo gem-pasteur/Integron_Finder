@@ -48,8 +48,8 @@ class IntegronTest(unittest.TestCase):
     maxDiff = None
     
     @classmethod
-    def find_data(cls, name):
-        data_path = os.path.join(cls._data_dir, name)
+    def find_data(cls, *names):
+        data_path = os.path.join(cls._data_dir, *names)
         if os.path.exists(data_path):
             return data_path
         else:

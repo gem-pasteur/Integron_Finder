@@ -73,7 +73,7 @@ See [Developer installation](https://integronfinder.readthedocs.io/en/latest/dev
 
 * Integron Finder is developed and released under [open source licence GPLv3](https://opensource.org/licenses/GPL-3.0)
   (see COPYING file)
-* *NCBIfam-AMRFinder* is provided by NCBI and accessible here: https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/NCBIfam-AMRFinder.LIB
+* *NCBIfam-AMRFinder* is provided by NCBI and accessible here: https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/2021-06-01.1/NCBIfam-AMRFinder.LIB
 * The other data files:
     * *attc_4.cm*
     * *integron_integrase.hmm*

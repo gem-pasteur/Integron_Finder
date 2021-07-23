@@ -72,7 +72,7 @@ class TestAcba(IntegronTest):
         os.makedirs(self.out_dir)
         integrase.call = self.mute_call(_prodigal_call)
         self.find_executable_ori = finder.distutils.spawn.find_executable
-        self.resfams_dir = os.path.normpath(
+        self.func_annot_dir = os.path.normpath(
             os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation")
         )
 
@@ -324,7 +324,7 @@ class TestAcba(IntegronTest):
         command = "integron_finder --outdir {out_dir} --func-annot --path-func-annot {annot_bank} --promoter-attI " \
                   "--gbk --keep-tmp " \
                   "{replicon}".format(out_dir=self.out_dir,
-                                      annot_bank=self.resfams_dir,
+                                      annot_bank=self.func_annot_dir,
                                       replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
                                       )
 
@@ -362,7 +362,7 @@ class TestAcba(IntegronTest):
         command = "integron_finder --outdir {out_dir} --func-annot --path-func-annot {annot_bank} --local-max --gbk " \
                   "--keep-tmp --promoter-attI {replicon}".format(
                                     out_dir=self.out_dir,
-                                    annot_bank=self.resfams_dir,
+                                    annot_bank=self.func_annot_dir,
                                     replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
                                 )
         with self.catch_io(out=True, err=True):

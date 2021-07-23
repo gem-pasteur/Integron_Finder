@@ -86,10 +86,10 @@ class TestFuncAnnot(IntegronTest):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
 
-        # Resfams is too big to bee in tests/data
+        # NCBIfam-AMRFinder is too big to bee in tests/data
         # search directly in data
         self.hmm_files = [os.path.normpath(
-            os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")
+            os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "NCBIfam-AMRFinder.hmm")
         )]
         # Define integron_finder variables
         args = argparse.Namespace()
@@ -108,10 +108,10 @@ class TestFuncAnnot(IntegronTest):
         shutil.copyfile(self.find_data(os.path.join('Proteins', self.replicon.id + ".prt")), self.prot_file)
         self.prot_db = ProdigalDB(self.replicon, self.cfg, prot_file=self.prot_file)
 
-        self.exp_files = ["{}{}".format(self.replicon.id, suffix) for suffix in ("_Resfams_fa_table.res",
+        self.exp_files = ["{}{}".format(self.replicon.id, suffix) for suffix in ("_NCBIfam-AMRFinder_fa_table.res",
                                                                                  "_intI_table.res",
                                                                                  "_phage_int_table.res",
-                                                                                 "_Resfams_fa.res",
+                                                                                 "_NCBIfam-AMRFinder_fa.res",
                                                                                  "_intI.res",
                                                                                  "_phage_int.res",
                                                                                  "_subseqprot.tmp")]
@@ -142,12 +142,12 @@ class TestFuncAnnot(IntegronTest):
 
 
     @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
-                     "Resfams not found")
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "NCBIfam-AMRFinder.hmm")),
+                     "NCBIfam not found")
     def test_annot_calin(self):
         """
         Test func_annot when the integron is a CALIN (attC but no integrase), with 4 proteins:
-        for 3 of them resfam annotations are found, and not for the last 1.
+        for 3 of them NCBIfam-AMRFinder annotations are found, and not for the third one.
         """
         # Create integron
         integron1 = Integron(self.replicon, self.cfg)
@@ -158,19 +158,16 @@ class TestFuncAnnot(IntegronTest):
         integron1.add_attC(19618, 19726, -1, 7e-7, "attc_4")
         # Add proteins between attC sites
         integron1.add_proteins(self.prot_db)
-        # Check that proteins dataframe is as expected before annotation
-        proteins = pd.DataFrame({"pos_beg": [17375, 17886, 19090, 19721],
-                                 "pos_end": [17722, 18665, 19749, 20254],
-                                 "strand": [-1] * 4,
-                                 "evalue": [np.nan] * 4,
-                                 "type_elt": ["protein"] * 4,
-                                 "model": ["NA"] * 4,
-                                 "distance_2attC": [np.nan] * 4,
-                                 "annotation": ["protein"] * 4},
-                                 index=["ACBA.007.P01_13_20", "ACBA.007.P01_13_21",
-                                        "ACBA.007.P01_13_22", "ACBA.007.P01_13_23"])
-        proteins = proteins[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
-                             "model", "distance_2attC", "annotation"]]
+
+        # Check that proteins dataframe is as expected BEFORE annotation
+        proteins = pd.DataFrame.from_dict({
+            "ACBA.007.P01_13_20": [17375, 17722, -1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_21": [17886, 18665, -1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_22": [19090, 19749, -1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_23": [19721, 20254, -1, np.nan, "protein", "NA", np.nan, "protein"]},
+            orient="index",
+            columns=["pos_beg", "pos_end", "strand", "evalue", "type_elt", "model", "distance_2attC", "annotation"]
+            )
         # we need to sort the dataframe
         # as protein file is parse using biopython and index
         # the order os sequences is not guarantee
@@ -183,18 +180,19 @@ class TestFuncAnnot(IntegronTest):
         files_created = [f for f in glob.glob(os.path.join(self.tmp_dir, "*")) if os.path.isfile(f)]
         self.assertEqual(set(self.exp_files), set(files_created))
 
-        # Check that annotated proteins are as expected
-        proteins.loc["ACBA.007.P01_13_20"] = [17375, 17722, -1, 4.5e-31, "protein", "RF0066", np.nan, "emrE"]
-        proteins.loc["ACBA.007.P01_13_21"] = [17886, 18665, -1, 7.4e-168, "protein", "RF0027", np.nan, "ANT3"]
-        proteins.loc["ACBA.007.P01_13_23"] = [19721, 20254, -1, 6.2e-110, "protein", "RF0003", np.nan, "AAC3-I"]
+        # create annotations for the set of proteins
+        proteins.loc["ACBA.007.P01_13_20"] = [17375, 17722, -1, 9.8e-65, "protein", "NF000276.2", np.nan, "SMR_qac_E-NCBIFAM"]
+        proteins.loc["ACBA.007.P01_13_21"] = [17886, 18665, -1, 2.8e-183,"protein", "NF033126.1", np.nan, "ANT_3pp_AadA1-NCBIFAM"]
+        proteins.loc["ACBA.007.P01_13_23"] = [19721, 20254, -1, 7.9e-69, "protein", "NF033083.0", np.nan, "AAC_3_I-NCBIFAM"]
         # we need to sort the dataframe
         # as protein file is parse using biopython and index
         # the order os sequences is not guarantee
         pdt.assert_frame_equal(proteins.sort_index(), integron1.proteins.sort_index())
 
+
     @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
-                     "Resfams not found")
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "NCBIfam-AMRFinder.hmm")),
+                     "NCBIfam not found")
     def test_annot_calin_empty(self):
         """
         Test func_annot when the integron is a CALIN (attC but no integrase), without any protein:
@@ -212,9 +210,7 @@ class TestFuncAnnot(IntegronTest):
         proteins = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                          "evalue", "type_elt", "model",
                                          "distance_2attC", "annotation"])
-        proteins = proteins.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                          "evalue": "float", "type_elt": "str", "model": "str",
-                                          "distance_2attC": "float", "annotation": "str"})
+        proteins = proteins.astype(dtype=self.prot_dtype)
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
         # Annotate proteins
@@ -232,9 +228,10 @@ class TestFuncAnnot(IntegronTest):
         # Check proteins after annotation
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
+
     @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
-                     "Resfams not found")
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "NCBIfam-AMRFinder.hmm")),
+                     "NCBIfam not found")
     def test_annot_in0(self):
         """
         Test func_annot when the integron is a in0: only an integrase. There are no proteins
@@ -270,24 +267,23 @@ class TestFuncAnnot(IntegronTest):
         # check proteins after annotation
         pdt.assert_frame_equal(proteins, integron1.proteins)
 
+
     @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
-                     "Resfams not found")
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "NCBIfam-AMRFinder.hmm")),
+                     "NCBIfam not found")
     def test_annot_multi(self):
         """
         Test func_annot when there are 4 integrons:
-        - 1 calin with 4 proteins, 2 having a resfam annotation
-        - 1 calin with 2 proteins, none having a resfam annotation
+        - 1 calin with 4 proteins, 2 having a NCBIfam annotation
+        - 1 calin with 2 proteins, none having a NCBIfam annotation
         - 1 in0
-        - 1 complete with 4 proteins, 3 having a resfam annotation
+        - 1 complete with 4 proteins, 3 having a NCBIfam annotation
         """
-        # resfam pour: 16, 13, 3, 12
-
         # Create integron in0
         integron1 = Integron(self.replicon.name, self.cfg)
         integron1.add_integrase(56, 1014, "ACBA.007.P01_13_1", 1, 1.9e-25, "intersection_tyr_intI")
 
-        # Create integron CALIN with resfam proteins
+        # Create integron CALIN with NCBIfam proteins
         integron2 = Integron(self.replicon, self.cfg)
         integron2.add_attC(7400, 7650, -1, 7e-9, "attc_4")
         integron2.add_attC(8600, 8650, -1, 7e-4, "attc_4")
@@ -295,7 +291,7 @@ class TestFuncAnnot(IntegronTest):
         integron2.add_attC(10800, 10900, -1, 7e-7, "attc_4")
         integron2.add_proteins(self.prot_db)
 
-        # Create integron CALIN without any resfam proteins
+        # Create integron CALIN without any NCBIfam proteins
         integron3 = Integron(self.replicon, self.cfg)
         integron3.add_attC(4320, 4400, -1, 7e-9, "attc_4")
         integron3.add_proteins(self.prot_db)
@@ -314,52 +310,34 @@ class TestFuncAnnot(IntegronTest):
         proteins1 = pd.DataFrame(columns=["pos_beg", "pos_end", "strand",
                                           "evalue", "type_elt", "model",
                                           "distance_2attC", "annotation"])
-        proteins1 = proteins1.astype(dtype={"pos_beg": "int", "pos_end": "int", "strand": "int",
-                                            "evalue": "float", "type_elt": "str", "model": "str",
-                                            "distance_2attC": "float", "annotation": "str"})
-        proteins1 = proteins1[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
-                               "model", "distance_2attC", "annotation"]]
         proteins1 = proteins1.astype(dtype=self.prot_dtype)
 
-        proteins2 = pd.DataFrame({"pos_beg": [7088, 7710, 8650, 10524],
-                                  "pos_end": [7351, 8594, 10125, 11699],
-                                  "strand": [1, -1, -1, -1],
-                                  "evalue": [np.nan] * 4,
-                                  "type_elt": ["protein"] * 4,
-                                  "model": ["NA"] * 4,
-                                  "distance_2attC": [np.nan] * 4,
-                                  "annotation": ["protein"] * 4},
-                                 index=["ACBA.007.P01_13_11", "ACBA.007.P01_13_12",
-                                        "ACBA.007.P01_13_13", "ACBA.007.P01_13_14"])
-        proteins2 = proteins2[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
-                               "model", "distance_2attC", "annotation"]]
+        proteins2 = pd.DataFrame.from_dict({
+            "ACBA.007.P01_13_11": [7088, 7351, 1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_12": [7710, 8594, -1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_13": [8650, 10125, -1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_14": [10524, 11699, -1, np.nan, "protein", "NA", np.nan, "protein"]},
+            orient="index",
+            columns=["pos_beg", "pos_end", "strand", "evalue", "type_elt", "model", "distance_2attC", "annotation"]
+            )
         proteins2 = proteins2.astype(dtype=self.prot_dtype)
 
-        proteins3 = pd.DataFrame({"pos_beg": [3546, 4380],
-                                  "pos_end": [4313, 4721],
-                                  "strand": [1, 1],
-                                  "evalue": [np.nan] * 2,
-                                  "type_elt": ["protein"] * 2,
-                                  "model": ["NA"] * 2,
-                                  "distance_2attC": [np.nan] * 2,
-                                  "annotation": ["protein"] * 2},
-                                 index=["ACBA.007.P01_13_6", "ACBA.007.P01_13_7"])
-        proteins3 = proteins3[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
-                               "model", "distance_2attC", "annotation"]]
+        proteins3 = pd.DataFrame.from_dict({
+            "ACBA.007.P01_13_6": [3546, 4313, 1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_7": [4380, 4721, 1, np.nan, "protein", "NA", np.nan, "protein"]},
+            orient="index",
+            columns=["pos_beg", "pos_end", "strand", "evalue", "type_elt", "model", "distance_2attC", "annotation"]
+            )
         proteins3 = proteins3.astype(dtype=self.prot_dtype)
 
-        proteins4 = pd.DataFrame({"pos_beg": [17375, 17886, 19090, 19721],
-                                  "pos_end": [17722, 18665, 19749, 20254],
-                                  "strand": [-1] * 4,
-                                  "evalue": [np.nan] * 4,
-                                  "type_elt": ["protein"] * 4,
-                                  "model": ["NA"] * 4,
-                                  "distance_2attC": [np.nan] * 4,
-                                  "annotation": ["protein"] * 4},
-                                 index=["ACBA.007.P01_13_20", "ACBA.007.P01_13_21",
-                                        "ACBA.007.P01_13_22", "ACBA.007.P01_13_23"])
-        proteins4 = proteins4[["pos_beg", "pos_end", "strand", "evalue", "type_elt",
-                               "model", "distance_2attC", "annotation"]]
+        proteins4 = pd.DataFrame.from_dict({
+            "ACBA.007.P01_13_20": [17375, 17722, -1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_21": [17886, 18665, -1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_22": [19090, 19749, -1, np.nan, "protein", "NA", np.nan, "protein"],
+            "ACBA.007.P01_13_23": [19721, 20254, -1, np.nan, "protein", "NA", np.nan, "protein"]},
+            orient="index",
+            columns=["pos_beg", "pos_end", "strand", "evalue", "type_elt", "model", "distance_2attC", "annotation"]
+            )
         proteins4 = proteins4.astype(dtype=self.prot_dtype)
 
         # Check proteins before annotation
@@ -372,45 +350,35 @@ class TestFuncAnnot(IntegronTest):
             pdt.assert_frame_equal(inte.proteins.sort_index(), exp_prot.sort_index())
 
         # Annotate proteins with evalue threshold
-        func_annot(integrons, self.replicon, self.prot_db, self.hmm_files, self.cfg, self.tmp_dir, evalue=1e-32)
+        func_annot(integrons, self.replicon, self.prot_db, self.hmm_files, self.cfg, self.tmp_dir, evalue=1e-67)
 
         # Check that all files generated are as expected
         files_created = [f for f in glob.glob(os.path.join(self.tmp_dir, "*")) if os.path.isfile(f)]
         self.assertEqual(set(self.exp_files), set(files_created))
 
         # Check that annotated proteins are as expected
-        proteins2.loc["ACBA.007.P01_13_13"] = [8650, 10125, -1, 2.4e-86, "protein",
-                                               "RF0007", np.nan, "ABC_efflux"]
-        proteins4.loc["ACBA.007.P01_13_21"] = [17886, 18665, -1, 7.4e-168, "protein",
-                                               "RF0027", np.nan, "ANT3"]
-        proteins4.loc["ACBA.007.P01_13_23"] = [19721, 20254, -1, 6.2e-110, "protein",
-                                               "RF0003", np.nan, "AAC3-I"]
+        proteins2.loc["ACBA.007.P01_13_12"] = [7710, 8594, -1, 5.7e-213, "protein", "NF012158.1", np.nan, "macrolide_MphE-NCBIFAM"]
+        proteins2.loc["ACBA.007.P01_13_13"] = [8650, 10125, -1, 4.5e-252, "protein", "NF000168.1", np.nan, "ABCF_Msr_all-NCBIFAM"]
+        proteins4.loc["ACBA.007.P01_13_21"] = [17886, 18665, -1, 2.8e-183, "protein", "NF033126.1", np.nan, "ANT_3pp_AadA1-NCBIFAM"]
+        proteins4.loc["ACBA.007.P01_13_23"] = [19721, 20254, -1, 7.9e-69, "protein", "NF033083.0", np.nan, "AAC_3_I-NCBIFAM"]
         for inte, prots in zip(integrons, expected_proteins):
             # we need to sort the dataframe
             # as protein file is parse using biopython and index
             # the order os sequences is not guarantee
             pdt.assert_frame_equal(inte.proteins.sort_index(), prots.sort_index())
 
-        # Annotate proteins with default evalue (1 more annotation)
+        proteins4.loc["ACBA.007.P01_13_20"] = [17375, 17722, -1, 9.8e-65, "protein", "NF000276.2", np.nan, "SMR_qac_E-NCBIFAM"]
+        # Annotate proteins with default evalue (found 1 more annotation ACBA.007.P01_13_23)
         with self.catch_io(out=True):
             func_annot(integrons, self.replicon, self.prot_db, self.hmm_files, self.cfg, self.tmp_dir)
-        proteins4.loc["ACBA.007.P01_13_20"] = [17375, 17722, -1, 4.5e-31, "protein",
-                                               "RF0066", np.nan, "emrE"]
+
         for inte, prots in zip(integrons, expected_proteins):
             pdt.assert_frame_equal(inte.proteins.sort_index(), prots.sort_index())
 
-        # Annotate proteins with lower coverage threshold (1 more annotation)
-        with self.catch_io(out=True):
-            func_annot(integrons, self.replicon, self.prot_db, self.hmm_files, self.cfg, self.tmp_dir, coverage=0.4)
-
-        proteins2.loc["ACBA.007.P01_13_12"] = [7710, 8594, -1, 1.6e-5, "protein",
-                                               "RF0033", np.nan, "APH3"]
-        for inte, prots in zip(integrons, expected_proteins):
-            pdt.assert_frame_equal(inte.proteins.sort_index(), prots.sort_index())
 
     @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "Resfams.hmm")),
-                     "Resfams not found")
+        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation", "NCBIfam-AMRFinder.hmm")),
+                     "NCBIfam not found")
     def test_annot_wrong_hmm(self):
         """
         Test that when the given hmm file does not exist, it returns an error specifying that

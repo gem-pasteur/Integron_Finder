@@ -242,7 +242,7 @@ def local_max(replicon,
 
 
 def expand(replicon,
-           window_beg, window_end, max_elt, df_max,
+           window_beg, window_end, max_elt,
            circular, dist_threshold, model_attc_path,
            max_attc_size=200, min_attc_size=40, evalue_attc=1.,
            search_left=False, search_right=False,
@@ -293,19 +293,19 @@ def expand(replicon,
     we = window_end
 
     if search_right:
-
+        # max_attc_size (200bo by default) to allow the detection of sites that would overlap 2 consecutive windows
         if circular:
+            # to allow the detection of sites that overlap last window and the first one (given as argument)
+            end_of_turn = wb + max_attc_size
+            pass_through_ori = False
             window_beg = (window_end - max_attc_size) % replicon_size
-            # max_attc_size (200bo by default) to allow the detection of sites that would overlap 2 consecutive windows
             window_end = (window_end + dist_threshold) % replicon_size
         else:
             window_beg = max(0, window_end - max_attc_size)
-            # max_attc_size (200bo by default) to allow the detection of sites that would overlap 2 consecutive windows
             window_end = min(replicon_size, window_end + dist_threshold)
 
         searched_strand = "both" if search_left else "top"  # search on both strands if search in both directions
-
-        while not df_max.empty and 0 < (window_beg and window_end) < replicon_size:
+        while True:
             df_max = local_max(replicon,
                                window_beg, window_end,
                                model_attc_path,
@@ -318,29 +318,44 @@ def expand(replicon,
             max_elt = pd.concat([max_elt, df_max])
 
             if circular:
+                if window_end == end_of_turn:
+                    if searched_strand == "both":
+                        # we loop all over the replicon and search in both strand
+                        # searching left is useless
+                        search_left = False
+                    break
+                elif df_max.empty:
+                    break
+
+                pass_through_ori = pass_through_ori or (window_end + dist_threshold) >= replicon_size
+
                 window_beg = (window_end - max_attc_size) % replicon_size
                 window_end = (window_end + dist_threshold) % replicon_size
+                if we > wb:
+                    if pass_through_ori:
+                        window_end = min(end_of_turn, window_end)
+                else:
+                    window_end = min(end_of_turn, window_end)
             else:
+                if df_max.empty or window_end == replicon_size:
+                    break
                 window_beg = max(0, window_end - max_attc_size)
                 window_end = min(replicon_size, window_end + dist_threshold)
 
-        # re-initialize in case we enter search left too.
-        df_max = max_elt.copy()
-        window_beg = wb
-        window_end = we
-
     if search_left:
+        window_beg = wb
         if circular:
-            window_end = (window_beg + 200) % replicon_size
+            #  to allow the detection of sites that overlap last window and the first one (given as argument)
+            end_of_turn = we - max_attc_size
+            pass_through_ori = False
+            window_end = (window_beg + max_attc_size) % replicon_size
             window_beg = (window_beg - dist_threshold) % replicon_size
         else:
+            window_end = min(replicon_size, window_beg + max_attc_size)
             window_beg = max(0, window_beg - dist_threshold)
-            window_end = min(replicon_size, window_beg + 200)
 
         searched_strand = "both" if search_right else "bottom"
-
-        while not df_max.empty and 0 < (window_beg and window_end) < replicon_size:
-
+        while True:
             df_max = local_max(replicon,
                                window_beg, window_end,
                                model_attc_path,
@@ -353,12 +368,24 @@ def expand(replicon,
             max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
 
             if circular:
-                window_end = (window_beg + 200) % replicon_size
-                window_beg = (window_beg - dist_threshold) % replicon_size
-            else:
-                window_end = min(replicon_size, window_beg + 200)
-                window_beg = max(0, window_beg - dist_threshold)
+                if df_max.empty or window_beg == end_of_turn:
+                    break
 
+                pass_through_ori = pass_through_ori or (window_end - dist_threshold) <= 0
+
+                window_end = (window_beg + max_attc_size) % replicon_size
+                window_beg = (window_beg - dist_threshold) % replicon_size
+
+                if we > wb:
+                    if pass_through_ori:
+                        window_beg = max(window_beg, end_of_turn)
+                else:
+                    window_beg = max(window_beg, end_of_turn)
+            else:
+                if df_max.empty or window_beg == 0:
+                    break
+                window_end = min(replicon_size, window_beg + max_attc_size)
+                window_beg = max(0, window_beg - dist_threshold)
     max_elt.drop_duplicates(inplace=True)
     max_elt.index = list(range(len(max_elt)))
     return max_elt
