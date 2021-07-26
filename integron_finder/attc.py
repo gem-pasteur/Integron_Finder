@@ -155,6 +155,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                   max_attc_size, min_attc_size,
                   evalue_attc=1.,
                   circular=True, out_dir='.',
+                  cmsearch_bin='cmsearch',
                   cpu=1):
     """
     Look for attC site with cmsearch --max option which remove all heuristic filters.
@@ -303,7 +304,9 @@ def find_attc_max(integrons, replicon, distance_threshold,
                              min_attc_size=min_attc_size,
                              evalue_attc=evalue_attc,
                              search_left=go_left, search_right=go_right,
-                             out_dir=out_dir, cpu=cpu)
+                             out_dir=out_dir,
+                             cmsearch_bin=cmsearch_bin,
+                             cpu=cpu)
 
         elif all(full_element.type == "CALIN"):
             if full_element[full_element.pos_beg.isin(max_final.pos_beg)].empty:
@@ -334,6 +337,9 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                ) % size_replicon < distance_threshold
                     go_right = (all_attc.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                                 ) % size_replicon < distance_threshold
+                    print("### go_left =", go_left)
+                    print("### go_rigth =", go_right)
+                    print("### df_max =", df_max, sep='\n')
                     max_elt = expand(replicon,
                                      window_beg, window_end, max_elt,
                                      circular, distance_threshold,
@@ -342,7 +348,9 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      min_attc_size=min_attc_size,
                                      evalue_attc=evalue_attc,
                                      search_left=go_left, search_right=go_right,
-                                     out_dir=out_dir, cpu=cpu)
+                                     out_dir=out_dir,
+                                     cmsearch_bin=cmsearch_bin,
+                                     cpu=cpu)
 
         elif all(full_element.type == "In0"):
             if all(full_element.model != "Phage_integrase"):
@@ -371,7 +379,9 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      min_attc_size=min_attc_size,
                                      evalue_attc=evalue_attc,
                                      search_left=True, search_right=True,
-                                     out_dir=out_dir, cpu=cpu)
+                                     out_dir=out_dir,
+                                     cmsearch_bin=cmsearch_bin,
+                                     cpu=cpu)
 
         max_final = pd.concat([max_final, max_elt])
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)

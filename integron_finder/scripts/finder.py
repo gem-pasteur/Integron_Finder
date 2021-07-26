@@ -336,7 +336,8 @@ def find_integron_in_one_replicon(replicon, config):
                                              min_attc_size=config.min_attc_size,
                                              circular=circular, out_dir=result_tmp_dir,
                                              cpu=config.cpu,
-                                             evalue_attc=config.evalue_attc)
+                                             evalue_attc=config.evalue_attc,
+                                             cmsearch_bin=config.cmsearch)
                 integron_max.to_pickle(os.path.join(result_tmp_dir, "integron_max.pickle"))
                 _log.info("Search with local_max done... :")
 

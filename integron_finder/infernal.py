@@ -246,7 +246,7 @@ def expand(replicon,
            circular, dist_threshold, model_attc_path,
            max_attc_size=200, min_attc_size=40, evalue_attc=1.,
            search_left=False, search_right=False,
-           out_dir='.', cpu=1):
+           out_dir='.', cpu=1, cmsearch_bin='cmsearch'):
     """
     for a given element, we can search on the left hand side (if integrase is on the right for instance)
     or right hand side (opposite situation) or both side (only integrase or only attC sites)
@@ -313,7 +313,8 @@ def expand(replicon,
                                min_attc_size=min_attc_size,
                                strand_search=searched_strand,
                                out_dir=out_dir, cpu_nb=cpu,
-                               evalue_attc=evalue_attc
+                               evalue_attc=evalue_attc,
+                               cmsearch_bin=cmsearch_bin
                                )
             max_elt = pd.concat([max_elt, df_max])
             _log.info(f"\tsearched {window_beg}->{window_end} in {searched_strand} strand(s) found {len(df_max)} attc sites")
@@ -365,7 +366,8 @@ def expand(replicon,
                                strand_search=searched_strand,
                                out_dir=out_dir,
                                cpu_nb=cpu,
-                               evalue_attc=evalue_attc)
+                               evalue_attc=evalue_attc,
+                               cmsearch_bin=cmsearch_bin)
             max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
             _log.info(f"\tsearched {window_beg}->{window_end} in {searched_strand} strand(s) found {len(df_max)} attc sites")
 
