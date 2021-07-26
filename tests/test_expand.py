@@ -54,141 +54,141 @@ def local_max_mock():
     _cache = {
               # test_expand_circular_no_more_attc
               ('LIAN.001.C02_10', 954528, 958728, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_no_more_attc_954528_958728_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_no_more_attc_954528_958728_top.csv')),
               ('LIAN.001.C02_10', 958528, 962728, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_no_more_attc_958528_962728_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_no_more_attc_958528_962728_top.csv')),
               ('LIAN.001.C02_10', 962528, 966728, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_no_more_attc_962528_966728_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_no_more_attc_962528_966728_top.csv')),
               ('LIAN.001.C02_10', 966528, 970728, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_no_more_attc_966528_970728_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_no_more_attc_966528_970728_top.csv')),
               ('LIAN.001.C02_10', 970528, 974728, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_no_more_attc_970528_974728_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_no_more_attc_970528_974728_top.csv')),
               ('LIAN.001.C02_10', 974528, 978728, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_no_more_attc_974528_978728_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_no_more_attc_974528_978728_top.csv')),
               ('LIAN.001.C02_10', 978528, 982728, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_no_more_attc_978528_982728_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_no_more_attc_978528_982728_top.csv')),
               ('LIAN.001.C02_10', 982528, 986728, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_no_more_attc_982528_986728_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_no_more_attc_982528_986728_top.csv')),
 
               # test_expand_circular_right_window_in_replicon
               ('NZ_CP016323.1', 23108, 27308, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_23108_27308_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_23108_27308_top.csv')),
               ('NZ_CP016323.1', 27108, 31308, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_27108_31308_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_27108_31308_top.csv')),
               ('NZ_CP016323.1', 31108, 35308, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_31108_35308_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_31108_35308_top.csv')),
               ('NZ_CP016323.1', 35108, 39308, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_35108_39308_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_35108_39308_top.csv')),
               ('NZ_CP016323.1', 39108, 2458, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_39108_2458_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_39108_2458_top.csv')),
               ('NZ_CP016323.1', 2258, 6458, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_2258_6458_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_2258_6458_top.csv')),
               ('NZ_CP016323.1', 6258, 10458, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_6258_10458_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_6258_10458_top.csv')),
               ('NZ_CP016323.1', 10258, 14458, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_10258_14458_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_10258_14458_top.csv')),
               ('NZ_CP016323.1', 14258, 15466, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_14258_15466_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_14258_15466_top.csv')),
 
               # test_expand_circular_left_window_in_replicon
               ('NZ_CP016323.1', 11266, 15466, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_in_rep_11266_15466_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_in_rep_11266_15466_bottom.csv')),
               ('NZ_CP016323.1', 7266, 11466, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_in_rep_7266_11466_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_in_rep_7266_11466_bottom.csv')),
               ('NZ_CP016323.1', 3266, 7466, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_in_rep_3266_7466_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_in_rep_3266_7466_bottom.csv')),
               ('NZ_CP016323.1', 40116, 3466, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_in_rep_40116_3466_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_in_rep_40116_3466_bottom.csv')),
               ('NZ_CP016323.1', 36116, 40316, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_in_rep_36116_40316_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_in_rep_36116_40316_bottom.csv')),
               ('NZ_CP016323.1', 32116, 36316, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_in_rep_32116_36316_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_in_rep_32116_36316_bottom.csv')),
               ('NZ_CP016323.1', 28116, 32316, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_in_rep_28116_32316_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_in_rep_28116_32316_bottom.csv')),
               ('NZ_CP016323.1', 24116, 28316, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_in_rep_24116_28316_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_in_rep_24116_28316_bottom.csv')),
               ('NZ_CP016323.1', 23108, 24316, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_in_rep_23108_24316_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_in_rep_23108_24316_bottom.csv')),
 
               # test_expand_circular_left_window_over_ori
               ('NZ_CP016323.1', 35181, 39381, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_over_ori_35181_39381_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_over_ori_35181_39381_bottom.csv')),
               ('NZ_CP016323.1', 31181, 35381, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_over_ori_31181_35381_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_over_ori_31181_35381_bottom.csv')),
               ('NZ_CP016323.1', 27181, 31381, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_over_ori_27181_31381_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_over_ori_27181_31381_bottom.csv')),
               ('NZ_CP016323.1', 23181, 27381, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_over_ori_23181_27381_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_over_ori_23181_27381_bottom.csv')),
               ('NZ_CP016323.1', 19181, 23381, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_over_ori_19181_23381_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_over_ori_19181_23381_bottom.csv')),
               ('NZ_CP016323.1', 15181, 19381, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_over_ori_15181_19381_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_over_ori_15181_19381_bottom.csv')),
               ('NZ_CP016323.1', 11181, 15381, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_over_ori_11181_15381_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_over_ori_11181_15381_bottom.csv')),
               ('NZ_CP016323.1', 7181, 11381, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_over_ori_7181_11381_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_over_ori_7181_11381_bottom.csv')),
               ('NZ_CP016323.1', 3271, 7381, 'attc_4', 'bottom'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_left_win_over_ori_3271_7381_bottom.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_left_win_over_ori_3271_7381_bottom.csv')),
 
               # test_expand_circular_right_window_over_ori
               ('NZ_CP016323.1', 3271, 7471, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_over_ori_3271_7471_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_3271_7471_top.csv')),
               ('NZ_CP016323.1', 7271, 11471, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_over_ori_7271_11471_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_7271_11471_top.csv')),
               ('NZ_CP016323.1', 11271, 15471, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_over_ori_11271_15471_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_11271_15471_top.csv')),
               ('NZ_CP016323.1', 15271, 19471, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_over_ori_15271_19471_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_15271_19471_top.csv')),
               ('NZ_CP016323.1', 19271, 23471, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_over_ori_19271_23471_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_19271_23471_top.csv')),
               ('NZ_CP016323.1', 23271, 27471, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_over_ori_23271_27471_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_23271_27471_top.csv')),
               ('NZ_CP016323.1', 27271, 31471, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_over_ori_27271_31471_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_27271_31471_top.csv')),
               ('NZ_CP016323.1', 31271, 35471, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_over_ori_31271_35471_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_31271_35471_top.csv')),
               ('NZ_CP016323.1', 35271, 39381, 'attc_4', 'top'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_over_ori_35271_39381_top.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_35271_39381_top.csv')),
 
               # test_expand_circular_both_window_in_rep
               ('NZ_CP016323.1', 23108, 27308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_23108_27308_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_23108_27308_both.csv')),
               ('NZ_CP016323.1', 27108, 31308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_27108_31308_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_27108_31308_both.csv')),
               ('NZ_CP016323.1', 31108, 35308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_31108_35308_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_31108_35308_both.csv')),
               ('NZ_CP016323.1', 35108, 39308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_35108_39308_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_35108_39308_both.csv')),
               ('NZ_CP016323.1', 39108, 2458, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_39108_2458_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_39108_2458_both.csv')),
               ('NZ_CP016323.1', 2258, 6458, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_2258_6458_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_2258_6458_both.csv')),
               ('NZ_CP016323.1', 6258, 10458, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_6258_10458_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_6258_10458_both.csv')),
               ('NZ_CP016323.1', 10258, 14458, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_10258_14458_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_10258_14458_both.csv')),
               ('NZ_CP016323.1', 14258, 15466, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_circ_right_win_in_rep_14258_15466_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_14258_15466_both.csv')),
 
               # test_expand_linear
               ('NZ_CP016323.1', 23108, 27308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_linear_23108_27308_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_linear_23108_27308_both.csv')),
               ('NZ_CP016323.1', 27108, 31308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_linear_27108_31308_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_linear_27108_31308_both.csv')),
               ('NZ_CP016323.1', 31108, 35308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_linear_31108_35308_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_linear_31108_35308_both.csv')),
               ('NZ_CP016323.1', 35108, 39308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_linear_35108_39308_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_linear_35108_39308_both.csv')),
               ('NZ_CP016323.1', 39108, 40850, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_linear_39108_40850_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_linear_39108_40850_both.csv')),
               ('NZ_CP016323.1', 11266, 15466, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_linear_11266_15466_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_linear_11266_15466_both.csv')),
               ('NZ_CP016323.1', 7266, 11466, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_linear_7266_11466_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_linear_7266_11466_both.csv')),
               ('NZ_CP016323.1', 3266, 7466, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_linear_3266_7466_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_linear_3266_7466_both.csv')),
               ('NZ_CP016323.1', 0, 3466, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('local_max_linear_0_3466_both.csv')),
+                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_linear_0_3466_both.csv')),
 
               }
 
@@ -249,8 +249,8 @@ class TestExpand(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
 
-        max_elt_input = pd.read_csv(self.find_data('expand_circ_no_more_attc_input.csv'))
-        max_elt_expected = pd.read_csv(self.find_data('expand_circ_no_more_attc_output.csv'))
+        max_elt_input = pd.read_csv(self.find_data('expand_mock', 'expand_circ_no_more_attc_input.csv'))
+        max_elt_expected = pd.read_csv(self.find_data('expand_mock', 'expand_circ_no_more_attc_output.csv'))
 
         max_elt_received = infernal.expand(replicon,
                                            wb, we,
@@ -302,8 +302,8 @@ class TestExpand(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
 
-        max_elt_input = pd.read_csv(self.find_data('expand_circ_right_in_rep_input.csv'))
-        max_elt_expected = pd.read_csv(self.find_data('expand_circ_right_in_rep_output.csv'))
+        max_elt_input = pd.read_csv(self.find_data('expand_mock', 'expand_circ_right_in_rep_input.csv'))
+        max_elt_expected = pd.read_csv(self.find_data('expand_mock', 'expand_circ_right_in_rep_output.csv'))
 
         max_elt_received = infernal.expand(replicon,
                                            wb, we,
@@ -343,8 +343,8 @@ class TestExpand(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
 
-        max_elt_input = pd.read_csv(self.find_data('expand_circ_left_in_rep_input.csv'))
-        max_elt_expected = pd.read_csv(self.find_data('expand_circ_left_in_rep_output.csv'))
+        max_elt_input = pd.read_csv(self.find_data('expand_mock', 'expand_circ_left_in_rep_input.csv'))
+        max_elt_expected = pd.read_csv(self.find_data('expand_mock', 'expand_circ_left_in_rep_output.csv'))
 
         max_elt_received = infernal.expand(replicon,
                                            wb, we,
@@ -382,8 +382,8 @@ class TestExpand(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
 
-        max_elt_input = pd.read_csv(self.find_data('expand_circ_left_over_ori_input.csv'))
-        max_elt_expected = pd.read_csv(self.find_data('expand_circ_left_over_ori_output.csv'))
+        max_elt_input = pd.read_csv(self.find_data('expand_mock', 'expand_circ_left_over_ori_input.csv'))
+        max_elt_expected = pd.read_csv(self.find_data('expand_mock', 'expand_circ_left_over_ori_output.csv'))
 
         max_elt_received = infernal.expand(replicon,
                                            wb, we,
@@ -422,8 +422,8 @@ class TestExpand(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
 
-        max_elt_input = pd.read_csv(self.find_data('expand_circ_right_over_ori_input.csv'))
-        max_elt_expected = pd.read_csv(self.find_data('expand_circ_right_over_ori_output.csv'))
+        max_elt_input = pd.read_csv(self.find_data('expand_mock', 'expand_circ_right_over_ori_input.csv'))
+        max_elt_expected = pd.read_csv(self.find_data('expand_mock', 'expand_circ_right_over_ori_output.csv'))
 
         max_elt_received = infernal.expand(replicon,
                                            wb, we,
@@ -463,8 +463,8 @@ class TestExpand(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
 
-        max_elt_input = pd.read_csv(self.find_data('expand_circ_both_win_in_rep_input.csv'))
-        max_elt_expected = pd.read_csv(self.find_data('expand_circ_both_win_in_rep_output.csv'))
+        max_elt_input = pd.read_csv(self.find_data('expand_mock', 'expand_circ_both_win_in_rep_input.csv'))
+        max_elt_expected = pd.read_csv(self.find_data('expand_mock', 'expand_circ_both_win_in_rep_output.csv'))
 
         max_elt_received = infernal.expand(replicon,
                                            wb, we,
@@ -503,8 +503,8 @@ class TestExpand(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
 
-        max_elt_input = pd.read_csv(self.find_data('expand_linear_input.csv'))
-        max_elt_expected = pd.read_csv(self.find_data('expand_linear_output.csv'))
+        max_elt_input = pd.read_csv(self.find_data('expand_mock', 'expand_linear_input.csv'))
+        max_elt_expected = pd.read_csv(self.find_data('expand_mock', 'expand_linear_output.csv'))
 
         max_elt_received = infernal.expand(replicon,
                                            wb, we,
