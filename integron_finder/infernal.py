@@ -316,6 +316,7 @@ def expand(replicon,
                                evalue_attc=evalue_attc
                                )
             max_elt = pd.concat([max_elt, df_max])
+            _log.info(f"\tsearched {window_beg}->{window_end} in {searched_strand} strand(s) found {len(df_max)} attc sites")
 
             if circular:
                 if window_end == end_of_turn:
@@ -366,6 +367,7 @@ def expand(replicon,
                                cpu_nb=cpu,
                                evalue_attc=evalue_attc)
             max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
+            _log.info(f"\tsearched {window_beg}->{window_end} in {searched_strand} strand(s) found {len(df_max)} attc sites")
 
             if circular:
                 if df_max.empty or window_beg == end_of_turn:
