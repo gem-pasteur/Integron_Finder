@@ -12,8 +12,6 @@ branches:
 
 # command to install dependencies
 before_install:
-  - sudo apt-get update
-  - sudo apt-get -y install python3-pip python3-setuptools python3-coverage python3-numpy python3-matplotlib python3-pandas python3-biopython
 
   - PV="2.6.3"
   - wget https://github.com/hyattpd/Prodigal/archive/v${PV}.tar.gz
@@ -35,12 +33,13 @@ before_install:
 
 # command to install integron_finder
 install:
-  - pip3 install .
+  - pip install .
+  - pip install coverage
 
 # test integron_finder
 script:
-  - python3-coverage run --source integron_finder tests/run_tests.py -vv
-  - python3-coverage report
+  - coverage run --source integron_finder tests/run_tests.py -vv
+  - coverage report
 
 after_success:
   - coveralls
