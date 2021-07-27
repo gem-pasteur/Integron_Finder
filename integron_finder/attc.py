@@ -339,9 +339,6 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                ) % size_replicon < distance_threshold
                     go_right = (all_attc.pos_beg.values[-1] - full_element[full_element.type_elt == "attC"].pos_end.values[-1]
                                 ) % size_replicon < distance_threshold
-                    print("### go_left =", go_left)
-                    print("### go_rigth =", go_right)
-                    print("### df_max =", df_max, sep='\n')
                     max_elt = expand(replicon,
                                      window_beg, window_end, max_elt,
                                      circular, distance_threshold,
