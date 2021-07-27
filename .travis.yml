@@ -3,15 +3,19 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 # Apply only on main branches
 branches:
   except:
        - /^feat.*$/
+       - /^issue.*$/
 
 # command to install dependencies
 before_install:
   - sudo apt-get update
-  - sudo apt-get -y install python-pip python-numpy python-matplotlib python-biopython
+  - sudo apt-get -y "install python3-pip python3-setuptools python3-coverage \
+    python3-numpy python3-matplotlib python3-pandas python3-biopython"
+
 
   - PV="2.6.3"
   - wget https://github.com/hyattpd/Prodigal/archive/v${PV}.tar.gz
@@ -19,7 +23,7 @@ before_install:
   - cd Prodigal-${PV} && make && sudo make install
   - cd -
 
-  - PV="1.1.3"
+  - PV="1.1.4"
   - wget http://eddylab.org/infernal/infernal-${PV}.tar.gz
   - tar -xf infernal-${PV}}.tar.gz
   - cd infernal-${PV} && ./configure && make && sudo make install
@@ -33,9 +37,7 @@ before_install:
 
 # command to install integron_finder
 install:
-  - python setup.py sdist
-  - pip install python-coveralls coverage
-  - pip install dist/integron_finder*.tar.gz
+  - pip3 install .
 
 # test integron_finder
 script:
