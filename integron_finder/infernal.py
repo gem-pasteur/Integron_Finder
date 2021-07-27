@@ -144,7 +144,7 @@ def local_max(replicon,
               model_attc_path,
               strand_search="both",
               evalue_attc=1., max_attc_size=200, min_attc_size=40,
-              cmsearch_bin='cmsearch', out_dir='.', cpu_nb=1):
+              cmsearch_bin='cmsearch', out_dir='.', cpu=1):
     """
     :param replicon: The replicon to analyse
     :type replicon: :class:`Bio.Seq.SeqRecord` object.
@@ -164,7 +164,7 @@ def local_max(replicon,
     :param int min_attc_size: The minimum value fot the attC size
     :param str cmsearch_bin: The path to cmsearch
     :param str out_dir: The path to directory where to write results
-    :param int cpu_nb: The number of cpu used by cmsearch
+    :param int cpu: The number of cpu used by cmsearch
     :return: DataFrame with same structure as the DataFrame returns by :func:`read_infernal`
              where position are converted on position on replicon and attc are filtered
              by evalue, min_attc_size, max_attc_size
@@ -199,7 +199,7 @@ def local_max(replicon,
                                                         strand={"both": "",
                                                                 "top": "--toponly",
                                                                 "bottom": "--bottomonly"}[strand_search],
-                                                        cpu=cpu_nb,
+                                                        cpu=cpu,
                                                         out=output_path,
                                                         tblout=tblout_path,
                                                         incE=evalue_attc,
@@ -312,7 +312,8 @@ def expand(replicon,
                                max_attc_size=max_attc_size,
                                min_attc_size=min_attc_size,
                                strand_search=searched_strand,
-                               out_dir=out_dir, cpu_nb=cpu,
+                               out_dir=out_dir,
+                               cpu=cpu,
                                evalue_attc=evalue_attc,
                                cmsearch_bin=cmsearch_bin
                                )
@@ -365,7 +366,7 @@ def expand(replicon,
                                min_attc_size=min_attc_size,
                                strand_search=searched_strand,
                                out_dir=out_dir,
-                               cpu_nb=cpu,
+                               cpu=cpu,
                                evalue_attc=evalue_attc,
                                cmsearch_bin=cmsearch_bin)
             max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.

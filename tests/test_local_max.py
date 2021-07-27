@@ -122,7 +122,7 @@ class TestLocalMax(IntegronTest):
         self.cmsearch = which('cmsearch')
         self.out_dir = self.tmp_dir
         self.model_attc_path = self.find_data(os.path.join('Models', 'attc_4.cm'))
-        self.cpu_nb = 1
+        self.cpu = 1
         replicon_name = 'lian.001.c02.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         topologies = Topology('lin')
@@ -155,7 +155,7 @@ class TestLocalMax(IntegronTest):
                                                 strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
-                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
+                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu=self.cpu
                                                 )
         local_max_expected = pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
                                            ['LIAN.001.C02_10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
@@ -174,7 +174,7 @@ class TestLocalMax(IntegronTest):
                                                 strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
-                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
+                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu=self.cpu
                                                 )
         local_max_expected = pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg',
                                                    'pos_end', 'sens', 'evalue'])
@@ -191,7 +191,7 @@ class TestLocalMax(IntegronTest):
                                                 strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
-                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
+                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu=self.cpu
                                                 )
         local_max_expected = pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg',
                                                    'pos_end', 'sens', 'evalue'])
@@ -209,7 +209,7 @@ class TestLocalMax(IntegronTest):
                                                 strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
-                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
+                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu=self.cpu
                                                 )
         local_max_expected = pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
                                            ['LIAN.001.C02_10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
@@ -229,7 +229,7 @@ class TestLocalMax(IntegronTest):
                                                 strand_search=strand_search,
                                                 evalue_attc=self.evalue_attc,
                                                 max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
-                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu_nb=self.cpu_nb
+                                                cmsearch_bin=self.cmsearch, out_dir=self.out_dir, cpu=self.cpu
                                                 )
         local_max_expected = pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 943270, 943395, '+', 0.13],
                                            ['LIAN.001.C02_10', 'attC_4', 1, 47, 944008, 944133, '+', 0.049],
@@ -252,7 +252,7 @@ class TestLocalMax(IntegronTest):
                                    strand_search=strand_search,
                                    evalue_attc=self.evalue_attc,
                                    max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
-                                   cmsearch_bin=cmsearch_bin, out_dir=self.out_dir, cpu_nb=self.cpu_nb
+                                   cmsearch_bin=cmsearch_bin, out_dir=self.out_dir, cpu=self.cpu
                                    )
         self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: '{}'".format(cmsearch_bin),
                         str(ctx.exception)))
@@ -270,6 +270,6 @@ class TestLocalMax(IntegronTest):
                                    strand_search=strand_search,
                                    evalue_attc=self.evalue_attc,
                                    max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
-                                   out_dir=self.out_dir, cpu_nb=self.cpu_nb
+                                   out_dir=self.out_dir, cpu=self.cpu
                                    )
         self.assertTrue(str(ctx.exception).endswith("failed returncode = {}".format(infernal.call(None))))

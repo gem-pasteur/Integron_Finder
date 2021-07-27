@@ -63,7 +63,7 @@ class TestFindAttc(IntegronTest):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
         self.cmsearch_path = find_executable("cmsearch")
-        self.cpu_nb = 1
+        self.cpu = 1
         self.model_attc = self.find_data(os.path.join('Models', 'attc_4.cm'))
         self.replicon_name = 'acba.007.p01.13'
         self.replicon_path = self.find_data(os.path.join('Replicons', self.replicon_name + '.fst'))
