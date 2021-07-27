@@ -23,7 +23,7 @@ before_install:
 
   - PV="1.1.4"
   - wget http://eddylab.org/infernal/infernal-${PV}.tar.gz
-  - tar -xf infernal-${PV}}.tar.gz
+  - tar -xf infernal-${PV}.tar.gz
   - cd infernal-${PV} && ./configure && make && sudo make install
   - cd -
 
