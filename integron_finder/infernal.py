@@ -281,6 +281,7 @@ def expand(replicon,
     :param bool search_right: trigger the local_max search on the right of the already detected element
     :param str out_dir: The path to directory where to write results
     :param int cpu: the number of cpu use by expand
+    :param str cmsearch_bin: the path to the `cmsearch` binary to use
     :return: a copy of max_elt with attC hits
     :rtype: :class:`pandas.DataFrame` object
 

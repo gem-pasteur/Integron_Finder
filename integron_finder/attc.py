@@ -191,13 +191,12 @@ def find_attc_max(integrons, replicon, distance_threshold,
     :param bool circular: True if replicon is circular, False otherwise.
     :param str out_dir: The directory where to write results
                         used indirectly by some called functions as :func:`infernal.local_max` or `infernal.expand`.
+    :param str cmsearch_bin: The path to the `cmsearch_bin` binary to use
     :param int cpu: call local_max with the right number of cpu
     :return:
     :rtype: :class:`pd.DataFrame` object
 
     """
-
-
     size_replicon = len(replicon)
     columns = ['Accession_number', 'cm_attC', 'cm_debut', 'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']
     data_type = {'Accession_number': 'str', 'cm_attC': 'str',
