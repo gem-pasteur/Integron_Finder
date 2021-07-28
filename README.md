@@ -32,27 +32,41 @@ If you want the version 2.0, you can install it with pip, but there are still a 
 
 for more installation options, or for developer installation see documentation
 
-#### Singularity container
+#### Container
 
 For reproducibility and easy way to use integron_finder without installing
-third party software (hmmsearch, ...) or libraries, we provide containers based on singularity
+third party software (hmmsearch, prodigal, ...) or libraries, we provide containers based on docker.
 
-[![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1314)
+https://hub.docker.com/repository/docker/gempasteur/integron_finder/general
 
-So you just have to install singularity (https://github.com/singularityware/singularity)
+##### Docker
 
-then
+The computation are perform under IF user in /home/IF inside the container. 
+So You have to mount a directory from the host in the container to exchange data 
+(inputs data, and results) from the host and the container. 
 
-    singularity run shub:gem-pasteur/Integron_Finder -h
+The shared directory must be writable by the IF user or overwrite the user in the container by your id (see example below)
 
-to run the last version (from master branch)
-if you prefer download a specific version (with renaming the container on the fly)
+```
+mkdir shared_dir
+cd shared_dir
+docker run -v $PWD:/home/IF -u $(id -u ${USER}):$(id -g ${USER}) integron_finder:2.0rc9 --local-max --circ --keep-tmp NZ_CP016323.fna
+```
 
-    singularity pull --name integron_finder shub:gem-pasteur/Integron_Finder:2.0
+##### Singularity
 
-when you have the image in local you can use it as if integron_finder has been installed
+As the docker image is registered in docker hub you can also use it directly with *Singularity*. 
+Unlike *docker*, you have not to worry about shared directory, your `home` and `/tmp` are automatically shared.
 
-    ./integron_finder -h
+```
+singularity run -H ${HOME} docker://gempasteur/integron_finder:2.0rc9  --local-max --circ --keep-tmp NZ_CP016323.fna
+```
+
+or use *-b* option if the data is not in your home.
+
+```
+singularity run -H ${HOME} -b <the directory containing data> docker://gempasteur/integron_finder:2.0rc9 --local-max --circ --keep-tmp NZ_CP016323.fna
+```
 
 #### Conda installation [not yet available]
 
@@ -248,8 +262,7 @@ Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
    **Prodigal: prokaryotic gene recognition and translation initiation site identification.**
    *BMC Bioinformatics, 11, 119.*
 
-and if you use the function `--func_annot` which uses Resfams:
+and if you use the function `--func_annot` which uses *NCBIfam-AMRFinder* hmm profiles:
 
- - Gibson, M.K., Forsberg, K.J. and Dantas, G. (2015)
-   **Improved annotation of antibiotic resistance determinants reveals microbial resistomes cluster by ecology.**
-   *ISME J, 9, 207-216.*
+ - Haft, DH et al., Nucleic Acids Res. 2018 Jan 4;46(D1):D851-D860 PMID: 29112715 
+ 
