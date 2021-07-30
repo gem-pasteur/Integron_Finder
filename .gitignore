@@ -28,6 +28,7 @@ coverage_html/
 # distribution packages #
 #########################
 dist/
+build/
 
 ########################
 # setup generated file #
@@ -44,6 +45,7 @@ doc/build/
 ###########################
 Results_Integron_Finder*/
 !tests/data/Results_Integron_Finder*/
+/data/
 
 ######################
 # Singularity images #
