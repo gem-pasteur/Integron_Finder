@@ -29,8 +29,7 @@
 import sys
 from time import localtime, strftime
 
-__version__ = '2-{}'.format(strftime("%Y-%m-%d", localtime()))
-__INTEGRON_DATA__ = '$INTEGRONDATA'
+__version__ = '22'
 
 
 class IntegronError(Exception):
