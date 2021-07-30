@@ -43,7 +43,7 @@ without to reinstall the project.
 
 .. warning::
     Debian/Ubuntu distribution `--user` is the default. So the `--prefix` option does not work
-    and the `--root` opton has unexpected behavior. Therefore the best solution is to use `--user` or a virtualenv.
+    and the `--root` option has unexpected behavior. Therefore the best solution is to use `--user` or a virtualenv.
 
 
 Send changes to upstream repository

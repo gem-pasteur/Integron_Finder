@@ -13,7 +13,7 @@ IntegronFinder dependencies
 
 IntegronFinder is built with Python >= 3.4, and a few libraries are needed:
 
-- Python >=3.4
+- Python >=3.6
 - Pandas (>=0.22)
 - Numpy (>=1.14.2)
 - Biopython (>=1.70)
@@ -27,7 +27,7 @@ installed prior the use of the program (click to access the corresponding
 website).
 
 - `HMMER 3.1b2`_
-- `INFERNAL 1.1`_
+- `INFERNAL 1.1.2`_
 - `Prodigal V2.6.2`_
 - `Nextflow`_ (for parallelization)
 
