@@ -13,7 +13,7 @@ IntegronFinder dependencies
 
 IntegronFinder is built with Python >= 3.4, and a few libraries are needed:
 
-- Python >=3.4
+- Python >=3.6
 - Pandas (>=0.22)
 - Numpy (>=1.14.2)
 - Biopython (>=1.70)
@@ -27,7 +27,7 @@ installed prior the use of the program (click to access the corresponding
 website).
 
 - `HMMER 3.1b2`_
-- `INFERNAL 1.1`_
+- `INFERNAL 1.1.2`_
 - `Prodigal V2.6.2`_
 - `Nextflow`_ (for parallelization)
 
@@ -57,7 +57,7 @@ From Version 2.0
 
 System wide installation
 """"""""""""""""""""""""
-1. Open a terminal and hit::
+1. Open a terminal and hit (not recommended)::
 
     sudo pip install integron_finder
 
@@ -243,10 +243,10 @@ To install version 1.71 of Biopython (recommended for IntegronFinder).
 .. _`stackoverflow`: http://stackoverflow.com/
 
 .. _`HMMER 3.1b2`: http://hmmer.janelia.org/
-.. _`INFERNAL 1.1`: http://infernal.janelia.org/
+.. _`INFERNAL 1.1.2`: http://infernal.janelia.org/
 .. _`Prodigal V2.6.2`: https://github.com/hyattpd/Prodigal/releases
 .. _`Nextflow`: https://www.nextflow.io/
 
 .. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/tag/v1.5.0
-.. _`virtualenv`: http://www.virtualenv.org/
+.. _`virtualenv`: https://docs.python.org/3/library/venv.html
 .. _`Canopy CLI`: http://docs.enthought.com/canopy/configure/canopy-cli.html#canopy-cli-venv

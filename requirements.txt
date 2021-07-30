@@ -1,5 +1,0 @@
-numpy>=1.19
-matplotlib>=3.2
-pandas>=1.1
-biopython>=1.78
-colorlog

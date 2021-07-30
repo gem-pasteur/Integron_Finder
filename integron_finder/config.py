@@ -27,9 +27,9 @@
 ####################################################################################
 
 import os
+import pkg_resources
 
 from . import utils
-from . import __INTEGRON_DATA__
 
 
 class Config:
@@ -40,11 +40,8 @@ class Config:
     def __init__(self, args):
         self._model_len = None  # model_len cache, because it's computation is "heavy" (open file)
         self._args = args
+        self._prefix_data = pkg_resources.resource_filename('integron_finder', "data")
 
-        if __INTEGRON_DATA__ == '$' + 'INTEGRONDATA':
-            self._prefix_data = os.path.normpath(os.path.join(os.path.join(os.path.dirname(__file__)), '..', 'data'))
-        else:
-            self._prefix_data = os.path.join(__INTEGRON_DATA__, 'data')
 
     def __getattr__(self, item):
         try:

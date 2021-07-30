@@ -21,16 +21,33 @@ See Documentation for how to use it:
 
 ## Installation
 
-*Nota Bene*: version 2.0 isn't fully released yet. The pip installation below is for the version 1.5 with python2.7. 
-If you want the version 2.0, you can install it with pip, but there are still a few minor bugs around (see issues). 
+Although a system wide installation is possible and supported, many distribution do not allow it.
+So we describe bellow some user wide installation procedures.
 
-    pip install git+https://github.com/gem-pasteur/Integron_Finder/#egg=integron_finder
+### For user
 
-### For user (version 1.5)
-
-    pip install integron_finder
+    pip install --user integron_finder==2.xx
 
 for more installation options, or for developer installation see documentation
+
+### In a virtualenv
+
+To avoid interaction with the system libraries you can install integron_finder in a [virtualenv](https://docs.python.org/3/library/venv.html).
+
+1. create and activate the virtualenv
+   ```bash
+    python -m venv Integron_Finder
+    ./Integron_Finder/bin/activate
+   ```
+2. install integron_finder
+    ```bash
+    (Integron_Finder) python -m pip install integron_finder
+    ```
+   all libraries will be located in `Integron_Finder` directory
+3. when you want to quit the virtualenv
+    ```bash
+    (Integron_Finder) deactivate
+    ```
 
 #### Container
 
@@ -88,7 +105,8 @@ Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
 ### For developer
 
 If you want to develop or submit a patch on this software you are welcome.
-See [Developer installation](https://integronfinder.readthedocs.io/en/latest/developer_guide/dev_guide.html#developer-installation) in documentation.
+See [Developer installation](https://integronfinder.readthedocs.io/en/latest/developer_guide/dev_guide.html#developer-installation) 
+in documentation.
 
 
 ## Licence:
@@ -112,10 +130,11 @@ But before to do that we encourage to read [the contributing guide](CONTRIBUTING
 ## Dependencies
 
 - Python >=3.6
-- Pandas >=0.22.0
+- Pandas >=0.22
 - Numpy >=1.14.2
 - Biopython >=1.70
 - Matplotlib >=2.2.2
+- colorlog
 - HMMER >=3.1b2
 - INFERNAL >=1.1.2
 - Prodigal >=2.6.2
@@ -228,7 +247,8 @@ By default, integron_finder will output 3 files under Results_Integron_Finder_my
 - `mysequences.summary` : A summary file with the number and type of integrons per sequence.
 - `integron_finder.out` : A copy standard output. The stdout can be silenced with the argument --mute
 
-The amount of log in the standard output can be controlled with `--verbose` for more or `--quiet` for less, and both are cumulative arguments, eg. `-vv` or `-qq`.
+The amount of log in the standard output can be controlled with `--verbose` for more or `--quiet` for less, 
+and both are cumulative arguments, eg. `-vv` or `-qq`.
 
 Other files can be created on demand:
 
