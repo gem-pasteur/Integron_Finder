@@ -31,8 +31,6 @@ import pkg_resources
 
 from . import utils
 
-my_data = pkg_resources.resource_filename('integron_finder', "data")
-
 
 class Config:
     """

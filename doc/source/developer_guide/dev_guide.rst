@@ -46,6 +46,24 @@ without to reinstall the project.
     and the `--root` option has unexpected behavior. Therefore the best solution is to use `--user` or a virtualenv.
 
 
+Build a new release
+===================
+
+#. activate the virtualenv::
+
+    ./Integron_Finder/bin/activate
+
+#. Go to the root of the project::
+
+    cd Integron_Finder/src/Integron_Finder
+
+#. Te build the new release::
+
+    python -m build .
+
+it will create a source *tar.gz* distribution and a *wheel*
+
+
 Send changes to upstream repository
 ===================================
 

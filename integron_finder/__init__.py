@@ -29,7 +29,7 @@
 import sys
 from time import localtime, strftime
 
-__version__ = '22'
+__version__ = '2-{}'.format(strftime("%Y-%m-%d", localtime()))
 
 
 class IntegronError(Exception):
