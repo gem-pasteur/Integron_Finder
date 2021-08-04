@@ -238,30 +238,32 @@ class TestFindAttCMax(IntegronTest):
         self.integron.attC = attC
         integrons = [self.integron]
 
-        max_final = find_attc_max(integrons, self.replicon,
-                                  self.cfg.distance_threshold, self.cfg.model_attc_path,
-                                  self.cfg.max_attc_size, self.cfg.min_attc_size,
-                                  circular=True,
-                                  out_dir=self.tmp_dir)
+        for is_circ in True, False:
+            with self.subTest(is_circ=is_circ):
+                max_final = find_attc_max(integrons, self.replicon,
+                                          self.cfg.distance_threshold, self.cfg.model_attc_path,
+                                          self.cfg.max_attc_size, self.cfg.min_attc_size,
+                                          circular=is_circ,
+                                          out_dir=self.tmp_dir)
 
-        exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001'],
-                            'cm_attC': ['attc_4'],
-                            'cm_debut': [1],
-                            'cm_fin': [47],
-                            'pos_beg': [421689],
-                            'pos_end': [421764],
-                            'sens': ['+'],
-                            'evalue': [0.062]
-                            },
-                           index=[0],
-                           columns=self.max_cols
-                           )
-        exp = exp.astype(dtype=self.max_dtype)
+                exp = pd.DataFrame({'Accession_number': ['OBAL001.B.00005.C001'],
+                                    'cm_attC': ['attc_4'],
+                                    'cm_debut': [1],
+                                    'cm_fin': [47],
+                                    'pos_beg': [421689],
+                                    'pos_end': [421764],
+                                    'sens': ['+'],
+                                    'evalue': [0.062]
+                                    },
+                                   index=[0],
+                                   columns=self.max_cols
+                                   )
+                exp = exp.astype(dtype=self.max_dtype)
 
-        cols_2_compare = ['Accession_number', 'cm_attC', 'pos_beg', 'pos_end', 'sens', 'evalue']
-        # cm_debut and cm_fin can varie depending if the data are generated with
-        # local_max or get from previous regular search (in this last case cm_debut & cm_fin are dummy)
-        pdt.assert_frame_equal(max_final[cols_2_compare], exp[cols_2_compare])
+                cols_2_compare = ['Accession_number', 'cm_attC', 'pos_beg', 'pos_end', 'sens', 'evalue']
+                # cm_debut and cm_fin can vary depending if the data are generated with
+                # local_max or get from previous regular search (in this last case cm_debut & cm_fin are dummy)
+                pdt.assert_frame_equal(max_final[cols_2_compare], exp[cols_2_compare])
 
 
     def test_find_attc_max_In0(self):
@@ -289,13 +291,14 @@ class TestFindAttCMax(IntegronTest):
         integrase = integrase.astype(dtype=self.dtype)
         integron.integrase = integrase
         integrons = [integron]
+        for is_circ in True, False:
+            with self.subTest(is_circ=is_circ):
+                max_final = find_attc_max(integrons, replicon,
+                                          self.cfg.distance_threshold, self.cfg.model_attc_path,
+                                          self.cfg.max_attc_size, self.cfg.min_attc_size,
+                                          circular=is_circ,
+                                          out_dir=self.tmp_dir)
 
-        max_final = find_attc_max(integrons, replicon,
-                                  self.cfg.distance_threshold, self.cfg.model_attc_path,
-                                  self.cfg.max_attc_size, self.cfg.min_attc_size,
-                                  circular=True,
-                                  out_dir=self.tmp_dir)
-
-        exp = pd.DataFrame(columns=self.max_cols)
-        exp = exp.astype(dtype=self.max_dtype)
-        pdt.assert_frame_equal(max_final, exp)
+                exp = pd.DataFrame(columns=self.max_cols)
+                exp = exp.astype(dtype=self.max_dtype)
+                pdt.assert_frame_equal(max_final, exp)
