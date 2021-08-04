@@ -281,7 +281,7 @@ class TestParseArgs(IntegronTest):
 
         with self.catch_io(out=True):
             try:
-                _ = cfg = parse_args(['--version'])
+                _ = parse_args(['--version'])
             except TypeError as err:
                 msg = sys.stdout.getvalue()
                 msg_expected = """integron_finder version {i_f}
