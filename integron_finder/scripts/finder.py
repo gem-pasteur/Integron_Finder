@@ -59,11 +59,12 @@ from integron_finder.infernal import find_attc
 from integron_finder.integron import find_integron
 from integron_finder.annotation import func_annot, add_feature
 from integron_finder.prot_db import GembaseDB, ProdigalDB
-from integron_finder.argparse_utils import MyVersionAction
+from integron_finder import argparse_utils
 
 def parse_args(args):
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("replicon",
+                        type=argparse_utils.path,
                         help="Path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst")
 
     parser.add_argument("--local-max",
@@ -102,18 +103,21 @@ def parse_args(args):
 
     parser.add_argument('--cmsearch',
                         default=distutils.spawn.find_executable("cmsearch"),
-                        type=str,
+                        type=argparse_utils.path,
                         help='Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch')
 
     parser.add_argument('--hmmsearch',
                         default=distutils.spawn.find_executable("hmmsearch"),
+                        type=argparse_utils.path,
                         help='Complete path to hmmsearch if not in PATH. eg: /usr/local/bin/hmmsearch')
 
     parser.add_argument('--prodigal',
                         default=distutils.spawn.find_executable("prodigal"),
+                        type=argparse_utils.path,
                         help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
 
     parser.add_argument('--path-func-annot',
+                        type=argparse_utils.path,
                         help='Path to file containing all hmm bank paths (one per line)')
 
     parser.add_argument("--gembase",
@@ -205,10 +209,11 @@ def parse_args(args):
                               help="Set the default topology for replicons to 'linear'",
                               action="store_true")
     parser.add_argument("--topology-file",
+                        type=argparse_utils.path,
                         help="The path to a file where the topology for each replicon is specified.")
 
     parser.add_argument("--version",
-                        action=MyVersionAction)
+                        action=argparse_utils.MyVersionAction)
 
     parser.add_argument("--mute",
                         action='store_true',
