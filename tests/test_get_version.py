@@ -66,7 +66,7 @@ class TestGetVersion(IntegronTest):
                 sys.exit = real_exit
 
         exp_version = """integron_finder version {i_f}
-Using:    
+Using:
  - Python {py}
  - numpy {np}
  - pandas {pd}

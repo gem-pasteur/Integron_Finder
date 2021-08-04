@@ -281,7 +281,7 @@ class TestParseArgs(IntegronTest):
             except TypeError as err:
                 msg = sys.stdout.getvalue()
                 msg_expected = """integron_finder version {i_f}
-Using:    
+Using:
  - Python {py}
  - numpy {np}
  - pandas {pd}
@@ -315,10 +315,7 @@ Citation:
            cmsearch=integron_finder._cmsearch_version(distutils.spawn.find_executable("cmsearch")),
            hmmsearch=integron_finder._hmmsearch_version(distutils.spawn.find_executable("hmmsearch"))
            )
-
-                self.assertEqual(msg.strip(), msg_expected.strip())
-                # program exit with returncode = 2
-                self.assertEqual(str(err), '0')
             finally:
                 sys.exit = real_exit
+            self.assertEqual(msg.strip(), msg_expected.strip())
 

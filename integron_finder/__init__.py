@@ -82,7 +82,7 @@ def get_version_message(hmmsearch, cmsearch, prodigal):
     from Bio import __version__ as bio_vers
 
     version_text = """integron_finder version {i_f}
-Using:    
+Using:
  - Python {py}
  - numpy {np}
  - pandas {pd}
