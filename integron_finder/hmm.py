@@ -68,13 +68,7 @@ def scan_hmm_bank(path):
                     if bank_path.startswith('#'):
                         continue
                     elif not os.path.isabs(bank_path):
-                        if "_prefix_share" in globals():
-                            prefix = _prefix_share
-                        elif 'INTEGRON_HOME' in os.environ:
-                            prefix = os.environ['INTEGRON_HOME']
-                        else:
-                            prefix = ''
-                        bank_path = os.path.normpath(os.path.join(prefix, bank_path))
+                        bank_path = os.path.normpath(bank_path)
                     bank_files = glob.glob(os.path.expanduser(bank_path))
                     if not bank_files:
                         wrong_lines += 1
