@@ -68,3 +68,4 @@ work/
 # egg-info #
 ############
 *.egg-info
+\.eggs/
