@@ -27,12 +27,14 @@
 ####################################################################################
 
 import sys
+import distutils.spawn
 
 try:
     from tests import IntegronTest
 except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
+
 
 from integron_finder.scripts import finder
 
@@ -51,11 +53,11 @@ class TestGetVersion(IntegronTest):
         from pandas import __version__ as pd_vers
         from matplotlib import __version__ as mplt_vers
         from Bio import __version__ as bio_vers
-        from integron_finder import __version__ as if_vers
+        import integron_finder
 
         with self.catch_io(out=True, err=False):
             try:
-                finder.main(['integron_finder', '-V'])
+                finder.main(['integron_finder', '--version'])
             except TypeError as err:
                 version = sys.stdout.getvalue()
                 # program exit with returncode = 0
@@ -71,6 +73,10 @@ Using:
  - matplolib {mplt}
  - biopython {bio}
 
+ - {prodigal}
+ - {cmsearch}
+ - {hmmsearch}
+
 Authors:
  - Jean Cury, Bertrand Neron, Eduardo Rocha,
 
@@ -84,11 +90,14 @@ Citation:
 
  Haft, DH et al., Nucleic Acids Res. 2018 Jan 4;46(D1):D851-D860
  PMID: 29112715
-""".format(i_f=if_vers,
+""".format(i_f=integron_finder.__version__,
             py=sys.version.replace('\n', ' '),
             np=np_vers,
             pd=pd_vers,
             mplt=mplt_vers,
-            bio=bio_vers
+            bio=bio_vers,
+            prodigal=integron_finder._prodigal_version(distutils.spawn.find_executable("prodigal")),
+            cmsearch=integron_finder._cmsearch_version(distutils.spawn.find_executable("cmsearch")),
+            hmmsearch=integron_finder._hmmsearch_version(distutils.spawn.find_executable("hmmsearch"))
             )
-        self.assertEqual(exp_version.strip(), version.strip())
+        self.assertEqual(exp_version, version)

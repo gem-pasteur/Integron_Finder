@@ -27,6 +27,9 @@
 ####################################################################################
 
 import sys
+from subprocess import run
+import distutils.spawn
+
 from time import localtime, strftime
 
 __version__ = '2-{}'.format(strftime("%Y-%m-%d", localtime()))
@@ -40,11 +43,44 @@ class EmptyFileError(IntegronError):
     pass
 
 
-def get_version_message():
+def _eddy_version(path):
+    process = run([path, "-h"], capture_output=True, text=True)
+    vers = process.stdout.split('\n')[1].strip()[2:]
+    return vers
+
+def _hmmsearch_version(path):
+    """
+
+    :return:
+    """
+    return _eddy_version(path)
+
+
+def _cmsearch_version(path):
+    """
+
+    :return:
+    """
+    return _eddy_version(path)
+
+
+def _prodigal_version(path):
+    """
+
+    :return:
+    """
+    process = run([path, "-v"], capture_output=True, text=True)
+    vers = process.stderr.strip()
+    return vers
+
+
+
+def get_version_message(hmmsearch, cmsearch, prodigal):
     from numpy import __version__ as np_vers
     from pandas import __version__ as pd_vers
     from matplotlib import __version__ as mplt_vers
     from Bio import __version__ as bio_vers
+
     version_text = """integron_finder version {i_f}
 Using:    
  - Python {py}
@@ -52,6 +88,10 @@ Using:
  - pandas {pd}
  - matplolib {mplt}
  - biopython {bio}
+
+ - {prodigal}
+ - {cmsearch}
+ - {hmmsearch}
 
 Authors:
  - Jean Cury, Bertrand Neron, Eduardo Rocha,
@@ -67,12 +107,15 @@ Citation:
  Haft, DH et al., Nucleic Acids Res. 2018 Jan 4;46(D1):D851-D860
  PMID: 29112715
 """.format(i_f=__version__,
-            py=sys.version.replace('\n', ' '),
-            np=np_vers,
-            pd=pd_vers,
-            mplt=mplt_vers,
-            bio=bio_vers
-            )
+           py=sys.version.replace('\n', ' '),
+           np=np_vers,
+           pd=pd_vers,
+           mplt=mplt_vers,
+           bio=bio_vers,
+           prodigal=_prodigal_version(prodigal),
+           cmsearch=_cmsearch_version(cmsearch),
+           hmmsearch=_hmmsearch_version(hmmsearch)
+          )
     return version_text
 
 

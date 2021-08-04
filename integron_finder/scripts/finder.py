@@ -59,7 +59,7 @@ from integron_finder.infernal import find_attc
 from integron_finder.integron import find_integron
 from integron_finder.annotation import func_annot, add_feature
 from integron_finder.prot_db import GembaseDB, ProdigalDB
-
+from integron_finder.argparse_utils import MyVersionAction
 
 def parse_args(args):
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -207,9 +207,8 @@ def parse_args(args):
     parser.add_argument("--topology-file",
                         help="The path to a file where the topology for each replicon is specified.")
 
-    parser.add_argument("-V", "--version",
-                        action="version",
-                        version=integron_finder.get_version_message())
+    parser.add_argument("--version",
+                        action=MyVersionAction)
 
     parser.add_argument("--mute",
                         action='store_true',
@@ -227,6 +226,19 @@ def parse_args(args):
                                default=0,
                                help='Decrease verbosity of output (can be cumulative : -qq)'
                                )
+
+    # to ensure that --version is at the end of cmd line
+    # to allow to parse cmsearch hmmsearch and prodigal options
+    # before to display version
+    # otherwise the version displayed used the default path for these third parties programs
+    vers = False
+    for i, item in enumerate(args):
+        if item.startswith('--vers'):
+            vers = True
+            break
+    if vers:
+        vers = args.pop(i)
+        args.append(vers)
 
     parsed_args = parser.parse_args(args)
 
@@ -425,7 +437,7 @@ def find_integron_in_one_replicon(replicon, config):
     return integron_file, summary_file
 
 
-def header(args):
+def header(args, hmmsearch, cmsearch, prodigal):
     """
 
     :param args: the arguments passed on command line. for instance: ['--pdf' '/path/to/replicon']
@@ -469,7 +481,9 @@ command used: integron_finder {cmd}
                      =======================
 
 """
-    header = tpl.format(version=integron_finder.get_version_message(),
+    header = tpl.format(version=integron_finder.get_version_message(hmmsearch=hmmsearch,
+                                                                    cmsearch=cmsearch,
+                                                                    prodigal=prodigal),
                         cmd=' '.join(args)
                         )
     return header
@@ -572,7 +586,11 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         log_header.addHandler(h)
     log_header.setLevel(colorlog.logging.logging.INFO)
     log_header.propagate = False
-    log_header.info(header(args))
+    log_header.info(header(args,
+                           hmmsearch=config.hmmsearch,
+                           cmsearch=config.cmsearch,
+                           prodigal=config.prodigal)
+                    )
 
     with utils.FastaIterator(config.input_seq_path, dist_threshold=config.distance_threshold) as sequences_db:
         ################
