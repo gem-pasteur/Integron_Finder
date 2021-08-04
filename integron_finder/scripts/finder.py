@@ -299,8 +299,8 @@ def find_integron_in_one_replicon(replicon, config):
         elif os.path.exists(config.func_annot_path):
             fa_hmm = scan_hmm_bank(config.func_annot_path)
         else:
-            raise IntegronError("the dir '{}' neither 'bank_hmm' exists, specify the location of hmm "
-                                "profile with --path-func-annot option".format(config.func_annot_path))
+            raise IntegronError("Neither the dir '{}' nor 'bank_hmm' exists, specify the location of hmm "
+                                "profiles with --path-func-annot option".format(config.func_annot_path))
         is_func_annot = True
 
     elif config.path_func_annot and config.no_proteins is False:
