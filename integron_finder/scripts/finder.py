@@ -139,7 +139,7 @@ def parse_args(args):
     parser.add_argument('--calin-threshold',
                         default=2,
                         type=int,
-                        help="keep 'CALIN' only if attC sites nuber >= calin-threshold (default: 2)")
+                        help="keep 'CALIN' only if attC sites number >= calin-threshold (default: 2)")
 
     parser.add_argument("--keep-palindromes",
                         default=False,
