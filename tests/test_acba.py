@@ -31,6 +31,7 @@ import shutil
 import tempfile
 import argparse
 import unittest
+import pkg_resources
 
 import pandas as pd
 import pandas.testing as pdt
@@ -72,9 +73,8 @@ class TestAcba(IntegronTest):
         os.makedirs(self.out_dir)
         integrase.call = self.mute_call(_prodigal_call)
         self.find_executable_ori = finder.distutils.spawn.find_executable
-        self.func_annot_dir = os.path.normpath(
-            os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation")
-        )
+        self._prefix_data = pkg_resources.resource_filename('integron_finder', "data")
+        self.func_annot_dir = os.path.join(self._prefix_data, "Functional_annotation")
 
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
@@ -168,6 +168,7 @@ class TestAcba(IntegronTest):
                                    columns=['ID_replicon', 'CALIN', 'complete', 'In0', 'topology', 'size'])
         iso_summary.set_index(['ID_replicon'], inplace=True)
         pdt.assert_frame_equal(summary_2nd_contig, iso_summary)
+
 
     def test_acba_simple_gembase(self):
         """
@@ -315,9 +316,6 @@ class TestAcba(IntegronTest):
         self.assertTrue(os.path.exists(pdf_test))
 
 
-    @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation")),
-                     "NCBIFAM profiles not found")
     def test_acba_annot(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
@@ -353,9 +351,6 @@ class TestAcba(IntegronTest):
         self.assertHmmEqual(expected_result_path, test_result_path)
 
 
-    @unittest.skipIf(not os.path.exists(
-        os.path.join(os.path.dirname(__file__), "..", "data", "Functional_annotation")),
-                     "NCBIFAM profiles not found")
     def test_acba_local_max(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
