@@ -457,6 +457,20 @@ class TestProdigalDB(IntegronTest):
         with self.assertRaises(RuntimeError) as ctx:
             ProdigalDB(replicon, cfg)
 
+    def test_make_protfile_prodigal_failed(self):
+        file_name = 'acba.007.p01.13'
+        replicon_path = self.find_data('Replicons', file_name + '.fst')
+        self.args.replicon = replicon_path
+        self.args.prodigal = self.find_data('fake_prodigal')
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+
+        with self.assertRaises(RuntimeError) as ctx:
+            ProdigalDB(replicon, cfg)
+
+        self.assertTrue(str(ctx.exception).strip().endswith(": failed : prodigal returncode = 50"))
 
     def test_protfile(self):
         file_name = 'acba.007.p01.13'
@@ -535,3 +549,5 @@ class TestProdigalDB(IntegronTest):
                         'ACBA.007.P01_13_1':  SeqDesc('ACBA.007.P01_13_1', 1, 55, 1014)}
         for seq_id, desc in descriptions.items():
             self.assertEqual(desc, db.get_description(seq_id))
+
+
