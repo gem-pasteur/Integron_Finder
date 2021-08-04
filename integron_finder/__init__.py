@@ -81,7 +81,15 @@ def get_version_message(hmmsearch, cmsearch, prodigal):
     from matplotlib import __version__ as mplt_vers
     from Bio import __version__ as bio_vers
 
-    version_text = """integron_finder version {i_f}
+    third_parties = {'hmmsearch': hmmsearch, 'cmsearch':cmsearch, 'prodigal':prodigal}
+    if not all(third_parties.values()):
+        version_text = ''
+        for prog_name, value in third_parties.items():
+            if not value:
+                version_text += f"{prog_name} not found in Path please use --{prog_name} option to specify it.\n"
+
+    else:
+        version_text = """integron_finder version {i_f}
 Using:
  - Python {py}
  - numpy {np}
@@ -116,6 +124,7 @@ Citation:
            cmsearch=_cmsearch_version(cmsearch),
            hmmsearch=_hmmsearch_version(hmmsearch)
           )
+
     return version_text
 
 

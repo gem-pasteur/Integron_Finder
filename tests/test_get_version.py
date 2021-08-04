@@ -37,7 +37,7 @@ except ImportError as err:
 
 
 from integron_finder.scripts import finder
-
+import integron_finder
 
 class TestGetVersion(IntegronTest):
 
@@ -53,7 +53,6 @@ class TestGetVersion(IntegronTest):
         from pandas import __version__ as pd_vers
         from matplotlib import __version__ as mplt_vers
         from Bio import __version__ as bio_vers
-        import integron_finder
 
         with self.catch_io(out=True, err=False):
             try:
@@ -100,4 +99,36 @@ Citation:
             cmsearch=integron_finder._cmsearch_version(distutils.spawn.find_executable("cmsearch")),
             hmmsearch=integron_finder._hmmsearch_version(distutils.spawn.find_executable("hmmsearch"))
             )
+        self.assertEqual(exp_version, version)
+
+
+    def test_get_version_no_binary(self):
+        # use directly get_version_message
+        # to simulate parser do not find binaries
+        # distutils.spawn.find_executable return None
+
+        ##################################
+        # case there is no binary at all #
+        ##################################
+        version = integron_finder.get_version_message(None,  # hmmsearch
+                                                      None,  # cmsearch
+                                                      None)  # prodigal
+
+        exp_version = """hmmsearch not found in Path please use --hmmsearch option to specify it.
+cmsearch not found in Path please use --cmsearch option to specify it.
+prodigal not found in Path please use --prodigal option to specify it.
+"""
+        self.assertEqual(exp_version, version)
+
+        #########################################
+        # case there cmsearch has been  found   #
+        # but not hmmsearch nor prodigal        #
+        #########################################
+        version = integron_finder.get_version_message(None,  # hmmsearch
+                                                      distutils.spawn.find_executable('cmsearch'),
+                                                      None)  # prodigal
+
+        exp_version = """hmmsearch not found in Path please use --hmmsearch option to specify it.
+prodigal not found in Path please use --prodigal option to specify it.
+"""
         self.assertEqual(exp_version, version)
