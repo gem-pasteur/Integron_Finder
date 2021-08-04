@@ -99,10 +99,8 @@ class ProteinDB(ABC):
         :return: an index of the sequence contains in protfile corresponding to the replicon
         """
         try:
-            alphabet = alphabet=Seq.IUPAC.extended_protein
             idx = SeqIO.index(self._prot_file, "fasta", alphabet=Seq.IUPAC.extended_protein)
         except AttributeError:
-            alphabet = None
             idx = SeqIO.index(self._prot_file, "fasta")
         return idx
 
@@ -149,7 +147,7 @@ class GembaseDB(ProteinDB):
             The attribute *path* must be injected in the object
             This attribute represent the path to a fasta file representing this replicon
         """
-        _log.debug("call GembaseDB with gembase_path= {}".format(gembase_path))
+        _log.debug(f"call GembaseDB with gembase_path= {gembase_path}")
         self.cfg = cfg
         if gembase_path is None:
             self._gembase_path = os.path.dirname(os.path.dirname(os.path.realpath(self.cfg.input_seq_path)))
@@ -232,7 +230,6 @@ class GembaseDB(ProteinDB):
         """
         all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._gembase_file_basename + '.prt')
         try:
-            alphabet=Seq.IUPAC.extended_protein
             all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
         except AttributeError:
             all_prots = SeqIO.index(all_prot_path, "fasta")
@@ -320,7 +317,7 @@ class GembaseDB(ProteinDB):
                           sep="\t"
                           )
         specie, date, strain, contig_gene = replicon_id.split('.')
-        pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig_gene)
+        pattern = f'{specie}\.{date}\.{strain}\.\w?{contig_gene}'
         genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
         prots_info = genome_info.loc[genome_info['type'] == 'CDS']
         return prots_info
@@ -334,7 +331,7 @@ class GembaseDB(ProteinDB):
 
         lst_path = os.path.join(self._gembase_path, 'LSTINF', self._gembase_file_basename + '.lst')
         if not os.path.exists(lst_path):
-            raise IntegronError("LSTINF directory nout found.")
+            raise IntegronError("LSTINF directory not found.")
         gembase_type = self.gembase_sniffer(lst_path)
         if gembase_type == 'Draft':
             prots_info = self.gembase_draft_parser(lst_path, self.replicon.id)
@@ -372,8 +369,8 @@ class GembaseDB(ProteinDB):
             specie, date, strain, contig_gene = gene_id.split('.')
             contig_gene = contig_gene[1:]  # remove the first letter b/i
         except ValueError:
-            raise IntegronError("'{}' is not a valid Gembase protein identifier.".format(gene_id))
-        pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig_gene)
+            raise IntegronError(f"'{gene_id}' is not a valid Gembase protein identifier.")
+        pattern = f'{specie}\.{date}\.{strain}\.\w?{contig_gene}'
         seq_info = self._info.loc[self._info['seq_id'].str.contains(pattern, regex=True)]
         if not seq_info.empty:
             return SeqDesc(seq_info.seq_id.values[0],
@@ -413,9 +410,9 @@ class ProdigalDB(ProteinDB):
                 _log.debug("run prodigal: {}".format(prodigal_cmd))
                 returncode = call(prodigal_cmd.split())
             except Exception as err:
-                raise RuntimeError("{0} failed : {1}".format(prodigal_cmd, err))
+                raise RuntimeError(f"{prodigal_cmd} : failed : {err}")
             if returncode != 0:
-                raise RuntimeError("{0} failed returncode = {1}".format(prodigal_cmd, returncode))
+                raise RuntimeError(f"{prodigal_cmd} : failed : prodigal returncode = {returncode}")
 
         return prot_file_path
 
@@ -449,7 +446,7 @@ class ProdigalDB(ProteinDB):
         try:
             id_, start, stop, strand, *_ = seq.description.split(" # ")
         except ValueError:
-            raise IntegronError("'{}' is not a valid Prodigal protein identifier.".format(gene_id))
+            raise IntegronError(f"'{gene_id}' is not a valid Prodigal protein identifier.")
         start = int(start)
         stop = int(stop)
         strand = int(strand)
