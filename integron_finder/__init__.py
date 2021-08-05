@@ -32,7 +32,7 @@ import distutils.spawn
 
 from time import localtime, strftime
 
-__version__ = '2-{}'.format(strftime("%Y-%m-%d", localtime()))
+__version__ = f'2.dev{strftime("%Y%m%d", localtime())}'
 
 
 class IntegronError(Exception):
