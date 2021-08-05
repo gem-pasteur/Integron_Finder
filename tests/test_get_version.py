@@ -96,8 +96,8 @@ Citation:
             mplt=mplt_vers,
             bio=bio_vers,
             prodigal=integron_finder._prodigal_version(distutils.spawn.find_executable("prodigal")),
-            cmsearch=integron_finder._cmsearch_version(distutils.spawn.find_executable("cmsearch")),
-            hmmsearch=integron_finder._hmmsearch_version(distutils.spawn.find_executable("hmmsearch"))
+            cmsearch=integron_finder._eddy_version(distutils.spawn.find_executable("cmsearch")),
+            hmmsearch=integron_finder._eddy_version(distutils.spawn.find_executable("hmmsearch"))
             )
         self.assertEqual(exp_version, version)
 

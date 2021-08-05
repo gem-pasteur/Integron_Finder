@@ -44,24 +44,16 @@ class EmptyFileError(IntegronError):
 
 
 def _eddy_version(path):
+    """
+    execute binary from eddy's lab (hmmsearch or cmsearch) and parse version
+
+    :param str path: the path to the binary to execute
+    :return: the version
+    :rtype: str
+    """
     process = run([path, "-h"], capture_output=True, text=True)
     vers = process.stdout.split('\n')[1].strip()[2:]
     return vers
-
-def _hmmsearch_version(path):
-    """
-
-    :return:
-    """
-    return _eddy_version(path)
-
-
-def _cmsearch_version(path):
-    """
-
-    :return:
-    """
-    return _eddy_version(path)
 
 
 def _prodigal_version(path):
@@ -72,7 +64,6 @@ def _prodigal_version(path):
     process = run([path, "-v"], capture_output=True, text=True)
     vers = process.stderr.strip()
     return vers
-
 
 
 def get_version_message(hmmsearch, cmsearch, prodigal):
@@ -121,8 +112,8 @@ Citation:
            mplt=mplt_vers,
            bio=bio_vers,
            prodigal=_prodigal_version(prodigal),
-           cmsearch=_cmsearch_version(cmsearch),
-           hmmsearch=_hmmsearch_version(hmmsearch)
+           cmsearch=_eddy_version(cmsearch),
+           hmmsearch=_eddy_version(hmmsearch)
           )
 
     return version_text
