@@ -14,8 +14,7 @@ ARG IF_GIT_URL="https://github.com/gem-pasteur/Integron_Finder.git"
 ARG IF_GIT_TAG="dev"
 
 RUN apt-get update -y &&\
-    apt-get install -y --no-install-recommends python3 python3-pip python3-setuptools git hmmer infernal prodigal &&\
-    apt-get install -y python3-numpy python3-pandas python3-matplotlib python3-biopython&&\
+    apt-get install -y --no-install-recommends python3 python3-pip git hmmer infernal prodigal &&\
     apt-get clean -y
 
 RUN cd /usr/local/src &&\
