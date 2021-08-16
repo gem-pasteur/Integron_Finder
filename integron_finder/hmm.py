@@ -123,6 +123,8 @@ def read_hmm(replicon_id, prot_db, infile, cfg, evalue=1., coverage=0.5):
         except AttributeError:
             id_query = "-"
         for idx2, hit in enumerate(query_result.hits):
+            if not hit.hsps:
+                continue
             id_prot = hit.id
 
             _, strand, pos_beg, pos_end = prot_db.get_description(hit.id)
