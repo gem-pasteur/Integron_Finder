@@ -278,11 +278,13 @@ def find_attc_max(integrons, replicon, distance_threshold,
 
             strand = "top" if full_element[full_element.type_elt == "attC"].strand.values[0] == 1 else "bottom"
             df_max = local_max(replicon, window_beg, window_end, model_attc_path,
-                               strand_search=strand, out_dir=out_dir,
-                               cpu=cpu,
+                               strand_search=strand,
                                evalue_attc=evalue_attc,
                                max_attc_size=max_attc_size,
-                               min_attc_size=min_attc_size)
+                               min_attc_size=min_attc_size,
+                               out_dir=out_dir,
+                               cmsearch_bin=cmsearch_bin,
+                               cpu=cpu)
 
             all_attc = merge_previous_attc_w_local_max(i, df_max)
             max_elt = pd.concat([max_elt, all_attc])
@@ -323,10 +325,10 @@ def find_attc_max(integrons, replicon, distance_threshold,
                 df_max = local_max(replicon, window_beg, window_end,
                                    model_attc_path,
                                    strand_search=strand,
-                                   out_dir=out_dir,
                                    evalue_attc=evalue_attc,
                                    max_attc_size=max_attc_size,
                                    min_attc_size=min_attc_size,
+                                   out_dir=out_dir,
                                    cmsearch_bin=cmsearch_bin,
                                    cpu=cpu)
 
@@ -363,11 +365,12 @@ def find_attc_max(integrons, replicon, distance_threshold,
                 df_max = local_max(replicon,
                                    window_beg, window_end,
                                    model_attc_path,
-                                   out_dir=out_dir,
-                                   cpu=cpu,
                                    evalue_attc=evalue_attc,
                                    max_attc_size=max_attc_size,
-                                   min_attc_size=min_attc_size)
+                                   min_attc_size=min_attc_size,
+                                   out_dir=out_dir,
+                                   cmsearch_bin=cmsearch_bin,
+                                   cpu=cpu)
                 max_elt = pd.concat([max_elt, df_max])
                 if not max_elt.empty:
                     max_elt = expand(replicon,
