@@ -124,6 +124,7 @@ def read_hmm(replicon_id, prot_db, infile, cfg, evalue=1., coverage=0.5):
             id_query = "-"
         for idx2, hit in enumerate(query_result.hits):
             if not hit.hsps:
+                _log.debug(f"{hit.id} does not contains any hsps. skip it.")
                 continue
             id_prot = hit.id
 
