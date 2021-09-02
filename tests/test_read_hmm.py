@@ -132,7 +132,8 @@ class TestReadHMM(IntegronTest):
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
-        prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
+        with self.catch_log():
+            prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
 
         df = read_hmm(contig_id, prot_db, infile, cfg)
         exp = pd.DataFrame(data={"Accession_number": contig_id,
@@ -326,7 +327,8 @@ class TestReadHMM(IntegronTest):
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
-        prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
+        with self.catch_log():
+            prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data('fictive_results', "{}_intI_multi.res".format(contig_id))
 
