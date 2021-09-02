@@ -578,7 +578,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     # print Header #
     ################
     log_header = colorlog.getLogger('integron_finder.header')
-    logging = colorlog.logging.logging
+    logging = integron_finder.get_logging_module()
     handlers = []
     header_log_file = logging.FileHandler(log_file)
     handlers.append(header_log_file)
@@ -589,7 +589,7 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     for h in handlers:
         h.setFormatter(formatter)
         log_header.addHandler(h)
-    log_header.setLevel(colorlog.logging.logging.INFO)
+    log_header.setLevel(logging.INFO)
     log_header.propagate = False
     log_header.info(header(args,
                            hmmsearch=config.hmmsearch,
