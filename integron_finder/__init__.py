@@ -122,7 +122,10 @@ Citation:
 def init_logger(log_file=None, out=True):
     import colorlog
     logger = colorlog.getLogger('integron_finder')
-    logging = colorlog.logging.logging
+    try:
+        logging = colorlog.logging.logging
+    except AttributeError:
+        logging = colorlog.wrappers.logging
     if out:
         stdout_handler = colorlog.StreamHandler(sys.stdout)
         stdout_formatter = colorlog.ColoredFormatter("%(log_color)s%(levelname)-8s : %(reset)s %(message)s",
@@ -161,13 +164,18 @@ def logger_set_level(level='WARNING'):
     # otherwise an error occured during pip install
     #  NameError: name 'colorlog' is not defined
     import colorlog
+    logger = colorlog.getLogger('integron_finder')
+    try:
+        logging = colorlog.logging.logging
+    except AttributeError:
+        logging = colorlog.wrappers.logging
 
-    levels = {'NOTSET': colorlog.logging.logging.NOTSET,
-              'DEBUG': colorlog.logging.logging.DEBUG,
-              'INFO': colorlog.logging.logging.INFO,
-              'WARNING': colorlog.logging.logging.WARNING,
-              'ERROR': colorlog.logging.logging.ERROR,
-              'CRITICAL': colorlog.logging.logging.CRITICAL,
+    levels = {'NOTSET': logging.NOTSET,
+              'DEBUG': logging.DEBUG,
+              'INFO': logging.INFO,
+              'WARNING': logging.WARNING,
+              'ERROR': logging.ERROR,
+              'CRITICAL': logging.CRITICAL,
               }
     if level in levels:
         level = levels[level]
@@ -177,7 +185,7 @@ def logger_set_level(level='WARNING'):
         raise IntegronError("Level must be {} or a positive integer")
 
     logger = colorlog.getLogger('integron_finder')
-    if level <= colorlog.logging.logging.DEBUG:
+    if level <= logging.DEBUG:
         stdout_formatter = colorlog.ColoredFormatter(
             "%(log_color)s%(levelname)-8s : %(module)s: L %(lineno)d :%(reset)s %(message)s",
             datefmt=None,
@@ -195,7 +203,6 @@ def logger_set_level(level='WARNING'):
         stdout_handler = logger.handlers[0]
         stdout_handler.setFormatter(stdout_formatter)
 
-        logging = colorlog.logging.logging
         file_formatter = logging.Formatter("%(levelname)-8s : %(module)s: L %(lineno)d : %(message)s")
         file_handler = logger.handlers[1]
         file_handler.setFormatter(file_formatter)
