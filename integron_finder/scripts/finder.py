@@ -578,10 +578,8 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
     # print Header #
     ################
     log_header = colorlog.getLogger('integron_finder.header')
-    try:
-        logging = colorlog.logging.logging
-    except AttributeError:
-        logging = colorlog.wrappers.logging
+    logging = integron_finder.get_logging_module()
+
     handlers = []
     header_log_file = logging.FileHandler(log_file)
     handlers.append(header_log_file)

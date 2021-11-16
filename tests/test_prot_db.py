@@ -94,6 +94,7 @@ class TestGemBase(IntegronTest):
         """
         gembase_path = self.find_data('Gembase')
         file_names = ('ACBA.0917.00019.fna', 'ESCO001.C.00001.C001.fst')
+        print()
         for file_name in file_names:
             replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', file_name))
             self.args.replicon = replicon_path
@@ -103,10 +104,12 @@ class TestGemBase(IntegronTest):
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
 
-            with self.catch_log():
-                db = GembaseDB(replicon, cfg)
-            self.assertTrue(db._find_gembase_file_basename(gembase_path, replicon_path),
-                            os.path.splitext(file_name)[0])
+            with self.subTest(file_name=file_name):
+                with self.catch_log() as log:
+                    db = GembaseDB(replicon, cfg)
+                    catch_msg = log.get_value().strip()
+                self.assertTrue(db._find_gembase_file_basename,
+                                os.path.splitext(file_name)[0])
 
 
     def test_find_gembase_file_basename_file_not_in_gembase(self):
@@ -133,11 +136,11 @@ class TestGemBase(IntegronTest):
             replicon = next(seq_db)
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
-
-            with self.catch_log():
-                db = GembaseDB(replicon, cfg, gembase_path=gembase_path)
-            self.assertTrue(db._find_gembase_file_basename(gembase_path, replicon_path),
-                            base_file_name)
+            with self.subTest(base_file_name=base_file_name):
+                with self.catch_log():
+                    db = GembaseDB(replicon, cfg, gembase_path=gembase_path)
+                self.assertTrue(db._find_gembase_file_basename,
+                                base_file_name)
 
         replicon_path = self.find_data(os.path.join('Replicons', 'acba.007.p01.13.fst'))
         self.args.replicon = replicon_path
@@ -161,6 +164,7 @@ class TestGemBase(IntegronTest):
             lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', file_name + '.lst'))
             type_recieved = GembaseDB.gembase_sniffer(lst_path)
             self.assertEqual(type_recieved, gem_type)
+
 
     def test_gembase_complete_parser(self):
         replicon_id = 'ESCO001.C.00001.C001'
@@ -278,7 +282,8 @@ class TestGemBase(IntegronTest):
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
-        db = GembaseDB(replicon, cfg)
+        with self.catch_log():
+            db = GembaseDB(replicon, cfg)
 
         try:
             idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
@@ -300,7 +305,6 @@ class TestGemBase(IntegronTest):
         replicon.path = replicon_path
         with self.catch_log():
             db = GembaseDB(replicon, cfg)
-
         try:
             idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
                               alphabet=Seq.IUPAC.extended_protein)
@@ -334,12 +338,13 @@ class TestGemBase(IntegronTest):
             replicon = next(seq_db)
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
-
-            db = GembaseDB(replicon, cfg)
+            with self.catch_log():
+                db = GembaseDB(replicon, cfg)
 
             descriptions = file_name[(seq_name, ext)]
             for seq_id, desc in descriptions.items():
-                self.assertEqual(desc, db.get_description(seq_id))
+                with self.subTest(seq_id=seq_id, desc=desc):
+                    self.assertEqual(desc, db.get_description(seq_id))
 
         with self.assertRaises(IntegronError) as ctx:
             db.get_description('nimport_naoik')

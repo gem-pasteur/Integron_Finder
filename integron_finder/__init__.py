@@ -42,6 +42,14 @@ class IntegronError(Exception):
 class EmptyFileError(IntegronError):
     pass
 
+def get_logging_module():
+    import colorlog
+    try:
+       logging = colorlog.logging.logging
+    except AttributeError:
+        logging = colorlog.wrappers.logging
+    return logging
+
 
 def _eddy_version(path):
     """
@@ -122,10 +130,8 @@ Citation:
 def init_logger(log_file=None, out=True):
     import colorlog
     logger = colorlog.getLogger('integron_finder')
-    try:
-        logging = colorlog.logging.logging
-    except AttributeError:
-        logging = colorlog.wrappers.logging
+    logging = get_logging_module()
+
     if out:
         stdout_handler = colorlog.StreamHandler(sys.stdout)
         stdout_formatter = colorlog.ColoredFormatter("%(log_color)s%(levelname)-8s : %(reset)s %(message)s",
@@ -164,12 +170,7 @@ def logger_set_level(level='WARNING'):
     # otherwise an error occured during pip install
     #  NameError: name 'colorlog' is not defined
     import colorlog
-    logger = colorlog.getLogger('integron_finder')
-    try:
-        logging = colorlog.logging.logging
-    except AttributeError:
-        logging = colorlog.wrappers.logging
-
+    logging = get_logging_module()
     levels = {'NOTSET': logging.NOTSET,
               'DEBUG': logging.DEBUG,
               'INFO': logging.INFO,

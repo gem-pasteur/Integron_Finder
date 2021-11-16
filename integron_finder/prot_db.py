@@ -188,9 +188,13 @@ class GembaseDB(ProteinDB):
         :return: the gemabse basename corresponding to the input file
         :rtype: string
         """
-        lst_dir_path = os.path.join(gembase_path, 'LSTINF')
+        lst_dir_path = os.path.join(gembase_path, 'LSTINFO')
         if not os.path.exists(lst_dir_path):
-            raise IntegronError("LSTINF directory nout found.")
+            _log.warning(f"{lst_dir_path} directory nout found. check LSTINF")
+            lst_dir_path = os.path.join(gembase_path, 'LSTINF')
+            if not os.path.exists(lst_dir_path):
+                _log.warning(f"{lst_dir_path} directory nout found.")
+                raise IntegronError(f"{lst_dir_path}O directory nout found.")
         gembase_file_basename = os.path.splitext(os.path.basename(input_seq_path))[0]
         # when IF is run through nextflow & parallel_integron_finder
         # the input data is split the name of the chunks can vary
@@ -326,12 +330,13 @@ class GembaseDB(ProteinDB):
     def _parse_lst(self):
         """
         Parse the LSTINFO file and extract information specific to the replicon
-        :return:
+        :return: `class`:pandas.DataFrame` object
         """
-
-        lst_path = os.path.join(self._gembase_path, 'LSTINF', self._gembase_file_basename + '.lst')
+        lst_path = os.path.join(self._gembase_path, 'LSTINFO', self._gembase_file_basename + '.lst')
         if not os.path.exists(lst_path):
-            raise IntegronError("LSTINF directory not found.")
+            lst_path = os.path.join(self._gembase_path, 'LSTINF', self._gembase_file_basename + '.lst')
+            if not os.path.exists(lst_path):
+                raise IntegronError(f"{lst_path}O directory not found.")
         gembase_type = self.gembase_sniffer(lst_path)
         if gembase_type == 'Draft':
             prots_info = self.gembase_draft_parser(lst_path, self.replicon.id)

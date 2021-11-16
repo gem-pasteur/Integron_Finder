@@ -121,7 +121,7 @@ class TestReadHMM(IntegronTest):
         replicon_id = 'ACBA.0917.00019'
         contig_id = 'ACBA.0917.00019.0001'
         result_dir_expected = self.find_data("Results_Integron_Finder_{}.gembase".format(replicon_id))
-        replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', replicon_id + '.fna'))
+        replicon_path = self.find_data('Gembase', 'Replicons', replicon_id + '.fna')
         prot_file = os.path.join(result_dir_expected, "tmp_{}".format(contig_id), contig_id + '.prt')
         infile = os.path.join(result_dir_expected, "tmp_{}".format(contig_id), "{}_intI.res".format(contig_id))
 
@@ -132,7 +132,8 @@ class TestReadHMM(IntegronTest):
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
-        prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
+        with self.catch_log():
+            prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
 
         df = read_hmm(contig_id, prot_db, infile, cfg)
         exp = pd.DataFrame(data={"Accession_number": contig_id,
@@ -158,8 +159,8 @@ class TestReadHMM(IntegronTest):
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
-        replicon_path = self.find_data(os.path.join('Replicons', rep_name + '.fst'))
-        prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
+        replicon_path = self.find_data('Replicons', rep_name + '.fst')
+        prot_file = self.find_data('Proteins', replicon_id + '.prt')
 
         args = argparse.Namespace()
         args.gembase = False
@@ -170,9 +171,9 @@ class TestReadHMM(IntegronTest):
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
-        infile = self.find_data(os.path.join("Results_Integron_Finder_{}".format(rep_name),
-                                             "tmp_{}".format(replicon_id),
-                                             "{}_intI.res".format(replicon_id)))
+        infile = self.find_data("Results_Integron_Finder_{}".format(rep_name),
+                                "tmp_{}".format(replicon_id),
+                                "{}_intI.res".format(replicon_id))
 
         df1 = read_hmm(rep_name, prot_db, infile, cfg, evalue=1.95e-25)
         exp1 = pd.DataFrame(data={"Accession_number": rep_name, "query_name": "intI_Cterm",
@@ -202,8 +203,8 @@ class TestReadHMM(IntegronTest):
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
-        replicon_path = self.find_data(os.path.join('Replicons', rep_name + '.fst'))
-        prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
+        replicon_path = self.find_data('Replicons', rep_name + '.fst')
+        prot_file = self.find_data('Proteins', replicon_id + '.prt')
 
         args = argparse.Namespace()
         args.gembase = False
@@ -214,7 +215,7 @@ class TestReadHMM(IntegronTest):
         replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
-        infile = self.find_data(os.path.join("fictive_results", "{}_intI.res".format(replicon_id)))
+        infile = self.find_data("fictive_results", "{}_intI.res".format(replicon_id))
 
         df1 = read_hmm(replicon_id, prot_db, infile, cfg, evalue=1e-3)
         exp1 = pd.DataFrame(data={"Accession_number": [replicon_id] * 2,
@@ -238,8 +239,8 @@ class TestReadHMM(IntegronTest):
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
-        replicon_path = self.find_data(os.path.join('Replicons', rep_name + '.fst'))
-        prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
+        replicon_path = self.find_data('Replicons', rep_name + '.fst')
+        prot_file = self.find_data('Proteins', replicon_id + '.prt')
 
         args = argparse.Namespace()
         args.gembase = False
@@ -250,9 +251,9 @@ class TestReadHMM(IntegronTest):
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
-        infile = self.find_data(os.path.join("Results_Integron_Finder_{}".format(rep_name),
-                                             "tmp_{}".format(replicon_id),
-                                             "{}_intI.res".format(replicon_id)))
+        infile = self.find_data("Results_Integron_Finder_{}".format(rep_name),
+                                "tmp_{}".format(replicon_id),
+                                "{}_intI.res".format(replicon_id))
 
         df1 = read_hmm(rep_name, prot_db, infile, cfg, coverage=0.945)
         exp1 = pd.DataFrame(data={"Accession_number": rep_name, "query_name": "intI_Cterm",
@@ -280,8 +281,8 @@ class TestReadHMM(IntegronTest):
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
-        replicon_path = self.find_data(os.path.join('Replicons', rep_name + '.fst'))
-        prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
+        replicon_path = self.find_data('Replicons', rep_name + '.fst')
+        prot_file = self.find_data('Proteins', replicon_id + '.prt')
 
         args = argparse.Namespace()
         args.gembase = False
@@ -292,7 +293,7 @@ class TestReadHMM(IntegronTest):
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
-        infile = self.find_data(os.path.join("fictive_results", "{}_intI.res".format(replicon_id)))
+        infile = self.find_data("fictive_results", "{}_intI.res".format(replicon_id))
 
         df1 = read_hmm(rep_name, prot_db, infile, cfg, coverage=0.7)
         exp1 = pd.DataFrame(data={"Accession_number": [rep_name] * 2,
@@ -316,7 +317,7 @@ class TestReadHMM(IntegronTest):
         replicon_id = 'ACBA.0917.00019'
         contig_id = 'ACBA.0917.00019.0001'
         result_dir_expected = self.find_data("Results_Integron_Finder_{}.gembase".format(replicon_id))
-        replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', replicon_id + '.fna'))
+        replicon_path = self.find_data('Gembase', 'Replicons', replicon_id + '.fna')
         prot_file = os.path.join(result_dir_expected, "tmp_{}".format(contig_id), contig_id + '.prt')
 
         args = argparse.Namespace()
@@ -326,9 +327,10 @@ class TestReadHMM(IntegronTest):
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
-        prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
+        with self.catch_log():
+            prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
 
-        infile = self.find_data(os.path.join('fictive_results', "{}_intI_multi.res".format(contig_id)))
+        infile = self.find_data('fictive_results', "{}_intI_multi.res".format(contig_id))
 
         df = read_hmm(contig_id, prot_db, infile, cfg)
         exp = pd.DataFrame(data={"Accession_number": [contig_id] * 2,
@@ -343,3 +345,41 @@ class TestReadHMM(IntegronTest):
         exp = exp[["Accession_number", "query_name", "ID_query", "ID_prot",
                    "strand", "pos_beg", "pos_end", "evalue"]]
         pdt.assert_frame_equal(df, exp)
+
+
+    def test_read_hmm_hit_no_hsp(self):
+        """
+        read hmm but skip hits without any hsp.
+        """
+        rep_name = "NZ_AP023221"
+        replicon_id = 'NZ_AP023221.2'
+
+        replicon_path = self.find_data('Replicons', rep_name + '.fasta')
+        prot_file = self.find_data('Proteins', replicon_id + '.prt')
+
+        args = argparse.Namespace()
+        args.gembase = False
+        args.replicon = replicon_path
+        cfg = Config(args)
+
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
+
+        infile = self.find_data("fictive_results",
+                                f"{replicon_id}_phage_int.res")
+
+        df1 = read_hmm(replicon_id, prot_db, infile, cfg)
+
+        exp1 = pd.DataFrame(data={"Accession_number": [replicon_id] * 2,
+                                  "query_name": ["Phage_integrase"] * 2,
+                                  "ID_query": ["PF00589.16", "PF00589.16"],
+                                  "ID_prot": ["NZ_AP023221.2_109", "NZ_AP023221.2_106"],
+                                  "strand": [-1, -1],
+                                  "pos_beg": [93412, 91461],
+                                  "pos_end": [94152, 92201],
+                                  "evalue": [7.300000e-30, 7.800000e-29]},
+                            index=[0, 1])
+        exp1 = exp1[["Accession_number", "query_name", "ID_query", "ID_prot",
+                     "strand", "pos_beg", "pos_end", "evalue"]]
+        pdt.assert_frame_equal(df1, exp1)

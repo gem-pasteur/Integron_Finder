@@ -39,7 +39,7 @@ import pandas as pd
 
 import pandas.testing as pdt
 
-from integron_finder import IntegronError, logger_set_level
+from integron_finder import IntegronError, logger_set_level, get_logging_module
 
 
 class IntegronTest(unittest.TestCase):
@@ -88,12 +88,13 @@ class IntegronTest(unittest.TestCase):
 
     @classmethod
     def set_log_level(cls, level):
-        levels = {'NOTSET': colorlog.logging.logging.NOTSET,
-                  'DEBUG': colorlog.logging.logging.DEBUG,
-                  'INFO': colorlog.logging.logging.INFO,
-                  'WARNING': colorlog.logging.logging.WARNING,
-                  'ERROR': colorlog.logging.logging.ERROR,
-                  'CRITICAL': colorlog.logging.logging.CRITICAL,
+        logging = get_logging_module()
+        levels = {'NOTSET': logging.NOTSET,
+                  'DEBUG': logging.DEBUG,
+                  'INFO': logging.INFO,
+                  'WARNING': logging.WARNING,
+                  'ERROR': logging.ERROR,
+                  'CRITICAL': logging.CRITICAL,
         }
         if level in levels:
             level = levels[level]
