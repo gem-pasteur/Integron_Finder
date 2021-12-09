@@ -159,12 +159,21 @@ class TestGemBase(IntegronTest):
 
 
     def test_gembase_sniffer(self):
-        file_names = (('ACBA.0917.00019', 'Draft'), ('ESCO001.C.00001.C001', 'Complet'))
+        file_names = (('ACBA.0917.00019', 'Draft'),
+                      ('ESCO001.C.00001.C001', 'Complet'),
+                      ('ACJO001.0321.00008.P008', 'Complet'))
         for file_name, gem_type in file_names:
             lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', file_name + '.lst'))
-            type_recieved = GembaseDB.gembase_sniffer(lst_path)
-            self.assertEqual(type_recieved, gem_type)
+            with self.subTest(lst_path=lst_path):
+                type_recieved = GembaseDB.gembase_sniffer(lst_path)
+                self.assertEqual(type_recieved, gem_type)
 
+        lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', 'SAEN001.0321.00753.P003.lst'))
+        with self.assertRaises(IntegronError) as ctx:
+            with self.catch_log():
+                GembaseDB.gembase_sniffer(lst_path)
+        self.assertEqual(str(ctx.exception),
+                         f'the genome SAEN001.0321.00753.P003_00001 seems empty: see {lst_path}')
 
     def test_gembase_complete_parser(self):
         replicon_id = 'ESCO001.C.00001.C001'

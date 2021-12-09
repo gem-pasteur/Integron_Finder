@@ -259,10 +259,16 @@ class GembaseDB(ProteinDB):
         """
         with open(lst_path) as lst_file:
             line = lst_file.readline()
-        if line.split()[5] in ('Valid', 'Invalid_Size', 'Pseudo'):
+        fields = line.split()
+        if fields[5] in ('Valid', 'Invalid_Size', 'Pseudo', 'Partial'):
             return 'Complet'
         else:
-            return 'Draft'
+            if fields[0] == '0' and fields[1] == '0':
+                msg = f"the genome {fields[2]} seems empty: see {lst_path}"
+                _log.critical(msg)
+                raise IntegronError(msg) from None
+            else:
+                return 'Draft'
 
 
     @staticmethod
@@ -308,18 +314,21 @@ class GembaseDB(ProteinDB):
         :return: the information related to the 'valid' CDS corresponding to the sequence_id
         :rtype: `class`:pandas.DataFrame` object
         """
-        lst = pd.read_csv(lst_path,
-                          header=None,
-                          names=['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description'],
-                          dtype={'start': 'int',
-                                 'end': 'int',
-                                 'strand': 'str',
-                                 'type': 'str',
-                                 'seq_id': 'str',
-                                 'gene_name': 'str',
-                                 'description': 'str'},
-                          sep="\t"
-                          )
+        try:
+            lst = pd.read_csv(lst_path,
+                              header=None,
+                              names=['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description'],
+                              dtype={'start': 'int',
+                                     'end': 'int',
+                                     'strand': 'str',
+                                     'type': 'str',
+                                     'seq_id': 'str',
+                                     'gene_name': 'str',
+                                     'description': 'str'},
+                              sep="\t")
+        except Exception as err:
+            _log.error(f"Error while parsing {lst_path} file")
+            raise err
         specie, date, strain, contig_gene = replicon_id.split('.')
         pattern = f'{specie}\.{date}\.{strain}\.\w?{contig_gene}'
         genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
