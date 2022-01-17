@@ -1,0 +1,33 @@
+FROM ubuntu:impish
+
+LABEL maintainer="Bertrand Neron"
+LABEL maintainer.email="bneron@pasteur.fr"
+LABEL authors="Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha"
+LABEL package.version="2.0"
+LABEL package.license="GPLv3"
+LABEL package.homepage="https://github.com/gem-pasteur/Integron_Finder/"
+LABEL publications="https://doi.org/10.1093/nar/gkw319"
+
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG IF_GIT_URL="https://github.com/gem-pasteur/Integron_Finder.git"
+ARG IF_GIT_TAG="master"
+
+RUN apt-get update -y &&\
+    apt-get install -y --no-install-recommends python3 python3-pip  git hmmer infernal prodigal &&\
+    apt-get clean -y
+
+RUN pip3 install integron_finder==2.0
+
+ENV DEBIAN_FRONTEND=teletype
+ENV PYTHONIOENCODING=UTF-8
+ENV MPLCONFIGDIR=/home/IF
+
+RUN useradd -m IF
+USER IF
+WORKDIR /home/IF
+
+
+ENTRYPOINT ["/usr/local/bin/integron_finder"]
+
+CMD ['-h']
