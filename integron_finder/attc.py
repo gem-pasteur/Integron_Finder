@@ -163,7 +163,9 @@ def find_attc_max(integrons, replicon, distance_threshold,
     hit. We call it local_max or eagle_eyes.
 
     **Default hit**
-    ::
+
+    .. code-block:: text
+    
                          attC
         __________________-->____-->_________-->_____________
         ______<--------______________________________________
@@ -172,7 +174,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
                      Search-space with --local_max
 
     **Updated hit**
-    ::
+
+    .. code-block:: text
 
                          attC          ***         ***
         __________________-->____-->___-->___-->___-->_______
