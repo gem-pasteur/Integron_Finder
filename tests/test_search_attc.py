@@ -87,35 +87,15 @@ class TestSearchAttc(IntegronTest):
         self.assertEqual(len(attc_array), 1)
 
         # Construct expected output:
-        attc_res = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                         "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 17825,
-                                    "pos_end": 17884,
-                                    "sens": "-",
-                                    "evalue": 1e-9},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19080,
-                                    "pos_end": 19149,
-                                    "sens": "-",
-                                    "evalue": 1e-4},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19618,
-                                    "pos_end": 19726,
-                                    "sens": "-",
-                                    "evalue": 1.1e-7},
-                                   ignore_index=True)
+        attc_res = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id],
+                                 "cm_attC": ["attc_4", "attc_4", "attc_4"],
+                                 "cm_debut": [1, 1, 1],
+                                 "cm_fin": [47, 47, 47],
+                                 "pos_beg": [17825, 19080, 19618],
+                                 "pos_end": [17884, 19149, 19726],
+                                 "sens": ["-", "-", "-",],
+                                 "evalue": [1e-9, 1e-4, 1.1e-7]})
+
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_res[intcols] = attc_res[intcols].astype(int)
@@ -202,7 +182,7 @@ class TestSearchAttc(IntegronTest):
                                            "pos_beg": [12900],
                                            "pos_end": [13800],
                                            "sens": ["-"],
-                                           "evalue": [1e-3]})
+                                           "evalue": [1e-3]}, index=[3])
                              ]
                             )
 
@@ -380,7 +360,7 @@ class TestSearchAttc(IntegronTest):
         # keep one with the highest evalue
         attc_df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
                                         "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
-        attc_df = attc_df.append({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id],
+        attc_df = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id],
                                   "cm_attC": ["attc_4", "attc_4", "attc_4", "attc_4", "attc_4", "attc_4", "attc_4"],
                                   "cm_debut": [1, 1, 1, 1, 1, 1, 1],
                                   "cm_fin": [47, 47, 47, 47, 47, 47, 47],
@@ -395,7 +375,7 @@ class TestSearchAttc(IntegronTest):
         attc_array = attc.search_attc(attc_df, False, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 1)
         # Construct expected outputs:
-        attc_res = pd.DataFrame({"Accession_number": [self.replicon_id, ],
+        attc_res = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id,],
                                  "cm_attC": ["attc_4", "attc_4", "attc_4", "attc_4"],
                                  "cm_debut": [1, 1, 1, 1],
                                  "cm_fin": [47, 47, 47, 47],
