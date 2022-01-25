@@ -347,7 +347,8 @@ class Integron(object):
         tmp_df["type_elt"] = "attC"
         tmp_df["annotation"] = "attC"
         tmp_df["model"] = [model]
-        self.attC = self.attC.append(tmp_df, ignore_index=True)
+        #self.attC = self.attC.append(tmp_df, ignore_index=True)
+        self.attC = pd.concat([self.attC, tmp_df], ignore_index=True)
         attC_len = len(self.attC)
         if attC_len < 2:
             self.sizes_cassettes = [np.nan]
