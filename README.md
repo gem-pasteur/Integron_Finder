@@ -129,14 +129,14 @@ But before to do that we encourage to read [the contributing guide](CONTRIBUTING
 
 ## Dependencies
 
-- Python >=3.7
-- Pandas >=0.22
-- Numpy >=1.14.2
-- Biopython >=1.70
-- Matplotlib >=2.2.2
+- Python >=3.7,<=3.10
+- Pandas >=1.1.5,<=1.4.0
+- Numpy >=1.19.4,<=1.22.1
+- Biopython >=1.78,<=1.79
+- Matplotlib >=3.3.3,<=3.5.1
 - colorlog
-- HMMER >=3.1b2
-- INFERNAL >=1.1.2
+- HMMER >=3.1b2,<=3.3.2
+- INFERNAL >=1.1.2,<=1.1.4
 - Prodigal >=2.6.2
 
 ## Usage
