@@ -45,16 +45,13 @@ Inputs
 Gembase format
 """"""""""""""
 
-Integron_FInder can used *gembase* formatted protein
-(https://gem.pages.pasteur.fr/MacSyFinder/user_guide/gembase_convention.html)
-file instead of re-annotating genes with *Prodigal*.
-Enables the user to use *Integron_Finder* with its own annotations.
+Integron_Finder can use *gembase* formatted protein
+files instead of re-annotating genes with *Prodigal*.
+This feature enables the user to use *Integron_Finder* with its own annotations.
 The *gembase* format is the typical result of *PanACoTA's*
 `annotation step <https://aperrin.pages.pasteur.fr/pipeline_annotation/html-doc/examples.html#annotate-step>`_
 It must contain, at least, a *LSTINF* and a Protein file per replicon.
-Folder structure must be Gembase/LSTINF/X.lst ; Gembase/Proteins/X.prt.
-
-Below an example of a *gembase* architecture:
+Folder structure must have the following architecture.
 
 .. code-block:: text
 
@@ -115,15 +112,15 @@ Below an example of a *gembase* architecture:
 
 
 Integron_finder will use *LSTINF* and *Proteins* folders.
-So if you want to analyze a replicon located in a *gembase*, the command line should look like to
+Hence if you want to analyze a replicon located in a *gembase*, the command line should look like
 
     integron_finder --gembase  data/Replicons/ACBA.0917.00019.fna
 
 
 .. note::
 
-    If the replicon you want to analyze is not in the gembase directory but you still want to take advantage of the
-    *gembase* annotation. Then you have to specify the *--gembase-path* option to indicate where to find it.
+    If the replicon you want to analyze is not in the gembase directory, but you still want to take advantage of the
+    *gembase* annotation, then you have to specify the *--gembase-path* option to indicate where to find it.
     A typical command line could be:
 
         integron_finder --gembase --gembase-path data/gembase/  My_replicons/ACBA.0917.00019.fna
