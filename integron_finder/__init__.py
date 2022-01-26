@@ -29,8 +29,9 @@
 import sys
 from subprocess import run
 
+from time import localtime, strftime
 
-__version__ = '2.0'
+__version__ = f'2.dev{strftime("%Y%m%d", localtime())}'
 
 
 class IntegronError(Exception):
@@ -39,6 +40,7 @@ class IntegronError(Exception):
 
 class EmptyFileError(IntegronError):
     pass
+
 
 def get_logging_module():
     import colorlog
