@@ -28,11 +28,9 @@
 
 import sys
 from subprocess import run
-import distutils.spawn
 
-from time import localtime, strftime
 
-__version__ = f'2.dev{strftime("%Y%m%d", localtime())}'
+__version__ = '2.0'
 
 
 class IntegronError(Exception):

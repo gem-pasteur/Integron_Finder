@@ -326,7 +326,7 @@ class Integron(object):
         tmp_df["model"] = [model]
         tmp_df.index = [id_int]
         tmp_df["distance_2attC"] = [np.nan]
-        self.integrase = self.integrase.append(tmp_df)
+        self.integrase = pd.concat([self.integrase, tmp_df], ignore_index=False)
 
 
     def add_attC(self, pos_beg_attC, pos_end_attC, strand, evalue, model):
@@ -347,7 +347,7 @@ class Integron(object):
         tmp_df["type_elt"] = "attC"
         tmp_df["annotation"] = "attC"
         tmp_df["model"] = [model]
-        self.attC = self.attC.append(tmp_df, ignore_index=True)
+        self.attC = pd.concat([self.attC, tmp_df], ignore_index=True)
         attC_len = len(self.attC)
         if attC_len < 2:
             self.sizes_cassettes = [np.nan]
@@ -417,7 +417,7 @@ class Integron(object):
                         tmp_df["model"] = "NA"
                         tmp_df.index = [m.name]
                         tmp_df["distance_2attC"] = [np.nan]
-                        self.promoter = self.promoter.append(tmp_df)
+                        self.promoter = pd.concat([self.promoter, tmp_df])
                 else:
                     generator_motifs = m.instances.reverse_complement().search(seq_p_int[-dist_prom:])
                     for pos, s in generator_motifs:
@@ -432,7 +432,7 @@ class Integron(object):
                         tmp_df["model"] = "NA"
                         tmp_df.index = [m.name]
                         tmp_df["distance_2attC"] = [np.nan]
-                        self.promoter = self.promoter.append(tmp_df)
+                        self.promoter = pd.concat([self.promoter, tmp_df])
             integrase_start = int(self.integrase.pos_beg.values[0])
             integrase_end = int(self.integrase.pos_end.values[-1])
         ######## Promoter of K7 #########
@@ -521,7 +521,7 @@ class Integron(object):
                     tmp_df["model"] = "NA"
                     tmp_df.index = [m.name]
                     tmp_df["distance_2attC"] = [np.nan]
-                    self.promoter = self.promoter.append(tmp_df)
+                    self.promoter = pd.concat([self.promoter, tmp_df])
 
 
     def add_attI(self):
@@ -614,7 +614,7 @@ class Integron(object):
                     tmp_df["model"] = "NA"
                     tmp_df.index = [m.name]
                     tmp_df["distance_2attC"] = [np.nan]
-                    self.attI = self.attI.append(tmp_df)
+                    self.attI = pd.concat([self.attI, tmp_df])
 
 
     def add_proteins(self, prot_db):

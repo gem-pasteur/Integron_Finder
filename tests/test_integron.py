@@ -155,7 +155,7 @@ class TestIntegron(IntegronTest):
         attc_2['pos_end'] = attc_2['pos_end'] + 100
         attc_2["distance_2attC"] = (attc_2.loc['attc_002', 'pos_beg'] - attc_1.loc['attc_001', 'pos_end']) % len(replicon)
 
-        attc = attc_1.append(attc_2)
+        attc = pd.concat((attc_1, attc_2))
 
         integron.add_attC(attc_2.loc['attc_002', 'pos_beg'],
                           attc_2.loc['attc_002', 'pos_end'],

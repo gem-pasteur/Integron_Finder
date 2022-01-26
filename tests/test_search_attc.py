@@ -39,11 +39,12 @@ except ImportError as err:
 
 from integron_finder import attc, infernal
 
-"""
-Unit tests search_attc function of integron_finder
-"""
 
 class TestSearchAttc(IntegronTest):
+    """
+    Unit tests search_attc function of integron_finder
+    """
+
 
     def setUp(self):
         """
@@ -86,35 +87,15 @@ class TestSearchAttc(IntegronTest):
         self.assertEqual(len(attc_array), 1)
 
         # Construct expected output:
-        attc_res = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                         "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 17825,
-                                    "pos_end": 17884,
-                                    "sens": "-",
-                                    "evalue": 1e-9},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19080,
-                                    "pos_end": 19149,
-                                    "sens": "-",
-                                    "evalue": 1e-4},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19618,
-                                    "pos_end": 19726,
-                                    "sens": "-",
-                                    "evalue": 1.1e-7},
-                                   ignore_index=True)
+        attc_res = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id],
+                                 "cm_attC": ["attc_4", "attc_4", "attc_4"],
+                                 "cm_debut": [1, 1, 1],
+                                 "cm_fin": [47, 47, 47],
+                                 "pos_beg": [17825, 19080, 19618],
+                                 "pos_end": [17884, 19149, 19726],
+                                 "sens": ["-", "-", "-",],
+                                 "evalue": [1e-9, 1e-4, 1.1e-7]})
+
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_res[intcols] = attc_res[intcols].astype(int)
@@ -132,15 +113,16 @@ class TestSearchAttc(IntegronTest):
         # Construct attC dataframe (read from infernal file)
         attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
         # Add another attC on the opposite strand
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 15000,
-                                  "pos_end": 16000,
-                                  "sens": "+",
-                                  "evalue": 0.19},
-                                 ignore_index=True)
+        attc_df = pd.concat([attc_df,
+                             pd.DataFrame({"Accession_number": [self.replicon_id],
+                                           "cm_attC": ["attc_4"],
+                                           "cm_debut": [1],
+                                           "cm_fin": [47],
+                                           "pos_beg": [15000],
+                                           "pos_end": [16000],
+                                           "sens": ["+"],
+                                           "evalue": [0.19]})],
+                            ignore_index=True)
         # search attC arrays, keeping palindromes
         # 2 attc sites are in the same array if they are on the same strand, and separated by
         # a distance less than 4kb
@@ -148,46 +130,30 @@ class TestSearchAttc(IntegronTest):
         self.assertEqual(len(attc_array), 2)
 
         # Construct expected outputs:
-        attc_res = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                         "pos_beg", "pos_end", "sens", "evalue"])
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 17825,
-                                    "pos_end": 17884,
-                                    "sens": "-",
-                                    "evalue": 1e-9},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19080,
-                                    "pos_end": 19149,
-                                    "sens": "-",
-                                    "evalue": 1e-4},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19618,
-                                    "pos_end": 19726,
-                                    "sens": "-",
-                                    "evalue": 1.1e-7},
-                                   ignore_index=True)
-        attc_res2 = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                          "pos_beg", "pos_end", "sens", "evalue"])
-        attc_res2 = attc_res2.append({"Accession_number": self.replicon_id,
-                                      "cm_attC": "attc_4",
-                                      "cm_debut": 1,
-                                      "cm_fin": 47,
-                                      "pos_beg": 15000,
-                                      "pos_end": 16000,
-                                      "sens": "+",
-                                      "evalue": 0.19},
-                                     ignore_index=True)
+        attc_res = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id],
+                                 "cm_attC": ["attc_4", "attc_4", "attc_4"],
+                                 "cm_debut": [1, 1, 1],
+                                 "cm_fin": [47, 47, 47],
+                                 "pos_beg": [17825, 19080, 19618],
+                                 "pos_end": [17884, 19149, 19726],
+                                 "sens": ["-", "-", "-"],
+                                 "evalue": [1e-9, 1e-4, 1.1e-7]}, columns=["Accession_number", "cm_attC",
+                                                                           "cm_debut", "cm_fin",
+                                                                           "pos_beg", "pos_end",
+                                                                           "sens", "evalue"])
+
+        attc_res2 = pd.DataFrame({"Accession_number": [self.replicon_id],
+                                  "cm_attC": ["attc_4"],
+                                  "cm_debut": [1],
+                                  "cm_fin": [47],
+                                  "pos_beg": [15000],
+                                  "pos_end": [16000],
+                                  "sens": ["+"],
+                                  "evalue": [0.19]},
+                                 columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
+                                          "pos_beg", "pos_end", "sens", "evalue"]
+                                 )
+
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_res[intcols] = attc_res[intcols].astype(int)
@@ -208,15 +174,18 @@ class TestSearchAttc(IntegronTest):
         # Construct attC dataframe (read from infernal file)
         attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
         # Add another attC at more than 4kb, same strand
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 12900,
-                                  "pos_end": 13800,
-                                  "sens": "-",
-                                  "evalue": 1e-3},
-                                 ignore_index=True)
+        attc_df = pd.concat([attc_df,
+                             pd.DataFrame({"Accession_number": [self.replicon_id],
+                                           "cm_attC": ["attc_4"],
+                                           "cm_debut": [1],
+                                           "cm_fin": [47],
+                                           "pos_beg": [12900],
+                                           "pos_end": [13800],
+                                           "sens": ["-"],
+                                           "evalue": [1e-3]}, index=[3])
+                             ]
+                            )
+
         attc_df.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
         # search attC arrays, keeping palindromes
         # 2 attc sites are in the same array if they are on the same strand, and separated by
@@ -225,46 +194,25 @@ class TestSearchAttc(IntegronTest):
         self.assertEqual(len(attc_array), 2)
 
         # Construct expected outputs:
-        attc_res = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                         "pos_beg", "pos_end", "sens", "evalue"])
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 17825,
-                                    "pos_end": 17884,
-                                    "sens": "-",
-                                    "evalue": 1e-9},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19080,
-                                    "pos_end": 19149,
-                                    "sens": "-",
-                                    "evalue": 1e-4},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19618,
-                                    "pos_end": 19726,
-                                    "sens": "-",
-                                    "evalue": 1.1e-7},
-                                   ignore_index=True)
-        attc_res2 = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                          "pos_beg", "pos_end", "sens", "evalue"])
-        attc_res2 = attc_res2.append({"Accession_number": self.replicon_id,
-                                      "cm_attC": "attc_4",
-                                      "cm_debut": 1,
-                                      "cm_fin": 47,
-                                      "pos_beg": 12900,
-                                      "pos_end": 13800,
-                                      "sens": "-",
-                                      "evalue": 1e-03},
-                                     ignore_index=True)
+        attc_res = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id],
+                                 "cm_attC": ["attc_4", "attc_4", "attc_4"],
+                                 "cm_debut": [1, 1, 1],
+                                 "cm_fin": [47, 47, 47],
+                                 "pos_beg": [17825, 19080, 19618],
+                                 "pos_end": [17884, 19149, 19726],
+                                 "sens": ["-", "-", "-"],
+                                 "evalue": [1e-9, 1e-4, 1.1e-7]})
+
+        attc_res2 = pd.DataFrame({"Accession_number": [self.replicon_id],
+                                  "cm_attC": ["attc_4"],
+                                  "cm_debut": [1],
+                                  "cm_fin": [47],
+                                  "pos_beg": [12900],
+                                  "pos_end": [13800],
+                                  "sens": ["-"],
+                                  "evalue": [1e-03]}
+                                 )
+
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_res[intcols] = attc_res[intcols].astype(int)
@@ -286,33 +234,18 @@ class TestSearchAttc(IntegronTest):
         # Construct attC dataframe (read from infernal file)
         attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
         # Add another attC at more than 4kb, same strand
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 15800,
-                                  "pos_end": 16000,
-                                  "sens": "+",
-                                  "evalue": 1e-3},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 12000,
-                                  "pos_end": 12500,
-                                  "sens": "+",
-                                  "evalue": 1e-3},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 7100,
-                                  "pos_end": 8200,
-                                  "sens": "+",
-                                  "evalue": 1e-3},
-                                 ignore_index=True)
+        attc_df = pd.concat([attc_df,
+                             pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id],
+                                           "cm_attC": ["attc_4", "attc_4", "attc_4"],
+                                           "cm_debut": [1, 1, 1],
+                                           "cm_fin": [47, 47, 47],
+                                           "pos_beg": [15800, 12000, 7100],
+                                           "pos_end": [16000, 12500, 8200],
+                                           "sens": ["+", "+", "+"],
+                                           "evalue": [1e-3, 1e-3, 1e-3]})
+                             ]
+                            )
+
         attc_df.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
         # search attC arrays, keeping palindromes
         # 2 attc sites are in the same array if they are on the same strand, and separated by
@@ -321,66 +254,32 @@ class TestSearchAttc(IntegronTest):
         self.assertEqual(len(attc_array), 3)
 
         # Construct expected outputs:
-        attc_res = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                         "pos_beg", "pos_end", "sens", "evalue"])
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 17825,
-                                    "pos_end": 17884,
-                                    "sens": "-",
-                                    "evalue": 1e-9},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19080,
-                                    "pos_end": 19149,
-                                    "sens": "-",
-                                    "evalue": 1e-4},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 19618,
-                                    "pos_end": 19726,
-                                    "sens": "-",
-                                    "evalue": 1.1e-7},
-                                   ignore_index=True)
-        attc_res2 = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                          "pos_beg", "pos_end", "sens", "evalue"])
-        attc_res2 = attc_res2.append({"Accession_number": self.replicon_id,
-                                      "cm_attC": "attc_4",
-                                      "cm_debut": 1,
-                                      "cm_fin": 47,
-                                      "pos_beg": 12000,
-                                      "pos_end": 12500,
-                                      "sens": "+",
-                                      "evalue": 1e-03},
-                                     ignore_index=True)
-        attc_res2 = attc_res2.append({"Accession_number": self.replicon_id,
-                                      "cm_attC": "attc_4",
-                                      "cm_debut": 1,
-                                      "cm_fin": 47,
-                                      "pos_beg": 15800,
-                                      "pos_end": 16000,
-                                      "sens": "+",
-                                      "evalue": 1e-03},
-                                     ignore_index=True)
-        attc_res3 = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                          "pos_beg", "pos_end", "sens", "evalue"])
-        attc_res3 = attc_res3.append({"Accession_number": self.replicon_id,
-                                      "cm_attC": "attc_4",
-                                      "cm_debut": 1,
-                                      "cm_fin": 47,
-                                      "pos_beg": 7100,
-                                      "pos_end": 8200,
-                                      "sens": "+",
-                                      "evalue": 1e-03},
-                                     ignore_index=True)
+        attc_res = pd.DataFrame({"Accession_number": self.replicon_id,
+                                 "cm_attC": ["attc_4", "attc_4", "attc_4"],
+                                 "cm_debut": [1, 1, 1],
+                                 "cm_fin": [47, 47, 47],
+                                 "pos_beg": [17825, 19080, 19618],
+                                 "pos_end": [17884, 19149, 19726],
+                                 "sens": ["-", "-", "-"],
+                                 "evalue": [1e-9, 1e-4, 1.1e-7]})
+
+        attc_res2 = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id],
+                                  "cm_attC": ["attc_4", "attc_4"],
+                                  "cm_debut": [1, 1],
+                                  "cm_fin": [47, 47],
+                                  "pos_beg": [12000, 15800],
+                                  "pos_end": [12500, 16000],
+                                  "sens": ["+", "+"],
+                                  "evalue": [1e-03, 1e-03]})
+        attc_res3 = pd.DataFrame({"Accession_number": [self.replicon_id],
+                                  "cm_attC": ["attc_4"],
+                                  "cm_debut": [1],
+                                  "cm_fin": [47],
+                                  "pos_beg": [7100],
+                                  "pos_end": [8200],
+                                  "sens": ["+"],
+                                  "evalue": [1e-03]})
+
         # convert positions to int
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_res[intcols] = attc_res[intcols].astype(int)
@@ -398,44 +297,15 @@ class TestSearchAttc(IntegronTest):
         1st attC site of the genome if we take into account its circularity.
         All 3 attC sites are on the strand -
         """
-        attc_df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                        "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 1000,
-                                  "pos_end": 2000,
-                                  "sens": "-",
-                                  "evalue": 1e-9},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 3000,
-                                  "pos_end": 4000,
-                                  "sens": "-",
-                                  "evalue": 1e-4},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 16000,
-                                  "pos_end": 17000,
-                                  "sens": "-",
-                                  "evalue": 1.1e-7},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 19815,
-                                  "pos_end": 20000,
-                                  "sens": "-",
-                                  "evalue": 1.1e-7},
-                                 ignore_index=True)
+        attc_df = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id],
+                                "cm_attC": ["attc_4", "attc_4", "attc_4", "attc_4"],
+                                "cm_debut": [1, 1, 1, 1],
+                                "cm_fin": [47, 47, 47, 47],
+                                "pos_beg": [1000, 3000, 16000, 19815],
+                                "pos_end": [2000, 4000, 17000, 20000],
+                                "sens": ["-", "-", "-", "-", ],
+                                "evalue": [1e-9, 1e-4, 1.1e-7, 1.1e-7]})
+
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_df[intcols] = attc_df[intcols].astype(int)
 
@@ -458,44 +328,14 @@ class TestSearchAttc(IntegronTest):
         1st attC site of the genome if we take into account its circularity.
         All 3 attC sites are on the same strand +
         """
-        attc_df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                        "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 1000,
-                                  "pos_end": 2000,
-                                  "sens": "+",
-                                  "evalue": 1e-9},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 3000,
-                                  "pos_end": 4000,
-                                  "sens": "+",
-                                  "evalue": 1e-4},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 16000,
-                                  "pos_end": 17000,
-                                  "sens": "+",
-                                  "evalue": 1.1e-7},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 19815,
-                                  "pos_end": 20000,
-                                  "sens": "+",
-                                  "evalue": 1.1e-7},
-                                 ignore_index=True)
+        attc_df = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id],
+                                "cm_attC": ["attc_4", "attc_4", "attc_4", "attc_4"],
+                                "cm_debut": [1, 1, 1, 1],
+                                "cm_fin": [47, 47, 47, 47],
+                                "pos_beg": [1000, 3000, 16000, 19815],
+                                "pos_end": [2000, 4000, 17000, 20000],
+                                "sens": ["+", "+", "+", "+",],
+                                "evalue": [1e-9, 1e-4, 1.1e-7, 1.1e-7]})
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_df[intcols] = attc_df[intcols].astype(int)
 
@@ -520,113 +360,29 @@ class TestSearchAttc(IntegronTest):
         # keep one with the highest evalue
         attc_df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
                                         "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 1000,
-                                  "pos_end": 2000,
-                                  "sens": "+",
-                                  "evalue": 1e-9},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 3001,
-                                  "pos_end": 4000,
-                                  "sens": "+",
-                                  "evalue": 1e-4},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 3000,
-                                  "pos_end": 4000,
-                                  "sens": "+",
-                                  "evalue": 1e-9},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 5500,
-                                  "pos_end": 7000,
-                                  "sens": "+",
-                                  "evalue": 1e-7},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 5500,
-                                  "pos_end": 7001,
-                                  "sens": "+",
-                                  "evalue": 1e-4},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 6300,
-                                  "pos_end": 7750,
-                                  "sens": "+",
-                                  "evalue": 1e-6},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 7000,
-                                  "pos_end": 8000,
-                                  "sens": "+",
-                                  "evalue": 1e-6},
-                                 ignore_index=True)
+        attc_df = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id],
+                                  "cm_attC": ["attc_4", "attc_4", "attc_4", "attc_4", "attc_4", "attc_4", "attc_4"],
+                                  "cm_debut": [1, 1, 1, 1, 1, 1, 1],
+                                  "cm_fin": [47, 47, 47, 47, 47, 47, 47],
+                                  "pos_beg": [1000, 3001, 3000, 5500, 5500, 6300, 7000],
+                                  "pos_end": [2000, 4000, 4000, 7000, 7001, 7750, 8000],
+                                  "sens": ["+", "+", "+", "+", "+", "+", "+"],
+                                  "evalue": [1e-9, 1e-4, 1e-9, 1e-7, 1e-4, 1e-6, 1e-6]})
+
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_df[intcols] = attc_df[intcols].astype(int)
 
         attc_array = attc.search_attc(attc_df, False, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 1)
         # Construct expected outputs:
-        attc_res = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                         "pos_beg", "pos_end", "sens", "evalue"])
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 1000,
-                                    "pos_end": 2000,
-                                    "sens": "+",
-                                    "evalue": 1e-9},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 3000,
-                                    "pos_end": 4000,
-                                    "sens": "+",
-                                    "evalue": 1e-9},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 5500,
-                                    "pos_end": 7000,
-                                    "sens": "+",
-                                    "evalue": 1e-7},
-                                   ignore_index=True)
-        attc_res = attc_res.append({"Accession_number": self.replicon_id,
-                                    "cm_attC": "attc_4",
-                                    "cm_debut": 1,
-                                    "cm_fin": 47,
-                                    "pos_beg": 7000,
-                                    "pos_end": 8000,
-                                    "sens": "+",
-                                    "evalue": 1e-6},
-                                    ignore_index=True)
+        attc_res = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id,],
+                                 "cm_attC": ["attc_4", "attc_4", "attc_4", "attc_4"],
+                                 "cm_debut": [1, 1, 1, 1],
+                                 "cm_fin": [47, 47, 47, 47],
+                                 "pos_beg": [1000, 3000, 5500, 7000],
+                                 "pos_end": [2000, 4000, 7000, 8000],
+                                 "sens": ["+", "+", "+", "+"],
+                                 "evalue": [1e-9, 1e-9, 1e-7, 1e-6]})
         attc_res[intcols] = attc_res[intcols].astype(int)
         attc_array[0].reset_index(inplace=True, drop=True)
         pdt.assert_frame_equal(attc_res, attc_array[0])
@@ -636,44 +392,15 @@ class TestSearchAttc(IntegronTest):
         """
         tests if attc sites are clustered according the strand
         """
-        attc_df = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut", "cm_fin",
-                                        "pos_beg", "pos_end", "sens", "evalue"], dtype='int')
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 1000,
-                                  "pos_end": 2000,
-                                  "sens": "-",
-                                  "evalue": 1e-9},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 3000,
-                                  "pos_end": 4000,
-                                  "sens": "-",
-                                  "evalue": 1e-4},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 3000,
-                                  "pos_end": 4000,
-                                  "sens": "+",  # this make that we get 3 clusters
-                                  "evalue": 1e-9},
-                                 ignore_index=True)
-        attc_df = attc_df.append({"Accession_number": self.replicon_id,
-                                  "cm_attC": "attc_4",
-                                  "cm_debut": 1,
-                                  "cm_fin": 47,
-                                  "pos_beg": 5500,
-                                  "pos_end": 7000,
-                                  "sens": "-",
-                                  "evalue": 1.1e-7},
-                                 ignore_index=True)
+        attc_df = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id, self.replicon_id],
+                                "cm_attC": ["attc_4", "attc_4", "attc_4", "attc_4"],
+                                "cm_debut": [1, 1, 1 , 1],
+                                "cm_fin": [47, 47, 47, 47],
+                                "pos_beg": [1000, 3000, 3000, 5500],
+                                "pos_end": [2000, 4000, 4000, 7000],
+                                "sens": ["-", "-", "+", "-"],
+                                "evalue": [1e-9, 1e-4, 1e-9, 1.1e-7]})
+
         intcols = ["cm_debut", "cm_fin", "pos_beg", "pos_end"]
         attc_df[intcols] = attc_df[intcols].astype(int)
 
