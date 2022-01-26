@@ -40,6 +40,95 @@ Inputs
 - a fasta file
 - a multi-fasta file
 - many (multi-)fasta files
+- several replicon in gembase format
+
+Gembase format
+""""""""""""""
+
+Integron_FInder can used *gembase* formatted protein
+(https://gem.pages.pasteur.fr/MacSyFinder/user_guide/gembase_convention.html)
+file instead of re-annotating genes with *Prodigal*.
+Enables the user to use *Integron_Finder* with its own annotations.
+The *gembase* format is the typical result of *PanACoTA's*
+`annotation step <https://aperrin.pages.pasteur.fr/pipeline_annotation/html-doc/examples.html#annotate-step>`_
+It must contain, at least, a *LSTINF* and a Protein file per replicon.
+Folder structure must be Gembase/LSTINF/X.lst ; Gembase/Proteins/X.prt.
+
+Below an example of a *gembase* architecture:
+
+.. code-block:: text
+
+    gembase/
+    ├── Genes
+    │   ├── ACBA.0917.00019.gen       # genome in fasta format one seq/gene
+    │   └── ESCO001.C.00001.C001.gen
+    ├── LSTINFO
+    │   ├── ACBA.0917.00019.lst       # information in space separated values
+    │   └── ESCO001.C.00001.C001.lst
+    ├── Proteins
+    │   ├── ACBA.0917.00019.prt       # proteins in fasta format
+    │   └── ESCO001.C.00001.C001.prt
+    └── Replicons
+        ├── ACBA.0917.00019.fna             # genome in fasta format one seq/replicon
+        └── ESCO001.C.00001.C001.fst
+
+
+5 first sequences headers in gembase/Genes/ACBA.0917.00019.gen file
+
+.. code-block:: text
+
+    >ACBA.0917.00019.b0001_00001 1215 tyrS | Tyrosine--tRNA ligase | 6.1.1.1 | similar to AA sequence:UniProtKB:P41256
+    >ACBA.0917.00019.i0001_00002 1128 anmK | Anhydro-N-acetylmuramic acid kinase | 2.7.1.170 | similar to AA sequence:UniProtKB:Q8EHB5
+    >ACBA.0917.00019.i0001_00003 846 ephA | Epoxide hydrolase A | 3.3.2.10 | similar to AA sequence:UniProtKB:I6YGS0
+    >ACBA.0917.00019.i0001_00004 336 erpA | Iron-sulfur cluster insertion protein ErpA | NA | similar to AA sequence:UniProtKB:P45344
+    >ACBA.0917.00019.i0001_00005 1005 NA | hypothetical protein | NA | NA
+    ...
+
+5 first sequences headers in gembase/Genes/ACBA.0917.00019.gen file
+
+.. code-block:: text
+
+    >ACBA.0917.00019.b0001_00001 1215 tyrS | Tyrosine--tRNA ligase | 6.1.1.1 | similar to AA sequence:UniProtKB:P41256
+    >ACBA.0917.00019.i0001_00002 1128 anmK | Anhydro-N-acetylmuramic acid kinase | 2.7.1.170 | similar to AA sequence:UniProtKB:Q8EHB5
+    >ACBA.0917.00019.i0001_00003 846 ephA | Epoxide hydrolase A | 3.3.2.10 | similar to AA sequence:UniProtKB:I6YGS0
+    >ACBA.0917.00019.i0001_00004 336 erpA | Iron-sulfur cluster insertion protein ErpA | NA | similar to AA sequence:UniProtKB:P45344
+    >ACBA.0917.00019.i0001_00005 1005 NA | hypothetical protein | NA | NA
+    ...
+
+5 first lines in gembase/LSTINFO/ACBA.0917.00019.lst
+
+.. code-block:: text
+
+    266     1480    C       CDS     ACBA.0917.00019.b0001_00001     tyrS    | Tyrosine--tRNA ligase | 6.1.1.1 | similar to AA sequence:UniProtKB:P41256
+    1560    2687    D       CDS     ACBA.0917.00019.i0001_00002     anmK    | Anhydro-N-acetylmuramic acid kinase | 2.7.1.170 | similar to AA sequence:UniProtKB:Q8EHB5
+    2815    3660    D       CDS     ACBA.0917.00019.i0001_00003     ephA    | Epoxide hydrolase A | 3.3.2.10 | similar to AA sequence:UniProtKB:I6YGS0
+    3716    4051    C       CDS     ACBA.0917.00019.i0001_00004     erpA    | Iron-sulfur cluster insertion protein ErpA | NA | similar to AA sequence:UniProtKB:P45344
+    4176    5180    C       CDS     ACBA.0917.00019.i0001_00005     NA      | hypothetical protein | NA | NA
+    ...
+
+**all** sequences headers in gembase/Replicons/ACBA.0917.00019.fna
+
+.. code-block:: text
+
+    >ACBA.0917.00019.0001
+    >ACBA.0917.00019.0002
+
+
+Integron_finder will use *LSTINF* and *Proteins* folders.
+So if you want to analyze a replicon located in a *gembase*, the command line should look like to
+
+    integron_finder --gembase  data/Replicons/ACBA.0917.00019.fna
+
+
+.. note::
+
+    If the replicon you want to analyze is not in the gembase directory but you still want to take advantage of the
+    *gembase* annotation. Then you have to specify the *--gembase-path* option to indicate where to find it.
+    A typical command line could be:
+
+        integron_finder --gembase --gembase-path data/gembase/  My_replicons/ACBA.0917.00019.fna
+
+
 
 Outputs
 -------
