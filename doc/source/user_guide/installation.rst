@@ -13,11 +13,11 @@ IntegronFinder dependencies
 
 IntegronFinder is built with Python >= 3.4, and a few libraries are needed:
 
-- Python >=3.7
-- Pandas (>=0.22)
-- Numpy (>=1.14.2)
-- Biopython (>=1.70)
-- Matplotlib (>=2.2.2)
+- Python >=3.7,<=3.10
+- Pandas >=1.1.5,<=1.4.0
+- Numpy >=1.19.4,<=1.22.1
+- Biopython >=1.78,<=1.79
+- Matplotlib >=3.3.3,<=3.5.1
 - colorlog
 
 From version 1.5.1, integron_finder will check and install theses libraries for you.
@@ -26,9 +26,9 @@ In addition, IntegronFinder has external dependencies, which have to be
 installed prior the use of the program (click to access the corresponding
 website).
 
-- `HMMER 3.1b2`_
-- `INFERNAL 1.1.2`_
-- `Prodigal V2.6.2`_
+- `HMMER`_ >=3.1b2,<=3.3.2
+- `INFERNAL`_ >=1.1.2,<=1.1.4
+- `Prodigal`_ >V2.6.2,<=V2.6.3
 - `Nextflow`_ (for parallelization)
 
 After installation of these programs, they should be in your ``$PATH`` (*i.e.*
@@ -242,9 +242,9 @@ To install version 1.71 of Biopython (recommended for IntegronFinder).
 .. _`Canopy for Academics`: https://store.enthought.com/#canopy-academic
 .. _`stackoverflow`: http://stackoverflow.com/
 
-.. _`HMMER 3.1b2`: http://hmmer.janelia.org/
-.. _`INFERNAL 1.1.2`: http://infernal.janelia.org/
-.. _`Prodigal V2.6.2`: https://github.com/hyattpd/Prodigal/releases
+.. _`HMMER`: http://hmmer.janelia.org/
+.. _`INFERNAL`: http://infernal.janelia.org/
+.. _`Prodigal`: https://github.com/hyattpd/Prodigal/releases
 .. _`Nextflow`: https://www.nextflow.io/
 
 .. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/tag/v1.5.0

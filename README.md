@@ -137,7 +137,7 @@ But before to do that we encourage to read [the contributing guide](CONTRIBUTING
 - colorlog
 - HMMER >=3.1b2,<=3.3.2
 - INFERNAL >=1.1.2,<=1.1.4
-- Prodigal >=2.6.2
+- Prodigal >=2.6.2,<=V2.6.3
 
 ## Usage
 
