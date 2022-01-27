@@ -142,93 +142,66 @@ But before to do that we encourage to read [the contributing guide](CONTRIBUTING
 ## Usage
 
 ```
-usage: integron_finder [-h] [--local-max] [--func-annot] [--cpu CPU]
-                       [-dt DISTANCE_THRESHOLD] [--outdir OUTDIR]
-                       [--union-integrases] [--cmsearch CMSEARCH]
-                       [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
-                       [--path-func-annot PATH_FUNC_ANNOT] [--gembase]
-                       [--annot-parser ANNOT_PARSER_NAME]
-                       [--attc-model ATTC_MODEL] [--evalue-attc EVALUE_ATTC]
-                       [--calin-threshold CALIN_THRESHOLD]
-                       [--keep-palindromes] [--no-proteins] [--promoter-attI]
-                       [--max-attc-size MAX_ATTC_SIZE]
-                       [--min-attc-size MIN_ATTC_SIZE] [--eagle-eyes] [--pdf]
-                       [--gbk] [--keep-tmp] [--split-results]
-                       [--circ | --linear] [--topology-file TOPOLOGY_FILE]
-                       [-V] [--mute] [-v] [-q]
+usage: integron_finder [-h] [--local-max] [--func-annot] [--cpu CPU] [-dt DISTANCE_THRESHOLD] [--outdir OUTDIR] 
+                       [--union-integrases] [--cmsearch CMSEARCH] [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
+                       [--path-func-annot PATH_FUNC_ANNOT] [--gembase] [--gembase-path GEMBASE_PATH] 
+                       [--annot-parser ANNOT_PARSER_NAME] [--attc-model ATTC_MODEL] [--evalue-attc EVALUE_ATTC]
+                       [--calin-threshold CALIN_THRESHOLD] [--keep-palindromes] [--no-proteins] [--promoter-attI]
+                       [--max-attc-size MAX_ATTC_SIZE] [--min-attc-size MIN_ATTC_SIZE] [--eagle-eyes] [--pdf] [--gbk]
+                       [--keep-tmp] [--split-results] [--circ | --linear] [--topology-file TOPOLOGY_FILE]
+                       [--version] [--mute] [-v] [-q]
                        replicon
 
 positional arguments:
-  replicon              Path to the replicon file (in fasta format), eg :
-                        path/to/file.fst or file.fst
+  replicon              Path to the replicon file (in fasta format), eg : path/to/file.fst or file.fst
 
 optional arguments:
   -h, --help            show this help message and exit
-  --local-max           Allows thorough local detection (slower but more
-                        sensitive and do not increase false positive rate).
-  --func-annot          Functional annotation of CDS associated with integrons
-                        HMM files are needed in Func_annot folder.
+  --local-max           Allows thorough local detection (slower but more sensitive and do not increase false positive rate).
+  --func-annot          Functional annotation of CDS associated with integrons HMM files are needed in Func_annot folder.
   --cpu CPU             Number of CPUs used by INFERNAL and HMMER
   -dt DISTANCE_THRESHOLD, --distance-thresh DISTANCE_THRESHOLD
-                        Two elements are aggregated if they are distant of
-                        DISTANCE_THRESH [4000]bp or less
+                        Two elements are aggregated if they are distant of DISTANCE_THRESH [4000]bp or less
   --outdir OUTDIR       Set the output directory (default: current)
-  --union-integrases    Instead of taking intersection of hits from Phage_int
-                        profile (Tyr recombinases) and integron_integrase
+  --union-integrases    Instead of taking intersection of hits from Phage_int profile (Tyr recombinases) and integron_integrase
                         profile, use the union of the hits
-  --cmsearch CMSEARCH   Complete path to cmsearch if not in PATH. eg:
-                        /usr/local/bin/cmsearch
+  --cmsearch CMSEARCH   Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch
   --hmmsearch HMMSEARCH
-                        Complete path to hmmsearch if not in PATH. eg:
-                        /usr/local/bin/hmmsearch
-  --prodigal PRODIGAL   Complete path to prodigal if not in PATH. eg:
-                        /usr/local/bin/prodigal
+                        Complete path to hmmsearch if not in PATH. eg: /usr/local/bin/hmmsearch
+  --prodigal PRODIGAL   Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal
   --path-func-annot PATH_FUNC_ANNOT
-                        Path to file containing all hmm bank paths (one per
-                        line)
-  --gembase             Use gembase formatted protein file instead of
-                        Prodigal. Folder structure must be preserved
+                        Path to file containing all hmm bank paths (one per line)
+  --gembase             Use gembase formatted protein file instead of Prodigal. Folder structure must be preserved
+  --gembase-path GEMBASE_PATH
+                        path to the gembase root directory (needed only if the replicon file is not locatedin gembase-path)
   --annot-parser ANNOT_PARSER_NAME
-                        the name of the parser to use to get information from
-                        protein file.
+                        the name of the parser to use to get information from protein file.
   --attc-model ATTC_MODEL
                         Path or file to the attc model (Covariance Matrix).
   --evalue-attc EVALUE_ATTC
-                        Set evalue threshold to filter out hits above it
-                        (default: 1)
+                        Set evalue threshold to filter out hits above it (default: 1)
   --calin-threshold CALIN_THRESHOLD
-                        keep 'CALIN' only if attC sites nuber >= calin-
-                        threshold (default: 2)
-  --keep-palindromes    For a given hit, if the palindromic version is found,
-                        don't remove the one with highest evalue.
-  --no-proteins         Don't annotate CDS and don't find integrase, just look
-                        for attC sites.
-  --promoter-attI       Search also for promoter and attI sites. (default
-                        False)
+                        keep 'CALIN' only if attC sites number >= calin-threshold (default: 2)
+  --keep-palindromes    For a given hit, if the palindromic version is found, don't remove the one with highest evalue.
+  --no-proteins         Don't annotate CDS and don't find integrase, just look for attC sites.
+  --promoter-attI       Search also for promoter and attI sites. (default False)
   --max-attc-size MAX_ATTC_SIZE
                         Set maximum value fot the attC size (default: 200bp)
   --min-attc-size MIN_ATTC_SIZE
                         set minimum value fot the attC size (default: 40bp)
-  --eagle-eyes          Synonym of --local-max. Like a soaring eagle in the
-                        sky, catching rabbits (or attC sites) by surprise.
+  --eagle-eyes          Synonym of --local-max. Like a soaring eagle in the sky, catching rabbits (or attC sites) by surprise.
   --circ                Set the default topology for replicons to 'circular'
   --linear              Set the default topology for replicons to 'linear'
   --topology-file TOPOLOGY_FILE
-                        The path to a file where the topology for each
-                        replicon is specified.
-  -V, --version         show program's version number and exit
-  --mute                mute the log on stdout.(continue to log on
-                        integron_finder.out)
+                        The path to a file where the topology for each replicon is specified.
+  --version             show program's version number and exit
+  --mute                mute the log on stdout.(continue to log on integron_finder.out)
 
 Output options:
-  --pdf                 For each complete integron, a simple graphic of the
-                        region is depicted (in pdf format)
-  --gbk                 generate a GenBank file with the sequence annotated
-                        with the same annotations than .integrons file.
-  --keep-tmp            keep intermediate results. This results are stored in
-                        directory named tmp_<replicon id>
-  --split-results       Instead of merging integron results from all replicon
-                        in one file, keep them in separated files.
+  --pdf                 For each complete integron, a simple graphic of the region is depicted (in pdf format)
+  --gbk                 generate a GenBank file with the sequence annotated with the same annotations than .integrons file.
+  --keep-tmp            keep intermediate results. This results are stored in directory named tmp_<replicon id>
+  --split-results       Instead of merging integron results from all replicon in one file, keep them in separated files.
 
   -v, --verbose         Increase verbosity of output (can be cumulative : -vv)
   -q, --quiet           Decrease verbosity of output (can be cumulative : -qq)
