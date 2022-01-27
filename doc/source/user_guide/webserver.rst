@@ -55,6 +55,6 @@ along with the number of *attC* sites per type. There are 4 different outputs cr
 
 For each of the aforementioned files, you can save them by clicking on the download button.
 
-.. _`Galaxy server of the Pasteur institute`: https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F1.5.1
+.. _`Galaxy server of the Pasteur institute`: https://galaxy.pasteur.fr/tool_runner?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F2.0%2Bgalaxy0
 
 
