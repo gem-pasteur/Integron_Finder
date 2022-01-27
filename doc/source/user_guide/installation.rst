@@ -247,6 +247,6 @@ To install version 1.71 of Biopython (recommended for IntegronFinder).
 .. _`Prodigal`: https://github.com/hyattpd/Prodigal/releases
 .. _`Nextflow`: https://www.nextflow.io/
 
-.. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases/tag/v1.5.0
+.. _`latest release`: https://github.com/gem-pasteur/Integron_Finder/releases
 .. _`virtualenv`: https://docs.python.org/3/library/venv.html
 .. _`Canopy CLI`: http://docs.enthought.com/canopy/configure/canopy-cli.html#canopy-cli-venv
