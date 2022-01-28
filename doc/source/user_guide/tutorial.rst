@@ -126,6 +126,31 @@ Hence if you want to analyze a replicon located in a *gembase*, the command line
         integron_finder --gembase --gembase-path data/gembase/  My_replicons/ACBA.0917.00019.fna
 
 
+Custom protein file
+-------------------
+
+Integron_Finder allow the user to provide it's own protein file with it's own annotations
+instead of using *prodigal* (default).
+In this case you have to specified the protein file to use with the option *--prot-file*
+and the path to the parser to extract information from this file *--annot-parser*.
+A typical command line could be:
+
+    integron_finder --prot-file <path/to/custom/protein /file> --annot-parser <my_annot_paser.py> <replicon_path>
+
+The annotation parser must be a python file (with the *.py* extention') with one function called *description_parser*
+This function must take **one** argument which is the header of a fasta sequence header (without the first charracter >)
+and must return a **tuple with 4 elements**:
+
+    * sequence id: the id of the sequence (string)
+    * start: the beginning position of the protein on the genome (positive int)
+    * stop: the end position of the protein on the genome (positive int)
+    * strand: the strand 1 if the protein os coded on the direct strand or -1 on the reverse
+
+Below a description_parser to parse annotation in prodigal format:
+
+    .. literalinclude:: ../_static/prodigal_annot_parser.py
+        :language: python
+
 
 Outputs
 -------

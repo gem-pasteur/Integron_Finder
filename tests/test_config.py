@@ -186,3 +186,8 @@ class TestConfig(IntegronTest):
             self.args.quiet = q
             cf = config.Config(self.args)
             self.assertEqual(cf.log_level, l)
+
+    def test_prot_file(self):
+        self.args.prot_file = 'nimportnaoik'
+        cf = config.Config(self.args)
+        self.assertEqual(cf.prot_file, self.args.prot_file)

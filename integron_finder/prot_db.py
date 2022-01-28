@@ -31,6 +31,7 @@ import os
 from subprocess import call
 from collections import namedtuple
 import re
+import importlib.util
 
 import colorlog
 import pandas as pd
@@ -60,12 +61,11 @@ class ProteinDB(ABC):
         """
         self.cfg = cfg
         self.replicon = replicon
-        if prot_file is None:
-            self._prot_file = self._make_protfile()
-        else:
-            self._prot_file = prot_file
+        self._prot_file = self._make_protfile(path=prot_file)
         self._prot_db = self._make_db()
 
+
+    @abstractmethod
     def __getitem__(self, prot_seq_id):
         """
 
@@ -76,6 +76,7 @@ class ProteinDB(ABC):
         """
         pass
 
+    @abstractmethod
     def __iter__(self):
         """
         :return: a generator which iterate on the protein seq_id which constitute the contig.
@@ -84,7 +85,7 @@ class ProteinDB(ABC):
         pass
 
     @abstractmethod
-    def _make_protfile(self):
+    def _make_protfile(self, path=None):
         """
         Create fasta file with protein corresponding to the nucleic sequence (replicon)
 
@@ -99,8 +100,10 @@ class ProteinDB(ABC):
         :return: an index of the sequence contains in protfile corresponding to the replicon
         """
         try:
+            # for biopython < 1.78
             idx = SeqIO.index(self._prot_file, "fasta", alphabet=Seq.IUPAC.extended_protein)
         except AttributeError:
+            # for biopython > 1.76
             idx = SeqIO.index(self._prot_file, "fasta")
         return idx
 
@@ -223,7 +226,7 @@ class GembaseDB(ProteinDB):
                 raise FileNotFoundError("cannot find lst file matching {} sequence".format(self.cfg.input_seq_path))
 
 
-    def _make_protfile(self):
+    def _make_protfile(self, path=None):
         """
         Create fasta file with protein corresponding to this sequence, from the corresponding Gembase protfile
         This step is necessary because in Gembase Draft
@@ -232,21 +235,24 @@ class GembaseDB(ProteinDB):
         :return: the path of the created protein file
         :rtype: str
         """
-        all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._gembase_file_basename + '.prt')
-        try:
-            all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
-        except AttributeError:
-            all_prots = SeqIO.index(all_prot_path, "fasta")
-        if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
-            os.makedirs(self.cfg.tmp_dir(self.replicon.id))
-        prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')
-        with open(prot_file_path, 'w') as prot_file:
-            for seq_id in self._info['seq_id']:
-                try:
-                    seq = all_prots[seq_id]
-                    SeqIO.write(seq, prot_file, 'fasta')
-                except KeyError:
-                    _log.warning('Sequence describe in LSTINF file {} is not present in {}'.format(seq_id, all_prot_path))
+        if path:
+            prot_file_path = path
+        else:
+            all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._gembase_file_basename + '.prt')
+            try:
+                all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
+            except AttributeError:
+                all_prots = SeqIO.index(all_prot_path, "fasta")
+            if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
+                os.makedirs(self.cfg.tmp_dir(self.replicon.id))
+            prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')
+            with open(prot_file_path, 'w') as prot_file:
+                for seq_id in self._info['seq_id']:
+                    try:
+                        seq = all_prots[seq_id]
+                        SeqIO.write(seq, prot_file, 'fasta')
+                    except KeyError:
+                        _log.warning('Sequence describe in LSTINF file {} is not present in {}'.format(seq_id, all_prot_path))
         return prot_file_path
 
 
@@ -402,31 +408,34 @@ class ProdigalDB(ProteinDB):
     """
 
 
-    def _make_protfile(self):
+    def _make_protfile(self, path=None):
         """
         Use `prodigal` to generate proteins corresponding to the replicon
 
         :return: the path of the created protfile
         :rtype: str
         """
-        if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
-            os.makedirs(self.cfg.tmp_dir(self.replicon.id))
-        prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + ".prt")
-        if not os.path.exists(prot_file_path):
-            prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q ".format(
-                prodigal=self.cfg.prodigal,
-                meta='' if len(self.replicon) > 200000 else '-p meta',
-                replicon=self.replicon.path,
-                prot=prot_file_path,
-                out=os.devnull,
-            )
-            try:
-                _log.debug("run prodigal: {}".format(prodigal_cmd))
-                returncode = call(prodigal_cmd.split())
-            except Exception as err:
-                raise RuntimeError(f"{prodigal_cmd} : failed : {err}")
-            if returncode != 0:
-                raise RuntimeError(f"{prodigal_cmd} : failed : prodigal returncode = {returncode}")
+        if path:
+            prot_file_path = path
+        else:
+            if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
+                os.makedirs(self.cfg.tmp_dir(self.replicon.id))
+            prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + ".prt")
+            if not os.path.exists(prot_file_path):
+                prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q ".format(
+                    prodigal=self.cfg.prodigal,
+                    meta='' if len(self.replicon) > 200000 else '-p meta',
+                    replicon=self.replicon.path,
+                    prot=prot_file_path,
+                    out=os.devnull,
+                )
+                try:
+                    _log.debug("run prodigal: {}".format(prodigal_cmd))
+                    returncode = call(prodigal_cmd.split())
+                except Exception as err:
+                    raise RuntimeError(f"{prodigal_cmd} : failed : {err}")
+                if returncode != 0:
+                    raise RuntimeError(f"{prodigal_cmd} : failed : prodigal returncode = {returncode}")
 
         return prot_file_path
 
@@ -437,8 +446,11 @@ class ProdigalDB(ProteinDB):
         :return: The Sequence corresponding to the prot_seq_id.
         :rtype: :class:`Bio.SeqRecord` object
         """
-        return self._prot_db[prot_seq_id]
-
+        try:
+            return self._prot_db[prot_seq_id]
+        except KeyError:
+            raise IntegronError(f"protein file does not contains '{prot_seq_id}' id. "
+                                f"Try again with removing previous results dir {self.cfg.result_dir}")
 
     def __iter__(self):
         """
@@ -465,3 +477,89 @@ class ProdigalDB(ProteinDB):
         stop = int(stop)
         strand = int(strand)
         return SeqDesc(id_, strand, start, stop)
+
+
+class CustomDB(ProteinDB):
+    """
+    Creates proteins from Replicon/contig using prodigal and provide facilities to access them.
+    """
+
+
+    def __init__(self, replicon, cfg, prot_file):
+        super().__init__(replicon, cfg, prot_file=prot_file)
+        try:
+            parser_path = self.cfg.annot_parser
+            spec = importlib.util.spec_from_file_location('custom_module', parser_path)
+            custom_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(custom_module)
+            self._parser = custom_module.description_parser
+        except Exception as err:
+            raise RuntimeError(f"Cannot import custom --annot-parser '{parser_path}': {err}")
+
+    def _make_protfile(self, path=None):
+        if path is None:
+            raise IntegronError("If use CustomDB prot_file must be specified")
+        return path
+
+
+    def __getitem__(self, prot_seq_id):
+        """
+        :param str prot_seq_id: the id of a protein sequence
+        :return: The Sequence corresponding to the prot_seq_id.
+        :rtype: :class:`Bio.SeqRecord` object
+        """
+        try:
+            return self._prot_db[prot_seq_id]
+        except KeyError:
+            raise IntegronError(f"protein file does not contains '{prot_seq_id}' id. "
+                                f"Check if it's the right proteins file {self._prot_file} "
+                                f"or remove previous results dir {self.cfg.result_dir}")
+
+
+    def __iter__(self):
+        """
+        :return: a generator which iterate on the protein seq_id which constitute the contig.
+        :rtype: generator
+                """
+        return (seq_id for seq_id in self._prot_db)
+
+
+    def get_description(self, gene_id):
+        """
+        :param str gene_id: a protein/gene identifier
+        :returns: The description of the protein corresponding to the gene_id
+        :rtype: :class:`SeqDesc` namedtuple object
+        :raise IntegronError: when gene_id is not a valid Gembase gene identifier
+        :raise KeyError: if gene_id is not found in ProdigalDB instance
+        """
+        def check_id(x):
+            return isinstance(x, str)
+
+        def check_strand(s):
+            return s == 1 or s == -1
+
+        def check_start(s):
+            return isinstance(s, int) and s >= 0
+
+        check_stop = check_start
+
+        seq = self[gene_id]
+
+        try:
+            id_, start, stop, strand = self._parser(seq.description)
+        except ValueError:
+            msg = f"'{gene_id}' protein is not compliant with custom --annot-parser '{self.cfg.annot_parser}'."
+            _log.critical(msg)
+            raise IntegronError(msg)
+        except Exception as err:
+            msg = f"Cannot parse protein file '{self._prot_file}' with annot-parser '{self.cfg.annot_parser}': {err}"
+            _log.critical(msg)
+            raise IntegronError(msg) from None
+
+        if not all((check_id(id_), check_start(start), check_stop(stop), check_strand(strand))):
+            msg = "Error during protein file parsing: expected seq_id: str, start: positive int, stop: positive int, " \
+                  f"strand 1/-1. got: {id_}, {start}, {stop}, {strand}"
+            _log.critical(msg)
+            raise IntegronError(msg)
+        return SeqDesc(id_, strand, start, stop)
+

@@ -50,6 +50,7 @@ except ImportError as err:
 
 from integron_finder import integrase
 from integron_finder import config
+from integron_finder import IntegronError
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
 
@@ -111,6 +112,69 @@ class TestAcba(IntegronTest):
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
         test_summary = pd.read_csv(test_summary_path, sep="\t", comment="#")
         pdt.assert_frame_equal(exp_summary, test_summary)
+
+
+    def test_acba_custom_parser(self):
+        replicon_filename = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = f"integron_finder --outdir {self.out_dir} --linear " \
+                  f"--prot-file {self.find_data('Proteins', prot_name)} " \
+                  f"--annot-parser {self.find_data('prodigal_annot_parser.py')} " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
+
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:], loglevel='WARNING')
+
+        output_filename = '{}.integrons'.format(replicon_filename)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13.linear',
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        summary_file_name = '{}.summary'.format(replicon_filename)
+        exp_summary_path = self.find_data(
+            os.path.join('Results_Integron_Finder_acba.007.p01.13.linear', summary_file_name))
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment="#")
+        test_summary_path = os.path.join(test_result_dir, summary_file_name)
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment="#")
+        pdt.assert_frame_equal(exp_summary, test_summary)
+
+    def test_acba_custom_parser_no_parser(self):
+        replicon_filename = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = f"integron_finder --outdir {self.out_dir} --linear " \
+                  f"--prot-file {self.find_data('Proteins', prot_name)} " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
+
+        with self.catch_io(out=True, err=True):
+            with self.assertRaises(IntegronError) as ctx:
+                main(command.split()[1:], loglevel='WARNING')
+        self.assertEqual(str(ctx.exception),
+                         "If you provide your own proteins file for annotation (--prot-file) "
+                         "you have to provide also the parser (--annot-parser)"
+                         )
+
+    def test_acba_custom_parser_no_protfile(self):
+        replicon_filename = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = f"integron_finder --outdir {self.out_dir} --linear " \
+                  f"--annot-parser {self.find_data('prodigal_annot_parser.py')} " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
+
+        with self.catch_io(out=True, err=True):
+            with self.assertRaises(IntegronError) as ctx:
+                main(command.split()[1:], loglevel='WARNING')
+        self.assertEqual(str(ctx.exception),
+                         "If you provide your own proteins file for annotation (--prot-file) "
+                         "you have to provide also the parser (--annot-parser)"
+                         )
+
 
 
     def test_acba_sequential_eq_isolate(self):

@@ -58,8 +58,9 @@ from integron_finder.attc import find_attc_max
 from integron_finder.infernal import find_attc
 from integron_finder.integron import find_integron
 from integron_finder.annotation import func_annot, add_feature
-from integron_finder.prot_db import GembaseDB, ProdigalDB
+from integron_finder.prot_db import GembaseDB, ProdigalDB, CustomDB
 from integron_finder import argparse_utils
+
 
 def parse_args(args):
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -126,11 +127,15 @@ def parse_args(args):
                              " Folder structure must be preserved",
                         action="store_true")
     parser.add_argument("--gembase-path",
+                        type=argparse_utils.path,
                         help="path to the gembase root directory (needed only if the replicon file is not located"
                              "in gembase-path)")
     parser.add_argument("--annot-parser",
-                        dest='annot_parser_name',
-                        help="the name of the parser to use to get information from protein file.")
+                        type=argparse_utils.path,
+                        help="the path to the parser to use to get information from protein file.")
+    parser.add_argument("--prot-file",
+                        type=argparse_utils.path,
+                        help="The path to the proteins file used for annotations")
     parser.add_argument('--attc-model',
                         default='attc_4.cm',
                         help='Path or file to the attc model (Covariance Matrix).')
@@ -312,10 +317,22 @@ def find_integron_in_one_replicon(replicon, config):
     if is_func_annot and not fa_hmm:
         _log.warning("No hmm profiles for functional annotation detected, skip functional annotation step.")
 
+    custom_annot_files = (config.prot_file, config.annot_parser)
+
+    if any(custom_annot_files) and config.gembase:
+        raise IntegronError("The --prot-file or --annot-parser are not compatible with --gembase option.")
+    elif any(custom_annot_files) and not all(custom_annot_files):
+        msg = "If you provide your own proteins file for annotation (--prot-file) " \
+              "you have to provide also the parser (--annot-parser)"
+        colorlog.critical(msg)
+        raise IntegronError(msg)
+
     if config.gembase_path:
         protein_db = GembaseDB(replicon, config, gembase_path=config.gembase_path)
     elif config.gembase:
         protein_db = GembaseDB(replicon, config)
+    elif config.prot_file:
+        protein_db = CustomDB(replicon, config, prot_file=config.prot_file)
     else:
         protein_db = ProdigalDB(replicon, config)
 

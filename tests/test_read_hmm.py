@@ -28,6 +28,8 @@
 
 import os
 import argparse
+import tempfile
+import shutil
 
 import pandas as pd
 import pandas.testing as pdt
@@ -46,6 +48,9 @@ from integron_finder.utils import read_multi_prot_fasta
 
 class TestReadHMM(IntegronTest):
 
+    def setUp(self) -> None:
+        self.args = argparse.Namespace()
+        self.args.gembase = False
 
     def test_read_empty(self):
         """
@@ -58,10 +63,8 @@ class TestReadHMM(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', rep_name + '.fst'))
         prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
 
-        args = argparse.Namespace()
-        args.gembase = False
-        args.replicon = replicon_path
-        cfg = Config(args)
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
@@ -90,10 +93,8 @@ class TestReadHMM(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', rep_name + '.fst'))
         prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
 
-        args = argparse.Namespace()
-        args.gembase = False
-        args.replicon = replicon_path
-        cfg = Config(args)
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
@@ -125,10 +126,9 @@ class TestReadHMM(IntegronTest):
         prot_file = os.path.join(result_dir_expected, "tmp_{}".format(contig_id), contig_id + '.prt')
         infile = os.path.join(result_dir_expected, "tmp_{}".format(contig_id), "{}_intI.res".format(contig_id))
 
-        args = argparse.Namespace()
-        args.gembase = True
-        args.replicon = replicon_path
-        cfg = Config(args)
+        self.args.gembase = True
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
@@ -162,10 +162,8 @@ class TestReadHMM(IntegronTest):
         replicon_path = self.find_data('Replicons', rep_name + '.fst')
         prot_file = self.find_data('Proteins', replicon_id + '.prt')
 
-        args = argparse.Namespace()
-        args.gembase = False
-        args.replicon = replicon_path
-        cfg = Config(args)
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
@@ -206,10 +204,8 @@ class TestReadHMM(IntegronTest):
         replicon_path = self.find_data('Replicons', rep_name + '.fst')
         prot_file = self.find_data('Proteins', replicon_id + '.prt')
 
-        args = argparse.Namespace()
-        args.gembase = False
-        args.replicon = replicon_path
-        cfg = Config(args)
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
 
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)
@@ -242,10 +238,8 @@ class TestReadHMM(IntegronTest):
         replicon_path = self.find_data('Replicons', rep_name + '.fst')
         prot_file = self.find_data('Proteins', replicon_id + '.prt')
 
-        args = argparse.Namespace()
-        args.gembase = False
-        args.replicon = replicon_path
-        cfg = Config(args)
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
@@ -284,10 +278,8 @@ class TestReadHMM(IntegronTest):
         replicon_path = self.find_data('Replicons', rep_name + '.fst')
         prot_file = self.find_data('Proteins', replicon_id + '.prt')
 
-        args = argparse.Namespace()
-        args.gembase = False
-        args.replicon = replicon_path
-        cfg = Config(args)
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
@@ -320,10 +312,9 @@ class TestReadHMM(IntegronTest):
         replicon_path = self.find_data('Gembase', 'Replicons', replicon_id + '.fna')
         prot_file = os.path.join(result_dir_expected, "tmp_{}".format(contig_id), contig_id + '.prt')
 
-        args = argparse.Namespace()
-        args.gembase = True
-        args.replicon = replicon_path
-        cfg = Config(args)
+        self.args.gembase = True
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
 
         sequences_db = read_multi_prot_fasta(replicon_path)
         replicon = next(sequences_db)
@@ -357,10 +348,8 @@ class TestReadHMM(IntegronTest):
         replicon_path = self.find_data('Replicons', rep_name + '.fasta')
         prot_file = self.find_data('Proteins', replicon_id + '.prt')
 
-        args = argparse.Namespace()
-        args.gembase = False
-        args.replicon = replicon_path
-        cfg = Config(args)
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
 
         seq_db = read_multi_prot_fasta(replicon_path)
         replicon = next(seq_db)

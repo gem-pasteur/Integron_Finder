@@ -44,7 +44,7 @@ except ImportError as err:
 from integron_finder import IntegronError
 from integron_finder.config import Config
 from integron_finder.utils import read_multi_prot_fasta
-from integron_finder.prot_db import GembaseDB, ProdigalDB, SeqDesc
+from integron_finder.prot_db import GembaseDB, ProdigalDB, SeqDesc, CustomDB
 
 
 class TestGemBase(IntegronTest):
@@ -520,9 +520,13 @@ class TestProdigalDB(IntegronTest):
                              prot_expected.id)
             self.assertEqual(prot_received.seq,
                              prot_expected.seq)
-        with self.assertRaises(KeyError) as ctx:
-            db['nimport_naoik']
-        self.assertEqual(str(ctx.exception), "'nimport_naoik'")
+        with self.assertRaises(IntegronError) as ctx:
+            gene_id = 'nimport_naoik'
+            db[gene_id]
+        self.assertEqual(str(ctx.exception),
+                         f"protein file does not contains '{gene_id}' id. "
+                         f"Try again with removing previous results dir {cfg.result_dir}"
+                         )
 
 
     def test_iter(self):
@@ -564,4 +568,235 @@ class TestProdigalDB(IntegronTest):
         for seq_id, desc in descriptions.items():
             self.assertEqual(desc, db.get_description(seq_id))
 
+
+class TestCustomDB(IntegronTest):
+
+    def setUp(self):
+        """
+        Define variables common to all tests
+        """
+        # Simulate argparse to get argument
+        self.args = argparse.Namespace()
+        self.args.gembase = False
+        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self.args.outdir = self.tmp_dir
+        self.args.prodigal = None
+        self.args.annot_parser = self.find_data('prodigal_annot_parser.py')
+
+        if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
+        os.makedirs(self.tmp_dir)
+
+
+    def tearDown(self):
+        try:
+            shutil.rmtree(self.tmp_dir)
+            pass
+        except:
+            pass
+
+    def test_ProteinDB(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data('Replicons', file_name + '.fst')
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        db = CustomDB(replicon, cfg, protein_path)
+        self.assertTrue(db.replicon.id, replicon.id)
+
+
+    def test_ProteinDB_bad_parser(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        self.args.annot_parser = self.find_data('df_max_input_1.csv')
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        with self.assertRaises(RuntimeError) as ctx:
+            with self.catch_log():
+                db = CustomDB(replicon, cfg, protein_path)
+        self.assertEqual(str(ctx.exception),
+                         f"Cannot import custom --annot-parser '{self.args.annot_parser}': "
+                         f"'NoneType' object has no attribute 'loader'")
+
+
+    def test_protfile(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data('Replicons', file_name + '.fst')
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        db = CustomDB(replicon, cfg, protein_path)
+        self.assertEqual(protein_path,
+                         db.protfile)
+
+
+    def test_getitem(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        db = CustomDB(replicon, cfg, protein_path)
+        exp = read_multi_prot_fasta(self.find_data(os.path.join('Proteins', prot_name)))
+        for prot_expected in exp:
+            prot_received = db[prot_expected.id]
+            self.assertEqual(prot_received.id,
+                             prot_expected.id)
+            self.assertEqual(prot_received.seq,
+                             prot_expected.seq)
+        with self.assertRaises(IntegronError) as ctx:
+            gene_id = 'nimport_naoik'
+            db[gene_id]
+        self.assertEqual(str(ctx.exception),
+                         f"protein file does not contains '{gene_id}' id. "
+                         f"Check if it's the right proteins file {protein_path} "
+                         f"or remove previous results dir {cfg.result_dir}"
+                         )
+
+    def test_iter(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        db = CustomDB(replicon, cfg, protein_path)
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta',
+                               alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta')
+        for exp_seq_id, get_seq_id in zip(idx, db):
+            self.assertEqual(exp_seq_id, get_seq_id)
+
+
+    def test_get_description(self):
+        # SeqDesc(id, strand, strat, stop)
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        self.args.annot_parser = self.find_data('prodigal_annot_parser.py')
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        db = CustomDB(replicon, cfg, protein_path)
+
+        descriptions = {'ACBA.007.P01_13_23': SeqDesc('ACBA.007.P01_13_23', -1, 19721, 20254),
+                        'ACBA.007.P01_13_1':  SeqDesc('ACBA.007.P01_13_1', 1, 55, 1014)}
+        for seq_id, desc in descriptions.items():
+            self.assertEqual(desc, db.get_description(seq_id))
+
+
+    def test_get_description_stupid_parser(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        self.args.annot_parser = self.find_data('stupid_annot_parser.py')
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        seq_id = 'ACBA.007.P01_13_23'
+        db = CustomDB(replicon, cfg, protein_path)
+        with self.assertRaises(IntegronError) as ctx:
+            with self.catch_log():
+                db.get_description(seq_id)
+        self.assertEqual(str(ctx.exception),
+                         f"Cannot parse protein file '{self.args.prot_file}' with annot-parser '{self.args.annot_parser}': "
+                          "cannot unpack non-iterable NoneType object")
+
+
+    def test_get_description_stupid_parser2(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        self.args.annot_parser = self.find_data('stupid_annot_parser2.py')
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        seq_id = 'ACBA.007.P01_13_23'
+        db = CustomDB(replicon, cfg, protein_path)
+        with self.assertRaises(IntegronError) as ctx:
+            with self.catch_log():
+                db.get_description(seq_id)
+        self.assertEqual(str(ctx.exception),
+                         f"'{seq_id}' protein is not compliant with custom --annot-parser '{self.args.annot_parser}'."
+                         )
+
+
+    def test_get_description_lazy_parser(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        self.args.annot_parser = self.find_data('lazy_annot_parser.py')
+        cfg = Config(self.args)
+        seq_db = read_multi_prot_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        seq_id = 'ACBA.007.P01_13_23'
+        db = CustomDB(replicon, cfg, protein_path)
+        with self.assertRaises(IntegronError) as ctx:
+            with self.catch_log():
+                db.get_description(seq_id)
+        self.assertEqual(str(ctx.exception),
+                         f"Error during protein file parsing: "
+                         f"expected seq_id: str, start: positive int, stop: positive int, strand 1/-1. got: "
+                         f"ACBA.007.P01_13_23, 19721, 20254, -1")
 
