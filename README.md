@@ -142,14 +142,12 @@ But before to do that we encourage to read [the contributing guide](CONTRIBUTING
 ## Usage
 
 ```
-usage: integron_finder [-h] [--local-max] [--func-annot] [--cpu CPU] [-dt DISTANCE_THRESHOLD] [--outdir OUTDIR] 
-                       [--union-integrases] [--cmsearch CMSEARCH] [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL]
-                       [--path-func-annot PATH_FUNC_ANNOT] [--gembase] [--gembase-path GEMBASE_PATH] 
-                       [--annot-parser ANNOT_PARSER_NAME] [--attc-model ATTC_MODEL] [--evalue-attc EVALUE_ATTC]
-                       [--calin-threshold CALIN_THRESHOLD] [--keep-palindromes] [--no-proteins] [--promoter-attI]
-                       [--max-attc-size MAX_ATTC_SIZE] [--min-attc-size MIN_ATTC_SIZE] [--eagle-eyes] [--pdf] [--gbk]
-                       [--keep-tmp] [--split-results] [--circ | --linear] [--topology-file TOPOLOGY_FILE]
-                       [--version] [--mute] [-v] [-q]
+usage: integron_finder [-h] [--local-max] [--func-annot] [--cpu CPU] [-dt DISTANCE_THRESHOLD] [--outdir OUTDIR] [--union-integrases]
+                       [--cmsearch CMSEARCH] [--hmmsearch HMMSEARCH] [--prodigal PRODIGAL] [--path-func-annot PATH_FUNC_ANNOT] [--gembase]
+                       [--gembase-path GEMBASE_PATH] [--annot-parser ANNOT_PARSER] [--prot-file PROT_FILE] [--attc-model ATTC_MODEL]
+                       [--evalue-attc EVALUE_ATTC] [--calin-threshold CALIN_THRESHOLD] [--keep-palindromes] [--no-proteins]
+                       [--promoter-attI] [--max-attc-size MAX_ATTC_SIZE] [--min-attc-size MIN_ATTC_SIZE] [--eagle-eyes] [--pdf] [--gbk]
+                       [--keep-tmp] [--split-results] [--circ | --linear] [--topology-file TOPOLOGY_FILE] [--version] [--mute] [-v] [-q]
                        replicon
 
 positional arguments:
@@ -163,8 +161,8 @@ optional arguments:
   -dt DISTANCE_THRESHOLD, --distance-thresh DISTANCE_THRESHOLD
                         Two elements are aggregated if they are distant of DISTANCE_THRESH [4000]bp or less
   --outdir OUTDIR       Set the output directory (default: current)
-  --union-integrases    Instead of taking intersection of hits from Phage_int profile (Tyr recombinases) and integron_integrase
-                        profile, use the union of the hits
+  --union-integrases    Instead of taking intersection of hits from Phage_int profile (Tyr recombinases) and integron_integrase profile,
+                        use the union of the hits
   --cmsearch CMSEARCH   Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch
   --hmmsearch HMMSEARCH
                         Complete path to hmmsearch if not in PATH. eg: /usr/local/bin/hmmsearch
@@ -174,8 +172,10 @@ optional arguments:
   --gembase             Use gembase formatted protein file instead of Prodigal. Folder structure must be preserved
   --gembase-path GEMBASE_PATH
                         path to the gembase root directory (needed only if the replicon file is not locatedin gembase-path)
-  --annot-parser ANNOT_PARSER_NAME
-                        the name of the parser to use to get information from protein file.
+  --annot-parser ANNOT_PARSER
+                        the path to the parser to use to get information from protein file.
+  --prot-file PROT_FILE
+                        The path to the proteins file used for annotations
   --attc-model ATTC_MODEL
                         Path or file to the attc model (Covariance Matrix).
   --evalue-attc EVALUE_ATTC
@@ -205,6 +205,7 @@ Output options:
 
   -v, --verbose         Increase verbosity of output (can be cumulative : -vv)
   -q, --quiet           Decrease verbosity of output (can be cumulative : -qq)
+
 ```
 
 
