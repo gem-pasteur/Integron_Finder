@@ -211,14 +211,14 @@ However, one can modify this value with the option `--calin-threshold` and use a
 Functional annotation
 ---------------------
 
-This option allows to annotate cassettes given HMM profiles. As Resfams database
+This option allows to annotate cassettes given HMM profiles. As AMRFinderPlus database
 is distributed, to annotate antibiotic resistance genes, just use::
 
     integron_finder mysequences.fst --func-annot
 
 IntegronFinder will look in the directory
 ``Integron_Finder-x.x/data/Functional_annotation`` and use all ``.hmm`` files
-available to annotate. By default, there is only ``Resfams.hmm``, but one can
+available to annotate. By default, there is only ``NCBIfam-AMRFinder.hmm``, but one can
 add any other HMM file here. Alternatively, if one wants to use a database which
 is present elsewhere on the user's computer without copying it into that
 directory, one can specify the following option ::
@@ -228,11 +228,11 @@ directory, one can specify the following option ::
 where ``bank_hmm`` is a file containing one absolute path to a hmm file per
 line, and you can comment out a line ::
 
-  ~/Downloads/Integron_Finder-x.x/data/Functional_annotation/Resfams.hmm
+  ~/Downloads/Integron_Finder-x.x/data/Functional_annotation/NCBIfam-AMRFinder.hmm
   ~/Documents/Data/Pfam-A.hmm
   # ~/Documents/Data/Pfam-B.hmm
 
-Here, annotation will be made using Pfam-A et Resfams, but not Pfam-B. If a
+Here, annotation will be made using Pfam-A et NCBIfam-AMRFinder, but not Pfam-B. If a
 protein is hit by 2 different profiles, the one with the best e-value will be kept.
 
 Search for promoter and *attI* sites

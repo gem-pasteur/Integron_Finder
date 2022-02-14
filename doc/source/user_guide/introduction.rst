@@ -47,7 +47,7 @@ positions.
       *attC* site.
 
 IntegronFinder can also annotate gene cassettes (CDS nearby *attC* sites) using
-Resfams, a database of HMM profiles aiming at annotating antibiotic resistance
+AMRFinderPlus, a database of HMM profiles aiming at annotating antibiotic resistance
 genes. This database is provided but the user can add any other HMM profiles
 database of its own interest.
 
