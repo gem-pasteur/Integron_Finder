@@ -548,7 +548,9 @@ In the case of your cluster cannot reach the world wide web. you have to downloa
 
 the move the image on your cluster
 modify the nextflow.config to point on the location of the image, and adapt the cluster options
-(executor, queue, ...) to your architecture ::
+(executor, queue, ...) to your architecture
+
+.. code-block:: text
 
      cluster_singularity {
             executor {
