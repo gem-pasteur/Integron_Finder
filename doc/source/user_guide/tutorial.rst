@@ -137,8 +137,8 @@ A typical command line could be:
 
     integron_finder --prot-file <path/to/custom/protein /file> --annot-parser <my_annot_paser.py> <replicon_path>
 
-The annotation parser must be a python file (with the *.py* extention') with one function called *description_parser*
-This function must take **one** argument which is the header of a fasta sequence header (without the first charracter >)
+The annotation parser must be a python file (with the *.py* extension') with one function called *description_parser*
+This function must take **one** argument which is the header of a fasta sequence header (without the first character >)
 and must return a **tuple with 4 elements**:
 
     * sequence id: the id of the sequence (string)
