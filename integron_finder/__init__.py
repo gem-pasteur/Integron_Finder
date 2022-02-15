@@ -28,9 +28,9 @@
 
 import sys
 from subprocess import run
+from time import localtime, strftime
 
-
-__version__ = '2.0.1'
+__version__ = f'2.dev{strftime("%Y%m%d", localtime())}'
 
 
 class IntegronError(Exception):
