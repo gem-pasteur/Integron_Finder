@@ -14,7 +14,7 @@ Finds integrons in DNA sequences
 
 You can use it in command line, see *installation* below,
 or you can use it online on the
-[Galaxy Pasteur](https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F1.5.1).
+[Galaxy Pasteur](https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F2.0.1).
 
 See Documentation for how to use it:
 [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest)
@@ -54,7 +54,7 @@ To avoid interaction with the system libraries you can install integron_finder i
 For reproducibility and easy way to use integron_finder without installing
 third party software (hmmsearch, prodigal, ...) or libraries, we provide containers based on docker.
 
-https://hub.docker.com/repository/docker/gempasteur/integron_finder/general
+https://hub.docker.com/r/gempasteur/integron_finder
 
 ##### Docker
 
@@ -234,7 +234,7 @@ Other files can be created on demand:
 
 You can use this program without installing it, through the pasteur galaxy webserver instance:
 
-* [Galaxy Pasteur](https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F1.5.1)
+* [Galaxy Pasteur](https://galaxy.pasteur.fr/root?tool_id=toolshed.pasteur.fr%2Frepos%2Fkhillion%2Fintegron_finder%2Fintegron_finder%2F2.0.1)
 
 # Citation
 
