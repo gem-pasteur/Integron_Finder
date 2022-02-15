@@ -57,8 +57,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'IntegronFinder'
-copyright = u'2015-2018 Institut Pasteur, Paris, CNRS.'
-author = u'Jean Cury, Bertrand Néron, Eduardo PC Rocha'
+copyright = u'2015-2022 Institut Pasteur, Paris, CNRS.'
+author = u'Bertrand Néron1, Eloi Littner, Matthieu Haudiquet, Amandine Perrin, Jean Cury, Eduardo P.C. Rocha'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -245,7 +245,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   (master_doc, 'IntegronFinder.tex', u'IntegronFinder Documentation',
-   u'Jean Cury, Bertrand Néron, Eduardo PC Rocha', 'manual'),
+   "B. Néron, E. Littner, M. Haudiquet, A. Perrin, \\and J. Cury, E. P.C. Rocha", 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
