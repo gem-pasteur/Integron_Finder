@@ -92,7 +92,7 @@ Using:
  - Python {py}
  - numpy {np}
  - pandas {pd}
- - matplolib {mplt}
+ - matplotlib {mplt}
  - biopython {bio}
 
  - {prodigal}
