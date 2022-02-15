@@ -100,7 +100,7 @@ Using:
  - {hmmsearch}
 
 Authors:
- - Jean Cury, Bertrand Neron, Eduardo Rocha,
+ - Bertrand Néron, Eloi Littner, Matthieu Haudiquet, Amandine Perrin, Jean Cury, Eduardo P.C. Rocha,
 
 Citation:
 
