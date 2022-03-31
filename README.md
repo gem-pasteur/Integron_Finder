@@ -87,7 +87,7 @@ or use *-b* option if the data is not in your home.
 singularity run -H ${HOME} -b <the directory containing data> docker://gempasteur/integron_finder:2.0rc9 --local-max --circ --keep-tmp NZ_CP016323.fna
 ```
 
-#### Conda installation [not yet available]
+#### Conda installation
 
 From 2.0 version, Integron_Finder is available as [conda](https://conda.io/docs/index.html) package.
 Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
