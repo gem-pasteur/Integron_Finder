@@ -5,8 +5,10 @@
 [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) 
 [![Build Status](https://travis-ci.com/gem-pasteur/Integron_Finder.svg?branch=master)](https://travis-ci.com/gem-pasteur/Integron_Finder)
 [![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/gempasteur/integron_finder?sort=semver)](https://hub.docker.com/r/gempasteur/integron_finder/tags)
-![Conda](https://img.shields.io/conda/pn/bioconda/integron_finder)
+![Conda](https://img.shields.io/conda/v/bioconda/integron_finder)
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/gem-pasteur/Integron_Finder/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/gem-pasteur/Integron_Finder)
+
+
 
 # Integron Finder
 
