@@ -240,11 +240,10 @@ You can use this program without installing it, through the pasteur galaxy webse
 
 # Citation
 
-The paper is published in Nucleic Acid Research.
+The paper is published in Microorganism.
 
-**Identification and analysis of integrons and cassette arrays in bacterial genomes**
-Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
-*Nucleic Acids Research 2016; [doi: 10.1093/nar/gkw319](https://academic.oup.com/nar/article/44/10/4539/2516972)*
+Néron, Bertrand, Eloi Littner, Matthieu Haudiquet, Amandine Perrin, Jean Cury, and Eduardo P.C. Rocha. 2022. 
+**IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria, with a Focus on Antibiotic Resistance in Klebsiella** Microorganisms 10, no. 4: 700. https://doi.org/10.3390/microorganisms10040700
 
  Please cite also the following articles:
 
