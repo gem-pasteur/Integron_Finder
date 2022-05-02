@@ -21,7 +21,7 @@
 # Coverage files #
 ##################
 .coverage
-.coveralls.yml
+!/.github/workflows/.coverage
 coverage_html/
 
 #########################
