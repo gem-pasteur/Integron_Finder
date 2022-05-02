@@ -243,7 +243,8 @@ You can use this program without installing it, through the pasteur galaxy webse
 The paper is published in Microorganism.
 
 Néron, Bertrand, Eloi Littner, Matthieu Haudiquet, Amandine Perrin, Jean Cury, and Eduardo P.C. Rocha. 2022. 
-**IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria, with a Focus on Antibiotic Resistance in Klebsiella** Microorganisms 10, no. 4: 700. https://doi.org/10.3390/microorganisms10040700
+**IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria, with a Focus on Antibiotic Resistance in Klebsiella** 
+Microorganisms 10, no. 4: 700. https://doi.org/10.3390/microorganisms10040700
 
  Please cite also the following articles:
 
