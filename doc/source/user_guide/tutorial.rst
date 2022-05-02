@@ -533,7 +533,7 @@ You can also use the integron_finder apptainer image on a cluster, for this use 
 
 In the case of your cluster cannot reach the world wide web. you have to download the apptainer image ::
 
-    apptainer pull --name Integron_Finder docker pull gempasteur/integron_finder:2.0
+    apptainer pull --name Integron_Finder docker pull gempasteur/integron_finder:<tag>
 
 the move the image on your cluster
 modify the nextflow.config to point on the location of the image, and adapt the cluster options
@@ -548,7 +548,7 @@ modify the nextflow.config to point on the location of the image, and adapt the 
             }
 
             process {
-                container = /path/to/integron_finder
+                container = /path/to/integron_finder/image
                 queue = 'common,dedicated'
                 clusterOptions = '--qos=fast'
                 withName: integron_finder {
