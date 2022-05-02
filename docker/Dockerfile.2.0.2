@@ -12,7 +12,7 @@ LABEL publications="https://doi.org/10.3390/microorganisms10040700"
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y &&\
-    apt-get install -y --no-install-recommends python3 python3-pip  git hmmer infernal prodigal &&\
+    apt-get install -y --no-install-recommends python3 python3-pip hmmer infernal prodigal python3-biopython &&\
     apt-get clean -y
 
 RUN pip3 install integron_finder==2.0.2
