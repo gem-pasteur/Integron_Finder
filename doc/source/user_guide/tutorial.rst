@@ -345,19 +345,8 @@ The workflow file should not be modified. Whereas the profile must be adapted to
 The file `nextflow.config` provide for profiles:
     - a standard profile for local use
     - a cluster profile
-    - a standard profile using singularity container
-    - a cluster profile using singularity container
-
-.. warning::
-
-    On Ubuntu Bionic Beaver (18.04) The default java is not suitable to run nextflow
-    So you have to install another jvm
-
-        sudo add-apt-repository ppa:webupd8team/java
-        sudo apt-get update
-        sudo apt-get install oracle-java8-installer
-
-    for more details see: https://medium.com/coderscorner/installing-oracle-java-8-in-ubuntu-16-10-845507b13343
+    - a standard profile using apptainer container
+    - a cluster profile using apptainer container
 
     so now install nextflow.
     If you have  capsule error like ::
@@ -420,7 +409,7 @@ You can specify the number of tasks in parallel by setting the queueSize value :
             }
      }
 
-If you installed IntegronFinder with singularity, just uncomment the container line in the script,
+If you installed IntegronFinder with apptainer, just uncomment the container line in the script,
 and set the proper path to the container.
 
 All options available in non parallel version are also available for the parallel one.
@@ -488,14 +477,14 @@ cluster profile
 """""""""""""""
 
 The cluster profile is intended to work on a cluster managed by SLURM.
-If You cluster is managed by an other drm change executor name by the right value
+If your cluster is managed by an other drm replace executor name by the right value
 (see `nextflow supported cluster <https://www.nextflow.io/docs/latest/executor.html>`_ )
 
-You can also managed
+You can also manage
 
-- The number of task in parallel with the `executor.queueSize` parameter (here 500).
+- The number of tasks in parallel with the `executor.queueSize` parameter (here 500).
   If you remove this line, the system will send in parallel as many jobs as there are replicons in your data set.
-- The queue with `process.queue` parameter (here common,dedicated)
+- The queue (or partition in SLURM terminology) with `process.queue` parameter (here common,dedicated)
 - and some options specific to your cluster management systems with `process.clusterOptions` parameter ::
 
 
@@ -515,36 +504,36 @@ You can also managed
         }
     }
 
-To run the parallel version on cluster, for instance on a cluster managed by slurm,
+To run the parallel version on a cluster, for instance on a cluster managed by slurm,
 I can launch the main nextflow process in one slot. The parallelization and the submission on the other slots
 is made by nextflow itself.
 Below a command line to run parallel_integron_finder and use 2 cpus per integron_finder task,
-each integron_finder task can be executed on different machines, each integron_finder task claim 2 cpus to speed up
-the attC sites or integrase search::
+each integron_finder task can be executed on a different machine, each integron_finder task claim 2 cores
+(cpus in nextflow terminology) to speed up the attC sites or integrase search::
 
     sbatch --qos fast -p common nextflow run  parallel_integron_finder.nf -profile cluster --replicons all_coli.fst --cpu 2 --local-max --gbk --circ
 
 
-The results will be the same as describe in local execution.
+The results will be the same as described in local execution.
 
-singualrity profiles
-""""""""""""""""""""
+apptainer (formely singularity) profiles
+""""""""""""""""""""""""""""""""""""""""
 
-If you use the singularity integron_finder image, use the profile *standard_singularity*.
-With the command line below nextflow will download parallel_integron_finder from github and
-download the integron_finder image from the singularity-hub so you haven't to install anything except
-nextflow and singularity. ::
+If you use the integron_finder image with the `apptainer <https://apptainer.org/>`_ container executor,
+use the profile *standard_apptainer*. With the command line below nextflow will download
+parallel_integron_finder from github and download the integron_finder image from the docker hub and convert
+it to apptainer on the fly so you haven't to install anything except nextflow and apptainer. ::
 
-    nextflow run gem-pasteur/Integron_Finder -profile standard_singularity --replicons all_coli.fst --circ
+    nextflow run gem-pasteur/Integron_Finder -profile standard_apptainer --replicons all_coli.fst --circ
 
 
-You can also use the integron_finder singularity image on a cluster, for this use the profile *cluster_singularity*. ::
+You can also use the integron_finder apptainer image on a cluster, for this use the profile *cluster_apptainer*. ::
 
-    sbatch --qos fast -p common nextflow run  gem-pasteur/Integron_Finder:2.0 -profile cluster_singualrity --replicons all_coli.fst --cpu 2 --local-max --gbk --circ
+    sbatch --qos fast -p common nextflow run  gem-pasteur/Integron_Finder:2.0 -profile cluster_apptainer --replicons all_coli.fst --cpu 2 --local-max --gbk --circ
 
-In the case of your cluster cannot reach the world wide web. you have to download the singularity image ::
+In the case of your cluster cannot reach the world wide web. you have to download the apptainer image ::
 
-    singularity pull --name Integron_Finder shub://gem-pasteur/integron_finder:2.0
+    apptainer pull --name Integron_Finder docker pull gempasteur/integron_finder:<tag>
 
 the move the image on your cluster
 modify the nextflow.config to point on the location of the image, and adapt the cluster options
@@ -552,14 +541,14 @@ modify the nextflow.config to point on the location of the image, and adapt the 
 
 .. code-block:: text
 
-     cluster_singularity {
+     cluster_apptainer {
             executor {
                 name = 'slurm'
                 queueSize = 500
             }
 
             process {
-                container = /path/to/integron_finder
+                container = /path/to/integron_finder/image
                 queue = 'common,dedicated'
                 clusterOptions = '--qos=fast'
                 withName: integron_finder {
