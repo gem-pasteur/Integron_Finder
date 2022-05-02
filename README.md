@@ -4,9 +4,11 @@
 [![Doc](https://readthedocs.org/projects/integronfinder/badge/?version=latest)](https://integronfinder.readthedocs.io/en/latest) 
 [![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) 
 [![Build Status](https://travis-ci.com/gem-pasteur/Integron_Finder.svg?branch=master)](https://travis-ci.com/gem-pasteur/Integron_Finder)
-[![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/gempasteur/integron_finder/latest)](https://hub.docker.com/repository/docker/gempasteur/integron_finder)
-![Conda](https://img.shields.io/conda/pn/bioconda/integron_finder)
+[![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/gempasteur/integron_finder?sort=semver)](https://hub.docker.com/r/gempasteur/integron_finder/tags)
+![Conda](https://img.shields.io/conda/v/bioconda/integron_finder)
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/gem-pasteur/Integron_Finder/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/gem-pasteur/Integron_Finder)
+
+
 
 # Integron Finder
 
@@ -85,7 +87,7 @@ or use *-b* option if the data is not in your home.
 singularity run -H ${HOME} -b <the directory containing data> docker://gempasteur/integron_finder:2.0rc9 --local-max --circ --keep-tmp NZ_CP016323.fna
 ```
 
-#### Conda installation [not yet available]
+#### Conda installation
 
 From 2.0 version, Integron_Finder is available as [conda](https://conda.io/docs/index.html) package.
 Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
@@ -238,11 +240,10 @@ You can use this program without installing it, through the pasteur galaxy webse
 
 # Citation
 
-The paper is published in Nucleic Acid Research.
+The paper is published in Microorganism.
 
-**Identification and analysis of integrons and cassette arrays in bacterial genomes**
-Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha
-*Nucleic Acids Research 2016; [doi: 10.1093/nar/gkw319](https://academic.oup.com/nar/article/44/10/4539/2516972)*
+Néron, Bertrand, Eloi Littner, Matthieu Haudiquet, Amandine Perrin, Jean Cury, and Eduardo P.C. Rocha. 2022. 
+**IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria, with a Focus on Antibiotic Resistance in Klebsiella** Microorganisms 10, no. 4: 700. https://doi.org/10.3390/microorganisms10040700
 
  Please cite also the following articles:
 
