@@ -1,0 +1,106 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Intergon_Finder
+message: "If you use this software, please cite both the article from preferred-citation and the software itself."
+type: software
+authors:
+  - given-names: Bertrand
+    family-names: Néron
+    email: bneron@pasteur.fr
+    affiliation: >-
+      Bioinformatics and Biostatistics Hub, Institut
+      Pasteur, Université de Paris Cité, 75015 Paris,
+      France
+    orcid: 'https://orcid.org/0000-0002-0220-0482'
+  - given-names: Jean
+    family-names: Cury
+    email: jean.cury@normalesup.org
+    affiliation: >-
+      Laboratoire Interdisciplinaire des Sciences du
+      Numérique, Université Paris-Saclay, CNRS UMR
+      9015, INRIA, 91400 Orsay, France
+  - given-names: Amandine
+    family-names: Perrin
+    email: amandine.perrin@pasteur.fr
+    affiliation: >-
+      Microbial Evolutionary Genomics, Institut
+      Pasteur, Université de Paris Cité, CNRS
+      UMR3525, 75015 Paris, France
+    orcid: 'https://orcid.org/0000-0003-4797-6185'
+identifiers:
+  - type: swh
+    value: >-
+      swh:1:dir:7740949344db5dbda20fde7d056973afd185a0d4
+    description: >-
+      "The Software Heritage identifier for version
+      2.0.2 of the work."
+repository-code: 'https://github.com/gem-pasteur/Integron_Finder'
+keywords:
+  - integron
+  - bioinformatic
+  - genomic
+  - antibiotic resistance
+license: GPL-3.0
+preferred-citation:
+  authors:
+    - given-names: Bertrand
+    family-names: Néron
+    email: bneron@pasteur.fr
+    affiliation: >-
+      Bioinformatics and Biostatistics Hub, Institut
+      Pasteur, Université de Paris Cité, 75015 Paris,
+      France
+    orcid: 'https://orcid.org/0000-0002-0220-0482'
+  - given-names: Eloi
+    family-names: Littner
+    email: eloi.littner@pasteur.fr
+    orcid: 'https://orcid.org/0000-0002-8793-9584'
+    affiliation: >-
+      Microbial Evolutionary Genomics, Institut
+      Pasteur, Université de Paris Cité, CNRS
+      UMR3525, 75015 Paris, France / DGA CBRN
+      Defence, 91710 Vert-le-Petit, France / Collège
+      Doctoral, Sorbonne Université, 75005 Paris,
+      France
+  - given-names: Matthieu
+    family-names: Haudiquet
+    email: matthieu.haudiquet@pasteur.fr
+    affiliation: >-
+      Microbial Evolutionary Genomics, Institut
+      Pasteur, Université de Paris Cité, CNRS
+      UMR3525, 75015 Paris, France /  Ecole Doctorale
+      FIRE–Programme Bettencourt, CRI, 75004 Paris,
+      France
+    orcid: 'https://orcid.org/0000-0002-0878-2209'
+  - given-names: Amandine
+    family-names: Perrin
+    email: amandine.perrin@pasteur.fr
+    affiliation: >-
+      Microbial Evolutionary Genomics, Institut
+      Pasteur, Université de Paris Cité, CNRS
+      UMR3525, 75015 Paris, France
+    orcid: 'https://orcid.org/0000-0003-4797-6185'
+  - given-names: Jean
+    family-names: Cury
+    email: jean.cury@normalesup.org
+    affiliation: >-
+      Laboratoire Interdisciplinaire des Sciences du
+      Numérique, Université Paris-Saclay, CNRS UMR
+      9015, INRIA, 91400 Orsay, France
+  - given-names: Eduardo
+    name-particle: P.C.
+    family-names: Rocha
+    email: erocha@pasteur.fr
+    affiliation: >-
+      Microbial Evolutionary Genomics, Institut
+      Pasteur, Université de Paris Cité, CNRS
+      UMR3525, 75015 Paris, France
+    orcid: 'https://orcid.org/0000-0001-7704-822X'
+  title: >-
+    IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria,
+    with a Focus on Antibiotic Resistance in Klebsiella
+  type: article
+  year: 2022
+  doi: https://doi.org/10.3390/microorganisms10040700
