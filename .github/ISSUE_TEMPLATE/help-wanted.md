@@ -1,6 +1,6 @@
 ---
 name: Help wanted
-about: Describe this issue template's purpose here.
+about: Need help to run integron_finder?.
 title: '[HELP]'
 labels: help wanted
 assignees: ''
