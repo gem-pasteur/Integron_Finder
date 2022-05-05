@@ -16,6 +16,8 @@ include COPYING
 include COPYRIGHT
 include CONTRIBUTING.md
 include CONTRIBUTORS.md
+include CITATION.cff
+include codemeta.json
 
 include parallel_integron_finder.nf
 include nextflow.config
