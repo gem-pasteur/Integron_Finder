@@ -159,7 +159,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --local-max           Allows thorough local detection (slower but more sensitive and do not increase false positive rate).
   --func-annot          Functional annotation of CDS associated with integrons HMM files are needed in Func_annot folder.
-  --cpu CPU             Number of CPUs used by INFERNAL and HMMER
+  --cpu CPU             Number of CPUs used by INFERNAL and HMMER. Increasing too much (usually above 4) may decrease performance. 
   -dt DISTANCE_THRESHOLD, --distance-thresh DISTANCE_THRESHOLD
                         Two elements are aggregated if they are distant of DISTANCE_THRESH [4000]bp or less
   --outdir OUTDIR       Set the output directory (default: current)
