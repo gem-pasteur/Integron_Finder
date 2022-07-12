@@ -327,6 +327,9 @@ So if you have to analyze one or few replicons the user can set the number of CP
 
 Default is 1.
 
+.. warning::
+    Increasing too much (usually above 4) the number of CPUs used may lower the performance of the software. 
+    Please refer to the documentation of HMMER and INFERNAL for more details.
 
 If you want to deal with a fasta file with a lot of replicons (from 10 to more than thousand) we provide a workflow to parallelize the execution of the data.
 This mean that we cut the data input into chunks (by default of one replicon) then execute

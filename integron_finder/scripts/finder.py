@@ -83,7 +83,7 @@ def parse_args(args):
     parser.add_argument('--cpu',
                         default='1',
                         type=int,
-                        help='Number of CPUs used by INFERNAL and HMMER')
+                        help='Number of CPUs used by INFERNAL and HMMER. Increasing too much (usually above 4) may decrease performance.')
 
     parser.add_argument('-dt', '--distance-thresh',
                         dest='distance_threshold',
