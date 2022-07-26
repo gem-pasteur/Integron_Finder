@@ -54,7 +54,7 @@ from integron_finder.prot_db import ProdigalDB
 from integron_finder.annotation import func_annot
 from integron_finder import annotation
 
-_annot_call_ori = annotation.call
+_annot_run_ori = annotation.subprocess.run
 
 
 class TestFuncAnnot(IntegronTest):
@@ -127,7 +127,7 @@ class TestFuncAnnot(IntegronTest):
 
         # Run prodigal to find CDS on replicon (and run hmmsearch on integrase (2 profiles))
         self.integrases = find_integrase(self.replicon.id, self.prot_file, self.tmp_dir, self.cfg)
-        annotation.call = self.mute_call(_annot_call_ori)
+        annotation.subprocess.run = self.mute_call(_annot_run_ori)
 
 
     def tearDown(self):
@@ -137,7 +137,7 @@ class TestFuncAnnot(IntegronTest):
         if os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
             pass
-        annotation.call = _annot_call_ori
+        annotation.subprocess = _annot_run_ori
 
 
     def test_annot_calin(self):

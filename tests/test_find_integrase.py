@@ -45,7 +45,7 @@ from integron_finder.config import Config
 from integron_finder import integrase
 from integron_finder import EmptyFileError
 
-_call_ori = integrase.call
+_run_ori = integrase.subprocess.run
 
 
 class TestFindIntegrase(IntegronTest):
@@ -68,10 +68,10 @@ class TestFindIntegrase(IntegronTest):
         self.args.cpu = 1
         self.args.hmmsearch = distutils.spawn.find_executable('hmmsearch')
         self.args.prodigal = distutils.spawn.find_executable("prodigal")
-        integrase.call = self.mute_call(_call_ori)
+        integrase.subprocess.run = self.mute_call(_run_ori)
 
     def tearDown(self):
-        integrase.call = _call_ori
+        integrase.subprocess.run = _run_ori
         try:
             shutil.rmtree(self.tmp_dir)
             pass

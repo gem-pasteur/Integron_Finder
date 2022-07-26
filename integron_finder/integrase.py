@@ -27,7 +27,8 @@
 ####################################################################################
 
 import os
-from subprocess import call
+import subprocess
+import shlex
 import colorlog
 
 from . import EmptyFileError
@@ -48,7 +49,7 @@ def find_integrase(replicon_id, prot_file, out_dir, cfg):
     :returns: None, the results are written on the disk
     """
 
-    intI_hmm_out = os.path.join(out_dir, replicon_id + "_intI.res")
+    intI_hmm_out = f'"{os.path.join(out_dir, replicon_id + "_intI.res")}"'
     hmm_cmd = []
     if not os.path.exists(prot_file):
         msg = "The protein file: '{}' does not exists cannot perform hmmsearch on it.".format(prot_file)
@@ -60,29 +61,21 @@ def find_integrase(replicon_id, prot_file, out_dir, cfg):
         raise EmptyFileError(msg)
 
     if not os.path.isfile(intI_hmm_out):
-        hmm_cmd.append([cfg.hmmsearch,
-                        "--cut_ga",
-                        "--cpu", str(cfg.cpu),
-                        "--tblout", os.path.join(out_dir, replicon_id + "_intI_table.res"),
-                        "-o", intI_hmm_out,
-                        cfg.model_integrase,
-                        prot_file])
+        hmm_cmd.append(f'{cfg.hmmsearch} --cut_ga --cpu {cfg.cpu} ' \
+                       f'--tblout {os.path.join(out_dir, replicon_id + "_intI_table.res")} ' \
+                       f'-o {intI_hmm_out} {cfg.model_integrase} {prot_file}')
 
     phage_hmm_out = os.path.join(out_dir, replicon_id + "_phage_int.res")
     if not os.path.isfile(phage_hmm_out):
-        hmm_cmd.append([cfg.hmmsearch,
-                        "--cut_ga",
-                        "--cpu", str(cfg.cpu),
-                        "--tblout", os.path.join(out_dir, replicon_id + "_phage_int_table.res"),
-                        "-o", phage_hmm_out,
-                        cfg.model_phage_int,
-                        prot_file])
+        hmm_cmd.append(f'{cfg.hmmsearch} --cut_ga --cpu {cfg.cpu} ' \
+                       f'--tblout {os.path.join(out_dir, replicon_id + "_phage_int_table.res")} ' \
+                       f'-o {phage_hmm_out} {cfg.model_phage_int} {prot_file}')
 
     for cmd in hmm_cmd:
         try:
-            _log.debug("run hmmsearch: {}".format(' '.join(cmd)))
-            returncode = call(cmd)
+            _log.debug(f"run hmmsearch: {cmd}")
+            completed_process = subprocess.run(shlex.split(cmd))
         except Exception as err:
-            raise RuntimeError("{0} failed : {1}".format(' '.join(cmd), err))
-        if returncode != 0:
-            raise RuntimeError("{0} failed return code = {1}".format(' '.join(cmd), returncode))
+            raise RuntimeError(f"{cmd} failed : {err}")
+        if completed_process.returncode != 0:
+            raise RuntimeError(f"{cmd} failed return code = {completed_process.returncode}")

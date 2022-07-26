@@ -385,7 +385,6 @@ class TestProdigalDB(IntegronTest):
     def tearDown(self):
         try:
             shutil.rmtree(self.tmp_dir)
-            pass
         except:
             pass
 

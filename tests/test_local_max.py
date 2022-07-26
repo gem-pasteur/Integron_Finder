@@ -30,14 +30,10 @@ import os
 import tempfile
 import shutil
 import re
+from collections import namedtuple
 
 import pandas as pd
 import pandas.testing as pdt
-
-# # display warning only for non installed integron_finder
-# from Bio import BiopythonExperimentalWarning
-# import warnings
-# warnings.simplefilter('ignore', BiopythonExperimentalWarning)
 
 try:
     from tests import IntegronTest
@@ -49,29 +45,10 @@ from integron_finder.utils import FastaIterator
 from integron_finder.topology import Topology
 from integron_finder import infernal
 
-_call_ori = infernal.call
 _read_infernal_ori = infernal.read_infernal
 
 from tests import which
 
-
-def call_wrapper():
-    """
-    hmmsearch or prodigal write lot of things on stderr or stdout 
-    which noise the unit test output
-    So I replace the `call` function in module integron_finder
-    by a wrapper which call the original function but add redirect stderr and stdout
-    in dev_null
-    :return: wrapper around integron_finder.call
-    :rtype: function
-    """
-    def wrapper(*args, **kwargs):
-        with open(os.devnull, 'w') as f:
-            kwargs['stderr'] = f
-            kwargs['stdout'] = f
-            res = _call_ori(*args, **kwargs)
-        return res
-    return wrapper
 
 
 def read_infernal_mock(tmp_dir):
@@ -133,11 +110,9 @@ class TestLocalMax(IntegronTest):
         self.max_attc_size = 200
         self.min_attc_size = 40
         self.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
-        self.call = call_wrapper()
         infernal.read_infernal = read_infernal_mock(self.tmp_dir)
 
     def tearDown(self):
-        infernal.call = _call_ori
         infernal.read_infernal = _read_infernal_ori
         try:
             shutil.rmtree(self.tmp_dir)
@@ -259,17 +234,23 @@ class TestLocalMax(IntegronTest):
 
 
     def test_local_max_cmsearch_bad_rc(self):
+        run_ori = infernal.subprocess.run
         win_beg = 942899
         win_end = 947099
         strand_search = 'top'
-        infernal.call = lambda x, stdout=None: 1
-        with self.assertRaises(RuntimeError) as ctx:
-            _ = infernal.local_max(self.replicon,
-                                   win_beg, win_end,
-                                   self.model_attc_path,
-                                   strand_search=strand_search,
-                                   evalue_attc=self.evalue_attc,
-                                   max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
-                                   out_dir=self.out_dir, cpu=self.cpu
-                                   )
-        self.assertTrue(str(ctx.exception).endswith("failed returncode = {}".format(infernal.call(None))))
+        fake_cp = namedtuple('FakeCompletedProcess', 'returncode')
+        fake_cp_1 = fake_cp(1)
+        try:
+            infernal.subprocess.run = lambda x, stdout=None: fake_cp_1
+            with self.assertRaises(RuntimeError) as ctx:
+                _ = infernal.local_max(self.replicon,
+                                       win_beg, win_end,
+                                       self.model_attc_path,
+                                       strand_search=strand_search,
+                                       evalue_attc=self.evalue_attc,
+                                       max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
+                                       out_dir=self.out_dir, cpu=self.cpu
+                                       )
+            self.assertTrue(str(ctx.exception).endswith(f"failed returncode = {fake_cp_1.returncode}"))
+        finally:
+            infernal.subprocess.run = run_ori

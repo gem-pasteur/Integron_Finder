@@ -45,7 +45,7 @@ except ImportError as err:
 
 from integron_finder import infernal
 
-_call_ori = infernal.call
+_run_ori = infernal.subprocess.run
 
 
 class TestFindAttc(IntegronTest):
@@ -67,7 +67,7 @@ class TestFindAttc(IntegronTest):
         self.model_attc = self.find_data(os.path.join('Models', 'attc_4.cm'))
         self.replicon_name = 'acba.007.p01.13'
         self.replicon_path = self.find_data(os.path.join('Replicons', self.replicon_name + '.fst'))
-        infernal.call = self.mute_call(_call_ori)
+        infernal.subprocess.run = self.mute_call(_run_ori)
 
 
     def tearDown(self):
@@ -75,7 +75,7 @@ class TestFindAttc(IntegronTest):
             shutil.rmtree(self.tmp_dir)
         except:
             pass
-        infernal.call = _call_ori
+        infernal.subprocess.run = _run_ori
 
 
     def test_find_attc(self):

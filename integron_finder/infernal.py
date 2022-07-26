@@ -27,7 +27,8 @@
 ####################################################################################
 
 import os
-from subprocess import call
+import subprocess
+import shlex
 import colorlog
 import pandas as pd
 from Bio import SeqIO
@@ -119,8 +120,8 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, in
     :returns: None, the results are written on the disk.
     :raises RuntimeError: when cmsearch run failed.
     """
-    cmsearch_cmd = "{cmsearch} --cpu {cpu} -A {out} --tblout {tblout_path} " \
-                   "-E 10 --incE {incE} {mod_attc} {infile}".format(cmsearch=cmsearch_path,
+    cmsearch_cmd = '{cmsearch} --cpu {cpu} -A {out} --tblout {tblout_path} ' \
+                   '-E 10 --incE {incE} {mod_attc} {infile}'.format(cmsearch=cmsearch_path,
                                                                     cpu=cpu,
                                                                     out=os.path.join(out_dir,
                                                                                      replicon_id + "_attc.res"),
@@ -133,11 +134,11 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, in
     try:
         _log.debug("run cmsearch: {}".format(cmsearch_cmd))
         with open(os.devnull, 'w') as dev_null:
-            returncode = call(cmsearch_cmd.split(), stdout=dev_null)
+            completed_process = subprocess.run(shlex.split(cmsearch_cmd), stdout=dev_null)
     except Exception as err:
-        raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd, err))
-    if returncode != 0:
-        raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd, returncode))
+        raise RuntimeError(f"{cmsearch_cmd} failed : {err}")
+    if completed_process.returncode != 0:
+        raise RuntimeError(f"{cmsearch_cmd} failed returncode = {completed_process.returncode}")
 
 
 def local_max(replicon,
@@ -194,8 +195,8 @@ def local_max(replicon,
                                                                                                   win_end=window_end))
 
     cmsearch_cmd = \
-        "{bin} -Z {size} {strand} --max --cpu {cpu} -A {out} --tblout {tblout} -E 10 " \
-        "--incE {incE} {mod_attc_path} {infile}".format(bin=cmsearch_bin,
+        '{bin} -Z {size} {strand} --max --cpu {cpu} -A {out} --tblout {tblout} -E 10 ' \
+        '--incE {incE} {mod_attc_path} {infile}'.format(bin=cmsearch_bin,
                                                         size=replicon_size / 1000000.,
                                                         strand={"both": "",
                                                                 "top": "--toponly",
@@ -209,11 +210,11 @@ def local_max(replicon,
     try:
         _log.debug("run cmsearch: {}".format(cmsearch_cmd))
         with open(os.devnull, 'w') as dev_null:
-            returncode = call(cmsearch_cmd.split(), stdout=dev_null)
+            completed_process = subprocess.run(shlex.split(cmsearch_cmd), stdout=dev_null)
     except Exception as err:
-        raise RuntimeError("{0} failed : {1}".format(cmsearch_cmd, err))
-    if returncode != 0:
-        raise RuntimeError("{0} failed returncode = {1}".format(cmsearch_cmd, returncode))
+        raise RuntimeError(f"{cmsearch_cmd} failed : {err}")
+    if completed_process.returncode != 0:
+        raise RuntimeError(f"{cmsearch_cmd} failed returncode = {completed_process.returncode}")
     df_max = read_infernal(tblout_path,
                            replicon.id, model_len(model_attc_path),
                            evalue=evalue_attc,

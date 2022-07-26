@@ -27,7 +27,8 @@
 ####################################################################################
 
 import os
-from subprocess import call
+import subprocess
+import shlex
 import colorlog
 
 import numpy as np
@@ -70,7 +71,7 @@ def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue
 
     """
 
-    prot_tmp = os.path.join(out_dir, replicon.id + "_subseqprot.tmp")
+    prot_tmp = f'{os.path.join(out_dir, replicon.id + "_subseqprot.tmp")}'
 
     for integron in integrons:
         if os.path.isfile(prot_tmp):
@@ -93,22 +94,16 @@ def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue
                 name_wo_ext = "{}_{}".format(replicon.id, get_name_from_path(hmm))
                 hmm_out = os.path.join(out_dir, "{}_fa.res".format(name_wo_ext))
                 hmm_tableout = os.path.join(out_dir, "{}_fa_table.res".format(name_wo_ext))
-                hmm_cmd = [cfg.hmmsearch,
-                           "--cut_ga",
-                           "-Z", str(prot_nb),
-                           "--cpu", str(cfg.cpu),
-                           "--tblout", hmm_tableout,
-                           "-o", hmm_out,
-                           hmm,
-                           prot_tmp]
+                hmm_cmd = f"{cfg.hmmsearch} --cut_ga -Z {prot_nb} --cpu {cfg.cpu} --tblout {hmm_tableout} -o {hmm_out}" \
+                          f" {hmm} {prot_tmp}"
 
                 try:
-                    _log.debug("run hmmsearch: {}".format(' '.join(hmm_cmd)))
-                    returncode = call(hmm_cmd)
+                    _log.debug(f"run hmmsearch: {hmm_cmd}")
+                    completed_process = subprocess.run(shlex.split(hmm_cmd))
                 except Exception as err:
-                    raise RuntimeError("{0} failed : {1}".format(' '.join(hmm_cmd), err))
-                if returncode != 0:
-                    raise RuntimeError("{0} failed return code = {1}".format(' '.join(hmm_cmd), returncode))
+                    raise RuntimeError(f"{hmm_cmd} failed : {err}")
+                if completed_process.returncode != 0:
+                    raise RuntimeError(f"{hmm_cmd} failed return code = {completed_process.returncode}")
                 hmm_in = read_hmm(replicon.id, prot_db, hmm_out, cfg, evalue=evalue, coverage=coverage
                                   ).sort_values("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])
