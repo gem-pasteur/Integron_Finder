@@ -28,7 +28,8 @@
 
 from abc import ABC, abstractmethod
 import os
-from subprocess import call
+import subprocess
+import shlex
 from collections import namedtuple
 import re
 import importlib.util
@@ -422,7 +423,7 @@ class ProdigalDB(ProteinDB):
                 os.makedirs(self.cfg.tmp_dir(self.replicon.id))
             prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + ".prt")
             if not os.path.exists(prot_file_path):
-                prodigal_cmd = "{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q ".format(
+                prodigal_cmd = '{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q '.format(
                     prodigal=self.cfg.prodigal,
                     meta='' if len(self.replicon) > 200000 else '-p meta',
                     replicon=self.replicon.path,
@@ -431,11 +432,11 @@ class ProdigalDB(ProteinDB):
                 )
                 try:
                     _log.debug("run prodigal: {}".format(prodigal_cmd))
-                    returncode = call(prodigal_cmd.split())
+                    completed_process = subprocess.run(shlex.split(prodigal_cmd))
                 except Exception as err:
                     raise RuntimeError(f"{prodigal_cmd} : failed : {err}")
-                if returncode != 0:
-                    raise RuntimeError(f"{prodigal_cmd} : failed : prodigal returncode = {returncode}")
+                if completed_process.returncode != 0:
+                    raise RuntimeError(f"{prodigal_cmd} : failed : prodigal returncode = {completed_process.returncode}")
 
         return prot_file_path
 

@@ -1,0 +1,3 @@
+# cmd: integron_finder toto/dir space/acba_short.fst
+ID_replicon	CALIN	complete	In0	topology	size
+ACBA.007.P01_13	0	0	1	lin	2000

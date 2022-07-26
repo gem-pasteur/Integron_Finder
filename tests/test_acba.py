@@ -54,7 +54,7 @@ from integron_finder import IntegronError
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
 
-_prodigal_call = integrase.call
+_prodigal_run = integrase.subprocess.run
 
 
 class TestAcba(IntegronTest):
@@ -72,7 +72,7 @@ class TestAcba(IntegronTest):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
-        integrase.call = self.mute_call(_prodigal_call)
+        integrase.subprocess.run = self.mute_call(_prodigal_run)
         self.find_executable_ori = finder.distutils.spawn.find_executable
         self._prefix_data = pkg_resources.resource_filename('integron_finder', "data")
         self.func_annot_dir = os.path.join(self._prefix_data, "Functional_annotation")
@@ -80,7 +80,7 @@ class TestAcba(IntegronTest):
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
-        integrase.call = _prodigal_call
+        integrase.subprocess.run = _prodigal_run
         finder.distutils.spawn.find_executable = self.find_executable_ori
 
 
@@ -621,3 +621,25 @@ class TestAcba(IntegronTest):
         err_msg = "result dir '{}' already exists and is not writable".format(self.out_dir)
         self.assertEqual(err_msg, str(ctx.exception))
 
+
+    def test_acba_genome_with_space(self):
+        replicon_filename = 'acba_short'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        replicon=self.find_data(os.path.join('Replicons', replicon_filename + '.fst'))
+        dir_with_space = os.path.join(self.out_dir, "genome dir")
+        os.mkdir(dir_with_space)
+        replicon_path = shutil.copyfile(replicon, os.path.join(dir_with_space, replicon_filename + '.fst'))
+        command = f"integron_finder --outdir {self.out_dir} --linear"
+
+        with self.catch_io(out=True, err=True):
+            args = command.split()[1:]
+            # we have to add replicon path after splitting to avoid to split the replicon path with space inside
+            args.append(replicon_path)
+            main(args, loglevel='WARNING')
+
+        output_filename = '{}.integrons'.format(replicon_filename)
+        expected_result_path = self.find_data(os.path.join(f'Results_Integron_Finder_{replicon_filename}',
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
