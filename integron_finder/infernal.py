@@ -121,24 +121,25 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, in
     :raises RuntimeError: when cmsearch run failed.
     """
     cmsearch_cmd = '{cmsearch} --cpu {cpu} -A {out} --tblout {tblout_path} ' \
-                   '-E 10 --incE {incE} {mod_attc} {infile}'.format(cmsearch=cmsearch_path,
+                   '-E 10 --incE {incE} {mod_attc} {infile}'.format(cmsearch=cmsearch_path.replace(' ', '\ '),
                                                                     cpu=cpu,
                                                                     out=os.path.join(out_dir,
-                                                                                     replicon_id + "_attc.res"),
+                                                                                     replicon_id + "_attc.res").replace(' ', '\ '),
                                                                     tblout_path=os.path.join(out_dir,
                                                                                              replicon_id +
-                                                                                             "_attc_table.res"),
+                                                                                             "_attc_table.res").replace(' ', '\ '),
                                                                     incE=incE,
-                                                                    mod_attc=model_attc,
-                                                                    infile=replicon_path)
+                                                                    mod_attc=model_attc.replace(' ', '\ '),
+                                                                    infile=replicon_path.replace(' ', '\ '))
     try:
         _log.debug("run cmsearch: {}".format(cmsearch_cmd))
         with open(os.devnull, 'w') as dev_null:
-            completed_process = subprocess.run(shlex.split(cmsearch_cmd), stdout=dev_null)
+            cmd = shlex.split(cmsearch_cmd)
+            completed_process = subprocess.run(cmd, stdout=dev_null)
     except Exception as err:
-        raise RuntimeError(f"{cmsearch_cmd} failed : {err}")
+        raise RuntimeError(f"{cmd} failed : {err}")
     if completed_process.returncode != 0:
-        raise RuntimeError(f"{cmsearch_cmd} failed returncode = {completed_process.returncode}")
+        raise RuntimeError(f"{cmd} failed returncode = {completed_process.returncode}")
 
 
 def local_max(replicon,
@@ -196,17 +197,17 @@ def local_max(replicon,
 
     cmsearch_cmd = \
         '{bin} -Z {size} {strand} --max --cpu {cpu} -A {out} --tblout {tblout} -E 10 ' \
-        '--incE {incE} {mod_attc_path} {infile}'.format(bin=cmsearch_bin,
+        '--incE {incE} {mod_attc_path} {infile}'.format(bin=cmsearch_bin.replace(' ', '\ '),
                                                         size=replicon_size / 1000000.,
                                                         strand={"both": "",
                                                                 "top": "--toponly",
                                                                 "bottom": "--bottomonly"}[strand_search],
                                                         cpu=cpu,
-                                                        out=output_path,
-                                                        tblout=tblout_path,
+                                                        out=output_path.replace(' ', '\ '),
+                                                        tblout=tblout_path.replace(' ', '\ '),
                                                         incE=evalue_attc,
-                                                        mod_attc_path=model_attc_path,
-                                                        infile=infile_path)
+                                                        mod_attc_path=model_attc_path.replace(' ', '\ '),
+                                                        infile=infile_path.replace(' ', '\ '))
     try:
         _log.debug("run cmsearch: {}".format(cmsearch_cmd))
         with open(os.devnull, 'w') as dev_null:

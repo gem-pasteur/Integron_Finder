@@ -72,11 +72,15 @@ class TestResults(IntegronTest):
             replicon = next(sequences_db)
 
         args = argparse.Namespace()
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         cfg = Config(args)
         cfg._args.eagle_eyes = False
-        cfg._args.eagle_eyes = False
         cfg._args.local_max = False
-
+        
         integron = Integron(replicon, cfg)
         columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
         dtype = {"pos_beg": 'int',

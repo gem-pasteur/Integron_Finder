@@ -68,6 +68,9 @@ class TestFindIntegrase(IntegronTest):
         self.args.cpu = 1
         self.args.hmmsearch = distutils.spawn.find_executable('hmmsearch')
         self.args.prodigal = distutils.spawn.find_executable("prodigal")
+        self.args.gembase = False
+        self.args.prot_file = False
+        self.args.cmsearch = __file__
         integrase.subprocess.run = self.mute_call(_run_ori)
 
     def tearDown(self):
@@ -216,11 +219,13 @@ class TestFindIntegrase(IntegronTest):
 
 
     def test_find_integrase_no_gembase_no_protfile_no_prodigal(self):
+        len_ori = None
         try:
-            self.args.hmmsearch = 'foo'
+            self.args.hmmsearch = __file__
             self.args.gembase = False
             cfg = Config(self.args)
             cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
+            cfg._args.hmmsearch = 'foo'
 
             replicon_name = 'acba.007.p01.13'
             replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
@@ -240,7 +245,8 @@ class TestFindIntegrase(IntegronTest):
                 integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
             self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: 'foo'", str(ctx.exception)))
         finally:
-            replicon.__class__.__len__ = len_ori
+            if len_ori:
+                replicon.__class__.__len__ = len_ori
 
 
     def test_find_integrase_no_gembase_no_protfile(self):
@@ -270,7 +276,7 @@ class TestFindIntegrase(IntegronTest):
 
     def test_find_integrase_gembase_no_hmmer_no_replicon(self):
         self.args.gembase = True
-        self.args.hmmsearch = 'foo'
+        self.args.hmmsearch = __file__
         cfg = Config(self.args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 

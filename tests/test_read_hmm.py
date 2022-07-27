@@ -51,6 +51,12 @@ class TestReadHMM(IntegronTest):
     def setUp(self) -> None:
         self.args = argparse.Namespace()
         self.args.gembase = False
+        self.args.prot_file = False
+        # need to provide any file to fool config binary check
+        self.args.cmsearch = __file__
+        self.args.hmmsearch = __file__
+        self.args.prodigal = __file__
+
 
     def test_read_empty(self):
         """

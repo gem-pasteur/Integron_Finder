@@ -42,6 +42,89 @@ class TestConfig(IntegronTest):
 
     def setUp(self):
         self.args = argparse.Namespace()
+        self.args.gembase = False
+        self.args.prot_file = False
+        self.args.prodigal = __file__
+        self.args.cmsearch = __file__
+        self.args.hmmsearch = __file__
+
+
+    def test_config(self):
+        # check that we can instanciate a config
+        # if gembase is True even prodigal is not provided
+        self.args = argparse.Namespace()
+        self.args.gembase = True
+        self.args.prot_file = False
+        self.args.prodigal = None
+        self.args.cmsearch = __file__
+        self.args.hmmsearch = __file__
+        cf = config.Config(self.args)
+
+        # check that we cannot instanciate a config
+        # if cmsearch is not provided
+        self.args = argparse.Namespace()
+        self.args.gembase = True
+        self.args.prot_file = False
+        self.args.prodigal = None
+        self.args.cmsearch = None
+        self.args.hmmsearch = __file__
+        with self.assertRaises(RuntimeError) as ctx:
+            with self.catch_log():
+                config.Config(self.args)
+        self.assertEqual(str(ctx.exception),
+                         "Cannot find 'cmsearch' in PATH.\n" \
+                          "Please install infernal package or setup 'cmsearch' binary path with --cmsearch option"
+                         )
+        # check that we cannot instanciate a config
+        # if hmmsearch is not provided
+        self.args = argparse.Namespace()
+        self.args.gembase = True
+        self.args.prot_file = False
+        self.args.prodigal = None
+        self.args.cmsearch = __file__
+        self.args.hmmsearch = None
+        with self.assertRaises(RuntimeError) as ctx:
+            with self.catch_log():
+                config.Config(self.args)
+        self.assertEqual(str(ctx.exception),
+                         "Cannot find 'hmmsearch' in PATH.\n" \
+                          "Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option"
+                         )
+        # check that we can instanciate a config
+        # if a custom prot_file is provided even prodigal is not provided
+        self.args = argparse.Namespace()
+        self.args.gembase = False
+        self.args.prot_file = True
+        self.args.prodigal = None
+        self.args.cmsearch = __file__
+        self.args.hmmsearch = __file__
+        cf = config.Config(self.args)
+
+        # check that we can instanciate a config
+        # if a prodigal, hmmsearch and cmsearch are provided
+        self.args = argparse.Namespace()
+        self.args.gembase = False
+        self.args.prot_file = False
+        self.args.prodigal = __file__
+        self.args.cmsearch = __file__
+        self.args.hmmsearch = __file__
+        cf = config.Config(self.args)
+
+        # check that we cannot instanciate a config
+        # if prodigal is not provided and it's not a gambase nor a custom prot_file
+        self.args = argparse.Namespace()
+        self.args.gembase = False
+        self.args.prot_file = False
+        self.args.prodigal = None
+        self.args.cmsearch = __file__
+        self.args.hmmsearch = __file__
+        with self.assertRaises(RuntimeError) as ctx:
+            with self.catch_log():
+                config.Config(self.args)
+        self.assertEqual(str(ctx.exception),
+                         "Cannot find 'prodigal' in PATH.\n" \
+                          "Please install Prodigal package or setup 'prodigal' binary path with --prodigal option"
+                         )
 
     def test_getattr(self):
         self.args.replicon = 'foo'
@@ -88,6 +171,8 @@ class TestConfig(IntegronTest):
         self.assertEqual(cf.tmp_dir(replicon_id), exp_result_tmp_dir)
 
     def test_default_topology(self):
+        cf = config.Config(self.args)
+        self.assertIsNone(cf.default_topology)
         self.args.circular = True
         self.args.linear = False
         cf = config.Config(self.args)
@@ -98,9 +183,6 @@ class TestConfig(IntegronTest):
         self.assertEqual(cf.default_topology, 'lin')
         self.args.circular = False
         self.args.linear = False
-        cf = config.Config(self.args)
-        self.assertIsNone(cf.default_topology)
-        self.args = argparse.Namespace()
         cf = config.Config(self.args)
         self.assertIsNone(cf.default_topology)
 

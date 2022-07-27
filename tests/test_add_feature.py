@@ -60,6 +60,11 @@ class TestAddFeature(IntegronTest):
                                                      "tmp_{}".format(self.replicon_id),
                                                      "{}.prt".format(self.replicon_id)))
         args = argparse.Namespace()
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         cfg = Config(args)
         self.prot_db = ProdigalDB(self.seq, cfg, prot_file=self.prot_file)
         self.dist_threshold = 4000

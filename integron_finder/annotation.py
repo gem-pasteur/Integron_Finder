@@ -94,16 +94,25 @@ def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue
                 name_wo_ext = "{}_{}".format(replicon.id, get_name_from_path(hmm))
                 hmm_out = os.path.join(out_dir, "{}_fa.res".format(name_wo_ext))
                 hmm_tableout = os.path.join(out_dir, "{}_fa_table.res".format(name_wo_ext))
-                hmm_cmd = f"{cfg.hmmsearch} --cut_ga -Z {prot_nb} --cpu {cfg.cpu} --tblout {hmm_tableout} -o {hmm_out}" \
-                          f" {hmm} {prot_tmp}"
+                hmm_cmd = "{hmmsearch} --cut_ga -Z {prot_nb} --cpu {cpu} --tblout {tblout} -o {hmm_out}" \
+                          " {hmm} {prot_tmp}".format(
+                    hmmsearch=cfg.hmmsearch.replace(' ', '\ '),
+                    prot_nb=prot_nb,
+                    cpu=cfg.cpu,
+                    tblout=hmm_tableout.replace(' ', '\ '),
+                    hmm_out=hmm_out.replace(' ', '\ '),
+                    hmm=hmm.replace(' ', '\ '),
+                    prot_tmp=prot_tmp.replace(' ', '\ ')
+                )
 
                 try:
                     _log.debug(f"run hmmsearch: {hmm_cmd}")
-                    completed_process = subprocess.run(shlex.split(hmm_cmd))
+                    cmd = shlex.split(hmm_cmd)
+                    completed_process = subprocess.run(cmd)
                 except Exception as err:
-                    raise RuntimeError(f"{hmm_cmd} failed : {err}")
+                    raise RuntimeError(f"{cmd} failed : {err}")
                 if completed_process.returncode != 0:
-                    raise RuntimeError(f"{hmm_cmd} failed return code = {completed_process.returncode}")
+                    raise RuntimeError(f"{cmd} failed return code = {completed_process.returncode}")
                 hmm_in = read_hmm(replicon.id, prot_db, hmm_out, cfg, evalue=evalue, coverage=coverage
                                   ).sort_values("evalue").drop_duplicates(subset="ID_prot")
                 func_annotate_res = pd.concat([func_annotate_res, hmm_in])

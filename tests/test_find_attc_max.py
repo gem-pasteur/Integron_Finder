@@ -65,6 +65,11 @@ class TestFindAttCMax(IntegronTest):
         os.makedirs(self.tmp_dir)
 
         args = argparse.Namespace()
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         args.attc_model = 'attc_4.cm'
         args.max_attc_size = 200
         args.min_attc_size = 40

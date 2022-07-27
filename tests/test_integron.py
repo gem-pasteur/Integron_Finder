@@ -68,7 +68,14 @@ class TestIntegron(IntegronTest):
                       "model": 'str',
                       "distance_2attC": 'float'}
         args = argparse.Namespace()
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         self.cfg = Config(args)
+        self.cfg._args.eagle_eyes = False
+        self.cfg._args.local_max = False
         self._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
 
@@ -390,6 +397,10 @@ class TestIntegron(IntegronTest):
 
         args = argparse.Namespace()
         args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         args.annot_parser_name = None
         cfg = Config(args)
         integron = Integron(replicon, cfg)
@@ -437,6 +448,11 @@ class TestIntegron(IntegronTest):
             replicon = next(sequences_db)
 
         args = argparse.Namespace()
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         args.eagle_eyes = False
         args.local_max = False
         cfg = Config(args)

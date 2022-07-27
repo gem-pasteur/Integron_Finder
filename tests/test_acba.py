@@ -501,7 +501,7 @@ class TestAcba(IntegronTest):
                 # I need to catch stdout as log are write on
                 main(command.split()[1:])
 
-        err_msg = "cannot find 'hmmsearch' in PATH.\n" \
+        err_msg = "Cannot find 'hmmsearch' in PATH.\n" \
                   "Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option"
         self.assertEqual(err_msg, str(ctx.exception))
 
@@ -524,8 +524,8 @@ class TestAcba(IntegronTest):
                 # I need to catch stdout as log are write on
                 main(command.split()[1:])
 
-        err_msg = "cannot find 'prodigal' in PATH.\n" \
-                  "Please install prodigal package or setup 'prodigal' binary path with --prodigal option"
+        err_msg = "Cannot find 'prodigal' in PATH.\n" \
+                  "Please install Prodigal package or setup 'prodigal' binary path with --prodigal option"
         self.assertEqual(err_msg, str(ctx.exception))
 
 
@@ -546,7 +546,7 @@ class TestAcba(IntegronTest):
                 # I cannot catch log because loggers are reinitialized in main
                 # I need to catch stdout as log are write on
                 main(command.split()[1:])
-        err_msg = "cannot find 'cmsearch' in PATH.\n" \
+        err_msg = "Cannot find 'cmsearch' in PATH.\n" \
                   "Please install infernal package or setup 'cmsearch' binary path with --cmsearch option"
         self.assertEqual(err_msg, str(ctx.exception))
 
@@ -575,6 +575,11 @@ class TestAcba(IntegronTest):
     def test_resultdir_is_file(self):
         replicon_filename = 'acba.007.p01.13'
         args = argparse.Namespace()
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         args.replicon = self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
         args.outdir = self.out_dir
         cf = config.Config(args)
@@ -603,6 +608,11 @@ class TestAcba(IntegronTest):
         args = argparse.Namespace()
         args.replicon = self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
         args.outdir = self.out_dir
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         cf = config.Config(args)
         os.mkdir(cf.result_dir, mode=0o500)
         command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,

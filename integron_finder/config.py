@@ -29,6 +29,9 @@
 import os
 import pkg_resources
 
+import colorlog
+_log = colorlog.getLogger(__name__)
+
 from . import utils
 
 
@@ -41,7 +44,27 @@ class Config:
         self._model_len = None  # model_len cache, because it's computation is "heavy" (open file)
         self._args = args
         self._prefix_data = pkg_resources.resource_filename('integron_finder', "data")
-
+        if  self._args.gembase or self._args.prot_file:
+            third_party = ('cmsearch', 'hmmsearch')
+        else:
+            third_party = ('prodigal', 'cmsearch', 'hmmsearch')
+        for binary in third_party:
+            bin_path = getattr(self._args, binary)
+            if not bin_path:
+                if binary == 'cmsearch':
+                    msg = "Cannot find 'cmsearch' in PATH.\n" \
+                          "Please install infernal package or setup 'cmsearch' binary path with --cmsearch option"
+                elif binary == 'hmmsearch':
+                    msg = "Cannot find 'hmmsearch' in PATH.\n" \
+                          "Please install hmmer package or setup 'hmmsearch' binary path with --hmmsearch option"
+                elif binary == 'prodigal':
+                    msg = "Cannot find 'prodigal' in PATH.\n" \
+                          "Please install Prodigal package or setup 'prodigal' binary path with --prodigal option"
+                _log.critical(msg)
+                raise RuntimeError(msg)
+            elif not os.path.isfile(bin_path):
+                msg = f"path for {binary}: {bin_path} is not a file"
+                raise RuntimeError(msg)
 
     def __getattr__(self, item):
         try:

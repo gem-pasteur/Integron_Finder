@@ -73,7 +73,14 @@ class TestFindIntegons(IntegronTest):
         # if need some values create a local config with these values
         # this rule should avoid side effects
         args = argparse.Namespace()
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         self.cfg = Config(args)
+        self.cfg._args.eagle_eyes = False
+        self.cfg._args.local_max = False
         self.cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         self.columns = ['pos_beg', 'pos_end', 'strand', 'evalue', 'type_elt', 'model', 'distance_2attC', 'annotation']
@@ -113,6 +120,11 @@ class TestFindIntegons(IntegronTest):
         phageI_file = os.path.join(replicon_results_path, '{}_phage_int.res'.format(replicon.id))
 
         args = argparse.Namespace()
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         args.no_proteins = True
         args.keep_palindromes = True
         args.distance_threshold = 4000
@@ -184,6 +196,10 @@ class TestFindIntegons(IntegronTest):
         args.min_attc_size = 40
         args.local_max = False
         args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         args.union_integrases = False
         args.calin_threshold = 2
 
@@ -226,6 +242,11 @@ class TestFindIntegons(IntegronTest):
                                                   '{}_phage_int.res'.format(replicon.id)))
 
         args = argparse.Namespace()
+        args.gembase = False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         args.no_proteins = True
         args.keep_palindromes = True
         args.attc_model = 'attc_4.cm'
@@ -410,6 +431,10 @@ class TestFindIntegons(IntegronTest):
         args.attc_model = 'attc_4.cm'
         args.no_proteins = False
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         args.union_integrases = False
         args.keep_palindromes = True
         args.calin_threshold = 2
@@ -494,12 +519,6 @@ class TestFindIntegons(IntegronTest):
                                                   'tmp_{}'.format(replicon.id),
                                                   '{}_phage_int.res'.format(replicon.id)))
         args = argparse.Namespace()
-        args.no_proteins = False
-        args.keep_palindromes = True
-        args.union_integrases = False
-        args.gembase = False  # needed by read_hmm which is called when no_proteins == False
-
-        args = argparse.Namespace()
         args.evalue_attc = 1.
         args.max_attc_size = 200
         args.min_attc_size = 40
@@ -507,6 +526,11 @@ class TestFindIntegons(IntegronTest):
         args.attc_model = 'attc_4.cm'
         args.no_proteins = False
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
+
         args.union_integrases = False
         args.keep_palindromes = True
         args.calin_threshold = 2
@@ -597,6 +621,10 @@ class TestFindIntegons(IntegronTest):
         args.keep_palindromes = True
         args.union_integrases = True
         args.gembase = False  # needed by read_hmm which is called when no_proteins == False
+        args.prot_file = False
+        args.cmsearch = __file__
+        args.hmmsearch = __file__
+        args.prodigal = __file__
         args.local_max = False
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')

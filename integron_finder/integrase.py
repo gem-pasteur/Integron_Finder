@@ -49,7 +49,7 @@ def find_integrase(replicon_id, prot_file, out_dir, cfg):
     :returns: None, the results are written on the disk
     """
 
-    intI_hmm_out = f'"{os.path.join(out_dir, replicon_id + "_intI.res")}"'
+    intI_hmm_out = os.path.join(out_dir, replicon_id + "_intI.res")
     hmm_cmd = []
     if not os.path.exists(prot_file):
         msg = "The protein file: '{}' does not exists cannot perform hmmsearch on it.".format(prot_file)
@@ -61,20 +61,33 @@ def find_integrase(replicon_id, prot_file, out_dir, cfg):
         raise EmptyFileError(msg)
 
     if not os.path.isfile(intI_hmm_out):
-        hmm_cmd.append(f'{cfg.hmmsearch} --cut_ga --cpu {cfg.cpu} ' \
-                       f'--tblout {os.path.join(out_dir, replicon_id + "_intI_table.res")} ' \
-                       f'-o {intI_hmm_out} {cfg.model_integrase} {prot_file}')
+        cmd = "{hmmsearch} --cut_ga --cpu {cpu} --tblout {tblout} -o {out} {model_int} {prot_file}".format(
+            hmmsearch=cfg.hmmsearch.replace(' ', '\ '),
+            cpu=cfg.cpu,
+            tblout=os.path.join(out_dir, replicon_id + "_intI_table.res").replace(' ', '\ '),
+            out=intI_hmm_out.replace(' ', '\ '),
+            model_int=cfg.model_integrase.replace(' ', '\ '),
+            prot_file=prot_file.replace(' ', '\ ')
+        )
+        hmm_cmd.append(cmd)
 
     phage_hmm_out = os.path.join(out_dir, replicon_id + "_phage_int.res")
     if not os.path.isfile(phage_hmm_out):
-        hmm_cmd.append(f'{cfg.hmmsearch} --cut_ga --cpu {cfg.cpu} ' \
-                       f'--tblout {os.path.join(out_dir, replicon_id + "_phage_int_table.res")} ' \
-                       f'-o {phage_hmm_out} {cfg.model_phage_int} {prot_file}')
+        cmd = "{hmmsearch} --cut_ga --cpu {cpu} --tblout {tblout} -o {phage_hmm_out} {model_phage_int} {prot_file}"\
+            .format( hmmsearch=cfg.hmmsearch.replace(' ', '\ '),
+                     cpu=cfg.cpu,
+                     tblout=os.path.join(out_dir, replicon_id + "_phage_int_table.res").replace(' ', '\ '),
+                     phage_hmm_out=phage_hmm_out.replace(' ', '\ '),
+                     model_phage_int=cfg.model_phage_int.replace(' ', '\ '),
+                     prot_file=prot_file.replace(' ', '\ ')
+                     )
+        hmm_cmd.append(cmd)
 
     for cmd in hmm_cmd:
         try:
             _log.debug(f"run hmmsearch: {cmd}")
-            completed_process = subprocess.run(shlex.split(cmd))
+            cmd = shlex.split(cmd)
+            completed_process = subprocess.run(cmd)
         except Exception as err:
             raise RuntimeError(f"{cmd} failed : {err}")
         if completed_process.returncode != 0:

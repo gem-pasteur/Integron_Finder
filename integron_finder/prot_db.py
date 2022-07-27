@@ -416,6 +416,7 @@ class ProdigalDB(ProteinDB):
         :return: the path of the created protfile
         :rtype: str
         """
+        assert self.cfg.prodigal, f"'prodigal' not found."
         if path:
             prot_file_path = path
         else:
@@ -424,10 +425,10 @@ class ProdigalDB(ProteinDB):
             prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + ".prt")
             if not os.path.exists(prot_file_path):
                 prodigal_cmd = '{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q '.format(
-                    prodigal=self.cfg.prodigal,
+                    prodigal=self.cfg.prodigal.replace(' ', '\ '),
                     meta='' if len(self.replicon) > 200000 else '-p meta',
-                    replicon=self.replicon.path,
-                    prot=prot_file_path,
+                    replicon=self.replicon.path.replace(' ', '\ '),
+                    prot=prot_file_path.replace(' ', '\ '),
                     out=os.devnull,
                 )
                 try:
