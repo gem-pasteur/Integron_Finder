@@ -142,7 +142,7 @@ def parse_args(args):
     parser.add_argument('-o', '--outdir',
                         default='.',
                         help='The path to the directory where to write the chunks.\n'
-                             'It must exists.')
+                             'If outdir doe not exists, it will be created.')
     parser.add_argument("--mute",
                         action='store_true',
                         default=False,
@@ -175,7 +175,10 @@ def main(args=None, log_level=None):
 
     args = sys.argv[1:] if args is None else args
     parsed_args = parse_args(args)
-
+    if not os.path.exists(parsed_args.outdir):
+        os.makedirs(parsed_args.outdir)
+    elif not os.path.isdir(parsed_args.outdir):
+        raise RuntimeError(f"The outdir '{parsed_args.outdir}' alredy exist and is not a directory.")
     integron_finder.init_logger(log_file=os.path.join(parsed_args.outdir, 'integron_split.out'),
                                 out=not parsed_args.mute)
     _log = colorlog.getLogger('integron_finder.split')

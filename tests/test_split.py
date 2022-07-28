@@ -167,6 +167,15 @@ class TestMain(IntegronTest):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
 
+    def test_out_dir_isnot_dir(self):
+        out_dir_not_dir  = os.path.join(self.out_dir, "foo_file.txt")
+        open(out_dir_not_dir, 'w').close()
+        replicon_path = self.find_data(os.path.join('Replicons', 'multi_fasta.fst'))
+        command = 'integron_split --outdir {} {}'.format(out_dir_not_dir, replicon_path)
+        with self.assertRaises(RuntimeError) as ctx:
+            split.main(command.split()[1:], log_level="WARNING")
+        self.assertEqual(str(ctx.exception),
+                         "The outdir '/tmp/test_integron_split/foo_file.txt' alredy exist and is not a directory.")
 
     def test_wo_chunk(self):
         replicon_path = self.find_data(os.path.join('Replicons', 'multi_fasta.fst'))
