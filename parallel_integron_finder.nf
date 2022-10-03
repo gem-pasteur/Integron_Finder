@@ -1,5 +1,7 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.dsl = 2
+
 /*************************
  * Default options
  *************************/
@@ -25,6 +27,9 @@ params['keep-tmp'] = false
 params['calin-threshold'] = false
 params.gembase = false
 params['gembase-path'] = false
+params['cmsearch'] = false
+params['hmmsearch'] = false
+params['prodigal'] = false
 params.debug = false
 
 /****************************************
@@ -57,6 +62,9 @@ topology_file = params['topology-file'] ? "--topology-file ${params['topology-fi
 keep_tmp = params['keep-tmp'] ? '--keep-tmp' : ''
 calin_threshold = params['calin-threshold'] ? "--calin-threshold ${params['calin-threshold']}" : ''
 gembase_path = params['gembase-path'] ? "--gembase-path ${params['gembase-path']}" : ''
+cmsearch = params['cmsearch'] ? "--cmsearch ${params['cmsearch']}" : ''
+hmmsearch = params['hmmsearch'] ? "--hmmsearch ${params['hmmsearch']}" : ''
+prodigal = params['prodigal'] ? "--prodigal ${params['prodigal']}" : ''
 debug = params.debug ? '-vv' : ''
 
 
@@ -85,6 +93,9 @@ parallel_integron_finder available options:
  --calin-threshold
  --gembase-path
  --replicons
+ --cmsearch
+ --prodigal
+ --hmmsearch
 
 Please refer to the integron_finder documentation for the meaning of each options.
 '''
@@ -113,11 +124,11 @@ if (params['gembase-path']){
     gembase_path = ''
 }
 if (params.replicons.contains(',')){
-    paths = params.replicons.tokenize(',')
-    replicons_file = Channel.fromPath(paths)
-} else {
-    replicons_file = Channel.fromPath(params.replicons)
-}
+        paths = params.replicons.tokenize(',')
+    } else {
+        paths = params.replicons
+    }
+
 
 /****************************************
  *           The workflow               *
@@ -126,13 +137,13 @@ if (params.replicons.contains(',')){
 process split{
 
     input:
-        file(replicons) from replicons_file
-
+       path replicons_files
     output:
-        set val("${replicons.baseName}"), stdout, file("*.fst") into chunk_files mode flatten
+        val "${replicons_files.baseName}"
+        path stdout
     script:
         """
-        integron_split --mute ${replicons} | wc -w
+        integron_split --mute ${replicons_files}
         """
 }
 
@@ -140,7 +151,7 @@ process split{
 process integron_finder{
 
     input:
-        set val(id_input), val(nb_chunks), file(one_replicon) from chunk_files
+        val(id_input), path(one_replicon)
         val gbk
         val pdf
         val local_max
@@ -162,8 +173,11 @@ process integron_finder{
         val calin_threshold
         val gembase_path
         val debug
+        val cmsearch
+        val hmmsearch
+        val prodigal
     output:
-        set val(id_input), file("Results_Integron_Finder_${one_replicon.baseName}") into all_chunk_results_dir
+        val(id_input), path("Results_Integron_Finder_${one_replicon.baseName}")
 
     script:
         /*******************************************************************************************************
@@ -186,21 +200,18 @@ process integron_finder{
         }
         
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${topo} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} ${gembase_path} --mute ${debug} ${one_replicon}
+        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${topo} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} ${gembase_path} ${cmsearch} ${hmmsearch} ${prodigal} --mute ${debug} ${one_replicon}
         """
 }
 
 
-grouped_results = all_chunk_results_dir.groupTuple(by:0)
-
-
-process merge{
+process merge_results{
 
     input:
-        set val(input_id), file(all_chunk_results) from grouped_results
+        val(input_id), path(all_chunk_results)
 
     output:
-        set val(input_id), file ("${result_dir}/*") into final_res mode flatten
+        val(input_id), path("${result_dir}/*")
         
     script:
         result_dir = "Results_Integron_Finder_${input_id}"
@@ -210,11 +221,26 @@ process merge{
 }
 
 
-final_res.subscribe{
-    input_id, result ->
-        result_dir = "Results_Integron_Finder_${input_id}"
-        result.copyTo("${result_dir}/" + result.name);
+workflow {
+     replicons_files = Channel.fromPath(paths)
+
+     replicons = split(replicons_files.flatten())
+
+     results_per_replicon = integron_finder(replicons.flatten(), gbk, pdf, local_max, func_annot, path_func_annot,
+       circ, linear, topology_file, dist_thr, union_integrases, attc_model, evalue_attc, keep_palindrome, no_proteins,
+       promoter, max_attc_size, min_attc_size,keep_tmp, calin_threshold, gembase, gembase_path, debug,
+       cmsearch, hmmsearch, prodigal )
+
+//     grouped_results = all_chunk_results_dir.groupTuple(by:0)
+//
+//     results = merge(grouped_results)
 }
+
+// final_res.subscribe{
+//     input_id, result ->
+//         result_dir = "Results_Integron_Finder_${input_id}"
+//         result.copyTo("${result_dir}/" + result.name);
+// }
 
 workflow.onComplete {
     if ( workflow.success )
