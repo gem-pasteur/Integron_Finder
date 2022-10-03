@@ -7,7 +7,14 @@ References
 
 If you use this software, please cite:
 
-- Identification and analysis of integrons and cassette arrays in bacterial genomes Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha. **Nucleic Acids Research**, 2016; `doi: 10.1093/nar/gkw319`_
+- Néron, B.; Littner, E.; Haudiquet, M.; Perrin, A.; Cury, J.; Rocha, E.P.C.
+  IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria,
+  with a Focus on Antibiotic Resistance in Klebsiella.
+  **Microorganisms**, 2022, 10, 700. https://doi.org/10.3390/microorganisms10040700
+
+- Identification and analysis of integrons and cassette arrays in bacterial genomes
+  Jean Cury; Thomas Jove; Marie Touchon; Bertrand Neron; Eduardo PC Rocha.
+  **Nucleic Acids Research**, 2016; `doi: 10.1093/nar/gkw319`_
 
 Please cite also the following articles:
 
