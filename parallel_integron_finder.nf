@@ -42,29 +42,30 @@ params.profile = false
 /****************************************
 *             real parameters           *
 *****************************************/
-gbk = params.gbk ? '--gbk' : ''
-pdf = params.pdf ? '--pdf' : ''
-local_max = params['local-max'] ? '--local-max' : ''
-func_annot = params['func-annot'] ? '--func-annot' : ''
-path_func_annot = params['path-func-annot'] ? "--path-func-annot ${params['path-func-annot']}" : ''
-dist_thr = params['distance-threshold'] ? "--distance-thresh ${params['distance-threshold']}" : ''
-union_integrases = params['union-integrases'] ? '--union-integrase' : ''
-attc_model = params['attc-model'] ? "--attc-model ${params['attc-model']}" : ''
-evalue_attc = params['evalue-attc'] ? "--evalue-attc ${params['evalue-attc']}" : ''
-keep_palindrome = params['keep-palindrome'] ? '--keep-palindrome' : ''
-no_proteins = params['no-proteins'] ? '--no-proteins' : ''
-promoter = params['promoter-attI'] ? '--promoter-attI' : ''
-max_attc_size = params['max-attc-size'] ? "--max-attc-size ${params['max-attc-size']}" : ''
-min_attc_size = params['min-attc-size'] ? "--min-attc-size ${params['min-attc-size']}" : ''
-circ = params.circ ? '--circ' : ''
+gbk = params.gbk ? ' --gbk' : ''
+pdf = params.pdf ? ' --pdf' : ''
+local_max = params['local-max'] ? ' --local-max' : ''
+func_annot = params['func-annot'] ? ' --func-annot' : ''
+path_func_annot = params['path-func-annot'] ? " --path-func-annot ${params['path-func-annot']}" : ''
+dist_thr = params['distance-threshold'] ? " --distance-thresh ${params['distance-threshold']}" : ''
+union_integrases = params['union-integrases'] ? ' --union-integrase' : ''
+attc_model = params['attc-model'] ? " --attc-model ${params['attc-model']}" : ''
+evalue_attc = params['evalue-attc'] ? " --evalue-attc ${params['evalue-attc']}" : ''
+keep_palindrome = params['keep-palindrome'] ? ' --keep-palindrome' : ''
+no_proteins = params['no-proteins'] ? ' --no-proteins' : ''
+promoter = params['promoter-attI'] ? ' --promoter-attI' : ''
+max_attc_size = params['max-attc-size'] ? " --max-attc-size ${params['max-attc-size']}" : ''
+min_attc_size = params['min-attc-size'] ? " --min-attc-size ${params['min-attc-size']}" : ''
+circ = params.circ ? ' --circ' : ''
 linear = params.linear ? '--linear' : ''
-topology_file = params['topology-file'] ? "--topology-file ${params['topology-file']}" : ''
-keep_tmp = params['keep-tmp'] ? '--keep-tmp' : ''
-calin_threshold = params['calin-threshold'] ? "--calin-threshold ${params['calin-threshold']}" : ''
-gembase_path = params['gembase-path'] ? "--gembase-path ${params['gembase-path']}" : ''
-cmsearch = params['cmsearch'] ? "--cmsearch ${params['cmsearch']}" : ''
-hmmsearch = params['hmmsearch'] ? "--hmmsearch ${params['hmmsearch']}" : ''
-prodigal = params['prodigal'] ? "--prodigal ${params['prodigal']}" : ''
+topology_file = params['topology-file'] ? " --topology-file ${params['topology-file']}" : ''
+keep_tmp = params['keep-tmp'] ? ' --keep-tmp' : ''
+calin_threshold = params['calin-threshold'] ? " --calin-threshold ${params['calin-threshold']}" : ''
+gembase = params.gembase
+gembase_path = params['gembase-path'] ? " --gembase-path ${params['gembase-path']}" : ''
+cmsearch = params['cmsearch'] ? " --cmsearch ${params['cmsearch']}" : ''
+hmmsearch = params['hmmsearch'] ? " --hmmsearch ${params['hmmsearch']}" : ''
+prodigal = params['prodigal'] ? " --prodigal ${params['prodigal']}" : ''
 debug = params.debug ? '-vv' : ''
 
 
@@ -119,9 +120,11 @@ if (params['gembase-path']){
     // the integron_finder step will be compute in the work subdirectory
     file = new File(params['gembase-path'])
     gembase_path = file.getCanonicalPath();
-    gembase_path = "--gembase-path ${gembase_path}"
+    gembase_path = " --gembase-path ${gembase_path}"
+    gembase = " --gembase"
 } else {
     gembase_path = ''
+    gembase = ''
 }
 if (params.replicons.contains(',')){
         paths = params.replicons.tokenize(',')
@@ -139,11 +142,10 @@ process split{
     input:
        path replicons_files
     output:
-        val "${replicons_files.baseName}"
-        path stdout
+        tuple(val("${replicons_files.baseName}"),path("split_gem/*.fst"), stdout)
     script:
         """
-        integron_split --mute ${replicons_files}
+        integron_split --mute ${replicons_files} --outdir split_gem | wc -w
         """
 }
 
@@ -151,7 +153,7 @@ process split{
 process integron_finder{
 
     input:
-        val(id_input), path(one_replicon)
+        tuple( val(id_input), path(one_replicon), val (nb_chunks))
         val gbk
         val pdf
         val local_max
@@ -171,13 +173,14 @@ process integron_finder{
         val min_attc_size
         val keep_tmp
         val calin_threshold
+		val gembase
         val gembase_path
         val debug
         val cmsearch
         val hmmsearch
         val prodigal
     output:
-        val(id_input), path("Results_Integron_Finder_${one_replicon.baseName}")
+        tuple val(id_input), path("Results_Integron_Finder_${one_replicon.baseName}")
 
     script:
         /*******************************************************************************************************
@@ -200,18 +203,19 @@ process integron_finder{
         }
         
         """
-        integron_finder ${local_max} ${func_annot} ${path_func_annot} ${dist_thr} ${union_integrases} ${attc_model} ${evalue_attc} ${keep_palindrome} ${no_proteins} ${promoter} ${max_attc_size} ${min_attc_size} ${calin_threshold} ${topo} ${topology_file} ${gbk} ${pdf} ${keep_tmp} --cpu ${task.cpus} ${gembase_path} ${cmsearch} ${hmmsearch} ${prodigal} --mute ${debug} ${one_replicon}
+        integron_finder ${local_max}${func_annot}${path_func_annot}${dist_thr}${union_integrases}${attc_model}${evalue_attc}${keep_palindrome}${no_proteins}${promoter}${max_attc_size}${min_attc_size}${calin_threshold}${topo}${topology_file}${gbk}${pdf}${keep_tmp} --cpu ${task.cpus} ${gembase}${gembase_path}${cmsearch}${hmmsearch}${prodigal} --mute ${debug} ${one_replicon}
         """
 }
 
 
 process merge_results{
+    publishDir "Results_Integron_Finder_${input_id}", mode: 'copy'
 
     input:
-        val(input_id), path(all_chunk_results)
+        tuple(val(input_id), path(all_chunk_results))
 
     output:
-        val(input_id), path("${result_dir}/*")
+        tuple(val(input_id), path("${result_dir}/*"))
         
     script:
         result_dir = "Results_Integron_Finder_${input_id}"
@@ -224,23 +228,30 @@ process merge_results{
 workflow {
      replicons_files = Channel.fromPath(paths)
 
-     replicons = split(replicons_files.flatten())
+     replicons = split(replicons_files).transpose()
 
-     results_per_replicon = integron_finder(replicons.flatten(), gbk, pdf, local_max, func_annot, path_func_annot,
-       circ, linear, topology_file, dist_thr, union_integrases, attc_model, evalue_attc, keep_palindrome, no_proteins,
-       promoter, max_attc_size, min_attc_size,keep_tmp, calin_threshold, gembase, gembase_path, debug,
-       cmsearch, hmmsearch, prodigal )
+     //replicons.view()
 
-//     grouped_results = all_chunk_results_dir.groupTuple(by:0)
-//
-//     results = merge(grouped_results)
+
+     results_per_replicon = integron_finder(replicons, gbk, pdf, local_max, func_annot, path_func_annot,
+                            circ, linear, topology_file, dist_thr, union_integrases, attc_model, evalue_attc,
+                            keep_palindrome, no_proteins, promoter, max_attc_size, min_attc_size,keep_tmp,
+                            calin_threshold, gembase, gembase_path, debug, cmsearch, hmmsearch, prodigal )
+
+     grouped_results = results_per_replicon.groupTuple(by:0)
+
+     //grouped_results.view()
+
+     results = merge_results(grouped_results)
+
+     results.view()
+
+//     results.subscribe{
+//        val(input_id), path(result) ->
+//            result_dir = "Results_Integron_Finder_${input_id}"
+//            result.copyTo("${result_dir}/" + result.name);
+//    }
 }
-
-// final_res.subscribe{
-//     input_id, result ->
-//         result_dir = "Results_Integron_Finder_${input_id}"
-//         result.copyTo("${result_dir}/" + result.name);
-// }
 
 workflow.onComplete {
     if ( workflow.success )
