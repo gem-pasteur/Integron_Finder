@@ -177,6 +177,9 @@ containing
                                help='Decrease verbosity of output (can be cumulative : -qq)'
                                )
     parsed_args = parser.parse_args(args)
+
+    if parsed_args.outdir in parsed_args.results:
+        raise ValueError("'outdir' and 'results' cannot have the same value.")
     return parsed_args
 
 
