@@ -118,7 +118,6 @@ class TestMerge(IntegronTest):
             self.assertTrue(os.path.exists(os.path.join(self.out_dir, '{}.gbk'.format(_id))))
             self.assertTrue(os.path.exists(os.path.join(self.out_dir, '{}_1.pdf'.format(_id))))
 
-
 class TestParseArgs(IntegronTest):
 
     def test_parse_one_result(self):
@@ -153,7 +152,12 @@ class TestParseArgs(IntegronTest):
         parsed_args = merge.parse_args(['-qq', 'outdir', 'outfile', 'result'])
         self.assertEqual(parsed_args.quiet, 2)
 
-
+    def test_outdir_results_are_equals(self):
+        with self.assertRaises(ValueError) as ctx:
+            _ = merge.parse_args(['outdir', 'outfile', 'outdir'])
+        self.assertEqual(str(ctx.exception),
+                         "'outdir' and 'results' cannot have the same value.")
+        
 class TestMain(IntegronTest):
 
     def setUp(self):
