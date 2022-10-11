@@ -209,7 +209,6 @@ process integron_finder{
 
 
 process merge_results{
-    publishDir "Results_Integron_Finder_${input_id}", mode: 'copy'
 
     input:
         tuple(val(input_id), path(all_chunk_results))
@@ -219,6 +218,11 @@ process merge_results{
         
     script:
         result_dir = "Results_Integron_Finder_${input_id}"
+        if (result_dir ==  all_chunk_results){
+            // manage case wher there is one file with one sequence
+            result_dir = "${result_dir}_merged"
+        }
+
         """
         integron_merge "${result_dir}" "${input_id}" ${all_chunk_results}
         """
@@ -230,9 +234,6 @@ workflow {
 
      replicons = split(replicons_files).transpose()
 
-     //replicons.view()
-
-
      results_per_replicon = integron_finder(replicons, gbk, pdf, local_max, func_annot, path_func_annot,
                             circ, linear, topology_file, dist_thr, union_integrases, attc_model, evalue_attc,
                             keep_palindrome, no_proteins, promoter, max_attc_size, min_attc_size,keep_tmp,
@@ -240,17 +241,13 @@ workflow {
 
      grouped_results = results_per_replicon.groupTuple(by:0)
 
-     //grouped_results.view()
-
      results = merge_results(grouped_results)
 
-     results.view()
-
-//     results.subscribe{
-//        val(input_id), path(result) ->
-//            result_dir = "Results_Integron_Finder_${input_id}"
-//            result.copyTo("${result_dir}/" + result.name);
-//    }
+     results.transpose().subscribe{
+        it ->
+            result_dir = "Results_Integron_Finder_${it[0]}"
+            it[1].copyTo("${result_dir}/" + it[1].name);
+    }
 }
 
 workflow.onComplete {
