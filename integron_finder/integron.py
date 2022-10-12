@@ -47,7 +47,7 @@ from .attc import search_attc
 _log = colorlog.getLogger(__name__)
 
 
-def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
+def find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=None, attc=None):
     """
     Function that looks for integrons given rules :
         * presence of intI
@@ -64,15 +64,27 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
     :type replicon: :class:`Bio.Seq.SeqRecord` object
     :param prot_db: the protein database corresponding to the replicon translation
     :type prot_db: a :class:`integron_finder.prot_db.ProteinDB` object.
-    :param attc_file: the output of cmsearch or the result of parsing of this file by read_infernal
-    :type attc_file: path to cmsearch output or :class:`pd.Dataframe`
     :param str intI_file: the output of hmmsearch with the integrase model
     :param str phageI_file: the output of hmmsearch with the phage model
     :param cfg: configuration
+    :param attc_file: the output of cmsearch or the result of parsing of this file by read_infernal
+    :type attc_file: path to cmsearch output or :class:`pd.Dataframe`
+    :param attc: the result of parsing of cmsearch output file by read_infernal.
+                 attc is used when search with local_max
+                 attc_file when "normal search
+                 attc and attc_file are mutually exclusive parameter
+    :type attc: :class:`pd.Dataframe` object
     :type cfg: a :class:`integron_finder.config.Config` object
     :returns: list of all integrons, be they complete or not
     :retype: list of :class:`Integron` object
     """
+    print("###################### start find_integron ##########################")
+    print(f"### L82{attc_file =} {attc =} ")
+    print(f"### L83{attc is None =} {not attc_file =}")
+    print(f"{(attc is None) and (not attc_file) =}")
+    assert not(attc is not None and attc_file), "attc and attc_file are mutually exclusive parameter"
+    assert not((attc is None) and (not attc_file)), "Either attc or attc_file parameter must be provided"
+    print(f"### L87 {replicon =} {attc =} {intI_file =} {phageI_file =}")
     if not cfg.no_proteins:
         intI = read_hmm(replicon.id, prot_db, intI_file, cfg)
         intI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
@@ -95,13 +107,12 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                         "ID_prot", "strand", "pos_beg", "pos_end",
                                         "evalue", "hmmfrom", "hmmto", "alifrom",
                                         "alito", "len_profile"])
-    # if attc_file is integron_max
-    if isinstance(attc_file, pd.DataFrame):
+    if attc is not None:
+        # attc is a pandas.DataFrame result of integron_max
         local_max_done = True
-        attc = attc_file
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
-    # else it the call after default search
-    else:
+    elif attc_file:
+        # it call after default search
         local_max_done = False
         attc = read_infernal(attc_file, replicon.id, cfg.model_len,
                              evalue=cfg.evalue_attc,
@@ -109,19 +120,21 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                              size_min_attc=cfg.min_attc_size)
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-    # attc_ac = list of Dataframe, each have a an array of attC
-    attc_ac = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, len(replicon), replicon.topology)
+    # attc_cluster_list = list of Dataframe, each have a an array of attC
+    attc_cluster_list = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, len(replicon), replicon.topology)
     integrons = []
-
-    if not intI_ac.empty and attc_ac:
-        n_attc_array = len(attc_ac)
+    print("=============== avant la boucle sur attc_cluster_list =======================")
+    print(f"### {intI_ac =}")
+    print(f"### {attc_cluster_list =}")
+    if not intI_ac.empty and attc_cluster_list:
+        attc_cluster_nb = len(attc_cluster_list)
         # If an array hasn't been clustered with an Integrase
         # or if an integrase lacks an array
-        # redundant info, we could check for len(attc_ac)==0
+        # redundant info, we could check for len(attc_cluster_list)==0
         # -> to remove
         for i, id_int in enumerate(intI_ac.ID_prot.values):  # For each Integrase
 
-            if n_attc_array == 0:  # No more array to attribute to an integrase
+            if attc_cluster_nb == 0:  # No more array to attribute to an integrase
 
                 integrons.append(Integron(replicon, cfg))
                 integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
@@ -131,34 +144,43 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                             intI_ac.evalue.values[i],
                                             intI_ac.query_name.values[i])
 
-            else:  # we still have attC and int :
+            else:  # we still have several attC and int :
                 # Look for array of attC where intI would fall inside it
-                # array_2_split is a boolean with True when intI is within an array
-                array_2_split = [(aac.pos_beg.values[0] < intI_ac.pos_beg.values[i] and
-                                  intI_ac.pos_beg.values[i] < aac.pos_end.values[-1])
-                                  for aac in attc_ac]
-                # get the index of those
-                tsplt = np.where(array_2_split)[0]
-                # for each of the attc array to split
-                # pop it, split it and add the 2 new arrays back.
-                for split in tsplt:
-                    pop = attc_ac.pop(split)
-                    whr_split = np.searchsorted(pop.pos_beg.values, intI_ac.pos_beg.values[i])
-                    attc_ac.extend([pop.iloc[:whr_split], pop.iloc[whr_split:]])
-                    n_attc_array += 1 # new attC array
+                if attc_cluster_nb == -1: # only one attc_cluster to attribute to integrase
+                    # looking if the attc
+                    print()
+                else:
+                    # array_2_split is a boolean with True when intI is within an array
+                    array_2_split = [(attc.pos_beg.values[0] < intI_ac.pos_beg.values[i] and
+                                      intI_ac.pos_beg.values[i] < attc.pos_end.values[-1])
+                                      for attc in attc_cluster_list]
+                    print(f"### L157 {array_2_split =}")
+                    # get the index of those
+                    tsplt = np.where(array_2_split)[0]
+                    print(f"### L160 {tsplt}")
+                    # for each of the attc array to split
+                    # pop it, split it and add the 2 new arrays back.
+                    for split in tsplt:
+                        pop = attc_cluster_list.pop(split)
+                        whr_split = np.searchsorted(pop.pos_beg.values, intI_ac.pos_beg.values[i])
+                        print(f"### L166 {whr_split =}")
+                        attc_cluster_list.extend([pop.iloc[:whr_split], pop.iloc[whr_split:]])
+                        attc_cluster_nb += 1 # new attC array
 
-                attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_ac])
-                attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_ac])
+                    attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_cluster_list])
+                    attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_cluster_list])
+                    print(f"### L172 {attc_left =}")
+                    print(f"### L173 {attc_right =}")
                 if replicon.topology == 'circ':
                     distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
                                           (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
                 else:
                     distances = np.array([abs(attc_left - intI_ac.pos_end.values[i]),
                                           abs(intI_ac.pos_beg.values[i] - attc_right)])
-
-                if attc_ac:
+                print(f"### L180 {distances =}")
+                if attc_cluster_list:
                     # tmp = (distances /
-                    #       np.array([[len(aac) for aac in attc_ac]]))
+                    #       np.array([[len(aac) for attc in attc_cluster_list]]))
                     side, idx_attc = np.where(distances == distances.min())
                     # side : 0 <=> left; 1 <=> right
                     # index of the closest and biggest attC array to the integrase
@@ -184,7 +206,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                                 intI_ac.evalue.values[i],
                                                 intI_ac.query_name.values[i])
 
-                    attc_tmp = attc_ac.pop(idx_attc)
+                    attc_tmp = attc_cluster_list.pop(idx_attc)
                     for a_tmp in attc_tmp.values:
                         integrons[-1].add_attC(a_tmp[4],  # pos_beg
                                                a_tmp[5],  # pos_end
@@ -192,7 +214,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                                a_tmp[7],  # evalue
                                                cfg.model_attc_name
                                                )
-                    n_attc_array -= 1
+                    attc_cluster_nb -= 1
 
                 else:  # no array close to the integrase on both side
                     integrons.append(Integron(replicon, cfg))
@@ -202,8 +224,8 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                                 int(intI_ac.strand.values[i]),
                                                 intI_ac.evalue.values[i], intI_ac.query_name.values[i])
 
-        if n_attc_array > 0:  # after the integrase loop (<=> no more integrases)
-            for attc_array in attc_ac:
+        if attc_cluster_nb > 0:  # after the integrase loop (<=> no more integrases)
+            for attc_array in attc_cluster_list:
                 integrons.append(Integron(replicon, cfg))
 
                 for a_tmp in attc_array.values:
@@ -212,8 +234,8 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                            1 if a_tmp[6] == "+" else -1,
                                            a_tmp[7], cfg.model_attc_name)
 
-    elif intI_ac.pos_end.values.size == 0 and attc_ac:  # If attC only
-        for attc_array in attc_ac:
+    elif intI_ac.pos_end.values.size == 0 and attc_cluster_list:  # If attC only
+        for attc_array in attc_cluster_list:
             integrons.append(Integron(replicon, cfg))
             for a_tmp in attc_array.values:
                 integrons[-1].add_attC(a_tmp[4],
@@ -221,7 +243,7 @@ def find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg):
                                        1 if a_tmp[6] == "+" else -1,
                                        a_tmp[7], cfg.model_attc_name)
 
-    elif intI_ac.pos_end.values.size >= 1 and not attc_ac:  # If intI only
+    elif intI_ac.pos_end.values.size >= 1 and not attc_cluster_list:  # If intI only
         for i, id_int in enumerate(intI_ac.ID_prot.values):
             integrons.append(Integron(replicon, cfg))
             integrons[-1].add_integrase(intI_ac.pos_beg.values[i],
