@@ -134,7 +134,7 @@ if (params.replicons.contains(',')){
 
 
 /****************************************
- *           The workflow               *
+ *           The Process                *
  ****************************************/
 
 process split{
@@ -219,7 +219,11 @@ process merge_results{
     script:
         result_dir = "Results_Integron_Finder_${input_id}"
         if (result_dir ==  all_chunk_results){
-            // manage case wher there is one file with one sequence
+            // manage case where there is one file with one sequence
+            // in this case resilt_dir and all_chunk_results are ==
+            // and integron_merge raise an error
+            // it does not change the final result
+            // as the files will be copied in current_dir/${result_dir} see subscribe in workflow
             result_dir = "${result_dir}_merged"
         }
 
@@ -228,6 +232,9 @@ process merge_results{
         """
 }
 
+/****************************************
+ *           The Workflow               *
+ ****************************************/
 
 workflow {
      replicons_files = Channel.fromPath(paths)
