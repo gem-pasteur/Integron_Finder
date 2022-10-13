@@ -1,0 +1,3 @@
+# cmd: integron_finder --lin --local-max --cpu 4 --cmsearch ../infernal/infernal-1.1.4/src/cmsearch data/Replicons/VIBR.0322.11443.0157.fst
+ID_replicon	CALIN	complete	In0	topology	size
+VIBR.0322.11443.0157	0	1	0	lin	1243
