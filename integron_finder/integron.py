@@ -78,13 +78,8 @@ def find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=None
     :returns: list of all integrons, be they complete or not
     :retype: list of :class:`Integron` object
     """
-    print("###################### start find_integron ##########################")
-    print(f"### L82{attc_file =} {attc =} ")
-    print(f"### L83{attc is None =} {not attc_file =}")
-    print(f"{(attc is None) and (not attc_file) =}")
-    assert not(attc is not None and attc_file), "attc and attc_file are mutually exclusive parameter"
+    assert not(attc is not None and attc_file is not None), "attc and attc_file are mutually exclusive parameter"
     assert not((attc is None) and (not attc_file)), "Either attc or attc_file parameter must be provided"
-    print(f"### L87 {replicon =} {attc =} {intI_file =} {phageI_file =}")
     if not cfg.no_proteins:
         intI = read_hmm(replicon.id, prot_db, intI_file, cfg)
         intI.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
@@ -123,9 +118,6 @@ def find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=None
     # attc_cluster_list = list of Dataframe, each have a an array of attC
     attc_cluster_list = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, len(replicon), replicon.topology)
     integrons = []
-    print("=============== avant la boucle sur attc_cluster_list =======================")
-    print(f"### {intI_ac =}")
-    print(f"### {attc_cluster_list =}")
     if not intI_ac.empty and attc_cluster_list:
         attc_cluster_nb = len(attc_cluster_list)
         # If an array hasn't been clustered with an Integrase
@@ -144,40 +136,37 @@ def find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=None
                                             intI_ac.evalue.values[i],
                                             intI_ac.query_name.values[i])
 
-            else:  # we still have several attC and int :
-                # Look for array of attC where intI would fall inside it
-                if attc_cluster_nb == -1: # only one attc_cluster to attribute to integrase
-                    # looking if the attc
-                    print()
-                else:
-                    # array_2_split is a boolean with True when intI is within an array
-                    array_2_split = [(attc.pos_beg.values[0] < intI_ac.pos_beg.values[i] and
-                                      intI_ac.pos_beg.values[i] < attc.pos_end.values[-1])
-                                      for attc in attc_cluster_list]
-                    print(f"### L157 {array_2_split =}")
-                    # get the index of those
-                    tsplt = np.where(array_2_split)[0]
-                    print(f"### L160 {tsplt}")
-                    # for each of the attc array to split
-                    # pop it, split it and add the 2 new arrays back.
-                    for split in tsplt:
-                        pop = attc_cluster_list.pop(split)
-                        whr_split = np.searchsorted(pop.pos_beg.values, intI_ac.pos_beg.values[i])
-                        print(f"### L166 {whr_split =}")
-                        attc_cluster_list.extend([pop.iloc[:whr_split], pop.iloc[whr_split:]])
-                        attc_cluster_nb += 1 # new attC array
+            else:  # we still have several attC cluster and int :
+                # Look for array of attC (cluster) where intI would fall inside it
 
-                    attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_cluster_list])
-                    attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_cluster_list])
-                    print(f"### L172 {attc_left =}")
-                    print(f"### L173 {attc_right =}")
+                # array_2_split is a boolean with True when intI is within an array
+                array_2_split = [(attc.pos_beg.values[0] < intI_ac.pos_beg.values[i] and
+                                  intI_ac.pos_beg.values[i] < attc.pos_end.values[-1])
+                                  for attc in attc_cluster_list]
+                # get the index of array to split
+                split_index = np.where(array_2_split)[0]
+                # for each of the attc cluster to split
+                # pop it, split it and add the 2 new arrays back.
+                for index in split_index:
+                    poped_attc = attc_cluster_list.pop(index)
+                    whr_split = np.searchsorted(poped_attc.pos_beg.values, intI_ac.pos_beg.values[i])
+                    for split_item in poped_attc.iloc[:whr_split], poped_attc.iloc[whr_split:]:
+                        # when there is only one attC in the cluster
+                        # the split generate an emtpy dataframe
+                        if not split_item.empty:
+                            attc_cluster_list.append(split_item)
+                    attc_cluster_nb += 1  # new attC array
+
+                attc_left = np.array([i_attc.pos_beg.values[0] for i_attc in attc_cluster_list])
+                attc_right = np.array([i_attc.pos_end.values[-1] for i_attc in attc_cluster_list])
+
                 if replicon.topology == 'circ':
                     distances = np.array([(attc_left - intI_ac.pos_end.values[i]),
                                           (intI_ac.pos_beg.values[i] - attc_right)]) % len(replicon)
                 else:
                     distances = np.array([abs(attc_left - intI_ac.pos_end.values[i]),
                                           abs(intI_ac.pos_beg.values[i] - attc_right)])
-                print(f"### L180 {distances =}")
+
                 if attc_cluster_list:
                     # tmp = (distances /
                     #       np.array([[len(aac) for attc in attc_cluster_list]]))
