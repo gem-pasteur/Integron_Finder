@@ -149,8 +149,8 @@ will give :
 
 containing
 
-    - baz .integrons
-    - baz .summary
+    - baz.integrons
+    - baz.summary
     - psa_1.gbk
     - psa_2.gbk
     - psa_3.gbk
