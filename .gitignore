@@ -69,3 +69,8 @@ work/
 ############
 *.egg-info
 \.eggs/
+
+#######################
+# jupyter checkpoints #
+#######################
+\.ipynb_checkpoints/
