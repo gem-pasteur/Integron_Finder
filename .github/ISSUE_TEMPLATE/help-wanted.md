@@ -15,6 +15,8 @@ Steps to reproduce the behavior:
 
 1. The exact command lines you use 
 
+/!\ please share your input file so we can reproduce the problem
+
 **Screenshots / outputs**
 If applicable, add **screenshots**, **outputs** or **error traceback** 
 to help explain your problem.
