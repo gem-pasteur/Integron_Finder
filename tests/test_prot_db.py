@@ -65,6 +65,7 @@ class TestGemBase(IntegronTest):
         if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
+        self.maxDiff = 30
 
 
     def tearDown(self):

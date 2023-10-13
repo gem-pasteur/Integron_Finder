@@ -355,7 +355,7 @@ def find_integron_in_one_replicon(replicon, config):
                       cpu=config.cpu)
 
         _log.info("Default search done... : ")
-        integrons = find_integron(replicon, protein_db, attC_default_file, intI_file, phageI_file, config)
+        integrons = find_integron(replicon, protein_db, intI_file, phageI_file, config, attc_file=attC_default_file)
 
         #########################
         # Search with local_max #
@@ -382,7 +382,7 @@ def find_integron_in_one_replicon(replicon, config):
                                             (config.min_attc_size < abs(integron_max.pos_end - integron_max.pos_beg))]
                 _log.info("Search with local_max was already done, continue... :")
 
-            integrons = find_integron(replicon, protein_db, integron_max, intI_file, phageI_file, config)
+            integrons = find_integron(replicon, protein_db, intI_file, phageI_file, config, attc=integron_max)
 
         ##########################
         # Add promoters and attI #

@@ -57,7 +57,7 @@ import integron_finder.scripts.finder as finder
 _prodigal_run = integrase.subprocess.run
 
 
-class TestAcba(IntegronTest):
+class TestFunctional(IntegronTest):
 
     def setUp(self):
         if 'INTEGRON_HOME' in os.environ:
@@ -653,3 +653,27 @@ class TestAcba(IntegronTest):
                                                            output_filename))
         test_result_path = os.path.join(test_result_dir, output_filename)
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+
+    def test_one_attc_overlapping_intI(self):
+        replicon_filename = 'VIBR.0322.11443.0157'
+        replicon = self.find_data(os.path.join('Replicons', f'{replicon_filename}.fst'))
+        command = f"integron_finder --outdir {self.out_dir} --lin --local-max {replicon}"
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:], loglevel='WARNING')
+
+        result_dir = os.path.join(self.out_dir, f'Results_Integron_Finder_{replicon_filename}')
+
+        output_filename = f'{replicon_filename}.integrons'
+        expected_result_path = self.find_data(
+            os.path.join(f'Results_Integron_Finder_{replicon_filename}', output_filename))
+        test_result_path = os.path.join(result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        output_filename = f'{replicon_filename}.summary'
+        test_summary_path = os.path.join(result_dir, output_filename)
+        test_summary = pd.read_csv(test_summary_path, sep='\t', comment='#')
+        expected_summary_path = self.find_data(
+            os.path.join(f'Results_Integron_Finder_{replicon_filename}', output_filename))
+        expected_summary = pd.read_csv(expected_summary_path ,sep='\t', comment='#')
+        pdt.assert_frame_equal(test_summary, expected_summary)
