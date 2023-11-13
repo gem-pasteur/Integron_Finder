@@ -38,7 +38,9 @@ from integron_finder.topology import Topology
 class TestTopology(IntegronTest):
 
     def test_parse_topology(self):
-        topo = Topology('circ')
+        seq_nb = 1
+        cmdline_topo = 'circ'
+        topo = Topology(seq_nb, cmdline_topo)
         for t in ('circ', 'circular', 'CIRC', 'CIRCULAR'):
             self.assertEqual(topo._parse_topology(t), 'circ')
         for t in ('lin', 'linear', 'LIN', 'LINEAR'):
@@ -49,7 +51,9 @@ class TestTopology(IntegronTest):
 
 
     def test_parse(self):
-        topo = Topology('circ')
+        seq_nb = 1
+        cmdline_topo = 'circ'
+        topo = Topology(seq_nb, cmdline_topo)
         topo._parse(self.find_data('topology.txt'))
         expected = {
                     'seq1': 'circ',
@@ -61,11 +65,13 @@ class TestTopology(IntegronTest):
                     'seq7': 'lin',
                     'seq8': 'lin',
                     }
-        self.assertDictEqual(expected, topo._topology)
+        self.assertDictEqual(expected, topo._topology_file)
 
 
-    def test_getitem(self):
-        topo = Topology('circ', topology_file=self.find_data('topology.txt'))
+    def test_getitem_cmdline_topofile(self):
+        seq_nb = 1
+        cmdline_topo = 'circ'
+        topo = Topology(seq_nb, cmdline_topo, topology_file=self.find_data('topology.txt'))
         expected = {
                     'seq1': 'circ',
                     'seq2': 'circ',
@@ -75,8 +81,40 @@ class TestTopology(IntegronTest):
                     'seq6': 'circ',
                     'seq7': 'lin',
                     'seq8': 'lin',
+                    'seq9': 'circ'
                     }
         for seqid, topology in expected.items():
             self.assertEqual(topology, topo[seqid])
         self.assertEqual('circ', topo['foo'])
+
+
+    def test_getitem(self):
+        seq_nb = 1
+        cmdline_topo = None
+        topo = Topology(seq_nb, cmdline_topo)
+        self.assertEqual(topo['foo'], 'circ')
+        seq_nb = 2
+        topo = Topology(seq_nb, cmdline_topo)
+        self.assertEqual(topo['foo'], 'lin')
+
+
+    def test_getitem_gembase(self):
+        # gembase v2 Complete Chromosome
+        seq_nb = 2
+        cmdline_topo = None
+        topo = Topology(seq_nb, cmdline_topo, gembase=True)
+        self.assertEqual(topo['VICH001.0523.00090.001C'], 'circ')
+        # gembase v1 Complete Plasmid
+        seq_nb = 2
+        cmdline_topo = None
+        topo = Topology(seq_nb, cmdline_topo, gembase=True)
+        self.assertEqual(topo['ACJO001.0321.00008.P008'], 'circ')
+        # gembase V2 Draft
+        seq_nb = 2
+        topo = Topology(seq_nb, cmdline_topo, gembase=True)
+        self.assertEqual(topo['VIBR.0322.11443.0001'], 'lin')
+        # gembase V1 Draft
+        seq_nb = 2
+        topo = Topology(seq_nb, cmdline_topo, gembase=True)
+        self.assertEqual(topo['ACBA.0917.00019.0001'], 'lin')
 

@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2023  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -33,6 +33,8 @@ import shlex
 from collections import namedtuple
 import re
 import importlib.util
+from enum import Enum
+
 
 import colorlog
 import pandas as pd
@@ -129,12 +131,86 @@ class ProteinDB(ABC):
         return self._prot_file
 
 
+
+class GembaseType(Enum):
+    """
+    Modelize the Gembase type en version
+    """
+
+    COMPLETE_2 = 1
+    DRAFT_2 = 2
+    COMPLETE_1 = 3
+    DRAFT_1 = 4
+
+    def __str__(self):
+        _type, vers = self.name.split('_')
+
+        _type = _type.capitalize()
+        return f"vers: {vers} {_type}"
+
+    @property
+    def complete(self):
+        """
+
+        :return: True if the GembaseType is Complete genome or False if it's a Draft
+        :rtype: bool
+        """
+        return self.name.startswith('COMPLETE')
+
+    @property
+    def version(self):
+        """
+        :return: the gembase version
+        :rtype: int
+        """
+        return int(self.name[-1])
+
+
+class RepliconType(Enum):
+    """
+    Modelize Replicon type in Gembase
+    """
+
+    CHROMOSOME = 1
+    PLASMID = 2
+    PHAGE = 3
+    OTHER = 4
+    CONTIG = 5
+
+    def __str__(self):
+        return self.name.capitalize()
+
+    def topology(self):
+        """
+        :return: the default topology of this replicon type 'circ' | 'lin'
+        :rtype:  str
+        """
+        return {1: 'circ',
+                2: 'circ',
+                3: 'circ',
+                4: 'circ',
+                5: 'lin'
+        }[self.value]
+
+
 class GembaseDB(ProteinDB):
     """
     Implements :class:`ProteinDB` from a Gembase.
     Managed proteins from Proteins directory corresponding to a replicon/contig
     """
 
+    _gene_patterns = {
+        GembaseType.COMPLETE_2: '(\w{7})\.(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])_(\d{5})',
+        GembaseType.DRAFT_2: '(\w{4})\.(\d{4})\.(\d{5})\.(\d{4})(?P<g_type>[ib])_(\d{5})',
+        GembaseType.COMPLETE_1: '(\w{7})\.(\w|\d{4})\.(\d{5})\.(?P<g_type>[CPVO])(\d{3})_(\d{5})',
+        GembaseType.DRAFT_1: '(\w{4})\.(\d{4})\.(\d{5})\.(?P<g_type>[ib])(\d{4})_(\d{5})'
+    }
+
+    _rep_patterns = [
+        '(\w{7})\.(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])',  # Complete V2
+        '(\w{7})\.(\w|\d{4})\.(\d{5})\.(?P<g_type>[CPVO])(\d{3})',  # Complete V1
+        '(\w{4})\.(\d{4})\.(\d{5})\.(\d{4})',  # Draft V1 et V2
+    ]
 
     def __init__(self, replicon, cfg, gembase_path=None, prot_file=None):
         """
@@ -165,17 +241,67 @@ class GembaseDB(ProteinDB):
         # the filenames are based on replicon id
         # but in code the replicon id contains the contig number
         # for gembase complete both filename and seq_id contains contig number
+        self._lst_dir = self.get_lst_dir(self._gembase_path)
+        self._gembase_file_basename = self.find_gembase_file_basename(self._gembase_path, self.cfg.input_seq_path)
+        self._lst_path = self._get_lst_path()
+
+        self._gembase_type = self.gembase_sniffer(self._lst_path)
         self._replicon_name = os.path.splitext(os.path.basename(self.cfg.input_seq_path))[0]
-        self._gembase_file_basename = self._find_gembase_file_basename(self._gembase_path, self.cfg.input_seq_path)
-        self._info = self._parse_lst()
+        self._info = self._parse_lst(self._lst_path)
+        if self._info.empty:
+            msg = f"No CDS reported in {self._lst_path} for the replicon {replicon.id} ."
+            _log.warning(msg)
+        self.replicon_tye = self.get_replicon_type(seq_id=self.replicon.id)
         if prot_file is None:
             self._prot_file = self._make_protfile()
         else:
             self._prot_file = prot_file
         self._prot_db = self._make_db()
 
+    @staticmethod
+    def get_lst_dir( gembase_path):
+        """
+        :return: The path to the Gembase LST directory
+        :rtype: str
+        """
+        found = False
+        for lst_dirname in ('LST', 'LSTINF', 'LSTINFO'):
+            lst_dir_path = os.path.join(gembase_path, lst_dirname)
+            if os.path.exists(lst_dir_path):
+                found = True
+                break
+        if not found:
+            raise IntegronError(f"Neither 'LST' nor 'LSTINF' nor 'LSTINFO' directory found in '{gembase_path}' .")
 
-    def _find_gembase_file_basename(self, gembase_path, input_seq_path):
+        return lst_dir_path
+
+
+    def _get_lst_path(self):
+        lst_dir_path = self._lst_dir
+
+        lst_path = os.path.join(lst_dir_path, self._gembase_file_basename + '.lst')
+        if not os.path.exists(lst_path):
+            raise IntegronError(f"Do not find {lst_path} in {lst_dir_path}")
+        return lst_path
+
+
+    def _parse_lst(self, lst_path):
+        """
+        Parse the LSTINFO file and extract information specific to the replicon
+        :return: `class`:pandas.DataFrame` object
+        :raise IntegronError: when LST dir is not found
+        """
+        if self.gembase_type == GembaseType.DRAFT_1:
+            prots_info = self.gembase1_draft_parser(lst_path, self.replicon.id)
+        elif self.gembase_type == GembaseType.COMPLETE_1:
+            prots_info = self.gembase1_complete_parser(lst_path, self.replicon.id)
+        elif self.gembase_type.version == 2:
+            prots_info = self.gembase2_parser(lst_path, self.replicon.id)
+        return prots_info
+
+
+    @classmethod
+    def find_gembase_file_basename(cls, gembase_path, input_seq_path):
         """
         from the input file name, try to retrieve the basename which is used in gembase
         This specially useful when IF is run in parallel. The input sequence is split
@@ -189,16 +315,9 @@ class GembaseDB(ProteinDB):
             ESCO001.C.00001.C001.fst          => ESCO001.C.00001.C001
             ESCO001.C.00001.C001_chunk_1.fst  => ESCO001.C.00001.C001
 
-        :return: the gemabse basename corresponding to the input file
+        :return: the gembase basename corresponding to the input file
         :rtype: string
         """
-        lst_dir_path = os.path.join(gembase_path, 'LSTINFO')
-        if not os.path.exists(lst_dir_path):
-            _log.warning(f"{lst_dir_path} directory nout found. check LSTINF")
-            lst_dir_path = os.path.join(gembase_path, 'LSTINF')
-            if not os.path.exists(lst_dir_path):
-                _log.warning(f"{lst_dir_path} directory nout found.")
-                raise IntegronError(f"{lst_dir_path}O directory nout found.")
         gembase_file_basename = os.path.splitext(os.path.basename(input_seq_path))[0]
         # when IF is run through nextflow & parallel_integron_finder
         # the input data is split the name of the chunks can vary
@@ -212,7 +331,8 @@ class GembaseDB(ProteinDB):
         if match:
             gembase_file_basename = gembase_file_basename[:match.start()]
 
-        lst_path = os.path.join(lst_dir_path, gembase_file_basename + '.lst')
+        lst_dir = cls.get_lst_dir(gembase_path)
+        lst_path = os.path.join(lst_dir, gembase_file_basename + '.lst')
         if os.path.exists(lst_path):
             # it is a complete genome
             return gembase_file_basename
@@ -220,19 +340,19 @@ class GembaseDB(ProteinDB):
             # it is a contig
             # let's find the draft genome lst file
             gembase_file_basename = os.path.splitext(os.path.basename(gembase_file_basename))[0]
-            lst_path = os.path.join(lst_dir_path, gembase_file_basename + '.lst')
+            lst_path = os.path.join(gembase_path, gembase_file_basename + '.lst')
             if os.path.exists(lst_path):
                 return gembase_file_basename
             else:
-                raise FileNotFoundError("cannot find lst file matching {} sequence".format(self.cfg.input_seq_path))
+                raise FileNotFoundError(f"cannot find lst file matching {input_seq_path} sequence")
 
 
     def _make_protfile(self, path=None):
         """
         Create fasta file with protein corresponding to this sequence, from the corresponding Gembase protfile
-        This step is necessary because in Gembase Draft
-        One nucleic file can contains several contigs, but all proteins are in the same file.
-
+        This step is necessary because in Gembase1&2 Draft
+        One nucleic file can contain several contigs, but all proteins are in the same file.
+        and in Gembase2 replicons file can contain several chromosomes and plasmids
         :return: the path of the created protein file
         :rtype: str
         """
@@ -248,52 +368,121 @@ class GembaseDB(ProteinDB):
                 os.makedirs(self.cfg.tmp_dir(self.replicon.id))
             prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')
             with open(prot_file_path, 'w') as prot_file:
-                for seq_id in self._info['seq_id']:
+                for seq_id in self._info[4]:
                     try:
                         seq = all_prots[seq_id]
                         SeqIO.write(seq, prot_file, 'fasta')
                     except KeyError:
-                        _log.warning('Sequence describe in LSTINF file {} is not present in {}'.format(seq_id, all_prot_path))
+                        _log.warning(f'Sequence describe in LSTINF file {seq_id} is not present in {all_prot_path}')
         return prot_file_path
 
 
-    @staticmethod
-    def gembase_sniffer(lst_path):
+    @classmethod
+    def gembase_sniffer(cls, lst_path):
         """
         Detect the type of gembase
         :param str lst_path: the path to the LSTINFO file corresponding to the nucleic sequence
-        :returns: either 'Complet' or 'Draft'
+        :returns: either the type of replicon ('Complet' or 'Draft', 1 or 2)
+        :rtype: tuple
         """
         with open(lst_path) as lst_file:
-            line = lst_file.readline()
-        fields = line.split()
-        if fields[5] in ('Valid', 'Invalid_Size', 'Pseudo', 'Partial'):
-            return 'Complet'
-        else:
-            if fields[0] == '0' and fields[1] == '0':
-                msg = f"the genome {fields[2]} seems empty: see {lst_path}"
+            first_line = next(lst_file)
+
+        gene_id = first_line.split()[4]
+        guess_gb_type = False
+        for gb_type, pattern in cls._gene_patterns.items():
+            match = re.match(pattern, gene_id)
+            if match:
+                guess_gb_type = True
+                break
+
+        if not guess_gb_type:
+            start, end , seq_id= first_line.split()[:3]
+            if start == end == '0':
+                msg = f"The genome {seq_id} seems empty: see {lst_path}"
                 _log.critical(msg)
                 raise IntegronError(msg) from None
             else:
-                return 'Draft'
+                msg = f"Cannot detect GemBase version, check lst file '{lst_path}'."
+                raise IntegronError(msg) from None
+        _log.debug(f"GembaseDB sniff GemBase version:{gb_type}")
+        return gb_type
+
+
+    @property
+    def gembase_type(self):
+        return self._gembase_type
+
+    @classmethod
+    def get_replicon_type(cls, seq_id='', gen_id=''):
+        """
+
+        :param seq_id: the sequence id to parse
+        :type seq_id: str
+        :return: the kind of genome, it can be either:
+
+            * Chromosome
+            * Plasmid
+            * Phage
+            * Other
+
+        :rtype: :class:`RepliconType` object
+        """
+        if not any((seq_id, gen_id)):
+            raise IntegronError(f'{cls.__name__}.get_replicon_type you must provide either a seqid or a gen_id')
+        elif all((seq_id, gen_id)):
+            raise IntegronError(f'{cls.__name__}.get_replicon_type you must provide either a seqid or a gen_id')
+        guess_gb_type = False
+        if seq_id:
+            patterns = cls._rep_patterns
+            _id = seq_id
+        elif gen_id:
+            patterns = cls._gene_patterns.values()
+            _id = gen_id
+        for pattern in patterns:
+            match = re.match(pattern, _id)
+            if match:
+                guess_gb_type = True
+                try:
+                    genome_type_letter = match.group('g_type')
+                except IndexError:
+                    # there is no group
+                    # so a seq_id has been provided
+                    # and it match a Draft
+                    genome_type_letter = 'i'
+                break
+        if not guess_gb_type:
+            msg = f"Cannot detect GemBase version, from {'seq_id' if seq_id else 'gen_id'}: '{_id}'."
+            _log.error(msg)
+            raise IntegronError(msg) from None
+        else:
+            genome_type = {
+                'C': RepliconType.CHROMOSOME,
+                'P': RepliconType.PLASMID,
+                'V': RepliconType.PHAGE,
+                'O': RepliconType.OTHER,
+                'i': RepliconType.CONTIG,
+                'b': RepliconType.CONTIG
+            }[genome_type_letter]
+        return genome_type
 
 
     @staticmethod
-    def gembase_complete_parser(lst_path, sequence_id):
+    def gembase1_complete_parser(lst_path, sequence_id):
         """
         :param str lst_path: the path of the LSTINFO file Gembase Complet
         :param str sequence_id: the id of the genomic sequence to analyse
         :return: the information related to the 'valid' CDS corresponding to the sequence_id
         :rtype: `class`:pandas.DataFrame` object
         """
-        dtype = {'start': 'int',
-                 'end': 'int',
-                 'strand': 'str',
-                 'type': 'str',
-                 'seq_id': 'str',
-                 'valid': 'str',
-                 'gene_name': 'str',
-                 'description': 'str'}
+        dtype = {0: 'int', # start
+                 1: 'int', # end
+                 2: 'str', # strand C/D
+                 3: 'str', # type (CDS, ncRNA, tRNA,...)
+                 4: 'str', # seq id
+                 5: 'str', # Valid
+                 6: 'str', # gene name
+                 7: 'str'} # description
 
         with open(lst_path) as lst_file:
             lst_data = []
@@ -302,19 +491,15 @@ class GembaseDB(ProteinDB):
                 row = [start, end, strand, gene_type, seq_id, valid, gene_name, ' '.join(description)]
                 lst_data.append(row)
 
-            lst = pd.DataFrame(lst_data,
-                               columns=['start', 'end', 'strand', 'type', 'seq_id', 'valid', 'gene_name', 'description']
-                               )
+            lst = pd.DataFrame(lst_data)
             lst = lst.astype(dtype)
-            specie, date, strain, contig = sequence_id.split('.')
-            pattern = f'{specie}\.{date}\.{strain}\.{contig}'.format(specie, date, strain, contig)
-            genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
-            prots_info = genome_info.loc[(genome_info['type'] == 'CDS') & (genome_info['valid'] == 'Valid')]
+            genome_info = lst.loc[lst[4].str.contains(sequence_id, regex=True)]
+            prots_info = genome_info.loc[(genome_info[3] == 'CDS') & (genome_info[5] == 'Valid')]
             return prots_info
 
 
     @staticmethod
-    def gembase_draft_parser(lst_path, replicon_id):
+    def gembase1_draft_parser(lst_path, replicon_id):
         """
         :param str lst_path: the path of the LSTINFO file from a Gembase Draft
         :param str sequence_id: the id of the genomic sequence to analyse
@@ -324,40 +509,51 @@ class GembaseDB(ProteinDB):
         try:
             lst = pd.read_csv(lst_path,
                               header=None,
-                              names=['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description'],
-                              dtype={'start': 'int',
-                                     'end': 'int',
-                                     'strand': 'str',
-                                     'type': 'str',
-                                     'seq_id': 'str',
-                                     'gene_name': 'str',
-                                     'description': 'str'},
                               sep="\t")
         except Exception as err:
-            _log.error(f"Error while parsing {lst_path} file")
-            raise err
+            msg = f"Error while parsing {lst_path} file: {err}"
+            _log.error(msg)
+            raise IntegronError(msg)
         specie, date, strain, contig = replicon_id.split('.')
         pattern = f'{specie}\.{date}\.{strain}\.[bi]{contig}'
-        genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
-        prots_info = genome_info.loc[genome_info['type'] == 'CDS']
+        try:
+            genome_info = lst.loc[lst[4].str.contains(pattern, regex=True)]
+        except KeyError:
+            msg = f"The LST file '{lst_path}' seems not to be in gembase V1 draft format."
+            _log.error(msg)
+            raise IntegronError(msg) from None
+        prots_info = genome_info.loc[genome_info[3] == 'CDS']
         return prots_info
 
 
-    def _parse_lst(self):
+    @staticmethod
+    def gembase2_parser(lst_path, replicon_id):
         """
-        Parse the LSTINFO file and extract information specific to the replicon
-        :return: `class`:pandas.DataFrame` object
+        :param str lst_path: the path of the LSTINFO file from a Gembase Draft
+        :param str sequence_id: the id of the genomic sequence to analyse
+        :return: the information related to the 'valid' CDS corresponding to the sequence_id
+        :rtype: `class`:pandas.DataFrame` object
         """
-        lst_path = os.path.join(self._gembase_path, 'LSTINFO', self._gembase_file_basename + '.lst')
-        if not os.path.exists(lst_path):
-            lst_path = os.path.join(self._gembase_path, 'LSTINF', self._gembase_file_basename + '.lst')
-            if not os.path.exists(lst_path):
-                raise IntegronError(f"{lst_path}O directory not found.")
-        gembase_type = self.gembase_sniffer(lst_path)
-        if gembase_type == 'Draft':
-            prots_info = self.gembase_draft_parser(lst_path, self.replicon.id)
-        else:
-            prots_info = self.gembase_complete_parser(lst_path, self.replicon.id)
+        try:
+            lst = pd.read_csv(lst_path,
+                              header=None,
+                              sep="\t")
+        except Exception as err:
+            msg = f"Error while parsing {lst_path} file: {err}"
+            _log.error(msg)
+            raise IntegronError(msg)
+
+        try:
+            lst = lst.loc[:, :7]
+            dtype = {i: 'str' for i in range(lst.shape[1])}
+            dtype[0] = dtype[1] = 'int'
+            lst = lst.astype(dtype)
+            genome_info = lst.loc[lst[4].str.contains(replicon_id, regex=True)]
+            prots_info = genome_info.loc[genome_info[3] == 'CDS']
+        except Exception as err:
+            msg = f"The LST file '{lst_path}' seems not to be in gembase V2 draft format."
+            _log.error(msg)
+            raise IntegronError(msg) from None
         return prots_info
 
 
@@ -375,7 +571,7 @@ class GembaseDB(ProteinDB):
         :return: a generator which iterate on the protein seq_id which constitute the contig.
         :rtype: generator
         """
-        return (seq_id for seq_id in self._info['seq_id'])
+        return (seq_id for seq_id in self._info[4])
 
 
     def get_description(self, gene_id):
@@ -392,15 +588,18 @@ class GembaseDB(ProteinDB):
         except ValueError:
             raise IntegronError(f"'{gene_id}' is not a valid Gembase protein identifier.")
         pattern = f'{specie}\.{date}\.{strain}\.\w?{contig_gene}'
-        seq_info = self._info.loc[self._info['seq_id'].str.contains(pattern, regex=True)]
+        seq_info = self._info.loc[self._info[4].str.contains(pattern, regex=True)]
         if not seq_info.empty:
-            return SeqDesc(seq_info.seq_id.values[0],
-                           1 if seq_info.strand.values[0] == "D" else -1,
-                           seq_info.start.values[0],
-                           seq_info.end.values[0],
+            return SeqDesc(seq_info[4].values[0],
+                           1 if seq_info[2].values[0] == "D" else -1,
+                           seq_info[0].values[0],
+                           seq_info[1].values[0],
                            )
         else:
             raise KeyError(gene_id)
+
+
+
 
 
 class ProdigalDB(ProteinDB):
@@ -564,4 +763,3 @@ class CustomDB(ProteinDB):
             _log.critical(msg)
             raise IntegronError(msg)
         return SeqDesc(id_, strand, start, stop)
-

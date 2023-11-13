@@ -1,0 +1,3 @@
+# cmd: integron_finder --cpu 4 --cmsearch ../infernal/infernal-1.1.4/src/cmsearch --promoter-attI --gembase tests/data/Gembase/Gembase1/Replicons/ESCO001.C.00001.C001.fst --local-max
+ID_replicon	CALIN	complete	In0	topology	size
+ESCO001.C.00001.C001	0	0	0	circ	4641652

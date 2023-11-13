@@ -1,0 +1,4 @@
+# cmd: integron_finder --cpu 4 --promoter-attI --circ --gembase /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Replicons/VICH001.0523.00090.fna
+ID_replicon	CALIN	complete	In0	topology	size
+VICH001.0523.00090.001C	0	0	0	circ	2961008
+VICH001.0523.00090.002C	4	1	0	circ	1124701

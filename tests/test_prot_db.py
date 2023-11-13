@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2021  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2023  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -33,6 +33,7 @@ import distutils.spawn
 import shutil
 import re
 
+import numpy as np
 from Bio import SeqIO, Seq
 
 try:
@@ -43,9 +44,8 @@ except ImportError as err:
 
 from integron_finder import IntegronError
 from integron_finder.config import Config
-from integron_finder.utils import read_multi_prot_fasta
-from integron_finder.prot_db import GembaseDB, ProdigalDB, SeqDesc, CustomDB
-
+from integron_finder.utils import read_multi_fasta
+from integron_finder.prot_db import GembaseDB, ProdigalDB, SeqDesc, CustomDB, GembaseType, RepliconType
 
 class TestGemBase(IntegronTest):
 
@@ -76,13 +76,18 @@ class TestGemBase(IntegronTest):
 
 
     def test_ProteinDB(self):
-        # From Gembase Draft , Gembase Complete
-        file_names = ('ACBA.0917.00019.fna', 'ESCO001.C.00001.C001.fst')
-        for file_name in file_names:
-            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', file_name))
+        # From Gembase1 Draft , Gembase1 Complete
+        file_names = (
+            (1, 'ACBA.0917.00019.fna'),
+            (1, 'ESCO001.C.00001.C001.fst'),
+            (2, 'VIBR.0322.11443.fna'),
+            (2, 'VICH001.0523.00090.fna')
+        )
+        for gb_v, file_name in file_names:
+            replicon_path = self.find_data(os.path.join('Gembase', f'Gembase{gb_v}', 'Replicons', file_name))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = read_multi_prot_fasta(replicon_path)
+            seq_db = read_multi_fasta(replicon_path)
             replicon = next(seq_db)
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
@@ -91,99 +96,115 @@ class TestGemBase(IntegronTest):
                 db = GembaseDB(replicon, cfg)
             self.assertTrue(db.replicon.id, replicon.id)
 
+
+    def test_no_LST_dir(self):
+        dest_replicons_path = os.path.join(self.tmp_dir, 'Gembase', 'Replicons')
+        os.makedirs(dest_replicons_path)
+        file_name = 'VICH001.0523.00090.fna'
+        replicon_path = self.find_data(os.path.join('Gembase', 'Gembase2', 'Replicons', file_name))
+        replicon_copy = os.path.join(dest_replicons_path, file_name)
+        shutil.copy(replicon_path, replicon_copy)
+        self.args.replicon = replicon_copy
+        cfg = Config(self.args)
+        seq_db = read_multi_fasta(replicon_copy)
+        replicon = next(seq_db)
+        with self.assertRaises(IntegronError) as ctx:
+            GembaseDB(replicon, cfg)
+        self.assertEqual(str(ctx.exception),
+                         f"Neither 'LST' nor 'LSTINF' nor 'LSTINFO' directory found in '{os.path.dirname(dest_replicons_path)}' .")
+
+
     def test_find_gembase_file_basename(self):
-        """
-        test if find_gembase_file_basename get the the right basename
-        for files in gembase
-        """
-        gembase_path = self.find_data('Gembase')
-        file_names = ('ACBA.0917.00019.fna', 'ESCO001.C.00001.C001.fst')
-        print()
-        for file_name in file_names:
-            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', file_name))
+        # test if *find_gembase_file_basename* get the right basename
+        # for files in gembase
+        file_names = (
+            (1, 'ACBA.0917.00019.fna', 'ACBA.0917.00019'),                    # Draft v1
+            (1, 'ESCO001.C.00001.C001.fst', 'ESCO001.C.00001.C001'),          # Complete v1
+            (2, 'VICH001.0523.00090.fna', 'VICH001.0523.00090'),              # Complete V2
+            (2, 'VIBR.0322.11443.fna', 'VIBR.0322.11443'),                    # Draft V2
+            (1, 'ESCO001.C.00001.C001_chunk_1.fst' , 'ESCO001.C.00001.C001'), # Complete v1 chunk
+        )
+        for gbv, rep_file_name, basename in file_names:
+            gembase_path = self.find_data('Gembase', f'Gembase{gbv}')
+            replicon_path = self.find_data('Gembase', f'Gembase{gbv}', 'Replicons', rep_file_name)
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = read_multi_prot_fasta(replicon_path)
+            seq_db = read_multi_fasta(replicon_path)
             replicon = next(seq_db)
             replicon.path = replicon_path
-            os.makedirs(cfg.tmp_dir(replicon.id))
 
-            with self.subTest(file_name=file_name):
-                with self.catch_log() as log:
+            with self.subTest(file_name=rep_file_name):
+                with self.catch_log():
+                    # if sequence present in lst not present in prt file
+                    # a warning is raised
                     db = GembaseDB(replicon, cfg)
-                    catch_msg = log.get_value().strip()
-                self.assertTrue(db._find_gembase_file_basename,
-                                os.path.splitext(file_name)[0])
+                self.assertEqual(db.find_gembase_file_basename(gembase_path, replicon_path),
+                                 basename)
 
 
     def test_find_gembase_file_basename_file_not_in_gembase(self):
-        """
-        test if find_gembase_file_basename get the the right basename
-        for files not located in gembase and file name is the output of split operation
-        a file containing one contig
-        a file representing a chunk
-        """
-        gembase_path = self.find_data('Gembase')
+        # test if find_gembase_file_basename get the right basename
+        # for files not located in gembase and file name is the output of split operation
+        # a file containing one contig
+        # a file representing a chunk
+        gembase_path_ori = self.find_data('Gembase', 'Gembase2')
+        gembase_path_dest = os.path.join(self.tmp_dir, 'Gembase')
+        shutil.copytree(gembase_path_ori, gembase_path_dest)
 
-        file_names = {'ACBA.0917.00019': self.find_data(os.path.join('Replicons', 'ACBA.0917.00019.0001.fst')),
-                      'ESCO001.C.00001.C001.fst': os.path.join(self.tmp_dir, 'ESCO001.C.00001.C001_chunk_1.fst')
-                      }
+        extra_replicon_ori = self.find_data('Gembase', 'Gembase1', 'Replicons', 'ACBA.0917.00019.fna')
+        extra_replicon_path = os.path.join(gembase_path_dest, 'Replicons', os.path.basename(extra_replicon_ori))
+        shutil.copy(extra_replicon_ori, extra_replicon_path)
 
-        shutil.copyfile(os.path.join(gembase_path, 'Replicons', 'ESCO001.C.00001.C001.fst'),
-                        file_names['ESCO001.C.00001.C001.fst'])
-
-        for base_file_name, replicon_path in file_names.items():
-            self.args.replicon = replicon_path
-            self.args.gembase_path = gembase_path
-            cfg = Config(self.args)
-            seq_db = read_multi_prot_fasta(replicon_path)
-            replicon = next(seq_db)
-            replicon.path = replicon_path
-            os.makedirs(cfg.tmp_dir(replicon.id))
-            with self.subTest(base_file_name=base_file_name):
-                with self.catch_log():
-                    db = GembaseDB(replicon, cfg, gembase_path=gembase_path)
-                self.assertTrue(db._find_gembase_file_basename,
-                                base_file_name)
-
-        replicon_path = self.find_data(os.path.join('Replicons', 'acba.007.p01.13.fst'))
-        self.args.replicon = replicon_path
-        self.args.gembase_path = gembase_path
+        self.args.replicon = extra_replicon_path
+        self.args.gembase_path = gembase_path_dest
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(extra_replicon_path)
         replicon = next(seq_db)
-        replicon.path = replicon_path
-        os.makedirs(cfg.tmp_dir(replicon.id))
+        replicon.path = extra_replicon_path
 
         with self.assertRaises(FileNotFoundError) as ctx:
             with self.catch_log():
-                GembaseDB(replicon, cfg, gembase_path=gembase_path)
+                GembaseDB(replicon, cfg, gembase_path=gembase_path_dest)
         self.assertEqual(str(ctx.exception),
-                         'cannot find lst file matching {} sequence'.format(replicon_path))
+                         f'cannot find lst file matching {extra_replicon_path} sequence')
 
 
     def test_gembase_sniffer(self):
-        file_names = (('ACBA.0917.00019', 'Draft'),
-                      ('ESCO001.C.00001.C001', 'Complet'),
-                      ('ACJO001.0321.00008.P008', 'Complet'))
-        for file_name, gem_type in file_names:
-            lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', file_name + '.lst'))
+        file_names = (
+                      (1, 'ACBA.0917.00019', GembaseType.DRAFT_1),
+                      (1, 'ESCO001.C.00001.C001', GembaseType.COMPLETE_1),
+                      (1, 'ACJO001.0321.00008.P008', GembaseType.COMPLETE_1),
+                      (2, 'VICH001.0523.00090', GembaseType.COMPLETE_2),
+                      (2, 'VIBR.0322.11443', GembaseType.DRAFT_2),
+                      )
+        for gbv, file_name, gem_type in file_names:
+            lst_dir = 'LSTINF' if gbv == 1 else 'LST'
+            lst_path = self.find_data(os.path.join('Gembase', f'Gembase{gbv}', lst_dir, file_name + '.lst'))
             with self.subTest(lst_path=lst_path):
                 type_recieved = GembaseDB.gembase_sniffer(lst_path)
                 self.assertEqual(type_recieved, gem_type)
 
-        lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', 'SAEN001.0321.00753.P003.lst'))
+        lst_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'LSTINF', 'SAEN001.0321.00753.P003.lst'))
         with self.assertRaises(IntegronError) as ctx:
             with self.catch_log():
                 GembaseDB.gembase_sniffer(lst_path)
+        self.maxDiff = None
         self.assertEqual(str(ctx.exception),
-                         f'the genome SAEN001.0321.00753.P003_00001 seems empty: see {lst_path}')
+                         f"The genome SAEN001.0321.00753.P003_00001 seems empty: see {lst_path}")
 
-    def test_gembase_complete_parser(self):
+        lst_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'LSTINF', 'Bad_Fmt.0321.00008.P008.lst'))
+        with self.assertRaises(IntegronError) as ctx:
+            with self.catch_log():
+                GembaseDB.gembase_sniffer(lst_path)
+        self.maxDiff = None
+        self.assertEqual(str(ctx.exception),
+                         f"Cannot detect GemBase version, check lst file '{lst_path}'.")
+
+    def test_gembase1_complete_parser(self):
         replicon_id = 'ESCO001.C.00001.C001'
-        lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', replicon_id + '.lst'))
-        prots_info = GembaseDB.gembase_complete_parser(lst_path, replicon_id)
-        columns = ['start', 'end', 'strand', 'type', 'seq_id', 'valid', 'gene_name', 'description']
+        lst_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'LSTINF', replicon_id + '.lst'))
+        prots_info = GembaseDB.gembase1_complete_parser(lst_path, replicon_id)
+        columns = list(range(8))
         self.assertListEqual(list(prots_info.columns), columns)
         self.assertEqual(prots_info.shape, (4139, len(columns)))
         first_row = [190, 255, 'D', 'CDS', 'ESCO001.C.00001.C001_00001', 'Valid', 'thrL',
@@ -199,12 +220,12 @@ class TestGemBase(IntegronTest):
         self.assertListEqual(last_row, recieved_last_row)
 
 
-    def test_gembase_draft_parser(self):
+    def test_gembase1_draft_parser(self):
         replicon_name = 'ACBA.0917.00019'
         replicon_id = 'ACBA.0917.00019.0001'
-        lst_path = self.find_data(os.path.join('Gembase', 'LSTINF', replicon_name + '.lst'))
-        prots_info = GembaseDB.gembase_draft_parser(lst_path, replicon_id)
-        columns = ['start', 'end', 'strand', 'type', 'seq_id', 'gene_name', 'description']
+        lst_path = self.find_data('Gembase', 'Gembase1', 'LSTINF', replicon_name + '.lst')
+        prots_info = GembaseDB.gembase1_draft_parser(lst_path, replicon_id)
+        columns = list(range(7))
         self.assertListEqual(list(prots_info.columns), columns)
         self.assertEqual(prots_info.shape, (3870, len(columns)))
         first_row = [266, 1480, 'C', 'CDS', 'ACBA.0917.00019.b0001_00001', 'tyrS',
@@ -218,14 +239,137 @@ class TestGemBase(IntegronTest):
         recieved_last_row = prots_info.iloc[len(prots_info) - 1].values.tolist()
         self.assertListEqual(last_row, recieved_last_row)
 
+        # check thet if it's not right format it raise an error
+        replicon_id = 'ESCO001.C.00001.C001'
+        lst_path = self.find_data('Gembase', 'Gembase1', 'LSTINF', f'{replicon_id}.lst')
+        with self.assertRaises(IntegronError) as ctx:
+            with self.catch_log() as log:
+                GembaseDB.gembase1_draft_parser(lst_path, replicon_id)
+                log_msg = log.get_value().strip()
+            self.assertEqual(log_msg,
+                             f"The LST file '{lst_path}' seems not to be in gembase V1 draft format.")
+
+
+        replicon_id = 'SAEN001.0321.00753.P003'
+        lst_path = os.path.join(self.tmp_dir, f'{replicon_id}.fst')
+        open(lst_path, 'w').close()
+        with self.assertRaises(IntegronError) as ctx:
+            with self.catch_log() as log:
+                GembaseDB.gembase1_draft_parser(lst_path, replicon_id)
+                log_msg = log.get_value().strip()
+            self.assertEqual(log_msg,
+                             f" Error while parsing {lst_path} file: No columns to parse from file")
+
+    def test_gembase2_complete_parser(self):
+        replicon_name = 'VICH001.0523.00090'
+        replicon_id = 'VICH001.0523.00090.001C'
+        lst_path = self.find_data('Gembase', 'Gembase2', 'LST', replicon_name + '.lst')
+        prots_info = GembaseDB.gembase2_parser(lst_path, replicon_id)
+        self.assertEqual(prots_info.shape, (2570, 8))
+        first_row = [1, 2961008, 'C', 'CDS', 'VICH001.0523.00090.001C_00001',
+                     'FKV26_RS00005', 'mltC', 'WP_001230176.1',
+                     ]
+        recieved_first_row = prots_info.iloc[0].values.tolist()
+        self.assertListEqual(first_row, recieved_first_row)
+
+        last_row = [2958304, 2959929, 'C', 'CDS', 'VICH001.0523.00090.001C_02700',
+                    'FKV26_RS13450', 'nan', 'WP_000769916.1' ]
+        recieved_last_row = prots_info.iloc[len(prots_info) - 1].values.tolist()
+        self.assertListEqual(last_row, recieved_last_row)
+
+        replicon_id = 'SAEN001.0321.00753.P003'
+        lst_path = os.path.join(self.tmp_dir, f'{replicon_id}.fst')
+        open(lst_path, 'w').close()
+        with self.assertRaises(IntegronError) as ctx:
+            with self.catch_log() as log:
+                GembaseDB.gembase2_parser(lst_path, replicon_id)
+                log_msg = log.get_value().strip()
+            self.assertEqual(log_msg,
+                             f" Error while parsing {lst_path} file: No columns to parse from file")
+
+        replicon_id = 'SAEN001.0321.00753.P003'
+        lst_path = self.find_data('Gembase', 'Gembase1', 'LSTINF', f'{replicon_id}.lst')
+        with self.assertRaises(IntegronError) as ctx:
+            with self.catch_log() as log:
+                GembaseDB.gembase2_parser(lst_path, replicon_id)
+                log_msg = log.get_value().strip()
+            self.assertEqual(log_msg,
+                             f" The LST file '{lst_path}' seems not to be in gembase V2 draft format.")
+
+    def test_gembase2_draft_parser(self):
+        replicon_name = 'VIBR.0322.11443'
+        replicon_id = 'VIBR.0322.11443.0001'
+        lst_path = self.find_data(os.path.join('Gembase', 'Gembase2', 'LST', replicon_name + '.lst'))
+        prots_info = GembaseDB.gembase2_parser(lst_path, replicon_id)
+        self.assertEqual(prots_info.shape, (114, 7))
+        recieved_first_row = prots_info.iloc[0].values.tolist()[:-1]
+        first_row = [2, 655, 'C', 'CDS', 'VIBR.0322.11443.0001b_00001', 'nan']
+        recieved_last_row = prots_info.iloc[-1].values.tolist()[:-1]
+        last_row = [138318, 140534, 'C', 'CDS', 'VIBR.0322.11443.0001b_00114', 'nan']
+        self.assertListEqual(first_row, recieved_first_row)
+        self.assertListEqual(last_row, recieved_last_row)
+
+
+    def test_get_replicon_type(self):
+        expected_types= (
+            ('VIBR.0322.11443.0002', RepliconType.CONTIG),
+            ('VICH001.0523.00090.001C', RepliconType.CHROMOSOME),
+            ('ACBA.0917.00019.0001', RepliconType.CONTIG),
+            ('ACJO001.0321.00008.P008', RepliconType.PLASMID),
+            ('ESCO001.C.00001.C001', RepliconType.CHROMOSOME)
+        )
+
+        for seq_id, exp_typ in expected_types:
+            with self.subTest(seq_id=seq_id):
+                get_typ = GembaseDB.get_replicon_type(seq_id=seq_id)
+                self.assertEqual(get_typ, exp_typ)
+
+        with self.assertRaises(IntegronError) as ctx:
+            seq_id = "foo"
+            with self.catch_log() as log:
+                GembaseDB.get_replicon_type(seq_id=seq_id)
+                log_msg = log.get_value().strip()
+            exp_msg = f"Cannot detect GemBase version, from seq_id: {seq_id}."
+            self.assertEqual(log_msg,
+                             exp_msg
+                             )
+            self.assertEqual(str(ctx.exception),
+                             exp_msg
+                             )
+
+        expected_types =(
+            ('VIBR.0322.11443.0149b_03432', RepliconType.CONTIG),
+            ('VICH001.0523.00090.001C_00024', RepliconType.CHROMOSOME),
+            ('ACBA.0917.00019.i0001_00026', RepliconType.CONTIG),
+            ('ACJO001.0321.00008.P008_00009', RepliconType.PLASMID),
+            ('ESCO001.C.00001.C001_00021', RepliconType.CHROMOSOME)
+        )
+
+        for gene_id, exp_typ in expected_types:
+            with self.subTest(gene_id=gene_id):
+                get_typ = GembaseDB.get_replicon_type(gen_id=gene_id)
+                self.assertEqual(get_typ, exp_typ)
+
+        with self.assertRaises(IntegronError) as ctx:
+            GembaseDB.get_replicon_type()
+            self.assertEqual(str(ctx.exception),
+                             'GembaseDB.get_replicon_type you must provide either a seqid or a gen_id'
+                             )
+
+        with self.assertRaises(IntegronError) as ctx:
+            GembaseDB.get_replicon_type(seq_id='foo', gen_id='bar')
+            self.assertEqual(str(ctx.exception),
+                             'GembaseDB.get_replicon_type you must provide either a seqid or a gen_id'
+                             )
+
 
     def test_make_protfile(self):
         file_name = (('ACBA.0917.00019', '.fna', 3870), ('ESCO001.C.00001.C001', '.fst', 3870))
         for seq_name, ext, seq_nb in file_name:
-            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+            replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = read_multi_prot_fasta(replicon_path)
+            seq_db = read_multi_fasta(replicon_path)
             replicon = next(seq_db)
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
@@ -233,8 +377,8 @@ class TestGemBase(IntegronTest):
             with self.catch_log():
                 db = GembaseDB(replicon, cfg)
             for seq_nb, seqs in enumerate(zip(
-                    read_multi_prot_fasta(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt'))),
-                    read_multi_prot_fasta(db.protfile)), 1):
+                    read_multi_fasta(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt'))),
+                    read_multi_fasta(db.protfile)), 1):
                 expected, test = seqs
                 self.assertEqual(expected.id, test.id)
             self.assertEqual(seq_nb, seq_nb)
@@ -243,10 +387,10 @@ class TestGemBase(IntegronTest):
     def test_protfile(self):
         file_name = (('ACBA.0917.00019', '.fna'), ('ESCO001.C.00001.C001', '.fst'))
         for seq_name, ext in file_name:
-            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+            replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = read_multi_prot_fasta(replicon_path)
+            seq_db = read_multi_fasta(replicon_path)
             replicon = next(seq_db)
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
@@ -259,16 +403,16 @@ class TestGemBase(IntegronTest):
     def test_getitem(self):
         file_name = (('ACBA.0917.00019', '.fna'), ('ESCO001.C.00001.C001', '.fst'))
         for seq_name, ext in file_name:
-            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+            replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = read_multi_prot_fasta(replicon_path)
+            seq_db = read_multi_fasta(replicon_path)
             replicon = next(seq_db)
             os.makedirs(cfg.tmp_dir(replicon.id))
 
             with self.catch_log():
                 db = GembaseDB(replicon, cfg)
-            exp = read_multi_prot_fasta(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')))
+            exp = read_multi_fasta(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')))
 
             specie, date, strain, contig = replicon.id.split('.')
             pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
@@ -289,20 +433,20 @@ class TestGemBase(IntegronTest):
         # test Gembase Draft
         seq_name = 'ACBA.0917.00019'
         ext = '.fna'
-        replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+        replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         with self.catch_log():
             db = GembaseDB(replicon, cfg)
 
         try:
-            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')), 'fasta',
                               alphabet=Seq.IUPAC.extended_protein)
         except AttributeError:
-            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta')
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')), 'fasta')
         specie, date, strain, contig = replicon.id.split('.')
         pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
         self.assertListEqual(sorted([i for i in idx if re.match(pattern, i)]), sorted([i for i in db]))
@@ -310,19 +454,19 @@ class TestGemBase(IntegronTest):
         # test Gembase Complet
         seq_name = 'ESCO001.C.00001.C001'
         ext = '.fst'
-        replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+        replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         with self.catch_log():
             db = GembaseDB(replicon, cfg)
         try:
-            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta',
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')), 'fasta',
                               alphabet=Seq.IUPAC.extended_protein)
         except AttributeError:
-            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Proteins', seq_name + '.prt')), 'fasta')
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')), 'fasta')
 
         specie, date, strain, contig = replicon.id.split('.')
         pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
@@ -337,17 +481,17 @@ class TestGemBase(IntegronTest):
 
 
     def test_get_description(self):
-        # SeqDesc(id, strand, strat, stop)
+        # SeqDesc(id, strand, statt, stop)
         file_name = {('ACBA.0917.00019', '.fna'):
                          {'ACBA.0917.00019.b0001_00001': SeqDesc('ACBA.0917.00019.b0001_00001', -1, 266, 1480),
                           'ACBA.0917.00019.i0001_03957': SeqDesc('ACBA.0917.00019.i0001_03957', -1, 4043755, 4044354)},
                      }
 
         for seq_name, ext in file_name:
-            replicon_path = self.find_data(os.path.join('Gembase', 'Replicons', seq_name + ext))
+            replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = read_multi_prot_fasta(replicon_path)
+            seq_db = read_multi_fasta(replicon_path)
             replicon = next(seq_db)
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
@@ -399,7 +543,7 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -413,7 +557,7 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -431,15 +575,15 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
         for seq_nb, seqs in enumerate(zip(
-                read_multi_prot_fasta(self.find_data(os.path.join('Proteins', prot_name))),
-                read_multi_prot_fasta(db.protfile)), 1):
+                read_multi_fasta(self.find_data(os.path.join('Proteins', prot_name))),
+                read_multi_fasta(db.protfile)), 1):
             expected, test = seqs
             self.assertEqual(expected.id, test.id)
         self.assertEqual(seq_nb, 23)
@@ -451,14 +595,14 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
 
         db = ProdigalDB(replicon, cfg)
         for seq_nb, seqs in enumerate(zip(
-                read_multi_prot_fasta(self.find_data(os.path.join('Proteins', prot_name))),
-                read_multi_prot_fasta(db.protfile)), 1):
+                read_multi_fasta(self.find_data(os.path.join('Proteins', prot_name))),
+                read_multi_fasta(db.protfile)), 1):
             expected, test = seqs
             self.assertEqual(expected.id, test.id)
         self.assertEqual(seq_nb, 23)
@@ -470,7 +614,7 @@ class TestProdigalDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prodigal = self.find_data('fake_prodigal')
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
 
@@ -485,7 +629,7 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -500,13 +644,13 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
-        exp = read_multi_prot_fasta(self.find_data(os.path.join('Proteins', prot_name)))
+        exp = read_multi_fasta(self.find_data(os.path.join('Proteins', prot_name)))
         for prot_expected in exp:
             prot_received = db[prot_expected.id]
             self.assertEqual(prot_received.id,
@@ -528,7 +672,7 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -549,7 +693,7 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -600,7 +744,7 @@ class TestCustomDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prot_file = protein_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -618,7 +762,7 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('df_max_input_1.csv')
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -639,7 +783,7 @@ class TestCustomDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prot_file = protein_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -657,13 +801,13 @@ class TestCustomDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prot_file = protein_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = CustomDB(replicon, cfg, protein_path)
-        exp = read_multi_prot_fasta(self.find_data(os.path.join('Proteins', prot_name)))
+        exp = read_multi_fasta(self.find_data(os.path.join('Proteins', prot_name)))
         for prot_expected in exp:
             prot_received = db[prot_expected.id]
             self.assertEqual(prot_received.id,
@@ -687,7 +831,7 @@ class TestCustomDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prot_file = protein_path
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -712,7 +856,7 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('prodigal_annot_parser.py')
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -734,7 +878,7 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('stupid_annot_parser.py')
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -758,7 +902,7 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('stupid_annot_parser2.py')
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -782,7 +926,7 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('lazy_annot_parser.py')
         cfg = Config(self.args)
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -797,3 +941,50 @@ class TestCustomDB(IntegronTest):
                          f"expected seq_id: str, start: positive int, stop: positive int, strand 1/-1. got: "
                          f"ACBA.007.P01_13_23, 19721, 20254, -1")
 
+
+class TestRepliconType(IntegronTest):
+
+
+    def test_str(self):
+        self.assertEqual(str(RepliconType.CHROMOSOME), 'Chromosome')
+        self.assertEqual(str(RepliconType.OTHER), 'Other')
+
+    def topology(self):
+        topos = (
+            (RepliconType.CHROMOSOME, 'circ'),
+            (RepliconType.PLASMID, 'circ'),
+            (RepliconType.PHAGE, 'circ'),
+            (RepliconType.OTHER, 'circ'),
+            (RepliconType.CONTIG, 'lin'),
+        )
+
+        for r_type, topo in topos:
+            with self.subTest(topology=topo):
+                self.assertEqual(r_type.topology(), topo)
+
+
+class TestGembaseType(IntegronTest):
+
+    def test_str(self):
+        self.assertEqual(str(GembaseType.COMPLETE_2), 'vers: 2 Complete')
+        self.assertEqual(str(GembaseType.DRAFT_1), 'vers: 1 Draft')
+
+    def test_complete(self):
+        for gt in (GembaseType.COMPLETE_2, GembaseType.COMPLETE_1):
+            with self.subTest(gt=str(gt)):
+                self.assertTrue(gt.complete)
+
+        for gt in (GembaseType.DRAFT_1, GembaseType.DRAFT_2):
+            with self.subTest(gt=str(gt)):
+                self.assertFalse(gt.complete)
+
+    def test_version(self):
+
+        for gt , v in (
+                (GembaseType.DRAFT_1, 1),
+                (GembaseType.COMPLETE_1, 1),
+                (GembaseType.DRAFT_2, 2),
+                (GembaseType.COMPLETE_2, 2)
+        ):
+            with self.subTest(gt=str(gt)):
+                self.assertEqual(gt.version, v)
