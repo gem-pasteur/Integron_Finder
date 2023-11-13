@@ -243,7 +243,7 @@ class TestExpand(IntegronTest):
         search_right = True
 
         replicon_path = self.find_data('Replicons', replicon_name + '.fst')
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
 
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -296,7 +296,7 @@ class TestExpand(IntegronTest):
         search_right = True
 
         replicon_path = self.find_data('Replicons', replicon_name + '.fna')
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
 
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -337,7 +337,7 @@ class TestExpand(IntegronTest):
         search_right = False
 
         replicon_path = self.find_data('Replicons', replicon_name + '.fna')
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
 
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -376,7 +376,7 @@ class TestExpand(IntegronTest):
         search_right = False
 
         replicon_path = self.find_data('Replicons', replicon_name + '.fna')
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
 
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -416,7 +416,7 @@ class TestExpand(IntegronTest):
         search_right = True
 
         replicon_path = self.find_data('Replicons', replicon_name + '.fna')
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
 
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -457,7 +457,7 @@ class TestExpand(IntegronTest):
         search_right = True
 
         replicon_path = self.find_data('Replicons', replicon_name + '.fna')
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
 
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
@@ -497,7 +497,7 @@ class TestExpand(IntegronTest):
         search_right = True
 
         replicon_path = self.find_data('Replicons', replicon_name + '.fna')
-        topologies = Topology('lin')
+        topologies = Topology(1, 'lin')
 
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies

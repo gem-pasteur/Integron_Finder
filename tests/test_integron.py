@@ -82,7 +82,7 @@ class TestIntegron(IntegronTest):
     def test_add_integrase(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
+        topologies = Topology(2, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -126,7 +126,7 @@ class TestIntegron(IntegronTest):
     def test_add_attc(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
+        topologies = Topology(2, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -215,7 +215,7 @@ class TestIntegron(IntegronTest):
     def test_add_promoter(self):
         replicon_name = 'saen.040.p01.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
+        topologies = Topology(2, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -304,7 +304,7 @@ class TestIntegron(IntegronTest):
     def test_attI(self):
         replicon_name = 'saen.040.p01.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
+        topologies = Topology(2, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -387,7 +387,7 @@ class TestIntegron(IntegronTest):
     def test_add_proteins(self):
         replicon_name = 'pssu.001.c01.13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
+        topologies = Topology(2, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -442,7 +442,7 @@ class TestIntegron(IntegronTest):
     def test_describe(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
+        topologies = Topology(2, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)

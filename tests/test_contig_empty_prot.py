@@ -45,7 +45,6 @@ except ImportError as err:
     raise ImportError(msg)
 
 from integron_finder import integrase
-from integron_finder import config
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
 
@@ -68,14 +67,14 @@ class TestEmptyProt(IntegronTest):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
         integrase.subprocess.run = self.mute_call(_prodigal_run)
-        self.find_executable_ori = finder.distutils.spawn.find_executable
+        self.which_ori = finder.shutil.which
 
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
             #pass
         integrase.subprocess.run = _prodigal_run
-        finder.distutils.spawn.find_executable = self.find_executable_ori
+        finder.shutil.which = self.which_ori
 
 
     def test_contig_with_empty_prot(self):

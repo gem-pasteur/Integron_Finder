@@ -43,7 +43,7 @@ except ImportError as err:
 from integron_finder.config import Config
 from integron_finder.hmm import read_hmm
 from integron_finder.prot_db import GembaseDB, ProdigalDB
-from integron_finder.utils import read_multi_prot_fasta
+from integron_finder.utils import read_multi_fasta
 
 
 class TestReadHMM(IntegronTest):
@@ -59,10 +59,8 @@ class TestReadHMM(IntegronTest):
 
 
     def test_read_empty(self):
-        """
-        Test that when there are no hits in the hmm result file, it returns an empty
-        dataframe, without error.
-        """
+        # Test that when there are no hits in the hmm result file, it returns an empty
+        # dataframe, without error.
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
@@ -72,7 +70,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_prot_fasta(replicon_path)
+        sequences_db = read_multi_fasta(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -90,9 +88,7 @@ class TestReadHMM(IntegronTest):
 
 
     def test_read_hmm(self):
-        """
-        Test that the hmm hits are well read
-        """
+        # Test that the hmm hits are well read
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
@@ -102,7 +98,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_prot_fasta(replicon_path)
+        sequences_db = read_multi_fasta(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -121,14 +117,12 @@ class TestReadHMM(IntegronTest):
 
 
     def test_read_hmm_gembase(self):
-        """
-        Test that the hmm hits are well read, when the gembase format is used (.prt file is
-        provided, prodigal is not used to find the proteins).
-        """
+        # Test that the hmm hits are well read, when the gembase format is used (.prt file is
+        # provided, prodigal is not used to find the proteins).
         replicon_id = 'ACBA.0917.00019'
         contig_id = 'ACBA.0917.00019.0001'
         result_dir_expected = self.find_data("Results_Integron_Finder_{}.gembase".format(replicon_id))
-        replicon_path = self.find_data('Gembase', 'Replicons', replicon_id + '.fna')
+        replicon_path = self.find_data('Gembase', 'Gembase1', 'Replicons', replicon_id + '.fna')
         prot_file = os.path.join(result_dir_expected, "tmp_{}".format(contig_id), contig_id + '.prt')
         infile = os.path.join(result_dir_expected, "tmp_{}".format(contig_id), "{}_intI.res".format(contig_id))
 
@@ -136,7 +130,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_prot_fasta(replicon_path)
+        sequences_db = read_multi_fasta(replicon_path)
         replicon = next(sequences_db)
         with self.catch_log():
             prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
@@ -158,10 +152,8 @@ class TestReadHMM(IntegronTest):
 
 
     def test_read_hmm_evalue(self):
-        """
-        Test that the hmm hits are well read, and returned only if evalue is < to the
-        given threshold.
-        """
+        # Test that the hmm hits are well read, and returned only if evalue is < to the
+        # given threshold.
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
@@ -171,7 +163,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_prot_fasta(replicon_path)
+        sequences_db = read_multi_fasta(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -200,10 +192,8 @@ class TestReadHMM(IntegronTest):
 
 
     def test_read_hmm_evalue2(self):
-        """
-        Test that the hmm hits are well read, it returns only the hits with evalue < given
-        threshold
-        """
+        # Test that the hmm hits are well read, it returns only the hits with evalue < given
+        # threshold
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
@@ -213,7 +203,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -234,10 +224,8 @@ class TestReadHMM(IntegronTest):
 
 
     def test_read_hmm_cov(self):
-        """
-        Test that the hmm hits are well read, and returned only if coverage is > to the
-        given threshold.
-        """
+        # Test that the hmm hits are well read, and returned only if coverage is > to the
+        # given threshold.
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
@@ -247,7 +235,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_prot_fasta(replicon_path)
+        sequences_db = read_multi_fasta(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -274,10 +262,8 @@ class TestReadHMM(IntegronTest):
 
 
     def test_read_hmm_cov2(self):
-        """
-        Test that the hmm hits are well read, it returns only the hits with coverage >
-        given threshold
-        """
+        # Test that the hmm hits are well read, it returns only the hits with coverage >
+        # given threshold
         rep_name = "acba.007.p01.13"
         replicon_id = 'ACBA.007.P01_13'
 
@@ -287,7 +273,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_prot_fasta(replicon_path)
+        sequences_db = read_multi_fasta(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -308,21 +294,19 @@ class TestReadHMM(IntegronTest):
 
 
     def test_read_multi(self):
-        """
-        Test reading hmm results when there are multiple hits: 2 hits on the same protein: keep
-        only the one with the best evalue. 2 hits on 2 different proteins: keep the 2 proteins.
-        """
+        # Test reading hmm results when there are multiple hits: 2 hits on the same protein: keep
+        # only the one with the best evalue. 2 hits on 2 different proteins: keep the 2 proteins.
         replicon_id = 'ACBA.0917.00019'
         contig_id = 'ACBA.0917.00019.0001'
         result_dir_expected = self.find_data("Results_Integron_Finder_{}.gembase".format(replicon_id))
-        replicon_path = self.find_data('Gembase', 'Replicons', replicon_id + '.fna')
+        replicon_path = self.find_data('Gembase', 'Gembase1', 'Replicons', replicon_id + '.fna')
         prot_file = os.path.join(result_dir_expected, "tmp_{}".format(contig_id), contig_id + '.prt')
 
         self.args.gembase = True
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_prot_fasta(replicon_path)
+        sequences_db = read_multi_fasta(replicon_path)
         replicon = next(sequences_db)
         with self.catch_log():
             prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
@@ -345,9 +329,7 @@ class TestReadHMM(IntegronTest):
 
 
     def test_read_hmm_hit_no_hsp(self):
-        """
-        read hmm but skip hits without any hsp.
-        """
+        # read hmm but skip hits without any hsp.
         rep_name = "NZ_AP023221"
         replicon_id = 'NZ_AP023221.2'
 
@@ -357,7 +339,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        seq_db = read_multi_prot_fasta(replicon_path)
+        seq_db = read_multi_fasta(replicon_path)
         replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
