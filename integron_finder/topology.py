@@ -94,9 +94,9 @@ class Topology:
         :rtype: str 'circ' | 'lin'
         """
         r_type = GembaseDB.get_replicon_type(seq_id=seqid)
-        if r_type in (RepliconType.CHROMOSOME, RepliconType.PLASMID, RepliconType.PHAGE, RepliconType.OTHER):
+        if r_type in (RepliconType.CHROMOSOME, RepliconType.PLASMID):
             topo = 'circ'
-        elif r_type == RepliconType.CONTIG:
+        elif r_type in (RepliconType.CONTIG, RepliconType.PHAGE, RepliconType.OTHER):
             topo = 'lin'
         return topo
 

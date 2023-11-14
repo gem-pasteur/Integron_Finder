@@ -99,16 +99,30 @@ class TestTopology(IntegronTest):
 
 
     def test_getitem_gembase(self):
-        # gembase v2 Complete Chromosome
-        seq_nb = 2
-        cmdline_topo = None
-        topo = Topology(seq_nb, cmdline_topo, gembase=True)
-        self.assertEqual(topo['VICH001.0523.00090.001C'], 'circ')
-        # gembase v1 Complete Plasmid
-        seq_nb = 2
-        cmdline_topo = None
-        topo = Topology(seq_nb, cmdline_topo, gembase=True)
-        self.assertEqual(topo['ACJO001.0321.00008.P008'], 'circ')
+        for seq_nb, typ , topo_exp in (
+                (2, 'C', 'circ'), # gembase v2 Complete Chromosome
+                (2, 'P', 'circ'), # gembase v2 Complete Plasmid
+                (1, 'V', 'lin'),  # gembase v2 Complete Phage
+                (1, 'O', 'lin')   # gembase v2 Complete Other
+        ):
+            seq_id = f'VICH001.0523.00090.001{typ}'
+            with self.subTest(seq_id=seq_id):
+                cmdline_topo = None
+                topo = Topology(seq_nb, cmdline_topo, gembase=True)
+                self.assertEqual(topo[seq_id], topo_exp)
+
+        for seq_nb, typ , topo_exp in (
+                (2, 'C', 'circ'), # gembase v1 Complete Chromosome
+                (2, 'P', 'circ'), # gembase v1 Complete Plasmid
+                (1, 'V', 'lin'),  # gembase v1 Complete Phage
+                (1, 'O', 'lin')   # gembase v1 Complete Other
+        ):
+            seq_id = f'ACJO001.0321.00008.{typ}008'
+            with self.subTest(seq_id=seq_id):
+                cmdline_topo = None
+                topo = Topology(seq_nb, cmdline_topo, gembase=True)
+                self.assertEqual(topo[seq_id], topo_exp)
+
         # gembase V2 Draft
         seq_nb = 2
         topo = Topology(seq_nb, cmdline_topo, gembase=True)
