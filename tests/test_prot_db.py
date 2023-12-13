@@ -118,11 +118,13 @@ class TestGemBase(IntegronTest):
         # test if *find_gembase_file_basename* get the right basename
         # for files in gembase
         file_names = (
-            (1, 'ACBA.0917.00019.fna', 'ACBA.0917.00019'),                    # Draft v1
-            (1, 'ESCO001.C.00001.C001.fst', 'ESCO001.C.00001.C001'),          # Complete v1
-            (2, 'VICH001.0523.00090.fna', 'VICH001.0523.00090'),              # Complete V2
-            (2, 'VIBR.0322.11443.fna', 'VIBR.0322.11443'),                    # Draft V2
-            (1, 'ESCO001.C.00001.C001_chunk_1.fst' , 'ESCO001.C.00001.C001'), # Complete v1 chunk
+            ('1', 'ACBA.0917.00019.fna', 'ACBA.0917.00019'),                    # Draft v1
+            ('1', 'ESCO001.C.00001.C001.fst', 'ESCO001.C.00001.C001'),          # Complete v1
+            ('2', 'VICH001.0523.00090.fna', 'VICH001.0523.00090'),              # Complete V2
+            ('2', 'VIBR.0322.11443.fna', 'VIBR.0322.11443'),                    # Draft V2
+            ('2plus', 'VICH001.0523.00090.fna', 'VICH001.0523.00090'),          # Complete V2plus
+            ('2plus', 'VIBR001.0322.11443.fna', 'VIBR001.0322.11443'),          # Draft V2plus
+            ('1', 'ESCO001.C.00001.C001_chunk_1.fst' , 'ESCO001.C.00001.C001'), # Complete v1 chunk
         )
         for gbv, rep_file_name, basename in file_names:
             gembase_path = self.find_data('Gembase', f'Gembase{gbv}')
@@ -312,9 +314,9 @@ class TestGemBase(IntegronTest):
 
     def test_get_replicon_type(self):
         expected_types= (
-            ('VIBR.0322.11443.0002', RepliconType.CONTIG),
+            ('VIBR.0322.11443.0002', RepliconType.DRAFT),
             ('VICH001.0523.00090.001C', RepliconType.CHROMOSOME),
-            ('ACBA.0917.00019.0001', RepliconType.CONTIG),
+            ('ACBA.0917.00019.0001', RepliconType.DRAFT),
             ('ACJO001.0321.00008.P008', RepliconType.PLASMID),
             ('ESCO001.C.00001.C001', RepliconType.CHROMOSOME)
         )
@@ -338,28 +340,28 @@ class TestGemBase(IntegronTest):
                              )
 
         expected_types =(
-            ('VIBR.0322.11443.0149b_03432', RepliconType.CONTIG),
+            ('VIBR.0322.11443.0149b_03432', RepliconType.DRAFT),
             ('VICH001.0523.00090.001C_00024', RepliconType.CHROMOSOME),
-            ('ACBA.0917.00019.i0001_00026', RepliconType.CONTIG),
+            ('ACBA.0917.00019.i0001_00026', RepliconType.DRAFT),
             ('ACJO001.0321.00008.P008_00009', RepliconType.PLASMID),
             ('ESCO001.C.00001.C001_00021', RepliconType.CHROMOSOME)
         )
 
         for gene_id, exp_typ in expected_types:
             with self.subTest(gene_id=gene_id):
-                get_typ = GembaseDB.get_replicon_type(gen_id=gene_id)
+                get_typ = GembaseDB.get_replicon_type(rep_id=gene_id)
                 self.assertEqual(get_typ, exp_typ)
 
         with self.assertRaises(IntegronError) as ctx:
             GembaseDB.get_replicon_type()
             self.assertEqual(str(ctx.exception),
-                             'GembaseDB.get_replicon_type you must provide either a seqid or a gen_id'
+                             'GembaseDB.get_replicon_type you must provide either a seqid or a rep_id'
                              )
 
         with self.assertRaises(IntegronError) as ctx:
-            GembaseDB.get_replicon_type(seq_id='foo', gen_id='bar')
+            GembaseDB.get_replicon_type(seq_id='foo', rep_id='bar')
             self.assertEqual(str(ctx.exception),
-                             'GembaseDB.get_replicon_type you must provide either a seqid or a gen_id'
+                             'GembaseDB.get_replicon_type you must provide either a seqid or a rep_id'
                              )
 
 
@@ -955,7 +957,7 @@ class TestRepliconType(IntegronTest):
             (RepliconType.PLASMID, 'circ'),
             (RepliconType.PHAGE, 'circ'),
             (RepliconType.OTHER, 'circ'),
-            (RepliconType.CONTIG, 'lin'),
+            (RepliconType.DRAFT, 'lin'),
         )
 
         for r_type, topo in topos:
@@ -968,23 +970,28 @@ class TestGembaseType(IntegronTest):
     def test_str(self):
         self.assertEqual(str(GembaseType.COMPLETE_2), 'vers: 2 Complete')
         self.assertEqual(str(GembaseType.DRAFT_1), 'vers: 1 Draft')
+        self.assertEqual(str(GembaseType.DRAFT_2plus), 'vers: 2plus Draft')
+
 
     def test_complete(self):
-        for gt in (GembaseType.COMPLETE_2, GembaseType.COMPLETE_1):
+        for gt in (GembaseType.COMPLETE_2, GembaseType.COMPLETE_1, GembaseType.COMPLETE_2plus):
             with self.subTest(gt=str(gt)):
                 self.assertTrue(gt.complete)
 
-        for gt in (GembaseType.DRAFT_1, GembaseType.DRAFT_2):
+        for gt in (GembaseType.DRAFT_1, GembaseType.DRAFT_2, GembaseType.DRAFT_2plus):
             with self.subTest(gt=str(gt)):
                 self.assertFalse(gt.complete)
 
     def test_version(self):
 
         for gt , v in (
-                (GembaseType.DRAFT_1, 1),
-                (GembaseType.COMPLETE_1, 1),
-                (GembaseType.DRAFT_2, 2),
-                (GembaseType.COMPLETE_2, 2)
+                (GembaseType.DRAFT_1, '1'),
+                (GembaseType.COMPLETE_1, '1'),
+                (GembaseType.DRAFT_2, '2'),
+                (GembaseType.DRAFT_2, '2'),
+                (GembaseType.COMPLETE_2, '2'),
+                (GembaseType.DRAFT_2plus, '2plus'),
+                (GembaseType.COMPLETE_2plus, '2plus')
         ):
             with self.subTest(gt=str(gt)):
                 self.assertEqual(gt.version, v)
