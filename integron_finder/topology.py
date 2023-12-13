@@ -96,7 +96,7 @@ class Topology:
         r_type = GembaseDB.get_replicon_type(seq_id=seqid)
         if r_type in (RepliconType.CHROMOSOME, RepliconType.PLASMID):
             topo = 'circ'
-        elif r_type in (RepliconType.CONTIG, RepliconType.PHAGE, RepliconType.OTHER):
+        elif r_type in (RepliconType.DRAFT, RepliconType.PHAGE, RepliconType.OTHER):
             topo = 'lin'
         return topo
 

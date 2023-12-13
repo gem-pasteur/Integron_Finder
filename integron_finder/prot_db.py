@@ -137,10 +137,12 @@ class GembaseType(Enum):
     Modelize the Gembase type en version
     """
 
-    COMPLETE_2 = 1
-    DRAFT_2 = 2
-    COMPLETE_1 = 3
-    DRAFT_1 = 4
+    COMPLETE_2plus = 1
+    DRAFT_2plus = 2
+    COMPLETE_2 = 3
+    DRAFT_2 = 4
+    COMPLETE_1 = 5
+    DRAFT_1 = 6
 
     def __str__(self):
         _type, vers = self.name.split('_')
@@ -149,7 +151,7 @@ class GembaseType(Enum):
         return f"vers: {vers} {_type}"
 
     @property
-    def complete(self):
+    def complete(self) -> bool:
         """
 
         :return: True if the GembaseType is Complete genome or False if it's a Draft
@@ -158,12 +160,12 @@ class GembaseType(Enum):
         return self.name.startswith('COMPLETE')
 
     @property
-    def version(self):
+    def version(self) -> str:
         """
         :return: the gembase version
-        :rtype: int
+        :rtype: str
         """
-        return int(self.name[-1])
+        return self.name.split('_')[-1]
 
 
 class RepliconType(Enum):
@@ -175,7 +177,8 @@ class RepliconType(Enum):
     PLASMID = 2
     PHAGE = 3
     OTHER = 4
-    CONTIG = 5
+    DRAFT = 5
+
 
     def __str__(self):
         return self.name.capitalize()
@@ -200,6 +203,8 @@ class GembaseDB(ProteinDB):
     """
 
     _gene_patterns = {
+        GembaseType.COMPLETE_2plus: '(\w+).(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])_(\w+)_(\d{5})',
+        GembaseType.DRAFT_2plus: '(\w+).(\d{4})\.(\d{5})\.(\d{3,4})(?P<g_type>D)_([ib])_(\d{5})',
         GembaseType.COMPLETE_2: '(\w{7})\.(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])_(\d{5})',
         GembaseType.DRAFT_2: '(\w{4})\.(\d{4})\.(\d{5})\.(\d{4})(?P<g_type>[ib])_(\d{5})',
         GembaseType.COMPLETE_1: '(\w{7})\.(\w|\d{4})\.(\d{5})\.(?P<g_type>[CPVO])(\d{3})_(\d{5})',
@@ -207,6 +212,7 @@ class GembaseDB(ProteinDB):
     }
 
     _rep_patterns = [
+        '(\w+)\.(\d{4})\.(\d{5})\.(\d{3,4})(?P<g_type>[CPVOD])',  # Complete + Draft V2_plus
         '(\w{7})\.(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])',  # Complete V2
         '(\w{7})\.(\w|\d{4})\.(\d{5})\.(?P<g_type>[CPVO])(\d{3})',  # Complete V1
         '(\w{4})\.(\d{4})\.(\d{5})\.(\d{4})',  # Draft V1 et V2
@@ -295,8 +301,14 @@ class GembaseDB(ProteinDB):
             prots_info = self.gembase1_draft_parser(lst_path, self.replicon.id)
         elif self.gembase_type == GembaseType.COMPLETE_1:
             prots_info = self.gembase1_complete_parser(lst_path, self.replicon.id)
-        elif self.gembase_type.version == 2:
+        elif self.gembase_type.version == '2':
             prots_info = self.gembase2_parser(lst_path, self.replicon.id)
+        elif self.gembase_type.version == '2plus':
+            prots_info = self.gembase2_parser(lst_path, self.replicon.id)
+        else:
+            msg = f"Unknow gembase format: {self.gembase_type}"
+            _log.critical(msg)
+            raise IntegronError(msg)
         return prots_info
 
 
@@ -403,6 +415,7 @@ class GembaseDB(ProteinDB):
                 _log.critical(msg)
                 raise IntegronError(msg) from None
             else:
+
                 msg = f"Cannot detect GemBase version, check lst file '{lst_path}'."
                 raise IntegronError(msg) from None
         _log.debug(f"GembaseDB sniff GemBase version:{gb_type}")
@@ -414,31 +427,34 @@ class GembaseDB(ProteinDB):
         return self._gembase_type
 
     @classmethod
-    def get_replicon_type(cls, seq_id='', gen_id=''):
+    def get_replicon_type(cls, seq_id='', rep_id=''):
         """
 
         :param seq_id: the sequence id to parse
         :type seq_id: str
+        :param rep_id: the replicon identifier
+        :type rep_id: str
         :return: the kind of genome, it can be either:
 
             * Chromosome
             * Plasmid
             * Phage
             * Other
+            * Draft
 
         :rtype: :class:`RepliconType` object
         """
-        if not any((seq_id, gen_id)):
-            raise IntegronError(f'{cls.__name__}.get_replicon_type you must provide either a seqid or a gen_id')
-        elif all((seq_id, gen_id)):
-            raise IntegronError(f'{cls.__name__}.get_replicon_type you must provide either a seqid or a gen_id')
+        if not any((seq_id, rep_id)):
+            raise IntegronError(f'{cls.__name__}.get_replicon_type you must provide either a seqid or a rep_id')
+        elif all((seq_id, rep_id)):
+            raise IntegronError(f'{cls.__name__}.get_replicon_type you must provide either a seqid or a rep_id')
         guess_gb_type = False
         if seq_id:
             patterns = cls._rep_patterns
             _id = seq_id
-        elif gen_id:
+        elif rep_id:
             patterns = cls._gene_patterns.values()
-            _id = gen_id
+            _id = rep_id
         for pattern in patterns:
             match = re.match(pattern, _id)
             if match:
@@ -452,7 +468,7 @@ class GembaseDB(ProteinDB):
                     genome_type_letter = 'i'
                 break
         if not guess_gb_type:
-            msg = f"Cannot detect GemBase version, from {'seq_id' if seq_id else 'gen_id'}: '{_id}'."
+            msg = f"Cannot detect GemBase version, from {'seq_id' if seq_id else 'rep_id'}: '{_id}'."
             _log.error(msg)
             raise IntegronError(msg) from None
         else:
@@ -461,8 +477,9 @@ class GembaseDB(ProteinDB):
                 'P': RepliconType.PLASMID,
                 'V': RepliconType.PHAGE,
                 'O': RepliconType.OTHER,
-                'i': RepliconType.CONTIG,
-                'b': RepliconType.CONTIG
+                'D': RepliconType.DRAFT, # V2_plus
+                'i': RepliconType.DRAFT, # V2
+                'b': RepliconType.DRAFT  # V2
             }[genome_type_letter]
         return genome_type
 
