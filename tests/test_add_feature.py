@@ -51,7 +51,7 @@ class TestAddFeature(IntegronTest):
         """
         self.replicon_path = self.find_data(os.path.join('Replicons', "acba.007.p01.13.fst"))
         self.replicon_id = 'ACBA.007.P01_13'
-        topologies = Topology('lin')
+        topologies = Topology(1, 'lin')
         with FastaIterator(self.replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             self.seq = next(sequences_db)
@@ -78,10 +78,8 @@ class TestAddFeature(IntegronTest):
 
 
     def test_integron_1elem_prot(self):
-        """
-        Test add_feature when the only element is an integron composed of 1 protein only.
+        # Test add_feature when the only element is an integron composed of 1 protein only.
 
-        """
         infos = {"ID_replicon": self.replicon_id,
                  "ID_integron": "integron_01",
                  "element": "ACBA.007.P01_13_20",
@@ -133,10 +131,8 @@ class TestAddFeature(IntegronTest):
 
 
     def test_integron_1elem_int(self):
-        """
-        Test add_feature when the only element is an integron composed of 1 integrase only.
+        # Test add_feature when the only element is an integron composed of 1 integrase only.
 
-        """
         infos = {"ID_replicon": self.replicon_id,
                  "ID_integron": "integron_01",
                  "element": "ACBA.007.P01_13_1",
@@ -192,10 +188,7 @@ class TestAddFeature(IntegronTest):
 
 
     def test_integron_1elem_prom(self):
-        """
-        Test add_feature when the only element is an integron composed of 1 promoter only.
-
-        """
+        # Test add_feature when the only element is an integron composed of 1 promoter only.
         infos = {"ID_replicon": self.replicon_id,
                  "ID_integron": "integron_01",
                  "element": "Pc_int1",
@@ -240,11 +233,9 @@ class TestAddFeature(IntegronTest):
 
 
     def test_integron_nelem(self):
-        """
-        Test add_feature when there are several elements in the integron:
-        protein, integrase, promotor, attC
+        # Test add_feature when there are several elements in the integron:
+        # protein, integrase, promotor, attC
 
-        """
         # Integron is composed of: 1 promoter, 1 integrase, 1protein, 1attC
         # promoter and integrase are at the begining of the genome
         # others are at the end
@@ -378,12 +369,11 @@ class TestAddFeature(IntegronTest):
 
 
     def test_integron_2int_nelem(self):
-        """
-        Test add_feature when there are 2 integrons:
-            integron 1 with several elements: protein, integrase, promoter
-            integron 2 with only 1 attC site
-        Integrons are not over the edge of sequence
-        """
+        # Test add_feature when there are 2 integrons:
+        #     integron 1 with several elements: protein, integrase, promoter
+        #     integron 2 with only 1 attC site
+        # Integrons are not over the edge of sequence
+
         # integron 1
         int_id = "integron_01"
         int_type = "complete"
@@ -521,10 +511,8 @@ class TestAddFeature(IntegronTest):
 
 
     def test_integron_long_seqname(self):
-        """
-        Test add_feature when the only element is an integron composed of 1 protein only.
+        # Test add_feature when the only element is an integron composed of 1 protein only.
 
-        """
         infos = {"ID_replicon": self.replicon_id,
                  "ID_integron": "integron_01",
                  "element": "ACBA.007.P01_13_20",

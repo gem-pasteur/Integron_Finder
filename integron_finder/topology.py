@@ -26,20 +26,23 @@
 # If not, see <http://www.gnu.org/licenses/>.                                      #
 ####################################################################################
 
-from collections import defaultdict
+
+from .prot_db import GembaseDB, RepliconType
 
 
 class Topology:
     """Class to parse and handle replicons topologies"""
 
-    def __init__(self, default, topology_file=None):
+    def __init__(self, seq_nb, cmd_topo, gembase=False, topology_file=None):
         """
 
         :param str default: the default topology
         :param topology_file: the path to the file where topology for replicon are specified
         """
-        self._default = self._parse_topology(default)
-        self._topology = defaultdict(lambda: self._default)
+        self._seq_nb_in_file = seq_nb
+        self._cmd_line_opt = self._parse_topology(cmd_topo) if cmd_topo else cmd_topo
+        self._gembase = gembase
+        self._topology_file = dict()
         if topology_file:
             self._parse(topology_file)
 
@@ -79,7 +82,23 @@ class Topology:
                 if entry.startswith('#'):
                     continue
                 seq_id, topology = entry.split()
-                self._topology[seq_id] = self._parse_topology(topology)
+                self._topology_file[seq_id] = self._parse_topology(topology)
+
+
+    def _gembase_replicon_default_topo(self, seqid):
+        """
+
+        :param seqid: the id of the replicon
+        :type seqid: str
+        :return: The default topology corresponding to the repliocon seqid in gembase format.
+        :rtype: str 'circ' | 'lin'
+        """
+        r_type = GembaseDB.get_replicon_type(seq_id=seqid)
+        if r_type in (RepliconType.CHROMOSOME, RepliconType.PLASMID):
+            topo = 'circ'
+        elif r_type in (RepliconType.DRAFT, RepliconType.PHAGE, RepliconType.OTHER):
+            topo = 'lin'
+        return topo
 
 
     def __getitem__(self, replicon_id):
@@ -87,4 +106,11 @@ class Topology:
         :param str replicon_id: The id of the replicon.
         :returns: the topology for the replicon corresponding to the replicon_id
         """
-        return self._topology[replicon_id]
+        topo = 'circ' if self._seq_nb_in_file == 1 else 'lin'
+        if self._gembase:
+            topo = self._gembase_replicon_default_topo(replicon_id)
+        if self._cmd_line_opt:
+            topo = self._cmd_line_opt
+        if replicon_id in self._topology_file:
+            topo = self._topology_file[replicon_id]
+        return topo

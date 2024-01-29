@@ -34,7 +34,6 @@ integron_finder is a program that looks for integron in DNA sequences.
 import os
 import sys
 import argparse
-import distutils.spawn
 import shutil
 
 import pandas as pd
@@ -103,17 +102,17 @@ def parse_args(args):
                         action="store_true")
 
     parser.add_argument('--cmsearch',
-                        default=distutils.spawn.find_executable("cmsearch"),
+                        default=shutil.which("cmsearch"),
                         type=argparse_utils.path,
                         help='Complete path to cmsearch if not in PATH. eg: /usr/local/bin/cmsearch')
 
     parser.add_argument('--hmmsearch',
-                        default=distutils.spawn.find_executable("hmmsearch"),
+                        default=shutil.which("hmmsearch"),
                         type=argparse_utils.path,
                         help='Complete path to hmmsearch if not in PATH. eg: /usr/local/bin/hmmsearch')
 
     parser.add_argument('--prodigal',
-                        default=distutils.spawn.find_executable("prodigal"),
+                        default=shutil.which("prodigal"),
                         type=argparse_utils.path,
                         help='Complete path to prodigal if not in PATH. eg: /usr/local/bin/prodigal')
 
@@ -515,7 +514,8 @@ def main(args=None, loglevel=None):
     """
     main entry point to integron_finder
 
-    :param str args: the arguments passed on the command line
+    :param args: the arguments passed on the command line
+    :type args: list of str
     :param loglevel: the output verbosity
     :type loglevel: a positive int or a string among 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
     """
@@ -530,7 +530,6 @@ def main(args=None, loglevel=None):
 
     # need to create directory before to init logger
     # as we write log in integron_finder.out in this dir
-
     if not os.path.exists(config.outdir):
         os.mkdir(config.outdir)
     else:
@@ -619,13 +618,17 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         ################
         # set topology #
         ################
-        default_topology = 'circ' if len(sequences_db) == 1 else 'lin'
-        if config.linear:
-            default_topology = 'lin'
-        elif config.circular:
-            default_topology = 'circ'
+
+
         # the both options are mutually exclusive
-        topologies = Topology(default_topology, topology_file=config.topology_file)
+        cmd_topo = None
+        if config.linear:
+            cmd_topo = 'lin'
+        elif config.circular:
+            cmd_topo = 'circ'
+        topologies = Topology(len(sequences_db), cmd_topo,
+                              gembase=config.gembase,
+                              topology_file=config.topology_file)
 
         # allow sequences_db to inject topology information
         # in seq.topology attribute

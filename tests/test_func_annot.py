@@ -76,7 +76,7 @@ class TestFuncAnnot(IntegronTest):
         """
         replicon_name = "acba.007.p01.13"
         self.replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
+        topologies = Topology(1, 'lin')
         with FastaIterator(self.replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             self.replicon = next(sequences_db)

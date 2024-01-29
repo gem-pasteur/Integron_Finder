@@ -109,7 +109,7 @@ class TestFindIntegons(IntegronTest):
         prot_name = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         prot_file = self.find_data(os.path.join('Proteins', prot_name + '.prt'))
-        topologies = Topology('lin')
+        topologies = Topology(1, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -176,7 +176,7 @@ class TestFindIntegons(IntegronTest):
         replicon_name = 'ESCO001.B.00018.P002'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         prot_file = self.find_data(os.path.join('Proteins', replicon_name + '.prt'))
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -207,7 +207,7 @@ class TestFindIntegons(IntegronTest):
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
-        with self.catch_log() as log:
+        with self.catch_log():
             integrons = find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=attc_file)
 
         self.assertEqual(len(integrons), 2)
@@ -216,7 +216,7 @@ class TestFindIntegons(IntegronTest):
         cfg = Config(args)
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
-        with self.catch_log() as log:
+        with self.catch_log():
             integrons = find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=attc_file)
         self.assertEqual(len(integrons), 1)
 
@@ -226,7 +226,7 @@ class TestFindIntegons(IntegronTest):
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
-        topologies = Topology('lin')
+        topologies = Topology(1, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -312,7 +312,7 @@ class TestFindIntegons(IntegronTest):
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -403,7 +403,7 @@ class TestFindIntegons(IntegronTest):
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
-        topologies = Topology('lin')
+        topologies = Topology(1, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -504,7 +504,7 @@ class TestFindIntegons(IntegronTest):
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         prot_file = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
@@ -596,7 +596,7 @@ class TestFindIntegons(IntegronTest):
         replicon_id = 'OBAL001.B.00005.C001'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
         prot_file = self.find_data(os.path.join('Proteins', replicon_name + '.prt'))
-        topologies = Topology('lin')
+        topologies = Topology(1, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)

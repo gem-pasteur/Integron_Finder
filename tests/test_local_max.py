@@ -31,6 +31,8 @@ import tempfile
 import shutil
 import re
 from collections import namedtuple
+from shutil import which
+
 
 import pandas as pd
 import pandas.testing as pdt
@@ -46,9 +48,6 @@ from integron_finder.topology import Topology
 from integron_finder import infernal
 
 _read_infernal_ori = infernal.read_infernal
-
-from tests import which
-
 
 
 def read_infernal_mock(tmp_dir):
@@ -102,7 +101,7 @@ class TestLocalMax(IntegronTest):
         self.cpu = 1
         replicon_name = 'lian.001.c02.10'
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('lin')
+        topologies = Topology(1, 'lin')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             self.replicon = next(sequences_db)

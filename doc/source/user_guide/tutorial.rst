@@ -50,6 +50,12 @@ files instead of re-annotating genes with *Prodigal*.
 This feature enables the user to use *Integron_Finder* with its own annotations.
 The *gembase* format is the typical result of *PanACoTA's*
 `annotation step <https://aperrin.pages.pasteur.fr/pipeline_annotation/html-doc/examples.html#annotate-step>`_
+
+`Integron_Finder` support gembase format v1 and v2
+
+Gembase v1
+''''''''''
+
 It must contain, at least, a *LSTINF* and a Protein file per replicon.
 Folder structure must have the following architecture.
 
@@ -116,15 +122,121 @@ Hence if you want to analyze a replicon located in a *gembase*, the command line
 
     integron_finder --gembase  data/Replicons/ACBA.0917.00019.fna
 
+Gembase v2
+''''''''''
+
+In V2 format, there is one file per genome. If there are several chromosomes or chromosomes plus plasmids, phages, ...
+all the sequences are in the same file.
+
+Example of Gembase v2 architecture:
+
+.. code-block:: text
+
+    Gembase_v2_extraction/
+        ├── Genes
+        │   ├── VICH001.0523.00090.gen
+        │   ├── VICH001.0523.00091.gen
+        │   ├── ...
+        ├── LST
+        │   ├── VICH001.0523.00090.lst
+        │   ├── VICH001.0523.00091.lst
+        │   ├── ...
+        ├── Microbial0523-genomes.info
+        ├── Microbial0523-replicons.info
+        ├── Proteins
+        │   ├── VICH001.0523.00090.prt
+        │   ├── VICH001.0523.00091.prt
+        │   ├── ...
+        ├── RNA
+        │   ├── VICH001.0523.00090.rna
+        │   ├── VICH001.0523.00091.rna
+        │   ├── ...
+        ├── Replicons
+        │   ├── VICH001.0523.00090.fna
+        │   ├── VICH001.0523.00091.fna
+        │   ├── ...
+        └── gff
+            ├── VICH001.0523.00090.gff3
+            ├── VICH001.0523.00091.gff3
+            ├── ...
+
+
+5 first sequences headers in gembase/Genes/VICH001.0523.00090.gen file
+
+.. code-block:: text
+
+    >VICH001.0523.00090.001C_00001  C       ATG     TAA     1       2961008 1128    mltC    FKV26_RS00005   WP_001230176.1  membrane-bound_lytic_murein_transglycosylase_MltC
+    ATGAGAAAGTTAGTGTTATGTATCACCGCTCTATTATTGAGTGGCTGTAGTCGTGAATTTATCGAGAAAATTTACGATGTTGATTACGAGCCCACTAACCGTTTCGCCAAGAACTTAGCCGAATTACCCGGACAGTTTCAGAAAGACACCGCCGCACTGGATGCATTAATCAACAGCTTCTCCGGCAATATCGAAAAACGTTGGGGGCGCCGCGAGCTA
+    >VICH001.0523.00090.001C_00002  C       ATG     TAG     913     1185    273     NA      FKV26_RS00010   WP_000124739.1  oxidative_damage_protection_protein
+    ATGGCTCGCACCGTATTTTGTACCCGATTGCAGAAAGAAGCCGATGGCTTGGATTTCCAACTCTATCCCGGAGAACTGGGCAAACGCATTTTCGACAACATCTGCAAAGAAGCTTGGGCACAATGGCAGACCAAACAGACCATGCTGATCAATGAAAAAAAACTCAACATGATGGATCCTGAGCACCGCAAATTGCTGGAGCAAGAAATGGTGAGCTTC
+    >VICH001.0523.00090.001C_00003  C       GTG     TAA     1199    2260    1062    mutY    FKV26_RS00015   WP_001995048.1  A/G-specific_adenine_glycosylase
+    ...
+
+
+*VICH001.0523.00090* contains 2 chromosomes 001C and 002C
+
+5 first lines of chromosome 1 and 2 in gembase/LST/VICH001.0523.00090.lst
+
+.. code-block:: text
+
+    1	2961008	C	CDS	VICH001.0523.00090.001C_00001	FKV26_RS00005	mltC	WP_001230176.1	membrane-bound_lytic_murein_transglycosylase_MltC	4.2.2.-	COORDINATES:_similar_to_AA_sequence:RefSeq:WP_001230183.1	GO:0008933_-_lytic_transglycosylase_activity_[Evidence_IEA]	Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+    913	1185	C	CDS	VICH001.0523.00090.001C_00002	FKV26_RS00010	NA	WP_000124739.1	oxidative_damage_protection_protein	NA	COORDINATES:_similar_to_AA_sequence:RefSeq:WP_005482430.1	GO:0005506_-_iron_ion_binding_[Evidence_IEA]	Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+    1199	2260	C	CDS	VICH001.0523.00090.001C_00003	FKV26_RS00015	mutY	WP_001995048.1	A/G-specific_adenine_glycosylase	3.2.2.31	COORDINATES:_similar_to_AA_sequence:RefSeq:WP_014505785.1	GO:0019104_-_DNA_N-glycosylase_activity_[Evidence_IEA]	Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+    2500	3219	D	CDS	VICH001.0523.00090.001C_00004	FKV26_RS00020	trmB	WP_000005581.1	tRNA_(guanosine(46)-N7)-methyltransferase_TrmB	2.1.1.33	COORDINATES:_similar_to_AA_sequence:RefSeq:WP_001898008.1	GO:0008176_-_tRNA_(guanine-N7-)-methyltransferase_activity_[Evidence_IEA]	Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+    3330	4250	D	CDS VICH001.0523.00090.001C_00005	FKV26_RS00025	glsB	WP_000805054.1	glutaminase_B	3.5.1.2	COORDINATES:_similar_to_AA_sequence:RefSeq:WP_002046360.1	GO:0004359_-_glutaminase_activity_[Evidence_IEA]	Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+    ...
+    15      1373    D       CDS     VICH001.0523.00090.002C_02705   FKV26_RS13475   glpT    WP_000462380.1  glycerol-3-phosphate_transporter        NA      COORDINATES:_similar_to_AA_sequence:RefSeq:WP_019829515.1       GO:0015169_-_glycerol-3-phosphate_transmembrane_transporter_activity_[Evidence_IEA]     Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+    1527    2594    D       CDS     VICH001.0523.00090.002C_02706   FKV26_RS13480   glpQ    WP_000917229.1  glycerophosphodiester_phosphodiesterase 3.1.4.46        COORDINATES:_similar_to_AA_sequence:RefSeq:WP_005524061.1       GO:0008081_-_phosphoric_diester_hydrolase_activity_[Evidence_IEA]       Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+    2647    3327    C       CDS     VICH001.0523.00090.002C_02707   FKV26_RS13485   NA      WP_001177500.1  Crp/Fnr_family_transcriptional_regulator        NA      COORDINATES:_similar_to_AA_sequence:RefSeq:WP_001887744.1       NA      Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+    3467    4198    C       CDS     VICH001.0523.00090.002C_02708   FKV26_RS13490   NA      WP_000027384.1  nucleoside_phosphorylase        NA      COORDINATES:_similar_to_AA_sequence:RefSeq:WP_001897923.1       NA      Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+    4195    4920    C       CDS     VICH001.0523.00090.002C_02709   FKV26_RS13495   pnuC    WP_001995272.1  nicotinamide_riboside_transporter_PnuC  NA      COORDINATES:_similar_to_AA_sequence:RefSeq:WP_001933049.1       GO:0015663_-_nicotinamide_mononucleotide_transmembrane_transporter_activity_[Evidence_IEA]      Derived_by_automated_computational_analysis_using_gene_prediction_method:_Protein_Homology.
+
+
+
+
+5 sequences of chromosome 1 and 2 in gembase/Proteins/VICH001.0523.00090.prt
+
+.. code-block:: text
+
+    >VICH001.0523.00090.001C_00001  C       ATG     TAA     1       2961008 375     mltC    FKV26_RS00005   WP_001230176.1  membrane-bound_lytic_murein_transglycosylase_MltC
+    MRKLVLCITALLLSGCSREFIEKIYDVDYEPTNRFAKNLAELPGQFQKDTAALDALINSFSGNIEKRWGRRELKIAGKNNYVKYIDNYLSRSEVNFTEGRIIVETVSPIDPKAHLRNAIITTLLTPDDPAHVDLFSSKDIELKGQPFLYQQVLDQDGQPIQWSWRANRYADY
+    >VICH001.0523.00090.001C_00002  C       ATG     TAG     913     1185    90      NA      FKV26_RS00010   WP_000124739.1  oxidative_damage_protection_protein
+    MARTVFCTRLQKEADGLDFQLYPGELGKRIFDNICKEAWAQWQTKQTMLINEKKLNMMDPEHRKLLEQEMVSFLFEGKEVHIEGYTPPAK
+    ...
+    >VICH001.0523.00090.002C_02705  D       ATG     TAA     15      1373    452     glpT    FKV26_RS13475   WP_000462380.1  glycerol-3-phosphate_transporter
+    MFELFKPTAHTQRLPSDKVDSVYSRLRWQLFIGIFVGYAGYYLVRKNFSLAMPYLIEQGFSRGDLGVALGAVSIAYGLSKFLMGNVSDRSNPRYFLSAGLLLSALVMFCFGFMPWATGSITAMFILLFLNGWFQGMGWPACGRTMVHWWSRKER
+    >VICH001.0523.00090.002C_02706  D       ATG     TAA     1527    2594    355     glpQ    FKV26_RS13480   WP_000917229.1  glycerophosphodiester_phosphodiesterase
+    MLKPFSLSLLALACSTSLFSSIVSAEPIVIAHRGASGYLPEHTLEAKTLAYAMKPDYIEQDVVMTKDDQLVVLHDHYLDRVTDVAERFPNRARADGRYYAIDFTLAEIKTLRVTEGFNIDDQGKKVAGFPDRFPIWKGDFTVPTLAEEIELIQGLNKTLG
+
+
+**all** sequences headers in gembase/Replicons/VICH001.0523.00090.fna
+
+.. code-block:: text
+
+    >VICH001.0523.00090.001C        2023-05-16      2961008 bp      Vibrio cholerae O1 strain AAS91 chromosome 1, complete sequence
+    >VICH001.0523.00090.002C        2023-05-16      1124701 bp      Vibrio cholerae O1 strain AAS91 chromosome 2, complete sequence
+
+
+
+Integron_finder will use *LST* (or *LSTINF(O)* for Gembase v1) and *Proteins* folders.
+Hence if you want to analyze a replicon located in a *gembase*, the command line should look like
+
+.. code-block:: shell
+
+    integron_finder --gembase  data/My_base/Replicons/ACBA.0917.00019.fna
+
 
 .. note::
 
     If the replicon you want to analyze is not in the gembase directory, but you still want to take advantage of the
     *gembase* annotation, then you have to specify the *--gembase-path* option to indicate where to find it.
-    A typical command line could be:
+    A typical command line could be: ::
 
         integron_finder --gembase --gembase-path data/gembase/  My_replicons/ACBA.0917.00019.fna
 
+.. note::
+
+    The gembase format implies different default topology (`Topology`_)
 
 Custom protein file
 -------------------
@@ -270,16 +382,36 @@ For each tmp file, there are:
 - ``integron_max.pickle``: pickle file so ``integron_finder`` reuse this instead of re-running the local_max part
 
 
+
 Topology
 --------
+
+For regular sequence file format
+"""""""""""""""""""""""""""""""""
 
 By default, IntegronFinder assumes that
 
     * your replicon is considered as **circular** if there is **only one replicon** in the input file.
     * your replicons are considered as **linear** if there are **several replicons** in the input file.
 
+
+For sequence in GemBase format
+""""""""""""""""""""""""""""""
+
+By default, IntegronFinder assumes that
+
+    * Your replicon is considered as **circular** if it's a **Complete** Relicon
+      and it's a **Chromosome** or **Plasmid**.
+      Even there are several replicons in the same file.
+    * If your replicons are a **Phage**, **Other** or a **Draft**.
+      They will be considered by default as **linear**.
+
+
+Whatever The sequence format
+""""""""""""""""""""""""""""
+
 However, you can change this default behavior and specify the default topology with options
-``--circ`` or ``--lin``::
+``--circ`` or ``--lin`` on the command line::
 
     integron_finder --lin mylinearsequence.fst
     integron_finder --circ mycircularsequence.fst
@@ -310,6 +442,7 @@ The replicons specified in topofile supersede the default topology.
     (where ``dt`` is the distance threshold, so 4kb by default), the replicon is considered linear
     to avoid clustering problem.
     The topology used to searching integron is report in the *\*.integrons file*
+
 
 
 For big data people

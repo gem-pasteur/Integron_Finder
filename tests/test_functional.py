@@ -73,7 +73,7 @@ class TestFunctional(IntegronTest):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
         integrase.subprocess.run = self.mute_call(_prodigal_run)
-        self.find_executable_ori = finder.distutils.spawn.find_executable
+        self.which_ori = shutil.which
         self._prefix_data = pkg_resources.resource_filename('integron_finder', "data")
         self.func_annot_dir = os.path.join(self._prefix_data, "Functional_annotation")
 
@@ -81,20 +81,20 @@ class TestFunctional(IntegronTest):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
         integrase.subprocess.run = _prodigal_run
-        finder.distutils.spawn.find_executable = self.find_executable_ori
+        shutil.which = self.which_ori
 
-
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_simple_linear(self):
         replicon_filename = 'acba.007.p01.13'
         output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
-        command = "integron_finder --outdir {out_dir} --linear {replicon}".format(out_dir=self.out_dir,
-                                                                                  replicon=self.find_data(
-                                                                                      os.path.join('Replicons',
-                                                                                         replicon_filename + '.fst'
-                                                                                         )
-                                                                                       )
-                                                                                  )
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--linear " \
+                  "--cpu 4 " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
 
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
@@ -113,13 +113,17 @@ class TestFunctional(IntegronTest):
         test_summary = pd.read_csv(test_summary_path, sep="\t", comment="#")
         pdt.assert_frame_equal(exp_summary, test_summary)
 
-
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_custom_parser(self):
         replicon_filename = 'acba.007.p01.13'
         prot_name = 'ACBA.007.P01_13.prt'
         output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
-        command = f"integron_finder --outdir {self.out_dir} --linear " \
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  f"--linear " \
                   f"--prot-file {self.find_data('Proteins', prot_name)} " \
                   f"--annot-parser {self.find_data('prodigal_annot_parser.py')} " \
                   f"{self.find_data('Replicons', replicon_filename + '.fst')}"
@@ -141,12 +145,16 @@ class TestFunctional(IntegronTest):
         test_summary = pd.read_csv(test_summary_path, sep="\t", comment="#")
         pdt.assert_frame_equal(exp_summary, test_summary)
 
+
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_custom_parser_no_parser(self):
         replicon_filename = 'acba.007.p01.13'
         prot_name = 'ACBA.007.P01_13.prt'
-        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
-        test_result_dir = os.path.join(self.out_dir, output_filename)
-        command = f"integron_finder --outdir {self.out_dir} --linear " \
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  f"--linear " \
                   f"--prot-file {self.find_data('Proteins', prot_name)} " \
                   f"{self.find_data('Replicons', replicon_filename + '.fst')}"
 
@@ -158,13 +166,17 @@ class TestFunctional(IntegronTest):
                          "you have to provide also the parser (--annot-parser)"
                          )
 
+
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_custom_parser_no_protfile(self):
         replicon_filename = 'acba.007.p01.13'
-        prot_name = 'ACBA.007.P01_13.prt'
-        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
-        test_result_dir = os.path.join(self.out_dir, output_filename)
-        command = f"integron_finder --outdir {self.out_dir} --linear " \
+        command = f"integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                   "--linear " \
                   f"--annot-parser {self.find_data('prodigal_annot_parser.py')} " \
+                   "--cpu 4 " \
                   f"{self.find_data('Replicons', replicon_filename + '.fst')}"
 
         with self.catch_io(out=True, err=True):
@@ -176,41 +188,38 @@ class TestFunctional(IntegronTest):
                          )
 
 
-
+    @unittest.skipIf( not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_sequential_eq_isolate(self):
-        """
-        test if we find the same results if we run IF in sequential as isolated on each seq
-        ACBA.0917.00019 contains 2 contigs 0001 and 0002.
-        0002 does not contains integrons
-
-        .integrons file should be identical
-        .summary file should contains the 001 contig and 0 calin, 0 complete and 0 in0
-        :return:
-        """
+        # test if we find the same results if we run IF in sequential as isolated on each seq
+        # ACBA.0917.00019 contains 2 contigs 0001 and 0002.
+        # 0002 does not contain integrons
+        #
+        # .integrons file should be identical
+        # .summary file should contain the 001 contig and 0 calin, 0 complete and 0 in0
         seq_replicon_filename = 'ACBA.0917.00019'
         seq_output_dir = f'Results_Integron_Finder_{seq_replicon_filename}'
         seq_test_result_dir = os.path.join(self.out_dir, seq_output_dir)
-        seq_cmd = "integron_finder --outdir {out_dir} " \
-                  "--keep-tmp {replicon}".format(out_dir=self.out_dir,
-                                                 replicon=self.find_data(
-                                                          os.path.join('Gembase',
-                                                                       'Replicons',
-                                                                       seq_replicon_filename + '.fna')
-                                                          )
-                                                 )
+        seq_cmd = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--keep-tmp " \
+                  "--cpu 4 " \
+                  f"{self.find_data('Replicons', seq_replicon_filename + '.fna')}"
+
         with self.catch_io(out=True, err=True):
             main(seq_cmd.split()[1:], loglevel='WARNING')
 
         contig_name = 'ACBA.0917.00019.0001'
         iso_output_dir = 'Results_Integron_Finder_{}'.format(contig_name)
         iso_test_result_dir = os.path.join(self.out_dir, iso_output_dir)
-        iso_cmd = "integron_finder --outdir {out_dir} " \
-                  "--keep-tmp --lin {replicon}".format(out_dir=self.out_dir,
-                                                 replicon=self.find_data(
-                                                          os.path.join('Replicons',
-                                                                        contig_name + '.fst')
-                                                          )
-                                                 )
+        iso_cmd = "integron_finder " \
+                 f"--outdir {self.out_dir} " \
+                  "--keep-tmp " \
+                  "--lin " \
+                  "--cpu 4 " \
+                  f"{self.find_data('Replicons', contig_name + '.fst')}"
+
         with self.catch_io(out=True, err=True):
             main(iso_cmd.split()[1:], loglevel='WARNING')
 
@@ -234,89 +243,20 @@ class TestFunctional(IntegronTest):
         pdt.assert_frame_equal(summary_2nd_contig, iso_summary)
 
 
-    def test_acba_simple_gembase(self):
-        """
-        ACBA.0917.00019 contains 2 contigs 0001 and 0002.
-        0002 does not contains integrons
-        """
-        replicon_filename = 'ACBA.0917.00019'
-        contig_id = 'ACBA.0917.00019.0001'
-        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
-        test_result_dir = os.path.join(self.out_dir, output_filename)
-        command = "integron_finder --outdir {out_dir} --keep-tmp " \
-                  "--promoter-attI --gembase {replicon}".format(out_dir=self.out_dir,
-                                                                replicon=self.find_data(
-                                                                   os.path.join('Gembase',
-                                                                                'Replicons',
-                                                                                replicon_filename + '.fna')
-                                                                )
-                                                                )
-        with self.catch_io(out=True, err=True):
-            main(command.split()[1:], loglevel='WARNING')
-
-        output_filename = '{}.integrons'.format(replicon_filename)
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.gembase'.format(replicon_filename),
-                                                           output_filename))
-        test_result_path = os.path.join(test_result_dir, output_filename)
-        self.assertIntegronResultEqual(expected_result_path, test_result_path)
-
-        summary_file_name = '{}.summary'.format(replicon_filename)
-        exp_summary_path = self.find_data(
-            os.path.join('Results_Integron_Finder_{}.gembase'.format(replicon_filename), summary_file_name))
-        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
-        test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
-        pdt.assert_frame_equal(exp_summary, test_summary)
-
-
-    def test_acba_simple_no_gbk_no_pdf(self):
-        replicon_filename = 'acba.007.p01.13'
-        replicon_id = 'ACBA.007.P01_13'
-        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
-        test_result_dir = os.path.join(self.out_dir, output_filename)
-        command = "integron_finder --outdir {out_dir} --promoter-attI {replicon}".format(out_dir=self.out_dir,
-                                                                         replicon=self.find_data(
-                                                                             os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_filename))
-                                                                         )
-                                                                         )
-
-        with self.catch_io(out=True, err=True):
-            main(command.split()[1:], loglevel='WARNING')
-
-        output_filename = '{}.integrons'.format(replicon_filename)
-        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
-                                                           output_filename))
-        test_result_path = os.path.join(test_result_dir, output_filename)
-        self.assertIntegronResultEqual(expected_result_path, test_result_path)
-
-        summary_file_name = '{}.summary'.format(replicon_filename)
-        exp_summary_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13', summary_file_name))
-        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
-        test_summary_path = os.path.join(test_result_dir, summary_file_name)
-        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
-        pdt.assert_frame_equal(exp_summary, test_summary)
-
-        gbk = '{}.gbk'.format(replicon_filename)
-        gbk_test = os.path.join(test_result_dir, gbk)
-        self.assertFalse(os.path.exists(gbk_test))
-
-        pdf = '{}_1.pdf'.format(replicon_filename)
-        pdf_test = os.path.join(test_result_dir, pdf)
-        self.assertFalse(os.path.exists(pdf_test))
-
-
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_simple_with_gbk(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
         output_dirname = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_dirname)
-        command = "integron_finder --outdir {out_dir} --gbk --promoter-attI {replicon}".format(out_dir=self.out_dir,
-                                                                               replicon=self.find_data(
-                                                                                   os.path.join('Replicons',
-                                                                                                '{}.fst'.format(replicon_filename))
-                                                                                )
-                                                                               )
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--gbk " \
+                  "--promoter-attI " \
+                  "--cpu 4 " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
 
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
@@ -333,15 +273,18 @@ class TestFunctional(IntegronTest):
         test_result_path = os.path.join(test_result_dir, output_filename)
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
+
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_simple_with_gbk_without_promoter(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
-        command = "integron_finder --outdir {out_dir} --gbk {replicon}".format(out_dir=self.out_dir,
-                                                                               replicon=self.find_data(
-                                                                                   os.path.join('Replicons',
-                                                                                                '{}.fst'.format(replicon_filename))
-                                                                                )
-                                                                               )
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--gbk " \
+                  "--cpu 4 " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
 
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
@@ -361,17 +304,20 @@ class TestFunctional(IntegronTest):
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
 
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_simple_with_pdf(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
         output_dirname = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_dirname)
-        command = "integron_finder --outdir {out_dir} --pdf " \
-                  "--promoter-attI {replicon}".format(out_dir=self.out_dir,
-                                                      replicon=self.find_data(
-                                                          os.path.join('Replicons', '{}.fst'.format(replicon_filename))
-                                                        )
-                                                      )
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--pdf " \
+                  "--promoter-attI " \
+                  "--cpu 4 " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
 
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
@@ -380,15 +326,20 @@ class TestFunctional(IntegronTest):
         self.assertTrue(os.path.exists(pdf_test))
 
 
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_annot(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
-        command = "integron_finder --outdir {out_dir} --func-annot --path-func-annot {annot_bank} --promoter-attI " \
-                  "--gbk --keep-tmp " \
-                  "{replicon}".format(out_dir=self.out_dir,
-                                      annot_bank=self.func_annot_dir,
-                                      replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
-                                      )
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--func-annot " \
+                  f"--path-func-annot {self.func_annot_dir} " \
+                  "--gbk " \
+                  "--keep-tmp " \
+                  "--promoter-attI " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
 
         with self.catch_io(out=True, err=False):
             main(command.split()[1:], loglevel='WARNING')
@@ -415,15 +366,22 @@ class TestFunctional(IntegronTest):
         self.assertHmmEqual(expected_result_path, test_result_path)
 
 
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_local_max(self):
         replicon_filename = 'acba.007.p01.13'
         replicon_id = 'ACBA.007.P01_13'
-        command = "integron_finder --outdir {out_dir} --func-annot --path-func-annot {annot_bank} --local-max --gbk " \
-                  "--keep-tmp --promoter-attI {replicon}".format(
-                                    out_dir=self.out_dir,
-                                    annot_bank=self.func_annot_dir,
-                                    replicon=self.find_data(os.path.join('Replicons', '{}.fst'.format(replicon_filename)))
-                                )
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--func-annot " \
+                  f"--path-func-annot {self.func_annot_dir} " \
+                  "--local-max " \
+                  "--gbk " \
+                  "--keep-tmp " \
+                  "--promoter-attI " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
+
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
@@ -460,17 +418,195 @@ class TestFunctional(IntegronTest):
                 self.assertEqual(expected_line, result_line)
 
 
-    def test_no_integron(self):
-        replicon_filename = 'fake_seq'
-        replicon_id = 'fake_seq'
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
+    def test_acba_simple_no_gbk_no_pdf(self):
+        replicon_filename = 'acba.007.p01.13'
+        replicon_id = 'ACBA.007.P01_13'
         output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
-        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
-                                                                         replicon=self.find_data(
-                                                                             os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_filename))
-                                                                         )
-                                                                         )
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--promoter-attI " \
+                  "--cpu 4 " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
+
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:], loglevel='WARNING')
+
+        output_filename = '{}.integrons'.format(replicon_filename)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13',
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        summary_file_name = '{}.summary'.format(replicon_filename)
+        exp_summary_path = self.find_data(os.path.join('Results_Integron_Finder_acba.007.p01.13', summary_file_name))
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
+        test_summary_path = os.path.join(test_result_dir, summary_file_name)
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
+        pdt.assert_frame_equal(exp_summary, test_summary)
+
+        gbk = '{}.gbk'.format(replicon_filename)
+        gbk_test = os.path.join(test_result_dir, gbk)
+        self.assertFalse(os.path.exists(gbk_test))
+
+        pdf = '{}_1.pdf'.format(replicon_filename)
+        pdf_test = os.path.join(test_result_dir, pdf)
+        self.assertFalse(os.path.exists(pdf_test))
+
+
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
+    def test_gembase1_draft(self):
+        # ACBA.0917.00019 is a Draft in Gembase version 1
+        # It contains 2 contigs 0001 and 0002.
+        # 0002 does not contains integrons
+        replicon_filename = 'ACBA.0917.00019'
+        contig_id = 'ACBA.0917.00019.0001'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--keep-tmp " \
+                  "--promoter-attI " \
+                  "--cpu 4 " \
+                  f"--gembase {self.find_data('Gembase', 'Gembase1', 'Replicons', replicon_filename + '.fna')}"
+
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:], loglevel='WARNING')
+
+        output_filename = '{}.integrons'.format(replicon_filename)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}.gembase'.format(replicon_filename),
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        summary_file_name = '{}.summary'.format(replicon_filename)
+        exp_summary_path = self.find_data(
+            os.path.join('Results_Integron_Finder_{}.gembase'.format(replicon_filename), summary_file_name))
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
+        test_summary_path = os.path.join(test_result_dir, summary_file_name)
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
+        pdt.assert_frame_equal(exp_summary, test_summary)
+
+
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
+    def test_gembase1_complet(self):
+        # ESCO001.C.00001.C001 is a genome in GemBase v1 Complete format.
+
+        replicon_filename = 'ESCO001.C.00001.C001'
+        result_dirname = f'Results_Integron_Finder_{replicon_filename}'
+        test_result_dir = os.path.join(self.out_dir, result_dirname)
+        command = f"integron_finder --outdir {self.out_dir} " \
+                  "--promoter-attI " \
+                  "--local-max " \
+                  "--cpu 4 " \
+                  f"--gembase {self.find_data('Gembase', 'Gembase1', 'Replicons', replicon_filename + '.fst')} "
+
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:], loglevel='WARNING')
+
+        output_filename = f'{replicon_filename}.integrons'
+        expected_result_path = self.find_data(os.path.join(f'Results_Integron_Finder_{replicon_filename}',
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        summary_file_name = f'{replicon_filename}.summary'
+        exp_summary_path = self.find_data(
+            os.path.join(f'Results_Integron_Finder_{replicon_filename}', summary_file_name))
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
+        test_summary_path = os.path.join(test_result_dir, summary_file_name)
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
+        pdt.assert_frame_equal(exp_summary, test_summary)
+
+
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
+    def test_gembase2_complet(self):
+        # VICH001.0523.00090 contains 2 chromosomes 001C and 002C
+        # 0001 does not contains integrons
+        # 0002 contains 1 complete with 148 attc if with --local-max
+        #          or   1 complete with 9 attc + 4 CALIN with 39 attc
+
+        replicon_filename = 'VICH001.0523.00090'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--promoter-attI " \
+                  "--cpu 4 " \
+                  f"--gembase {self.find_data('Gembase', 'Gembase2', 'Replicons', replicon_filename + '.fna')}"
+
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:], loglevel='WARNING')
+
+        output_filename = '{}.integrons'.format(replicon_filename)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_filename),
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        summary_file_name = '{}.summary'.format(replicon_filename)
+        exp_summary_path = self.find_data(
+            os.path.join('Results_Integron_Finder_{}'.format(replicon_filename), summary_file_name))
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
+        test_summary_path = os.path.join(test_result_dir, summary_file_name)
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
+        pdt.assert_frame_equal(exp_summary, test_summary)
+
+
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
+    def test_gembase2_draft(self):
+        # VIBR.0322.11443 contains 210 contigs.
+
+        replicon_filename = 'VIBR.0322.11443'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--promoter-attI " \
+                  "--cpu 4 " \
+                  f"--gembase {self.find_data('Gembase', 'Gembase2', 'Replicons', replicon_filename + '.fna')}"
+
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:], loglevel='WARNING')
+
+        output_filename = '{}.integrons'.format(replicon_filename)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_filename),
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        summary_file_name = '{}.summary'.format(replicon_filename)
+        exp_summary_path = self.find_data(
+            os.path.join('Results_Integron_Finder_{}'.format(replicon_filename), summary_file_name))
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
+        test_summary_path = os.path.join(test_result_dir, summary_file_name)
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
+        pdt.assert_frame_equal(exp_summary, test_summary)
+
+
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
+    def test_no_integron(self):
+        replicon_filename = 'fake_seq'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--cpu 4 " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
+
         with self.catch_io(out=True, err=True):
             main(command.split()[1:], loglevel='WARNING')
 
@@ -483,16 +619,17 @@ class TestFunctional(IntegronTest):
             self.assertEqual(test_line.strip(), '# No Integron found')
 
 
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_no_hmmer(self):
         replicon_filename = 'acba.007.p01.13'
         decorator = hide_executable('hmmsearch')
-        finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
-        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
-                                                                         replicon=self.find_data(
-                                                                             os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_filename))
-                                                                         )
-                                                                         )
+        shutil.which = decorator(finder.shutil.which)
+        command = "integron_finder " \
+                   f"--outdir {self.out_dir} " \
+                   "--cpu 4 " \
+                   f"{self.find_data('Replicons', replicon_filename + '.fst')}"
+
         with self.assertRaises(RuntimeError) as ctx:
             with self.catch_io(out=True):
                 # in case the error is not raised
@@ -506,16 +643,17 @@ class TestFunctional(IntegronTest):
         self.assertEqual(err_msg, str(ctx.exception))
 
 
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
     def test_acba_no_prodigal(self):
         replicon_filename = 'acba.007.p01.13'
         decorator = hide_executable('prodigal')
-        finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
-        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
-                                                                         replicon=self.find_data(
-                                                                             os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_filename))
-                                                                         )
-                                                                         )
+        shutil.which = decorator(finder.shutil.which)
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--cpu 4 " \
+                  f"{self.find_data('Replicons', replicon_filename +'.fst')} "
+
         with self.assertRaises(RuntimeError) as ctx:
             with self.catch_io(out=True):
                 # in case the error is not raised
@@ -529,10 +667,12 @@ class TestFunctional(IntegronTest):
         self.assertEqual(err_msg, str(ctx.exception))
 
 
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_no_cmsearch(self):
         replicon_filename = 'acba.007.p01.13'
         decorator = hide_executable('cmsearch')
-        finder.distutils.spawn.find_executable = decorator(finder.distutils.spawn.find_executable)
+        shutil.which = decorator(finder.shutil.which)
         command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=self.out_dir,
                                                                          replicon=self.find_data(
                                                                              os.path.join('Replicons',
@@ -555,12 +695,11 @@ class TestFunctional(IntegronTest):
         replicon_filename = 'acba.007.p01.13'
         bad_out_dir = os.path.join(self.out_dir, 'bad_out_dir')
         open(bad_out_dir, 'w').close()
-        command = "integron_finder --outdir {out_dir} {replicon}".format(out_dir=bad_out_dir,
-                                                                         replicon=self.find_data(
-                                                                             os.path.join('Replicons',
-                                                                                          '{}.fst'.format(replicon_filename))
-                                                                         )
-                                                                         )
+        command = "integron_finder " \
+                  "--cpu 4 " \
+                  f"--outdir {bad_out_dir} " \
+                  f"{self.find_data('Replicons', replicon_filename + '.fst')}"
+
         with self.assertRaises(IsADirectoryError) as ctx:
             with self.catch_io(out=True):
                 # in case the error is not raised
@@ -655,6 +794,9 @@ class TestFunctional(IntegronTest):
         self.assertIntegronResultEqual(expected_result_path, test_result_path)
 
 
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_one_attc_overlapping_intI(self):
         replicon_filename = 'VIBR.0322.11443.0157'
         replicon = self.find_data(os.path.join('Replicons', f'{replicon_filename}.fst'))

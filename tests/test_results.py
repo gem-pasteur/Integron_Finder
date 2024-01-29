@@ -66,7 +66,7 @@ class TestResults(IntegronTest):
     def test_integrons_report(self):
         replicon_name = "acba.007.p01.13"
         replicon_path = self.find_data(os.path.join('Replicons', replicon_name + '.fst'))
-        topologies = Topology('circ')
+        topologies = Topology(1, 'circ')
         with FastaIterator(replicon_path) as sequences_db:
             sequences_db.topologies = topologies
             replicon = next(sequences_db)

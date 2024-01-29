@@ -1,0 +1,144 @@
+
+**************************************************************************
+ ___       _                               _____ _           _
+|_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __
+ | || '_ \| __/ _ \/ _` | '__/ _ \| '_ \  | |_  | | '_ \ / _` |/ _ \ '__|
+ | || | | | ||  __/ (_| | | | (_) | | | | |  _| | | | | | (_| |  __/ |
+|___|_| |_|\__\___|\__, |_|  \___/|_| |_| |_|   |_|_| |_|\__,_|\___|_|
+                   |___/
+
+**************************************************************************
+
+integron_finder version 2.dev20231111
+Using:
+ - Python 3.10.13 (main, Sep 15 2023, 00:19:42) [GCC 11.3.1 20230427]
+ - numpy 1.23.1
+ - pandas 1.4.3
+ - matplolib 3.5.2
+ - biopython 1.79
+
+ - Prodigal V2.6.3: February, 2016
+ - INFERNAL 1.1.4 (Dec 2020)
+ - HMMER 3.1b2 (February 2015); http://hmmer.org/
+
+Authors:
+ - Jean Cury, Bertrand Neron, Eduardo Rocha,
+
+Citation:
+
+ Néron, B.; Littner, E.; Haudiquet, M.; Perrin, A.; Cury, J.; Rocha, E.P.C. 
+ IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria, with a Focus on Antibiotic Resistance in Klebsiella. 
+ Microorganisms 2022, 10, 700. https://doi.org/10.3390/microorganisms10040700
+
+ If you use --func-annot in conjunction with file NCBIfam-AMRFinder.hmm please also cite
+
+ Haft, DH et al., Nucleic Acids Res. 2018 Jan 4;46(D1):D851-D860
+ PMID: 29112715
+
+
+                     =======================
+
+integron_finder is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+integron_finder is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program (COPYING file).
+If not, see <http://www.gnu.org/licenses/>.
+
+                     =======================
+
+command used: integron_finder --cpu 4 --promoter-attI --circ --gembase /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Replicons/VICH001.0523.00090.fna
+
+                     =======================
+
+[0m
+INFO     : ############ Processing replicon VICH001.0523.00090.001C (1/2) ############
+
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_00338 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_00365 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_00366 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_00825 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_00943 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_01231 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_01260 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02241 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02242 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02263 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02266 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02279 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02341 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02342 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02377 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02380 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.001C_02396 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+INFO     : Starting Default search ... :
+INFO     : Default search done... : 
+INFO     : In replicon VICH001.0523.00090.001C, there are:
+INFO     : - 0 complete integron(s) found with a total 0 attC site(s)
+INFO     : - 0 CALIN element(s) found with a total of 0 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Writing out results for replicon VICH001.0523.00090.001C
+INFO     : ############ Processing replicon VICH001.0523.00090.002C (2/2) ############
+
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_02875 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_02880 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_02946 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_02955 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03191 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03225 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03435 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03438 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03439 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03441 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03452 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03454 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03458 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03459 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03463 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03471 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03472 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03481 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03506 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03511 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03516 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03522 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03539 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03540 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03541 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03566 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03573 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03603 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03605 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03607 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03608 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03614 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03629 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03638 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03642 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+WARNING  : Sequence describe in LSTINF file VICH001.0523.00090.002C_03650 is not present in /home/bneron/Projects/GEM/Integron_Finder/src/Integron_Finder/tests/data/Gembase/Gembase2/Proteins/VICH001.0523.00090.prt
+INFO     : Starting Default search ... :
+INFO     : Default search done... : 
+INFO     : In replicon VICH001.0523.00090.002C, there are:
+INFO     : - 1 complete integron(s) found with a total 9 attC site(s)
+INFO     : - 4 CALIN element(s) found with a total of 39 attC site(s)
+INFO     : - 0 In0 element(s) found with a total of 0 attC site
+INFO     : Adding proteins ... :
+INFO     : Adding promoters and attI ... :
+INFO     : Adding proteins ... :
+INFO     : Adding promoters and attI ... :
+INFO     : Adding proteins ... :
+INFO     : Adding promoters and attI ... :
+INFO     : Adding proteins ... :
+INFO     : Adding promoters and attI ... :
+INFO     : Adding proteins ... :
+INFO     : Adding promoters and attI ... :
+INFO     : Writing out results for replicon VICH001.0523.00090.002C
+INFO     : Merging integrons results.
+

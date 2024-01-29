@@ -63,9 +63,9 @@ def make_multi_fasta_reader(alphabet):
 
 try:
     Seq.IUPAC
-    read_multi_prot_fasta = make_multi_fasta_reader(Seq.IUPAC.extended_protein)
+    read_multi_fasta = make_multi_fasta_reader(Seq.IUPAC.extended_protein)
 except AttributeError:
-    read_multi_prot_fasta = make_multi_fasta_reader(None)
+    read_multi_fasta = make_multi_fasta_reader(None)
 
 
 class FastaIterator:
@@ -147,18 +147,22 @@ class FastaIterator:
             return None
         if self.replicon_name is not None:
             seq.name = self.replicon_name
+
+        topology = None
         if self._topologies:
             topology = self._topologies[seq.id]
             # If sequence is too small, it can be problematic when using circularity
             if topology == 'circ' and len(seq) <= 4 * self.dist_threshold:
+                _log.info(f"replicon '{seq.id}' length is too short ({len(seq)}<{4 * self.dist_threshold}) "
+                          f"to be 'circular' set topology to 'linear'")
                 topology = 'lin'
-            seq.topology = topology
-        else:
-            seq.topology = 'circ' if len(self) == 1 else 'lin'
+
+        seq.topology = topology
 
         if self.alphabet is None:
             seq.annotations["molecule_type"] = 'DNA'
         return seq
+
 
     def __iter__(self):
         return self
