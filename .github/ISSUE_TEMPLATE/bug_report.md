@@ -15,6 +15,8 @@ Steps to reproduce the behavior:
 1. The exact command lines you use '...'
 2. See error
 
+/!\ please share your input file so we can reproduce the problem
+
 **Expected behavior**
 
 A clear and concise description of what you expected to happen.

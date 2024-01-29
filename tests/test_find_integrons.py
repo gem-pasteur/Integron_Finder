@@ -143,7 +143,7 @@ class TestFindIntegons(IntegronTest):
 - 1 CALIN element(s) found with a total of 3 attC site(s)
 - 0 In0 element(s) found with a total of 0 attC site""".format(replicon.id)
         with self.catch_log() as log:
-            integrons = find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg)
+            integrons = find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=attc_file)
             catch_msg = log.get_value().strip()
 
         self.assertEqual(catch_msg, exp_msg)
@@ -208,7 +208,7 @@ class TestFindIntegons(IntegronTest):
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         with self.catch_log() as log:
-            integrons = find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg)
+            integrons = find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=attc_file)
 
         self.assertEqual(len(integrons), 2)
 
@@ -217,7 +217,7 @@ class TestFindIntegons(IntegronTest):
         cfg._prefix_data = os.path.join(os.path.dirname(__file__), 'data')
 
         with self.catch_log() as log:
-            integrons = find_integron(replicon, prot_db, attc_file, intI_file, phageI_file, cfg)
+            integrons = find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=attc_file)
         self.assertEqual(len(integrons), 1)
 
 
@@ -261,7 +261,7 @@ class TestFindIntegons(IntegronTest):
 
         len_model_attc = 47  # length in 'CLEN' (value for model attc_4.cm)
 
-        attc_file = read_infernal(attc_file, replicon_name,
+        attc = read_infernal(attc_file, replicon_name,
                                   len_model_attc,
                                   evalue=cfg.evalue_attc,
                                   size_max_attc=cfg.max_attc_size,
@@ -275,10 +275,10 @@ class TestFindIntegons(IntegronTest):
         with self.catch_log() as log:
             integrons = find_integron(replicon,
                                       prot_db,
-                                      attc_file,
                                       intI_file,
                                       phageI_file,
-                                      cfg)
+                                      cfg,
+                                      attc=attc)
             catch_msg = log.get_value().strip()
         self.assertEqual(catch_msg, exp_msg)
 
@@ -354,10 +354,10 @@ class TestFindIntegons(IntegronTest):
         with self.catch_log() as log:
             integrons = find_integron(replicon,
                                       prot_db,
-                                      attc_file,
                                       intI_file,
                                       phageI_file,
-                                      cfg)
+                                      cfg,
+                                      attc_file=attc_file)
             catch_msg = log.get_value().strip()
         self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(len(integrons), 1)
@@ -451,10 +451,10 @@ class TestFindIntegons(IntegronTest):
         with self.catch_log() as log:
             integrons = find_integron(replicon,
                                       prot_db,
-                                      attc_file,
                                       intI_file,
                                       phageI_file,
-                                      cfg)
+                                      cfg,
+                                      attc_file=attc_file)
             catch_msg = log.get_value().strip()
         self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(len(integrons), 2)
@@ -547,10 +547,10 @@ class TestFindIntegons(IntegronTest):
         with self.catch_log() as log:
             integrons = find_integron(replicon,
                                       prot_db,
-                                      attc_file,
                                       intI_file,
                                       phageI_file,
-                                      cfg)
+                                      cfg,
+                                      attc_file=attc_file)
             catch_msg = log.get_value().strip()
         self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(len(integrons), 1)
@@ -637,10 +637,10 @@ class TestFindIntegons(IntegronTest):
         with self.catch_log() as log:
             integrons = find_integron(replicon,
                                       prot_db,
-                                      attc_file,
                                       intI_file,
                                       phageI_file,
-                                      cfg)
+                                      cfg,
+                                      attc_file=attc_file)
             catch_msg = log.get_value().strip()
         self.assertEqual(catch_msg, exp_msg)
         self.assertEqual(len(integrons), 5)

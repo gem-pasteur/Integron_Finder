@@ -1,0 +1,11 @@
+pygraphviz
+sphinx-rtd-theme
+sphinx_autodoc_typehints
+sphinxcontrib-applehelp
+sphinxcontrib-devhelp
+sphinxcontrib-htmlhelp
+sphinxcontrib-jsmath
+sphinxcontrib-qthelp
+sphinxcontrib-serializinghtml
+sphinxcontrib-svg2pdfconverter
+

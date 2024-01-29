@@ -179,7 +179,7 @@ class GembaseDB(ProteinDB):
         """
         from the input file name, try to retrieve the basename which is used in gembase
         This specially useful when IF is run in parallel. The input sequence is split
-        in chunks and treat in parallel. But in this case the name of the chunk does not math
+        in chunks and treat in parallel. But in this case the name of the chunk does not match
         neither the lstinfo file nor the protein file.
         So this method try retrieve the original basename without extension
         for instance: ::
@@ -281,7 +281,7 @@ class GembaseDB(ProteinDB):
     @staticmethod
     def gembase_complete_parser(lst_path, sequence_id):
         """
-        :param str lst_path: the path of of the LSTINFO file Gembase Complet
+        :param str lst_path: the path of the LSTINFO file Gembase Complet
         :param str sequence_id: the id of the genomic sequence to analyse
         :return: the information related to the 'valid' CDS corresponding to the sequence_id
         :rtype: `class`:pandas.DataFrame` object
@@ -307,7 +307,7 @@ class GembaseDB(ProteinDB):
                                )
             lst = lst.astype(dtype)
             specie, date, strain, contig = sequence_id.split('.')
-            pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
+            pattern = f'{specie}\.{date}\.{strain}\.{contig}'.format(specie, date, strain, contig)
             genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
             prots_info = genome_info.loc[(genome_info['type'] == 'CDS') & (genome_info['valid'] == 'Valid')]
             return prots_info
@@ -316,7 +316,7 @@ class GembaseDB(ProteinDB):
     @staticmethod
     def gembase_draft_parser(lst_path, replicon_id):
         """
-        :param str lst_path: the path of of the LSTINFO file from a Gembase Draft
+        :param str lst_path: the path of the LSTINFO file from a Gembase Draft
         :param str sequence_id: the id of the genomic sequence to analyse
         :return: the information related to the 'valid' CDS corresponding to the sequence_id
         :rtype: `class`:pandas.DataFrame` object
@@ -336,8 +336,8 @@ class GembaseDB(ProteinDB):
         except Exception as err:
             _log.error(f"Error while parsing {lst_path} file")
             raise err
-        specie, date, strain, contig_gene = replicon_id.split('.')
-        pattern = f'{specie}\.{date}\.{strain}\.\w?{contig_gene}'
+        specie, date, strain, contig = replicon_id.split('.')
+        pattern = f'{specie}\.{date}\.{strain}\.[bi]{contig}'
         genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
         prots_info = genome_info.loc[genome_info['type'] == 'CDS']
         return prots_info

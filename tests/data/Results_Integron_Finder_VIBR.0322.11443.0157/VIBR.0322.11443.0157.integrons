@@ -1,0 +1,4 @@
+# cmd: integron_finder --lin --local-max --cpu 4 --cmsearch ../infernal/infernal-1.1.4/src/cmsearch data/Replicons/VIBR.0322.11443.0157.fst
+ID_integron	ID_replicon	element	pos_beg	pos_end	strand	evalue	type_elt	annotation	model	type	default	distance_2attC	considered_topology
+integron_01	VIBR.0322.11443.0157	attc_001	196	251	-1	0.84	attC	attC	attc_4	complete	No	NA	lin
+integron_01	VIBR.0322.11443.0157	VIBR.0322.11443.0157_1	228	1190	1	1.8e-29	protein	intI	intersection_tyr_intI	complete	No	NA	lin
