@@ -151,6 +151,8 @@ class GembaseDB(ProteinDB):
             The attribute *path* must be injected in the object
             This attribute represent the path to a fasta file representing this replicon
         """
+        self._gem_vers = None
+        self._gem_type = None
         _log.debug(f"call GembaseDB with gembase_path= {gembase_path}")
         self.cfg = cfg
         if gembase_path is None:
@@ -173,7 +175,6 @@ class GembaseDB(ProteinDB):
         else:
             self._prot_file = prot_file
         self._prot_db = self._make_db()
-
 
     def _find_gembase_file_basename(self, gembase_path, input_seq_path):
         """
@@ -264,18 +265,40 @@ class GembaseDB(ProteinDB):
         :param str lst_path: the path to the LSTINFO file corresponding to the nucleic sequence
         :returns: either 'Complet' or 'Draft'
         """
-        with open(lst_path) as lst_file:
-            line = lst_file.readline()
-        fields = line.split()
-        if fields[5] in ('Valid', 'Invalid_Size', 'Pseudo', 'Partial'):
-            return 'Complet'
-        else:
-            if fields[0] == '0' and fields[1] == '0':
-                msg = f"the genome {fields[2]} seems empty: see {lst_path}"
-                _log.critical(msg)
-                raise IntegronError(msg) from None
+        def draft_sniffer(fields):
+            #fields = line.split()
+            if fields[5] in ('Valid', 'Invalid_Size', 'Pseudo', 'Partial'):
+                return 'Complet'
             else:
-                return 'Draft'
+                if fields[0] == '0' and fields[1] == '0':
+                    msg = f"the genome {fields[2]} seems empty: see {lst_path}"
+                    _log.critical(msg)
+                    raise IntegronError(msg) from None
+                else:
+                    return 'Draft'
+        def version_sniffer(fields):
+            gem_v = 1 if  line.count('\t') < 5 else 2
+            return gem_v
+
+        with open(lst_path) as lst_file:
+            line = next(lst_file)
+            fields = line.split()
+        gem_v = version_sniffer(fields)
+
+        genome_type = draft_sniffer(fields)
+        return gem_v, genome_type
+
+
+    def _get_pattern(self, specie, date, strain, contig, gene=''):
+        patterns = {(1, 'Draft'): f'{specie}\.{date}\.{strain}\.[bi]{contig}',
+                    (1, 'Draft'): f'{specie}\.{date}\.{strain}\.{contig}',
+                    (2, 'Draft'): f'{specie}\.{date}\.{strain}\.{contig}[bi]',
+                    (2, 'Complet'): f'{specie}\.{date}\.{strain}\.{contig}'
+                   }
+        pattern = patterns[(self._gem_vers, self._gem_type)]
+        if gene:
+            pattern = f'{pattern}_{gene}'
+        return pattern
 
 
     @staticmethod
@@ -307,17 +330,16 @@ class GembaseDB(ProteinDB):
                                )
             lst = lst.astype(dtype)
             specie, date, strain, contig = sequence_id.split('.')
-            pattern = f'{specie}\.{date}\.{strain}\.{contig}'.format(specie, date, strain, contig)
+            pattern = f'{specie}\.{date}\.{strain}\.{contig}'
             genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
             prots_info = genome_info.loc[(genome_info['type'] == 'CDS') & (genome_info['valid'] == 'Valid')]
             return prots_info
 
 
-    @staticmethod
-    def gembase_draft_parser(lst_path, replicon_id):
+    def gembase_draft_parser(self, lst_path, replicon_id):
         """
         :param str lst_path: the path of the LSTINFO file from a Gembase Draft
-        :param str sequence_id: the id of the genomic sequence to analyse
+        :param str replicon_id: the id of the genomic sequence to analyse
         :return: the information related to the 'valid' CDS corresponding to the sequence_id
         :rtype: `class`:pandas.DataFrame` object
         """
@@ -337,7 +359,8 @@ class GembaseDB(ProteinDB):
             _log.error(f"Error while parsing {lst_path} file")
             raise err
         specie, date, strain, contig = replicon_id.split('.')
-        pattern = f'{specie}\.{date}\.{strain}\.[bi]{contig}'
+        _log.info(f"Gembase v{self._gem_vers} draft detected.")
+        pattern = self._get_pattern(specie, date, strain, contig)
         genome_info = lst.loc[lst['seq_id'].str.contains(pattern, regex=True)]
         prots_info = genome_info.loc[genome_info['type'] == 'CDS']
         return prots_info
@@ -353,8 +376,8 @@ class GembaseDB(ProteinDB):
             lst_path = os.path.join(self._gembase_path, 'LSTINF', self._gembase_file_basename + '.lst')
             if not os.path.exists(lst_path):
                 raise IntegronError(f"{lst_path}O directory not found.")
-        gembase_type = self.gembase_sniffer(lst_path)
-        if gembase_type == 'Draft':
+        self._gem_vers, self._gem_type = self.gembase_sniffer(lst_path)
+        if self._gem_type == 'Draft':
             prots_info = self.gembase_draft_parser(lst_path, self.replicon.id)
         else:
             prots_info = self.gembase_complete_parser(lst_path, self.replicon.id)
@@ -388,10 +411,15 @@ class GembaseDB(ProteinDB):
         """
         try:
             specie, date, strain, contig_gene = gene_id.split('.')
-            contig_gene = contig_gene[1:]  # remove the first letter b/i
+            if self._gem_vers == 1:
+                contig, gene = contig_gene[1:].split('_')  # remove the first letter b/i
+            elif self._gem_vers == 2:
+                contig, gene = contig_gene.split('_')
+                contig = contig[:-1]  # remove the last letter b/i
         except ValueError:
             raise IntegronError(f"'{gene_id}' is not a valid Gembase protein identifier.")
-        pattern = f'{specie}\.{date}\.{strain}\.\w?{contig_gene}'
+        pattern = self._get_pattern(specie, date, strain, contig, gene=gene)
+        print(f"#### {pattern =}")
         seq_info = self._info.loc[self._info['seq_id'].str.contains(pattern, regex=True)]
         if not seq_info.empty:
             return SeqDesc(seq_info.seq_id.values[0],
