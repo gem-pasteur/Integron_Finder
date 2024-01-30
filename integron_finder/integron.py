@@ -399,8 +399,9 @@ class Integron(object):
 
         if self.has_integrase():
             # PintI1
-            p_intI1 = motifs.create([Seq.Seq("TTGCTGCTTGGATGCCCGAGGCATAGACTGTACA")])
-            p_intI1.name = "P_intI1"
+            p_intI1_seq = Seq.Seq("TTGCTGCTTGGATGCCCGAGGCATAGACTGTACA")
+            p_intI1_mot = motifs.create([p_intI1_seq])
+            p_intI1_mot.name = "P_intI1"
 
             # PintI2
             # Not known
@@ -408,14 +409,14 @@ class Integron(object):
             # PintI3
             # Not known
 
-            motifs_Pint = [p_intI1]
+            motifs_Pint = [p_intI1_mot]
 
             seq_p_int = self.replicon.seq[int(self.integrase.pos_beg.min()) - dist_prom:
                                           int(self.integrase.pos_end.max()) + dist_prom]
 
             for m in motifs_Pint:
                 if self.integrase.strand.values[0] == 1:
-                    generator_motifs = m.instances.search(seq_p_int[:dist_prom])
+                    generator_motifs = seq_p_int[:dist_prom].search(p_intI1_mot.alignment.sequences)
                     for pos, s in generator_motifs:
                         tmp_df = pd.DataFrame(columns=self._columns)
                         tmp_df = tmp_df.astype(dtype=self._dtype)
@@ -430,7 +431,8 @@ class Integron(object):
                         tmp_df["distance_2attC"] = [np.nan]
                         self.promoter = pd.concat([self.promoter, tmp_df])
                 else:
-                    generator_motifs = m.instances.reverse_complement().search(seq_p_int[-dist_prom:])
+                    # generator_motifs = m.instances.reverse_complement().search(seq_p_int[-dist_prom:])
+                    generator_motifs = seq_p_int[-dist_prom:].search(m.reverse_complement().alignment.sequences)
                     for pos, s in generator_motifs:
                         tmp_df = pd.DataFrame(columns=self._columns)
                         tmp_df = tmp_df.astype(dtype=self._dtype)
@@ -520,7 +522,8 @@ class Integron(object):
                 mot = [m.reverse_complement()]
 
             for sa, mo in enumerate(mot):
-                for pos, s in mo.instances.search(seq_Pc):
+                # for pos, s in mo.instances.search(seq_Pc):
+                for pos, s in seq_Pc.search(mo.alignment.sequences):
                     tmp_df = pd.DataFrame(columns=self._columns)
                     tmp_df = tmp_df.astype(dtype=self._dtype)
                     tmp_df["pos_beg"] = [(left - dist_prom + pos) % self.replicon_size]
@@ -613,7 +616,7 @@ class Integron(object):
                 mot = [m.reverse_complement()]
 
             for sa, mo in enumerate(mot):
-                for pos, s in mo.instances.search(seq_attI):
+                for pos, s in seq_attI.search(mo.alignment.sequences):  #  mo.instances.search(seq_attI) is depprecated
                     tmp_df = pd.DataFrame(columns=self._columns)
                     tmp_df = tmp_df.astype(dtype=self._dtype)
                     tmp_df["pos_beg"] = [(left - dist_atti + pos) % self.replicon_size]
