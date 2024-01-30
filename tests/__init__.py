@@ -164,12 +164,13 @@ class IntegronTest(unittest.TestCase):
         self.assertEqual(s1.description.rstrip('.'), s2.description.rstrip('.'))
         for s1_feat, s2_feat in zip(s1.features, s2.features):
             # location cannot be directly compared
+            # strand is now in location not anylonger in feature
             self.assertEqual(str(s1_feat.location), str(s2_feat.location))
 
-            for attr in ('strand', 'type'):
-                f1_attr = getattr(s1_feat, attr)
-                f2_attr = getattr(s2_feat, attr)
-                self.assertEqual(f1_attr, f2_attr, msg="{} are different: {} != {}".format(attr, f1_attr, f2_attr))
+            # for attr in ('strand', 'type'):
+            #     f1_attr = getattr(s1_feat, attr)
+            #     f2_attr = getattr(s2_feat, attr)
+            self.assertEqual(s1_feat.type, s2_feat.type, msg="{} are different: {} != {}".format(attr, s1_feat, s2_feat))
 
             # The order of qualifers does not matter
             # ('integron_type', ['complete']), ('integron_id', ['integron_01'])
