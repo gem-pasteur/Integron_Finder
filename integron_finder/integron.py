@@ -591,8 +591,8 @@ class Integron(object):
             strand_array = self.attC.strand.unique()[0]
 
         elif self.type() == "In0":
-            left = int(self.integrase.pos_beg)
-            right = int(self.integrase.pos_end)
+            left = int(self.integrase.pos_beg.iloc[0])
+            right = int(self.integrase.pos_end.iloc[0])
             strand_array = "both"
         elif self.type() == "CALIN":
             left = attc_start
