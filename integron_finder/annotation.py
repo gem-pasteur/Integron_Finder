@@ -115,7 +115,7 @@ def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue
                     raise RuntimeError(f"{cmd} failed return code = {completed_process.returncode}")
                 hmm_in = read_hmm(replicon.id, prot_db, hmm_out, cfg, evalue=evalue, coverage=coverage
                                   ).sort_values("evalue").drop_duplicates(subset="ID_prot")
-                func_annotate_res = pd.concat([func_annotate_res, hmm_in])
+                func_annotate_res = pd.concat([df for df in [func_annotate_res, hmm_in] if not df.empty])
             func_annotate_res = func_annotate_res.sort_values("evalue").drop_duplicates(subset="ID_prot")
 
             integron.proteins.loc[func_annotate_res.ID_prot, "evalue"] = func_annotate_res.evalue.values

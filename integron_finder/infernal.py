@@ -321,7 +321,7 @@ def expand(replicon,
                                evalue_attc=evalue_attc,
                                cmsearch_bin=cmsearch_bin
                                )
-            max_elt = pd.concat([max_elt, df_max])
+            max_elt = pd.concat([df for df in [max_elt, df_max] if not df.empty])
             _log.info(f"\tsearched {window_beg}->{window_end} in {searched_strand} strand(s) found {len(df_max)} attc sites")
 
             if circular:
