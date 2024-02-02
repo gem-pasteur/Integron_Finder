@@ -96,13 +96,13 @@ def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue
                 hmm_tableout = os.path.join(out_dir, "{}_fa_table.res".format(name_wo_ext))
                 hmm_cmd = "{hmmsearch} --cut_ga -Z {prot_nb} --cpu {cpu} --tblout {tblout} -o {hmm_out}" \
                           " {hmm} {prot_tmp}".format(
-                    hmmsearch=cfg.hmmsearch.replace(' ', '\ '),
+                    hmmsearch=cfg.hmmsearch.replace(' ', '\\ '),
                     prot_nb=prot_nb,
                     cpu=cfg.cpu,
-                    tblout=hmm_tableout.replace(' ', '\ '),
-                    hmm_out=hmm_out.replace(' ', '\ '),
-                    hmm=hmm.replace(' ', '\ '),
-                    prot_tmp=prot_tmp.replace(' ', '\ ')
+                    tblout=hmm_tableout.replace(' ', '\\ '),
+                    hmm_out=hmm_out.replace(' ', '\\ '),
+                    hmm=hmm.replace(' ', '\\ '),
+                    prot_tmp=prot_tmp.replace(' ', '\\ ')
                 )
 
                 try:

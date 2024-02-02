@@ -62,24 +62,24 @@ def find_integrase(replicon_id, prot_file, out_dir, cfg):
 
     if not os.path.isfile(intI_hmm_out):
         cmd = "{hmmsearch} --cut_ga --cpu {cpu} --tblout {tblout} -o {out} {model_int} {prot_file}".format(
-            hmmsearch=cfg.hmmsearch.replace(' ', '\ '),
+            hmmsearch=cfg.hmmsearch.replace(' ', '\\ '),
             cpu=cfg.cpu,
-            tblout=os.path.join(out_dir, replicon_id + "_intI_table.res").replace(' ', '\ '),
-            out=intI_hmm_out.replace(' ', '\ '),
-            model_int=cfg.model_integrase.replace(' ', '\ '),
-            prot_file=prot_file.replace(' ', '\ ')
+            tblout=os.path.join(out_dir, replicon_id + "_intI_table.res").replace(' ', '\\ '),
+            out=intI_hmm_out.replace(' ', '\\ '),
+            model_int=cfg.model_integrase.replace(' ', '\\ '),
+            prot_file=prot_file.replace(' ', '\\ ')
         )
         hmm_cmd.append(cmd)
 
     phage_hmm_out = os.path.join(out_dir, replicon_id + "_phage_int.res")
     if not os.path.isfile(phage_hmm_out):
         cmd = "{hmmsearch} --cut_ga --cpu {cpu} --tblout {tblout} -o {phage_hmm_out} {model_phage_int} {prot_file}"\
-            .format( hmmsearch=cfg.hmmsearch.replace(' ', '\ '),
+            .format( hmmsearch=cfg.hmmsearch.replace(' ', '\\ '),
                      cpu=cfg.cpu,
-                     tblout=os.path.join(out_dir, replicon_id + "_phage_int_table.res").replace(' ', '\ '),
-                     phage_hmm_out=phage_hmm_out.replace(' ', '\ '),
-                     model_phage_int=cfg.model_phage_int.replace(' ', '\ '),
-                     prot_file=prot_file.replace(' ', '\ ')
+                     tblout=os.path.join(out_dir, replicon_id + "_phage_int_table.res").replace(' ', '\\ '),
+                     phage_hmm_out=phage_hmm_out.replace(' ', '\\ '),
+                     model_phage_int=cfg.model_phage_int.replace(' ', '\\ '),
+                     prot_file=prot_file.replace(' ', '\\ ')
                      )
         hmm_cmd.append(cmd)
 
