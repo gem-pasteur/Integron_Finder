@@ -374,7 +374,11 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                    out_dir=out_dir,
                                    cmsearch_bin=cmsearch_bin,
                                    cpu=cpu)
-                max_elt = pd.concat([df for df in [max_elt, df_max] if not df.empty])
+                to_concat = [df for df in [max_elt, df_max] if not df.empty]
+                if to_concat:
+                    max_elt = pd.concat([df for df in [max_elt, df_max] if not df.empty])
+                else:
+                    max_elt = max_elt
                 if not max_elt.empty:
                     max_elt = expand(replicon,
                                      window_beg, window_end, max_elt,
@@ -387,9 +391,12 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      out_dir=out_dir,
                                      cmsearch_bin=cmsearch_bin,
                                      cpu=cpu)
-
-        max_final = pd.concat([df for df in [max_elt, df_max] if not df.empty])
+        to_concat = [df for df in [max_elt, df_max] if not df.empty]
+        if to_concat:
+            max_final = pd.concat([df for df in to_concat if not df.empty])
+        else:
+            max_final = max_elt.copy()
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)
-        max_final.index = list(range(len(max_final)))
+        max_final.index = range(len(max_final))
     max_final = max_final.astype(dtype=data_type)
     return max_final

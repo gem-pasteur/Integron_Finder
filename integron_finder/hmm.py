@@ -166,7 +166,7 @@ def read_hmm(replicon_id, prot_db, infile, cfg, evalue=1., coverage=0.5):
     df[floatcol] = df[floatcol].astype(float)
 
     df = df[(((df.hmmto - df.hmmfrom) / df.len_profile) > coverage) & (df.evalue < evalue)]
-    df.index = list(range(len(df)))
+    df.index = range(len(df))
 
     df_out = df[["Accession_number", "query_name", "ID_query", "ID_prot",
                  "strand", "pos_beg", "pos_end", "evalue"]]
