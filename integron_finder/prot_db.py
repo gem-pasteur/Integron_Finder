@@ -203,19 +203,19 @@ class GembaseDB(ProteinDB):
     """
 
     _gene_patterns = {
-        GembaseType.COMPLETE_2plus: '(\w+).(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])_(\w+)_(\d{5})',
-        GembaseType.DRAFT_2plus: '(\w+).(\d{4})\.(\d{5})\.(\d{3,4})(?P<g_type>D)_([ib])_(\d{5})',
-        GembaseType.COMPLETE_2: '(\w{7})\.(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])_(\d{5})',
-        GembaseType.DRAFT_2: '(\w{4})\.(\d{4})\.(\d{5})\.(\d{4})(?P<g_type>[ib])_(\d{5})',
-        GembaseType.COMPLETE_1: '(\w{7})\.(\w|\d{4})\.(\d{5})\.(?P<g_type>[CPVO])(\d{3})_(\d{5})',
-        GembaseType.DRAFT_1: '(\w{4})\.(\d{4})\.(\d{5})\.(?P<g_type>[ib])(\d{4})_(\d{5})'
+        GembaseType.COMPLETE_2plus: r'(\w+).(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])_(\w+)_(\d{5})',
+        GembaseType.DRAFT_2plus: r'(\w+).(\d{4})\.(\d{5})\.(\d{3,4})(?P<g_type>D)_([ib])_(\d{5})',
+        GembaseType.COMPLETE_2: r'(\w{7})\.(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])_(\d{5})',
+        GembaseType.DRAFT_2: r'(\w{4})\.(\d{4})\.(\d{5})\.(\d{4})(?P<g_type>[ib])_(\d{5})',
+        GembaseType.COMPLETE_1: r'(\w{7})\.(\w|\d{4})\.(\d{5})\.(?P<g_type>[CPVO])(\d{3})_(\d{5})',
+        GembaseType.DRAFT_1: r'(\w{4})\.(\d{4})\.(\d{5})\.(?P<g_type>[ib])(\d{4})_(\d{5})'
     }
 
     _rep_patterns = [
-        '(\w+)\.(\d{4})\.(\d{5})\.(\d{3,4})(?P<g_type>[CPVOD])',  # Complete + Draft V2_plus
-        '(\w{7})\.(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])',  # Complete V2
-        '(\w{7})\.(\w|\d{4})\.(\d{5})\.(?P<g_type>[CPVO])(\d{3})',  # Complete V1
-        '(\w{4})\.(\d{4})\.(\d{5})\.(\d{4})',  # Draft V1 et V2
+        r'(\w+)\.(\d{4})\.(\d{5})\.(\d{3,4})(?P<g_type>[CPVOD])',  # Complete + Draft V2_plus
+        r'(\w{7})\.(\d{4})\.(\d{5})\.(\d{3})(?P<g_type>[CPVO])',  # Complete V2
+        r'(\w{7})\.(\w|\d{4})\.(\d{5})\.(?P<g_type>[CPVO])(\d{3})',  # Complete V1
+        r'(\w{4})\.(\d{4})\.(\d{5})\.(\d{4})',  # Draft V1 et V2
     ]
 
     def __init__(self, replicon, cfg, gembase_path=None, prot_file=None):
@@ -339,7 +339,7 @@ class GembaseDB(ProteinDB):
         # so wee need to find the original name to find the
         # - lstinfo file
         # - protein file
-        match = re.search("_chunk_\d+$", gembase_file_basename)
+        match = re.search(r"_chunk_\d+$", gembase_file_basename)
         if match:
             gembase_file_basename = gembase_file_basename[:match.start()]
 
@@ -532,7 +532,7 @@ class GembaseDB(ProteinDB):
             _log.error(msg)
             raise IntegronError(msg)
         specie, date, strain, contig = replicon_id.split('.')
-        pattern = f'{specie}\.{date}\.{strain}\.[bi]{contig}'
+        pattern = fr'{specie}\.{date}\.{strain}\.[bi]{contig}'
         try:
             genome_info = lst.loc[lst[4].str.contains(pattern, regex=True)]
         except KeyError:
@@ -604,7 +604,7 @@ class GembaseDB(ProteinDB):
             contig_gene = contig_gene[1:]  # remove the first letter b/i
         except ValueError:
             raise IntegronError(f"'{gene_id}' is not a valid Gembase protein identifier.")
-        pattern = f'{specie}\.{date}\.{strain}\.\w?{contig_gene}'
+        pattern = fr'{specie}\.{date}\.{strain}\.\w?{contig_gene}'
         seq_info = self._info.loc[self._info[4].str.contains(pattern, regex=True)]
         if not seq_info.empty:
             return SeqDesc(seq_info[4].values[0],
@@ -641,10 +641,10 @@ class ProdigalDB(ProteinDB):
             prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + ".prt")
             if not os.path.exists(prot_file_path):
                 prodigal_cmd = '{prodigal} {meta} -i {replicon} -a {prot} -o {out} -q '.format(
-                    prodigal=self.cfg.prodigal.replace(' ', '\ '),
+                    prodigal=self.cfg.prodigal.replace(' ', '\\ '),
                     meta='' if len(self.replicon) > 200000 else '-p meta',
-                    replicon=self.replicon.path.replace(' ', '\ '),
-                    prot=prot_file_path.replace(' ', '\ '),
+                    replicon=self.replicon.path.replace(' ', '\\ '),
+                    prot=prot_file_path.replace(' ', '\\ '),
                     out=os.devnull,
                 )
                 try:
