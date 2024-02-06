@@ -663,13 +663,13 @@ class TestFindIntegons(IntegronTest):
             columns=self.columns,
             index=['OBAL001.B.00005.C001_472']).astype(dtype=self.dtype))
         exp_int.append(pd.DataFrame(
-            [[1940269, 1941171, 1, 4.200000e-43, 'protein', 'Phage_integrase', np.nan, 'intI']],
-            columns=self.columns,
-            index=['OBAL001.B.00005.C001_1793']).astype(dtype=self.dtype))
-        exp_int.append(pd.DataFrame(
             [[1545830, 1546807, -1, 1.100000e-21, 'protein', 'intersection_tyr_intI', np.nan, 'intI']],
             columns=self.columns,
             index=['OBAL001.B.00005.C001_1416']).astype(dtype=self.dtype))
+        exp_int.append(pd.DataFrame(
+            [[1940269, 1941171, 1, 4.200000e-43, 'protein', 'Phage_integrase', np.nan, 'intI']],
+            columns=self.columns,
+            index=['OBAL001.B.00005.C001_1793']).astype(dtype=self.dtype))
 
         exp_attC = []
         exp_attC.append(pd.DataFrame(
@@ -681,12 +681,12 @@ class TestFindIntegons(IntegronTest):
             columns=self.columns,
             index=['attc_001']).astype(dtype=self.dtype))
         exp_attC.append(empty)
-        exp_attC.append(empty)
         exp_attC.append(pd.DataFrame(
             [[1547800, 1547859, 1, 0.00049, 'attC', 'attc_4', np.nan, 'attC'],
              [1548775, 1548834, 1, 0.00009, 'attC', 'attc_4', 916.0, 'attC']],
             columns=self.columns,
             index=['attc_001', 'attc_002']).astype(dtype=self.dtype))
+        exp_attC.append(empty)
 
         for i, integron in enumerate(integrons):
             self.assertEqual(integron.replicon.name, replicon_id)

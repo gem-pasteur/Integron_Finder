@@ -95,6 +95,7 @@ def find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=None
         if cfg.union_integrases:
             intI_ac = intI[intI.ID_prot.isin(tmp.ID_prot) == 0].merge(phageI[phageI.ID_prot.isin(tmp.ID_prot) == 0],
                                                                       how="outer").merge(tmp, how="outer")
+            intI_ac.sort_values(['pos_beg', 'pos_end'], ascending=True, inplace=True)
         else:
             intI_ac = tmp
     else:
@@ -125,7 +126,6 @@ def find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=None
         # redundant info, we could check for len(attc_cluster_list)==0
         # -> to remove
         for i, id_int in enumerate(intI_ac.ID_prot.values):  # For each Integrase
-
             if attc_cluster_nb == 0:  # No more array to attribute to an integrase
 
                 integrons.append(Integron(replicon, cfg))
