@@ -72,7 +72,7 @@ def read_infernal(infile, replicon_id, len_model_attc,
                                    "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         return df.astype(dtype)
 
-    df = pd.read_csv(infile, sep="\s+", engine="python",  header=None,
+    df = pd.read_csv(infile, sep="\\s+", engine="python",  header=None,
                      comment='#',
                      usecols=[2, 5, 6, 7, 8, 9, 15])
     # some line can have different number of columns due to difference in description
