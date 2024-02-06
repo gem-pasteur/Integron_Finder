@@ -194,7 +194,7 @@ class TestResults(IntegronTest):
                              "considered_topology": ['lin'],
                              })
         res1 = res1.astype(dtype=dtype)
-        res1.to_csv(f1, sep="\t", index=False, na_rep="NA")
+        res1.to_csv(f1, sep="\t", index=False)
 
         f2 = os.path.join(self.tmp_dir, 'f2')
         res2 = pd.DataFrame({"ID_integron": ['integron_02'],
@@ -213,9 +213,11 @@ class TestResults(IntegronTest):
                              "considered_topology": ['lin']
                              })
         res2 = res2.astype(dtype=dtype)
-        res2.to_csv(f2, sep="\t", index=False, na_rep="NA")
+        res2.to_csv(f2, sep="\t", index=False)
 
         expected_res = pd.concat([res1, res2])
+        # during the sdesrialization None value are cast in np.nan
+        expected_res.model = pd.Series([np.nan, np.nan], dtype=object)
         res = results.merge_results(f1, f2)
         pdt.assert_frame_equal(expected_res, res)
 
@@ -252,7 +254,7 @@ class TestResults(IntegronTest):
                              }, columns=['ID_replicon', 'CALIN', 'complete', 'In0', 'topology', 'size'])
         res1 = res1.astype(dtype=dtype)
         res1 = res1.set_index('ID_replicon')
-        res1.to_csv(f1, sep="\t")\
+        res1.to_csv(f1, sep="\t")
 
         f2 = os.path.join(self.tmp_dir, 'f2')
         res2 = pd.DataFrame({'ID_replicon': ['LIAN.001.C02_10'],

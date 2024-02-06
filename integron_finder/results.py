@@ -77,10 +77,25 @@ def merge_results(*results_file):
     :rtype: a :class:`pandas.DataFrame` object.
     """
     _log.debug("merging_results " + ' '.join(results_file))
+    dtype = {"ID_integron": 'str',
+             "ID_replicon": 'str',
+             "element": 'str',
+             "pos_beg": 'int',
+             "pos_end": 'int',
+             "strand": 'int',
+             "evalue": 'float',
+             "type_elt": 'str',
+             "annotation": 'str',
+             "model": 'str',
+             "type": 'str',
+             "default": 'str',
+             "distance_2attC": 'float',
+             "considered_topology": 'str'
+             }
     all_res = []
     for one_result in results_file:
         try:
-            res = pd.read_csv(one_result, sep="\t", comment='#')
+            res = pd.read_csv(one_result, sep="\t", comment='#', dtype=dtype)
         except EmptyDataError:
             continue
         all_res.append(res)
