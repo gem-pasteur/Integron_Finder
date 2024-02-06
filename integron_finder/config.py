@@ -27,7 +27,7 @@
 ####################################################################################
 
 import os
-import pkg_resources
+from importlib import resources as impresources
 
 import colorlog
 _log = colorlog.getLogger(__name__)
@@ -43,7 +43,7 @@ class Config:
     def __init__(self, args):
         self._model_len = None  # model_len cache, because it's computation is "heavy" (open file)
         self._args = args
-        self._prefix_data = pkg_resources.resource_filename('integron_finder', "data")
+        self._prefix_data = (impresources.files('integron_finder') / 'data')
         if  self._args.gembase or self._args.prot_file:
             third_party = ('cmsearch', 'hmmsearch')
         else:
