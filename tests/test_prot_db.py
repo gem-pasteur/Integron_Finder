@@ -417,7 +417,7 @@ class TestGemBase(IntegronTest):
             exp = read_multi_fasta(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')))
 
             specie, date, strain, contig = replicon.id.split('.')
-            pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
+            pattern = rf'{specie}\.{date}\.{strain}\.\w?{contig}'
 
             for prot_expected in exp:
                 if re.match(pattern, prot_expected.id):
@@ -450,7 +450,7 @@ class TestGemBase(IntegronTest):
         except AttributeError:
             idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')), 'fasta')
         specie, date, strain, contig = replicon.id.split('.')
-        pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
+        pattern = fr'{specie}\.{date}\.{strain}\.\w?{contig}'
         self.assertListEqual(sorted([i for i in idx if re.match(pattern, i)]), sorted([i for i in db]))
 
         # test Gembase Complet
@@ -471,7 +471,7 @@ class TestGemBase(IntegronTest):
             idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')), 'fasta')
 
         specie, date, strain, contig = replicon.id.split('.')
-        pattern = '{}\.{}\.{}\.\w?{}'.format(specie, date, strain, contig)
+        pattern = fr'{specie}\.{date}\.{strain}\.\w?{contig}'
         seqid_from_gembase_protfile = set([i for i in idx if re.match(pattern, i)])
         seqid_from_if = set([i for i in db])
         non_common_seq = seqid_from_gembase_protfile ^ seqid_from_if

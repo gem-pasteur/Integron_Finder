@@ -243,7 +243,7 @@ class TestFindIntegrase(IntegronTest):
 
             with self.assertRaises(RuntimeError) as ctx:
                 integrase.find_integrase(replicon.id, prot_file, self.tmp_dir, cfg)
-            self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: 'foo'", str(ctx.exception)))
+            self.assertTrue(re.search(r"failed : \[Errno 2\] No such file or directory: 'foo'", str(ctx.exception)))
         finally:
             if len_ori:
                 replicon.__class__.__len__ = len_ori

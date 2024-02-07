@@ -142,7 +142,7 @@ sequence seq_(3|4) contains invalid characters, the sequence is skipped."""
 
         file_name = 'replicon_too_short'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
-        expected_warning = """sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\).
+        expected_warning = r"""sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\).
 sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 50bp\)."""
         with utils.FastaIterator(replicon_path) as seq_db:
             # 2 sequences are rejected so 2 messages are produced (for seq 2 & 4)

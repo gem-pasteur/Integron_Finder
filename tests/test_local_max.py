@@ -228,7 +228,7 @@ class TestLocalMax(IntegronTest):
                                    max_attc_size=self.max_attc_size, min_attc_size=self.min_attc_size,
                                    cmsearch_bin=cmsearch_bin, out_dir=self.out_dir, cpu=self.cpu
                                    )
-        self.assertTrue(re.search("failed : \[Errno 2\] No such file or directory: '{}'".format(cmsearch_bin),
+        self.assertTrue(re.search(r"failed : \[Errno 2\] No such file or directory: '{}'".format(cmsearch_bin),
                         str(ctx.exception)))
 
 

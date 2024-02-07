@@ -107,7 +107,7 @@ def split(replicon_path, chunk=None, outdir='.'):
                 while os.path.exists(chunk_name):
                     root, ext = os.path.splitext(chunk_name)
                     i += 1
-                    match = re.search("_chunk_\d+$", root)
+                    match = re.search(r"_chunk_\d+$", root)
                     if match:
                         root = root[:match.start()]
                     chunk_name = "{}_chunk_{}{}".format(root, i, ext)
