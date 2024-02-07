@@ -30,7 +30,6 @@ import os
 import tempfile
 import shutil
 import re
-from distutils.spawn import find_executable
 
 # # display warning only for non installed integron_finder
 # from Bio import BiopythonExperimentalWarning
@@ -62,7 +61,7 @@ class TestFindAttc(IntegronTest):
         if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
-        self.cmsearch_path = find_executable("cmsearch")
+        self.cmsearch_path = shutil.which("cmsearch")
         self.cpu = 1
         self.model_attc = self.find_data(os.path.join('Models', 'attc_4.cm'))
         self.replicon_name = 'acba.007.p01.13'

@@ -27,7 +27,7 @@
 ####################################################################################
 
 import os
-import distutils
+import shutil
 import sys
 
 try:
@@ -107,21 +107,21 @@ class TestParseArgs(IntegronTest):
 
     def test_cmsearch(self):
         cfg = parse_args([self.replicon])
-        self.assertEqual(cfg.cmsearch, distutils.spawn.find_executable("cmsearch"))
+        self.assertEqual(cfg.cmsearch, shutil.which("cmsearch"))
         cmsearch = self.find_data('Replicons', 'fake_seq.fst')  # whatever the value the file must exists
         cfg = parse_args(['--cmsearch', cmsearch, self.replicon])
         self.assertEqual(cfg.cmsearch, cmsearch)
 
     def test_hmmsearch(self):
         cfg = parse_args([self.replicon])
-        self.assertEqual(cfg.hmmsearch, distutils.spawn.find_executable("hmmsearch"))
+        self.assertEqual(cfg.hmmsearch, shutil.which("hmmsearch"))
         hmmsearch = self.find_data('Replicons', 'fake_seq.fst')  # whatever the value the file must exists
         cfg = parse_args(['--hmmsearch', hmmsearch, self.replicon])
         self.assertEqual(cfg.hmmsearch, hmmsearch)
 
     def test_prodigal(self):
         cfg = parse_args([self.replicon])
-        self.assertEqual(cfg.prodigal, distutils.spawn.find_executable('prodigal'))
+        self.assertEqual(cfg.prodigal, shutil.which('prodigal'))
         prodigal = self.find_data('Replicons', 'fake_seq.fst')  # whatever the value the file must exists
         cfg = parse_args(['--prodigal', prodigal, self.replicon])
         self.assertEqual(cfg.prodigal, prodigal)
@@ -315,9 +315,9 @@ Citation:
            pd=pd_vers,
            mplt=mplt_vers,
            bio=bio_vers,
-           prodigal=integron_finder._prodigal_version(distutils.spawn.find_executable("prodigal")),
-           cmsearch=integron_finder._eddy_version(distutils.spawn.find_executable("cmsearch")),
-           hmmsearch=integron_finder._eddy_version(distutils.spawn.find_executable("hmmsearch"))
+           prodigal=integron_finder._prodigal_version(shutil.which("prodigal")),
+           cmsearch=integron_finder._eddy_version(shutil.which("cmsearch")),
+           hmmsearch=integron_finder._eddy_version(shutil.which("hmmsearch"))
            )
             finally:
                 sys.exit = real_exit

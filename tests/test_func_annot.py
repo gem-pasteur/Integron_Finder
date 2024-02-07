@@ -27,13 +27,12 @@
 ####################################################################################
 
 import os
-import distutils.spawn
 import shutil
 import argparse
 import glob
 import tempfile
 import re
-import pkg_resources
+from importlib import resources as impresources
 
 import numpy as np
 import pandas as pd
@@ -88,7 +87,7 @@ class TestFuncAnnot(IntegronTest):
 
         # NCBIfam-AMRFinder is too big to bee in tests/data
         # search directly in data
-        self._prefix_data = pkg_resources.resource_filename('integron_finder', "data")
+        self._prefix_data = impresources.files('integron_finder') / 'data'
         self.hmm_files = [os.path.join(self._prefix_data, "Functional_annotation", "NCBIfam-AMRFinder.hmm")]
 
         # Define integron_finder variables
@@ -97,8 +96,8 @@ class TestFuncAnnot(IntegronTest):
         args.prot_file = False
         args.cmsearch = __file__
         args.annot_parser_name = None
-        args.hmmsearch = distutils.spawn.find_executable("hmmsearch")
-        args.prodigal = distutils.spawn.find_executable("prodigal")
+        args.hmmsearch = shutil.which("hmmsearch")
+        args.prodigal = shutil.which("prodigal")
         args.cpu = 1
         args.out_dir = self.tmp_dir
         self.cfg = Config(args)
