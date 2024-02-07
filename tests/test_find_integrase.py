@@ -31,7 +31,6 @@ import tempfile
 import shutil
 import argparse
 import re
-import distutils.spawn
 
 try:
     from tests import IntegronTest
@@ -66,8 +65,8 @@ class TestFindIntegrase(IntegronTest):
         self.args = argparse.Namespace()
         self.args.attc_model = 'attc_4.cm'
         self.args.cpu = 1
-        self.args.hmmsearch = distutils.spawn.find_executable('hmmsearch')
-        self.args.prodigal = distutils.spawn.find_executable("prodigal")
+        self.args.hmmsearch = shutil.which('hmmsearch')
+        self.args.prodigal = shutil.which("prodigal")
         self.args.gembase = False
         self.args.prot_file = False
         self.args.cmsearch = __file__

@@ -31,7 +31,7 @@ import shutil
 import tempfile
 import argparse
 import unittest
-import pkg_resources
+from importlib import resources as impresources
 
 import pandas as pd
 import pandas.testing as pdt
@@ -74,7 +74,7 @@ class TestFunctional(IntegronTest):
         os.makedirs(self.out_dir)
         integrase.subprocess.run = self.mute_call(_prodigal_run)
         self.which_ori = shutil.which
-        self._prefix_data = pkg_resources.resource_filename('integron_finder', "data")
+        self._prefix_data = impresources.files('integron_finder') / 'data'
         self.func_annot_dir = os.path.join(self._prefix_data, "Functional_annotation")
 
     def tearDown(self):

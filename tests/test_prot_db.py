@@ -29,7 +29,6 @@
 import os
 import argparse
 import tempfile
-import distutils.spawn
 import shutil
 import re
 
@@ -526,7 +525,7 @@ class TestProdigalDB(IntegronTest):
         self.args.prot_file = False
         self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
         self.args.outdir = self.tmp_dir
-        self.args.prodigal = distutils.spawn.find_executable("prodigal")
+        self.args.prodigal = shutil.which("prodigal")
         self.args.cmsearch = __file__
         self.args.hmmsearch = __file__
         if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):

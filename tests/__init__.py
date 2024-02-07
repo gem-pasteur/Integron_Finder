@@ -208,7 +208,7 @@ def hide_executable(bin_2_hide):
     :param bin_2_hide: the name of the binary to hide
     :return: a decorator
     """
-    def find_executable(func):
+    def which(func):
         @functools.wraps(func)
         def wrapper(exe):
             if exe == bin_2_hide:

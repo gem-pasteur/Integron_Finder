@@ -27,7 +27,7 @@
 ####################################################################################
 
 import sys
-import distutils.spawn
+import shutil
 
 try:
     from tests import IntegronTest
@@ -95,9 +95,9 @@ Citation:
             pd=pd_vers,
             mplt=mplt_vers,
             bio=bio_vers,
-            prodigal=integron_finder._prodigal_version(distutils.spawn.find_executable("prodigal")),
-            cmsearch=integron_finder._eddy_version(distutils.spawn.find_executable("cmsearch")),
-            hmmsearch=integron_finder._eddy_version(distutils.spawn.find_executable("hmmsearch"))
+            prodigal=integron_finder._prodigal_version(shutil.which("prodigal")),
+            cmsearch=integron_finder._eddy_version(shutil.which("cmsearch")),
+            hmmsearch=integron_finder._eddy_version(shutil.which("hmmsearch"))
             )
         self.assertEqual(exp_version, version)
 
@@ -105,7 +105,7 @@ Citation:
     def test_get_version_no_binary(self):
         # use directly get_version_message
         # to simulate parser do not find binaries
-        # distutils.spawn.find_executable return None
+        # shuti.which return None
 
         ##################################
         # case there is no binary at all #
@@ -125,7 +125,7 @@ prodigal not found in Path please use --prodigal option to specify it.
         # but not hmmsearch nor prodigal        #
         #########################################
         version = integron_finder.get_version_message(None,  # hmmsearch
-                                                      distutils.spawn.find_executable('cmsearch'),
+                                                      shutil.which('cmsearch'),
                                                       None)  # prodigal
 
         exp_version = """hmmsearch not found in Path please use --hmmsearch option to specify it.
