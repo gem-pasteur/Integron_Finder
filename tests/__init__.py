@@ -216,5 +216,5 @@ def hide_executable(bin_2_hide):
             else:
                 return func(exe)
         return wrapper
-    return find_executable
+    return which
 
