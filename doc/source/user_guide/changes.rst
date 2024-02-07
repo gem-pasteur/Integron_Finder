@@ -8,6 +8,15 @@ What's new ?
 
 .. _changesV2:
 
+V2.0.3
+======
+
+- Improve the support of gembase format (V1 and V2)
+- fix deprecation warning, in `biopython`, `pandas` and `python` to be compliant with latest version of these libraries.
+- fix `crashes on a multiple contigs file, using the gembase format, in the middle of the contigs being processed. <https://github.com/gem-pasteur/Integron_Finder/issues/103>`_
+- fix `IntegronFinder bugs when there is a "space" character in the path to the genome file <https://github.com/gem-pasteur/Integron_Finder/issues/99>`_
+
+
 In Version 2.0
 ==============
 
