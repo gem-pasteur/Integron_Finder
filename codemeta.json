@@ -7,7 +7,7 @@
     "downloadUrl": "https://files.pythonhosted.org/packages/4a/39/816165ed051a41560c9167590bf974a83de34e5a43509e9501f79cdf4ba4/integron_finder-2.0.2.tar.gz",
     "issueTracker": "https://github.com/gem-pasteur/Integron_Finder/issues",
     "name": "Integron_Finder",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "description": "Integron_Finder is a program that detects integrons in DNA sequences.",
     "applicationCategory": "Bioinformatic",
     "funding": "ANR-16-CONV-0005, EQU201903007835, ANR-10-LABX-62-IBEID",
@@ -31,19 +31,18 @@
         "macOS"
     ],
     "softwareRequirements": [
-        "- Python >=3.7,<=3.10",
-        "- Pandas >=1.1.5,<=1.4.0",
-        "- Numpy >=1.19.4,<=1.22.1",
-        "- Biopython >=1.78,<=1.79",
-        "- Matplotlib >=3.3.3,<=3.5.1",
+        "- Python >=3.10,<=3.12",
+        "- Pandas >=2",
+        "- Numpy >=1.26",
+        "- Biopython >=1.82,<=1.83",
+        "- Matplotlib >=3.8",
         "- colorlog",
         "- HMMER >=3.1b2,<=3.3.2",
         "- INFERNAL >=1.1.2,<=1.1.4",
         "- Prodigal >=2.6.2,<=V2.6.3",
-        ""
     ],
     "relatedLink": [
-        "https://integronfinder.readthedocs.io/en/v2.0.2/"
+        "https://integronfinder.readthedocs.io/en/v2.0.3/"
     ],
     "author": [
         {
