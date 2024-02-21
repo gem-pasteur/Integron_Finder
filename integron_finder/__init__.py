@@ -29,8 +29,10 @@
 import sys
 from subprocess import run
 from time import localtime, strftime
+from .utils import get_git_revision_short_hash
 
-__version__ = f'2.dev{strftime("%Y%m%d", localtime())}'
+
+__version__ = f'2.dev{strftime("%Y%m%d", localtime())}_{get_git_revision_short_hash()}'
 
 
 class IntegronError(Exception):
