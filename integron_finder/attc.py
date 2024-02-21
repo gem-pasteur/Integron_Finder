@@ -243,7 +243,6 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                  (all_attc["pos_end"].diff().abs() > 3)) &
                                 (all_attc["sens"].eq(all_attc["sens"].shift())
                                  )].copy()
-
         return all_attc
 
     for i in integrons:
@@ -336,7 +335,6 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                    cpu=cpu)
 
                 all_attc = merge_previous_attc_w_local_max(i, df_max)
-
                 max_elt = pd.concat([max_elt, all_attc])
                 if not df_max.empty:  # Max can sometimes find bigger attC than permitted
                     go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - all_attc.pos_end.values[0]
@@ -376,9 +374,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                    cpu=cpu)
                 to_concat = [df for df in [max_elt, df_max] if not df.empty]
                 if to_concat:
-                    max_elt = pd.concat([df for df in [max_elt, df_max] if not df.empty])
-                else:
-                    max_elt = max_elt
+                    max_elt = pd.concat(to_concat)
                 if not max_elt.empty:
                     max_elt = expand(replicon,
                                      window_beg, window_end, max_elt,
@@ -391,12 +387,9 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      out_dir=out_dir,
                                      cmsearch_bin=cmsearch_bin,
                                      cpu=cpu)
-        to_concat = [df for df in [max_elt, df_max] if not df.empty]
+        to_concat = [df for df in [max_final, max_elt] if not df.empty]
         if to_concat:
-            max_final = pd.concat([df for df in to_concat if not df.empty])
-        else:
-            max_final = max_elt.copy()
+            max_final = pd.concat(to_concat)
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)
-        max_final.index = range(len(max_final))
     max_final = max_final.astype(dtype=data_type)
     return max_final
