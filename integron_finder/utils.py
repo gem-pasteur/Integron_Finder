@@ -226,6 +226,10 @@ def log_level(verbose, quiet):
 
 
 def get_git_revision_short_hash():
+    """
+    :return: the git commit number (short version)
+    :rtype: str
+    """
     try:
         short_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'],
                                              cwd=os.path.dirname(os.path.abspath(__file__)))
