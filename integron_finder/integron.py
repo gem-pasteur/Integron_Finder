@@ -110,7 +110,10 @@ def find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=None
     elif attc_file:
         # it call after default search
         local_max_done = False
-        attc = read_infernal(attc_file, replicon.id, cfg.model_len,
+        attc = read_infernal(attc_file,
+                             replicon.id,
+                             len(replicon),
+                             cfg.model_len,
                              evalue=cfg.evalue_attc,
                              size_max_attc=cfg.max_attc_size,
                              size_min_attc=cfg.min_attc_size)
