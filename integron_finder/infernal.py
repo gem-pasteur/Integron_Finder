@@ -94,14 +94,14 @@ def read_infernal(infile, replicon_id, replicon_size,
         df.index = list(range(0, len(df)))
         idx = (df.pos_beg_tmp > df.pos_end_tmp)
         df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: max(x["pos_end_tmp"] - (len_model_attc - x["cm_fin"]),
-                                                                 0),
+                                                                 1),
                                                    axis=1)
         df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: min(x["pos_beg_tmp"] + (x["cm_debut"] - 1),
                                                                  replicon_size),
                                                    axis=1)
 
         df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: max(x["pos_beg_tmp"] - (x["cm_debut"] - 1),
-                                                                   0)
+                                                                   1)
                                                      , axis=1)
         df.loc[~idx, "pos_end"] = df.loc[~idx].apply(lambda x: min(x["pos_end_tmp"] + (len_model_attc - x["cm_fin"]),
                                                                    replicon_size)
