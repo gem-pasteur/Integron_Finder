@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import logging
 ####################################################################################
 # Integron_Finder - Integron Finder aims at detecting integrons in DNA sequences   #
 # by finding particular features of the integron:                                  #
@@ -56,7 +56,7 @@ def read_infernal(infile, replicon_id, replicon_size,
             | and each row is a hit that match the attc covariance model.
     :rtype: :class:`pandas.DataFrame` object
     """
-    _log.debug(f"read_infernal {infile}, {replicon_id}, {len_model_attc}, "
+    _log.debug(f"read_infernal {infile}, {replicon_id}, {replicon_size}, {len_model_attc}, "
                f"evalue={evalue}, size_max_attc={size_max_attc}, size_min_attc={size_min_attc}")
     dtype = {"Accession_number": "str",
              "cm_attC": "str",
