@@ -48,7 +48,7 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder import integrase
+from integron_finder import __version__ as _if_version, __commit__ as _if_commit
 from integron_finder import config
 from integron_finder import IntegronError
 from integron_finder.scripts.finder import main
@@ -646,6 +646,8 @@ class TestFunctional(IntegronTest):
         output_filename = 'fake_seq.integrons'
         test_result_path = os.path.join(test_result_dir, output_filename)
         with open(test_result_path) as tested_file:
+            test_line = next(tested_file)
+            self.assertTrue(test_line.startswith(f'# integron_finder {_if_version} {_if_commit}'))
             test_line = next(tested_file)
             self.assertTrue(test_line.startswith('# cmd: integron_finder'))
             test_line = next(tested_file)
