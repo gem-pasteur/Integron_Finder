@@ -8,8 +8,21 @@ What's new ?
 
 .. _changesV2:
 
+
+V2.0.4
+======
+
+- fix **major** bug introduce in 2.0.3 in the fix of pandas deprecation warning.
+  In some conditions with --local-max with CALIN the number of CALIN is wrong.
+- fix issue `Wrong coordinates in results <https://github.com/gem-pasteur/Integron_Finder/issues/114>`_
+  If an attC site is find on the very first position and the model is truncated the computation of the position
+  was wrong.
+
+
 V2.0.3
 ======
+
+**DO NOT USE** this version (see V2.0.4)
 
 - Improve the support of gembase format (V1 and V2)
 - fix deprecation warning, in `biopython`, `pandas` and `python` to be compliant with latest version of these libraries.
