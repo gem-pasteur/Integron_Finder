@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import logging
 ####################################################################################
 # Integron_Finder - Integron Finder aims at detecting integrons in DNA sequences   #
 # by finding particular features of the integron:                                  #
@@ -38,7 +38,8 @@ from .utils import model_len
 _log = colorlog.getLogger(__name__)
 
 
-def read_infernal(infile, replicon_id, len_model_attc,
+def read_infernal(infile, replicon_id, replicon_size,
+                  len_model_attc,
                   evalue=1, size_max_attc=200, size_min_attc=40):
     """
     Function that parse cmsearch --tblout output and returns a pandas DataFrame
@@ -55,7 +56,7 @@ def read_infernal(infile, replicon_id, len_model_attc,
             | and each row is a hit that match the attc covariance model.
     :rtype: :class:`pandas.DataFrame` object
     """
-    _log.debug(f"read_infernal {infile}, {replicon_id}, {len_model_attc}, "
+    _log.debug(f"read_infernal {infile}, {replicon_id}, {replicon_size}, {len_model_attc}, "
                f"evalue={evalue}, size_max_attc={size_max_attc}, size_min_attc={size_min_attc}")
     dtype = {"Accession_number": "str",
              "cm_attC": "str",
@@ -92,11 +93,19 @@ def read_infernal(infile, replicon_id, len_model_attc,
         df.sort_values(['pos_end_tmp', 'evalue'], inplace=True)
         df.index = list(range(0, len(df)))
         idx = (df.pos_beg_tmp > df.pos_end_tmp)
-        df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: x["pos_end_tmp"] - (len_model_attc - x["cm_fin"]), axis=1)
-        df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: x["pos_beg_tmp"] + (x["cm_debut"] - 1), axis=1)
+        df.loc[idx, "pos_beg"] = df.loc[idx].apply(lambda x: max(x["pos_end_tmp"] - (len_model_attc - x["cm_fin"]),
+                                                                 1),
+                                                   axis=1)
+        df.loc[idx, "pos_end"] = df.loc[idx].apply(lambda x: min(x["pos_beg_tmp"] + (x["cm_debut"] - 1),
+                                                                 replicon_size),
+                                                   axis=1)
 
-        df.loc[~idx, "pos_end"] = df.loc[~idx].apply(lambda x: x["pos_end_tmp"] + (len_model_attc - x["cm_fin"]), axis=1)
-        df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: x["pos_beg_tmp"] - (x["cm_debut"] - 1), axis=1)
+        df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: max(x["pos_beg_tmp"] - (x["cm_debut"] - 1),
+                                                                   1)
+                                                     , axis=1)
+        df.loc[~idx, "pos_end"] = df.loc[~idx].apply(lambda x: min(x["pos_end_tmp"] + (len_model_attc - x["cm_fin"]),
+                                                                   replicon_size)
+                                                     , axis=1)
 
         df = df[["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"]]
         df["cm_attC"] = df["cm_attC"].str.lower()
@@ -198,7 +207,7 @@ def local_max(replicon,
     cmsearch_cmd = \
         '{bin} -Z {size} {strand} --max --cpu {cpu} -A {out} --tblout {tblout} -E 10 ' \
         '--incE {incE} {mod_attc_path} {infile}'.format(bin=cmsearch_bin.replace(' ', '\\ '),
-                                                        size=replicon_size / 1000000.,
+                                                        size=replicon_size / 1000000.,  # search space size in *Mb*
                                                         strand={"both": "",
                                                                 "top": "--toponly",
                                                                 "bottom": "--bottomonly"}[strand_search],
@@ -217,7 +226,9 @@ def local_max(replicon,
     if completed_process.returncode != 0:
         raise RuntimeError(f"{cmsearch_cmd} failed returncode = {completed_process.returncode}")
     df_max = read_infernal(tblout_path,
-                           replicon.id, model_len(model_attc_path),
+                           replicon.id,
+                           replicon_size,
+                           model_len(model_attc_path),
                            evalue=evalue_attc,
                            size_max_attc=max_attc_size,
                            size_min_attc=min_attc_size)

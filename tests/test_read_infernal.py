@@ -48,6 +48,7 @@ class TestReadInfernal(IntegronTest):
         """
         self.replicon_name = "acba.007.p01.13"
         self.replicon_id = "ACBA.007.P01_13"
+        self.replicon_size = 20301
         self.length_cm = 47  # length in 'CLEN' (value for model attc_4.cm)
         self.dtype = {"Accession_number": "str",
                       "cm_attC": "str",
@@ -65,7 +66,9 @@ class TestReadInfernal(IntegronTest):
 
         """
         filename = "infernal.txt"
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm)
+        df = infernal.read_infernal(filename,
+                                    self.replicon_id, self.replicon_size,
+                                    self.length_cm)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.astype(self.dtype)
@@ -77,7 +80,9 @@ class TestReadInfernal(IntegronTest):
         inside, it returns an empty dataframe.
         """
         filename = self.find_data(os.path.join("fictive_results", "{}_attc_table-empty.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm)
+        df = infernal.read_infernal(filename,
+                                    self.replicon_id, self.replicon_size,
+                                    self.length_cm)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.astype(self.dtype)
@@ -92,7 +97,9 @@ class TestReadInfernal(IntegronTest):
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
                                                "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, evalue=1e-10)
+        df = infernal.read_infernal(filename,
+                                    self.replicon_id, self.replicon_size,
+                                    self.length_cm, evalue=1e-10)
         expect = pd.DataFrame(columns=["Accession_number", "cm_attC", "cm_debut",
                                        "cm_fin", "pos_beg", "pos_end", "sens", "evalue"])
         expect = expect.astype(self.dtype)
@@ -107,7 +114,9 @@ class TestReadInfernal(IntegronTest):
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
                                                "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm)
+        df = infernal.read_infernal(filename,
+                                    self.replicon_id, self.replicon_size,
+                                    self.length_cm)
         expect = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id,],
                                 "cm_attC": ["attc_4", "attc_4", "attc_4",],
                                 "cm_debut": [1, 1, 1],
@@ -126,7 +135,9 @@ class TestReadInfernal(IntegronTest):
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
                                                "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_min_attc=60)
+        df = infernal.read_infernal(filename,
+                                    self.replicon_id, self.replicon_size,
+                                    self.length_cm, size_min_attc=60)
         expect = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id],
                                 "cm_attC": ["attc_4", "attc_4"],
                                 "cm_debut": [1, 1],
@@ -146,7 +157,9 @@ class TestReadInfernal(IntegronTest):
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
                                                "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_max_attc=100)
+        df = infernal.read_infernal(filename,
+                                    self.replicon_id, self.replicon_size,
+                                    self.length_cm, size_max_attc=100)
         expect = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id],
                                "cm_attC": ["attc_4", "attc_4"],
                                "cm_debut": [1, 1],
@@ -165,11 +178,18 @@ class TestReadInfernal(IntegronTest):
         filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
                                                "tmp_{}".format(self.replicon_id),
                                                "{}_attc_table.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, evalue=1e-8)
-        expect = pd.DataFrame({"Accession_number": self.replicon_id, "cm_attC": "attc_4",
-                               "cm_debut": 1, "cm_fin": 47, "pos_beg": 17825,
-                               "pos_end": 17884, "sens": "-", "evalue": 1e-9},
-                              ignore_index=True)
+        df = infernal.read_infernal(filename,
+                                    self.replicon_id, self.replicon_size,
+                                    self.length_cm, evalue=1e-8)
+        expect = pd.DataFrame({"Accession_number": [self.replicon_id],
+                               "cm_attC": ["attc_4"],
+                               "cm_debut": [1],
+                               "cm_fin": [47],
+                               "pos_beg": [17825],
+                               "pos_end": [17884],
+                               "sens": ["-"],
+                               "evalue": [1e-9]}
+                              )
         expect = expect.astype(self.dtype)
         pdt.assert_frame_equal(df, expect)
 
@@ -178,9 +198,12 @@ class TestReadInfernal(IntegronTest):
         Test that when the model did not completely match on the sequence,
         the start and end positions of hit are well recalculated. All hits are on strand +
         """
-        filename = self.find_data(
-            os.path.join("fictive_results", "{}_attc_table-partial.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm)
+        filename = self.find_data("fictive_results",
+                                  f"{self.replicon_id}_attc_table-partial.res")
+
+        df = infernal.read_infernal(filename,
+                                    self.replicon_id, self.replicon_size,
+                                    self.length_cm)
         expect = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id],
                                "cm_attC": ["attc_4", "attc_4", "attc_4"],
                                "cm_debut": [1, 1, 10],
@@ -199,9 +222,11 @@ class TestReadInfernal(IntegronTest):
         """
         filename = self.find_data(
             os.path.join("fictive_results", "{}_attc_table-partialm.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm)
+        df = infernal.read_infernal(filename,
+                                    self.replicon_id, self.replicon_size,
+                                    self.length_cm)
         expect = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id],
-                               "cm_attC": ["attc_4", "attc_4", "attc_4", ],
+                               "cm_attC": ["attc_4", "attc_4", "attc_4"],
                                "cm_debut": [1, 1, 10],
                                "cm_fin": [40, 47, 47],
                                "pos_beg": [17818, 19080, 19618],
@@ -212,61 +237,24 @@ class TestReadInfernal(IntegronTest):
         expect = expect.astype(self.dtype)
         pdt.assert_frame_equal(df, expect)
 
-    def test_attcsize_minthres(self):
-        """
-        Test that the filter by a minimum attc size works.
-        """
-        filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "tmp_{}".format(self.replicon_id),
-                                               "{}_attc_table.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_min_attc=60)
-        expect = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id],
+    def test_attc_overflow_pos(self):
+        """test when model is truncated and on very first or last replicon pos"""
+        filename = self.find_data('fictive_results', '37_0_200_subseq_overflow_attc_table.res')
+        replicon_id = '37'
+        replicon_size = 3109
+        model_len = 47
+        df = infernal.read_infernal(filename,
+                                    replicon_id, replicon_size,
+                                    model_len)
+
+        expect = pd.DataFrame({"Accession_number": [replicon_id, replicon_id],
                                "cm_attC": ["attc_4", "attc_4"],
-                               "cm_debut": [1, 1],
-                               "cm_fin": [47, 47],
-                               "pos_beg": [19080, 19618],
-                               "pos_end": [19149, 19726],
-                               "sens": ["-", "-"],
-                               "evalue": [1e-4, 1.1e-7]})
+                               "cm_debut": [4, 1],
+                               "cm_fin": [44, 41],
+                               "pos_beg": [1, 3065],
+                               "pos_end": [126, 3109],
+                               "sens": ["-", "+"],
+                               "evalue": [0.0024,0.0023]})
+
         expect = expect.astype(self.dtype)
         pdt.assert_frame_equal(df, expect)
-
-    def test_attcsize_maxthres(self):
-        """
-        Test that the filter by a maximum attc size works.
-        """
-        filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "tmp_{}".format(self.replicon_id),
-                                               "{}_attc_table.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, size_max_attc=100)
-        expect = pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id],
-                               "cm_attC": ["attc_4", "attc_4"],
-                               "cm_debut": [1, 1],
-                               "cm_fin": [47, 47],
-                               "pos_beg": [17825, 19080],
-                               "pos_end": [17884, 19149],
-                               "sens": ["-", "-"],
-                               "evalue": [1e-9, 1e-4]})
-        expect = expect.astype(self.dtype)
-        pdt.assert_frame_equal(df, expect)
-
-    def test_filter_evalue_thres(self):
-        """
-        Test that the filter by a maximum attc size works.
-        """
-        filename = self.find_data(os.path.join("Results_Integron_Finder_{}".format(self.replicon_name),
-                                               "tmp_{}".format(self.replicon_id),
-                                               "{}_attc_table.res".format(self.replicon_id)))
-        df = infernal.read_infernal(filename, self.replicon_id, self.length_cm, evalue=1e-8)
-        expect =pd.DataFrame({"Accession_number": self.replicon_id,
-                              "cm_attC": "attc_4",
-                              "cm_debut": 1,
-                              "cm_fin": 47,
-                              "pos_beg": 17825,
-                              "pos_end": 17884,
-                              "sens": "-",
-                              "evalue": 1e-9},
-                             index=[0])
-        expect = expect.astype(self.dtype)
-        pdt.assert_frame_equal(df, expect)
-
