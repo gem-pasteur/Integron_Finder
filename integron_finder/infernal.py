@@ -76,7 +76,7 @@ def read_infernal(infile, replicon_id, len_model_attc,
                      comment='#',
                      usecols=[2, 5, 6, 7, 8, 9, 15])
     # some line can have different number of columns due to difference in description
-    # we do not use this columns so we must parse only cols we need
+    # we do not use these columns, so we must parse only cols we need
     # Keep only columns: query_name(2), mdl from(5), mdl to(6), seq from(7),
     # seq to(8), strand(9), E-value(15)
     df.columns = ["cm_attC", "cm_debut", "cm_fin", "pos_beg_tmp", "pos_end_tmp", "sens", "evalue"]
@@ -321,7 +321,9 @@ def expand(replicon,
                                evalue_attc=evalue_attc,
                                cmsearch_bin=cmsearch_bin
                                )
-            max_elt = pd.concat([df for df in [max_elt, df_max] if not df.empty])
+            to_concat = [df for df in [max_elt, df_max] if not df.empty]
+            if to_concat:
+                max_elt = pd.concat(to_concat)
             _log.info(f"\tsearched {window_beg}->{window_end} in {searched_strand} strand(s) found {len(df_max)} attc sites")
 
             if circular:
@@ -373,7 +375,9 @@ def expand(replicon,
                                cpu=cpu,
                                evalue_attc=evalue_attc,
                                cmsearch_bin=cmsearch_bin)
-            max_elt = pd.concat([max_elt, df_max])  # update of attC list of hits.
+            to_concat = [df for df in (max_elt, df_max) if not df.empty]
+            if to_concat:
+                max_elt = pd.concat(to_concat) # update of attC list of hits.
             _log.info(f"\tsearched {window_beg}->{window_end} in {searched_strand} strand(s) found {len(df_max)} attc sites")
 
             if circular:

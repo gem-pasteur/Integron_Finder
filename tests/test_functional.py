@@ -597,6 +597,40 @@ class TestFunctional(IntegronTest):
     @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
     @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
     @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
+    def test_gembase2_VICH001_0523_00092(self):
+        replicon_filename = 'VICH001.0523.00092'
+        output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
+        test_result_dir = os.path.join(self.out_dir, output_filename)
+        command = "integron_finder " \
+                  f"--outdir {self.out_dir} " \
+                  "--circ " \
+                  "--local-max " \
+                  "--cpu 4 " \
+                  "--gembase " \
+                  f"--gembase-path {self.find_data('Gembase', 'Gembase2')} " \
+                  f"{self.find_data('Gembase', 'Gembase2', 'Replicons', replicon_filename + '.fna')}"
+
+        with self.catch_io(out=True, err=True):
+            main(command.split()[1:], loglevel='WARNING')
+
+        output_filename = '{}.integrons'.format(replicon_filename)
+        expected_result_path = self.find_data(os.path.join('Results_Integron_Finder_{}'.format(replicon_filename),
+                                                           output_filename))
+        test_result_path = os.path.join(test_result_dir, output_filename)
+        self.assertIntegronResultEqual(expected_result_path, test_result_path)
+
+        summary_file_name = '{}.summary'.format(replicon_filename)
+        exp_summary_path = self.find_data(
+            os.path.join('Results_Integron_Finder_{}'.format(replicon_filename), summary_file_name))
+        exp_summary = pd.read_csv(exp_summary_path, sep="\t", comment='#')
+        test_summary_path = os.path.join(test_result_dir, summary_file_name)
+        test_summary = pd.read_csv(test_summary_path, sep="\t", comment='#')
+        pdt.assert_frame_equal(exp_summary, test_summary)
+
+
+    @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
+    @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_no_integron(self):
         replicon_filename = 'fake_seq'
         output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
