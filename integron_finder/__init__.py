@@ -60,7 +60,7 @@ def _eddy_version(path):
     :return: the version
     :rtype: str
     """
-    process = run([path, "-h"], capture_output=True, text=True)
+    process = subprocess.run([path, "-h"], stdout=subprocess.PIPE, text=True)
     vers = process.stdout.split('\n')[1].strip()[2:]
     return vers
 
@@ -70,7 +70,7 @@ def _prodigal_version(path):
 
     :return:
     """
-    process = run([path, "-v"], capture_output=True, text=True)
+    process = subprocess.run([path, "-v"], stderr=subprocess.PIPE, text=True)
     vers = process.stderr.strip()
     return vers
 

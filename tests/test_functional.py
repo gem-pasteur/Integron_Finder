@@ -54,7 +54,6 @@ from integron_finder import IntegronError
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
 
-_prodigal_run = integrase.subprocess.run
 
 
 class TestFunctional(IntegronTest):
@@ -72,7 +71,6 @@ class TestFunctional(IntegronTest):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
-        integrase.subprocess.run = self.mute_call(_prodigal_run)
         self.which_ori = shutil.which
         self._prefix_data = impresources.files('integron_finder') / 'data'
         self.func_annot_dir = os.path.join(self._prefix_data, "Functional_annotation")
@@ -80,8 +78,8 @@ class TestFunctional(IntegronTest):
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
-        integrase.subprocess.run = _prodigal_run
         shutil.which = self.which_ori
+
 
     @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
     @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
@@ -112,6 +110,7 @@ class TestFunctional(IntegronTest):
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
         test_summary = pd.read_csv(test_summary_path, sep="\t", comment="#")
         pdt.assert_frame_equal(exp_summary, test_summary)
+
 
     @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
     @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')

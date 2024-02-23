@@ -69,6 +69,7 @@ class TestFuncAnnot(IntegronTest):
         # loggers are singleton
         cls.set_log_level('INFO')
 
+
     def setUp(self):
         """
         Define variables common to all tests
@@ -128,7 +129,7 @@ class TestFuncAnnot(IntegronTest):
 
         # Run prodigal to find CDS on replicon (and run hmmsearch on integrase (2 profiles))
         self.integrases = find_integrase(self.replicon.id, self.prot_file, self.tmp_dir, self.cfg)
-        annotation.subprocess.run = self.mute_call(_annot_run_ori)
+        annotation.subprocess.run = self.mute_call(annotation.subprocess.run)
 
 
     def tearDown(self):
@@ -138,7 +139,7 @@ class TestFuncAnnot(IntegronTest):
         if os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
             pass
-        annotation.subprocess = _annot_run_ori
+        annotation.subprocess.run = _annot_run_ori
 
 
     def test_annot_calin(self):

@@ -111,6 +111,7 @@ class IntegronTest(unittest.TestCase):
         returncode = args[0]
         raise TypeError(returncode)
 
+
     @staticmethod
     def mute_call(call_ori):
         """
