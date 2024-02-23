@@ -101,11 +101,11 @@ def read_infernal(infile, replicon_id, replicon_size,
                                                    axis=1)
 
         df.loc[~idx, "pos_beg"] = df.loc[~idx].apply(lambda x: max(x["pos_beg_tmp"] - (x["cm_debut"] - 1),
-                                                                   1)
-                                                     , axis=1)
+                                                                   1),
+                                                     axis=1)
         df.loc[~idx, "pos_end"] = df.loc[~idx].apply(lambda x: min(x["pos_end_tmp"] + (len_model_attc - x["cm_fin"]),
-                                                                   replicon_size)
-                                                     , axis=1)
+                                                                   replicon_size),
+                                                     axis=1)
 
         df = df[["Accession_number", "cm_attC", "cm_debut", "cm_fin", "pos_beg", "pos_end", "sens", "evalue"]]
         df["cm_attC"] = df["cm_attC"].str.lower()

@@ -119,8 +119,9 @@ def find_integron(replicon, prot_db, intI_file, phageI_file, cfg, attc_file=None
                              size_min_attc=cfg.min_attc_size)
         attc.sort_values(["Accession_number", "pos_beg", "evalue"], inplace=True)
 
-    # attc_cluster_list = list of Dataframe, each have a an array of attC
-    attc_cluster_list = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold, len(replicon), replicon.topology)
+    # attc_cluster_list = list of Dataframe, each have an array of attC
+    attc_cluster_list = search_attc(attc, cfg.keep_palindromes, cfg.distance_threshold,
+                                    len(replicon), replicon.topology)
     integrons = []
     if not intI_ac.empty and attc_cluster_list:
         attc_cluster_nb = len(attc_cluster_list)

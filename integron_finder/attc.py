@@ -88,7 +88,7 @@ def search_attc(attc_df, keep_palindromes, dist_threshold, replicon_size, rep_to
             for row_idx in range(1, len(attc_df)):
                 previous_attc = attc_to_keep.pop()
                 attc_to_keep.extend(overlap(previous_attc, attc_df.iloc[row_idx]))
-            attc_df = pd.DataFrame(attc_to_keep)
+            attc_df = pd.DataFrame(attc_to_keep, index=list(range(len(attc_to_keep))))
         attc_plus = attc_df[attc_df.sens == "+"].copy()
         attc_minus = attc_df[attc_df.sens == "-"].copy()
 
