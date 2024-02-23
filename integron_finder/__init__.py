@@ -27,12 +27,29 @@
 ####################################################################################
 
 import sys
-from subprocess import run
+import os
+import  subprocess
 from time import localtime, strftime
-from .utils import get_git_revision_short_hash
 
 
-__version__ = f'2.dev{strftime("%Y%m%d", localtime())}_{get_git_revision_short_hash()}'
+__version__ = f'{strftime("%Y%m%d", localtime())}.dev'
+
+
+def get_git_revision_short_hash():
+    """
+    :return: the git commit number (short version)
+    :rtype: str
+    """
+    try:
+        short_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'],
+                                             cwd=os.path.dirname(os.path.abspath(__file__)))
+        short_hash = str(short_hash, "utf-8").strip()
+    except subprocess.CalledProcessError:
+        short_hash = ''
+    return short_hash
+
+
+__commit__ = f'{get_git_revision_short_hash()}'
 
 
 class IntegronError(Exception):
@@ -89,7 +106,7 @@ def get_version_message(hmmsearch, cmsearch, prodigal):
                 version_text += f"{prog_name} not found in Path please use --{prog_name} option to specify it.\n"
 
     else:
-        version_text = """integron_finder version {i_f}
+        version_text = """integron_finder version {i_f} {commit}
 Using:
  - Python {py}
  - numpy {np}
@@ -115,6 +132,7 @@ Citation:
  Haft, DH et al., Nucleic Acids Res. 2018 Jan 4;46(D1):D851-D860
  PMID: 29112715
 """.format(i_f=__version__,
+           commit=__commit__,
            py=sys.version.replace('\n', ' '),
            np=np_vers,
            pd=pd_vers,

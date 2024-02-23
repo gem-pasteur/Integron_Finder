@@ -27,7 +27,6 @@
 ####################################################################################
 
 import os
-import subprocess
 
 import colorlog
 from Bio import Seq
@@ -223,18 +222,3 @@ def log_level(verbose, quiet):
     level = max(10, level)
     level = min(50, level)
     return level
-
-
-def get_git_revision_short_hash():
-    """
-    :return: the git commit number (short version)
-    :rtype: str
-    """
-    try:
-        short_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'],
-                                             cwd=os.path.dirname(os.path.abspath(__file__)))
-    except subprocess.CalledProcessError:
-        short_hash = 'not_git'
-    short_hash = str(short_hash, "utf-8").strip()
-    return short_hash
-

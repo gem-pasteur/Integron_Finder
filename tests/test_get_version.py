@@ -64,7 +64,7 @@ class TestGetVersion(IntegronTest):
             finally:
                 sys.exit = real_exit
 
-        exp_version = """integron_finder version {i_f}
+        exp_version = """integron_finder version {i_f} {commit}
 Using:
  - Python {py}
  - numpy {np}
@@ -90,6 +90,7 @@ Citation:
  Haft, DH et al., Nucleic Acids Res. 2018 Jan 4;46(D1):D851-D860
  PMID: 29112715
 """.format(i_f=integron_finder.__version__,
+           commit=integron_finder.__commit__,
             py=sys.version.replace('\n', ' '),
             np=np_vers,
             pd=pd_vers,
