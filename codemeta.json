@@ -1,20 +1,82 @@
 {
     "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
-    "@type": "SoftwareSourceCode",
-    "license": "https://spdx.org/licenses/GPL-3.0",
-    "codeRepository": "git+https://github.com/gem-pasteur/Integron_Finder",
-    "dateModified": "2022-05-02",
-    "downloadUrl": "https://files.pythonhosted.org/packages/4a/39/816165ed051a41560c9167590bf974a83de34e5a43509e9501f79cdf4ba4/integron_finder-2.0.2.tar.gz",
-    "issueTracker": "https://github.com/gem-pasteur/Integron_Finder/issues",
-    "name": "Integron_Finder",
-    "version": "2.0.3",
-    "description": "Integron_Finder is a program that detects integrons in DNA sequences.",
+    "type": "SoftwareSourceCode",
     "applicationCategory": "Bioinformatic",
-    "funding": "ANR-16-CONV-0005, EQU201903007835, ANR-10-LABX-62-IBEID",
-    "developmentStatus": "active",
-    "referencePublication": "https://doi.org/10.3390/microorganisms10040700",
+    "author": [
+        {
+            "id": "https://orcid.org/0000-0002-0220-0482",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Bioinformatics and Biostatistics Hub, Institut Pasteur, Université de Paris Cité, 75015 Paris, France"
+            },
+            "email": "bneron@pasteur.fr",
+            "familyName": "Néron",
+            "givenName": "Bertrand"
+        },
+        {
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Laboratoire Interdisciplinaire des Sciences du Numérique, Université Paris-Saclay, CNRS UMR 9015, INRIA, 91400 Orsay, France"
+            },
+            "email": "jean.cury@normalesup.org",
+            "familyName": "Cury",
+            "givenName": "Jean"
+        },
+        {
+            "id": "https://orcid.org/0000-0001-7704-822X",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Microbial Evolutionary Genomics, Institut Pasteur, Université de Paris Cité, CNRS UMR3525, 75015 Paris, France"
+            },
+            "email": "erocha@pasteur.fr",
+            "familyName": "Rocha",
+            "givenName": "Eduardo"
+        }
+    ],
+    "codeRepository": "git+https://github.com/gem-pasteur/Integron_Finder",
+    "contributor": [
+        {
+            "id": "https://orcid.org/0000-0002-8793-9584",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Microbial Evolutionary Genomics, Institut Pasteur, Université de Paris Cité, CNRS UMR3525, 75015 Paris, France /  DGA CBRN Defence, 91710 Vert-le-Petit, France"
+            },
+            "email": "eloi.littner@pasteur.fr",
+            "familyName": "Littner",
+            "givenName": "Eloi"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-0878-2209",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Microbial Evolutionary Genomics, Institut Pasteur, Université de Paris Cité, CNRS UMR3525, 75015 Paris, France / Ecole Doctorale FIRE–Programme Bettencourt, CRI, 75004 Paris, France"
+            },
+            "email": "matthieu.haudiquet@pasteur.fr",
+            "familyName": "Haudiquet",
+            "givenName": "Matthieu"
+        },
+        {
+            "id": "https://orcid.org/0000-0003-4797-6185",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Microbial Evolutionary Genomics, Institut Pasteur, Université de Paris Cité, CNRS UMR3525, 75015 Paris, France / Collège Doctoral, Sorbonne Université, 75005 Paris, France"
+            },
+            "email": "amandine.perrin@pasteur.fr",
+            "familyName": "Perrin",
+            "givenName": "Amandine"
+        }
+    ],
+    "dateModified": "2022-05-02",
+    "description": "Integron_Finder is a program that detects integrons in DNA sequences.",
+    "downloadUrl": "https://files.pythonhosted.org/packages/4a/39/816165ed051a41560c9167590bf974a83de34e5a43509e9501f79cdf4ba4/integron_finder-2.0.2.tar.gz",
     "funder": {
-        "@type": "Organization",
+        "type": "Organization",
         "name": "Institut Pasteur, CNRS"
     },
     "keywords": [
@@ -23,13 +85,14 @@
         "antibiotic resistance",
         "bioinformatic"
     ],
-    "programmingLanguage": [
-        "Python 3"
-    ],
+    "license": "https://spdx.org/licenses/GPL-3.0",
+    "name": "Integron_Finder",
     "operatingSystem": [
         "Linux",
         "macOS"
     ],
+    "programmingLanguage": "Python 3",
+    "relatedLink": "https://integronfinder.readthedocs.io/en/v2.0.3/",
     "softwareRequirements": [
         "- Python >=3.10,<=3.12",
         "- Pandas >=2",
@@ -39,78 +102,11 @@
         "- colorlog",
         "- HMMER >=3.1b2,<=3.3.2",
         "- INFERNAL >=1.1.2,<=1.1.4",
-        "- Prodigal >=2.6.2,<=V2.6.3",
+        "- Prodigal >=2.6.2,<=V2.6.3"
     ],
-    "relatedLink": [
-        "https://integronfinder.readthedocs.io/en/v2.0.3/"
-    ],
-    "author": [
-        {
-            "@type": "Person",
-            "@id": "https://orcid.org/0000-0002-0220-0482",
-            "givenName": "Bertrand",
-            "familyName": "Néron",
-            "email": "bneron@pasteur.fr",
-            "affiliation": {
-                "@type": "Organization",
-                "name": "Bioinformatics and Biostatistics Hub, Institut Pasteur, Université de Paris Cité, 75015 Paris, France"
-            }
-        },
-        {
-            "@type": "Person",
-            "givenName": "Jean",
-            "familyName": "Cury",
-            "email": "jean.cury@normalesup.org",
-            "affiliation": {
-                "@type": "Organization",
-                "name": "Laboratoire Interdisciplinaire des Sciences du Numérique, Université Paris-Saclay, CNRS UMR 9015, INRIA, 91400 Orsay, France"
-            }
-        },
-        {
-            "@type": "Person",
-            "@id": "https://orcid.org/0000-0001-7704-822X",
-            "givenName": "Eduardo",
-            "familyName": "Rocha",
-            "email": "erocha@pasteur.fr",
-            "affiliation": {
-                "@type": "Organization",
-                "name": "Microbial Evolutionary Genomics, Institut Pasteur, Université de Paris Cité, CNRS UMR3525, 75015 Paris, France"
-            }
-        }
-    ],
-    "contributor": [
-        {
-            "@type": "Person",
-            "@id": "https://orcid.org/0000-0002-8793-9584",
-            "givenName": "Eloi",
-            "familyName": "Littner",
-            "email": "eloi.littner@pasteur.fr",
-            "affiliation": {
-                "@type": "Organization",
-                "name": "Microbial Evolutionary Genomics, Institut Pasteur, Université de Paris Cité, CNRS UMR3525, 75015 Paris, France /  DGA CBRN Defence, 91710 Vert-le-Petit, France"
-            }
-        },
-        {
-            "@type": "Person",
-            "@id": "https://orcid.org/0000-0002-0878-2209",
-            "givenName": "Matthieu",
-            "familyName": "Haudiquet",
-            "email": "matthieu.haudiquet@pasteur.fr",
-            "affiliation": {
-                "@type": "Organization",
-                "name": "Microbial Evolutionary Genomics, Institut Pasteur, Université de Paris Cité, CNRS UMR3525, 75015 Paris, France / Ecole Doctorale FIRE–Programme Bettencourt, CRI, 75004 Paris, France"
-            }
-        },
-        {
-            "@type": "Person",
-            "@id": "https://orcid.org/0000-0003-4797-6185",
-            "givenName": "Amandine",
-            "familyName": "Perrin",
-            "email": "amandine.perrin@pasteur.fr",
-            "affiliation": {
-                "@type": "Organization",
-                "name": "Microbial Evolutionary Genomics, Institut Pasteur, Université de Paris Cité, CNRS UMR3525, 75015 Paris, France / Collège Doctoral, Sorbonne Université, 75005 Paris, France"
-            }
-        }
-    ]
+    "version": "2.0.3",
+    "developmentStatus": "active",
+    "funding": "ANR-16-CONV-0005, EQU201903007835, ANR-10-LABX-62-IBEID",
+    "issueTracker": "https://github.com/gem-pasteur/Integron_Finder/issues",
+    "referencePublication": "https://doi.org/10.3390/microorganisms10040700"
 }
