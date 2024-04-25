@@ -389,7 +389,7 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      cpu=cpu)
         to_concat = [df for df in [max_final, max_elt] if not df.empty]
         if to_concat:
-            max_final = pd.concat(to_concat)
+            max_final = pd.concat(to_concat, ignore_index=True)
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)
     max_final = max_final.astype(dtype=data_type)
     return max_final
