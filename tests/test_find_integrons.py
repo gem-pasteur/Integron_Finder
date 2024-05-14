@@ -261,11 +261,13 @@ class TestFindIntegons(IntegronTest):
 
         len_model_attc = 47  # length in 'CLEN' (value for model attc_4.cm)
 
-        attc = read_infernal(attc_file, replicon_name,
-                                  len_model_attc,
-                                  evalue=cfg.evalue_attc,
-                                  size_max_attc=cfg.max_attc_size,
-                                  size_min_attc=cfg.min_attc_size)
+        attc = read_infernal(attc_file,
+                             replicon_name,
+                             len(replicon),
+                             len_model_attc,
+                             evalue=cfg.evalue_attc,
+                             size_max_attc=cfg.max_attc_size,
+                             size_min_attc=cfg.min_attc_size)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         exp_msg = """In replicon {}, there are:

@@ -48,7 +48,6 @@ from integron_finder import integrase
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
 
-_prodigal_run = integrase.subprocess.run
 
 
 class TestEmptyProt(IntegronTest):
@@ -66,14 +65,11 @@ class TestEmptyProt(IntegronTest):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
-        integrase.subprocess.run = self.mute_call(_prodigal_run)
         self.which_ori = finder.shutil.which
 
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
-            #pass
-        integrase.subprocess.run = _prodigal_run
         finder.shutil.which = self.which_ori
 
 

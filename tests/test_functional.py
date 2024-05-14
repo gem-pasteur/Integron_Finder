@@ -48,13 +48,12 @@ except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder import integrase
+from integron_finder import __version__ as _if_version, __commit__ as _if_commit
 from integron_finder import config
 from integron_finder import IntegronError
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
 
-_prodigal_run = integrase.subprocess.run
 
 
 class TestFunctional(IntegronTest):
@@ -72,7 +71,6 @@ class TestFunctional(IntegronTest):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
-        integrase.subprocess.run = self.mute_call(_prodigal_run)
         self.which_ori = shutil.which
         self._prefix_data = impresources.files('integron_finder') / 'data'
         self.func_annot_dir = os.path.join(self._prefix_data, "Functional_annotation")
@@ -80,8 +78,8 @@ class TestFunctional(IntegronTest):
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
-        integrase.subprocess.run = _prodigal_run
         shutil.which = self.which_ori
+
 
     @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
     @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
@@ -112,6 +110,7 @@ class TestFunctional(IntegronTest):
         test_summary_path = os.path.join(test_result_dir, summary_file_name)
         test_summary = pd.read_csv(test_summary_path, sep="\t", comment="#")
         pdt.assert_frame_equal(exp_summary, test_summary)
+
 
     @unittest.skipIf(not shutil.which('cmsearch'), 'cmsearch binary not found.')
     @unittest.skipIf(not shutil.which('hmmsearch'), 'hmmsearch binary not found.')
@@ -647,6 +646,8 @@ class TestFunctional(IntegronTest):
         output_filename = 'fake_seq.integrons'
         test_result_path = os.path.join(test_result_dir, output_filename)
         with open(test_result_path) as tested_file:
+            test_line = next(tested_file)
+            self.assertTrue(test_line.startswith(f'# integron_finder {_if_version} {_if_commit}'))
             test_line = next(tested_file)
             self.assertTrue(test_line.startswith('# cmd: integron_finder'))
             test_line = next(tested_file)

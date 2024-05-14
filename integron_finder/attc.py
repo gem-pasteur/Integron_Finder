@@ -289,7 +289,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                cpu=cpu)
 
             all_attc = merge_previous_attc_w_local_max(i, df_max)
-            max_elt = pd.concat([max_elt, all_attc])
+
+            max_elt = pd.concat([df for df in (max_elt, all_attc) if not df.empty])
 
             # If we find new attC after the last found with default algo and if the integrase is on the left
             # (We don't expand over the integrase) :
@@ -335,7 +336,10 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                    cpu=cpu)
 
                 all_attc = merge_previous_attc_w_local_max(i, df_max)
-                max_elt = pd.concat([max_elt, all_attc])
+                to_concat = [df for df in [max_elt, all_attc] if not df.empty]
+                if to_concat:
+                    max_elt = pd.concat(to_concat)
+
                 if not df_max.empty:  # Max can sometimes find bigger attC than permitted
                     go_left = (full_element[full_element.type_elt == "attC"].pos_beg.values[0] - all_attc.pos_end.values[0]
                                ) % size_replicon < distance_threshold

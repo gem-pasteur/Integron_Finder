@@ -62,7 +62,7 @@ class TestSearchAttc(IntegronTest):
         """
         attc_file = self.find_data(os.path.join("fictive_results", self.replicon_id + "_attc_table-empty.res"))
         # Construct attC dataframe (read from infernal file)
-        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
+        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.replicon_size, self.length_cm)
         attc_array = attc.search_attc(attc_df, True, self.dist_threshold, self.replicon_size, 'lin')
         self.assertEqual(len(attc_array), 0)
         attc_res = []
@@ -78,7 +78,7 @@ class TestSearchAttc(IntegronTest):
                                                 "tmp_{}".format(self.replicon_id),
                                                 "{}_attc_table.res".format(self.replicon_id)))
         # Construct attC dataframe (read from infernal file)
-        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
+        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.replicon_size, self.length_cm)
         # search attC arrays, keeping palindromes
         # 2 attc sites are in the same array if they are on the same strand, and separated by
         # a distance less than 4kb
@@ -111,7 +111,7 @@ class TestSearchAttc(IntegronTest):
                                                 "tmp_{}".format(self.replicon_id),
                                                 "{}_attc_table.res".format(self.replicon_id)))
         # Construct attC dataframe (read from infernal file)
-        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
+        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.replicon_size, self.length_cm)
         # Add another attC on the opposite strand
         attc_df = pd.concat([attc_df,
                              pd.DataFrame({"Accession_number": [self.replicon_id],
@@ -172,7 +172,7 @@ class TestSearchAttc(IntegronTest):
                                                 "tmp_{}".format(self.replicon_id),
                                                 "{}_attc_table.res".format(self.replicon_id)))
         # Construct attC dataframe (read from infernal file)
-        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
+        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.replicon_size, self.length_cm)
         # Add another attC at more than 4kb, same strand
         attc_df = pd.concat([attc_df,
                              pd.DataFrame({"Accession_number": [self.replicon_id],
@@ -232,7 +232,7 @@ class TestSearchAttc(IntegronTest):
                                                 "tmp_{}".format(self.replicon_id),
                                                 "{}_attc_table.res".format(self.replicon_id)))
         # Construct attC dataframe (read from infernal file)
-        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.length_cm)
+        attc_df = infernal.read_infernal(attc_file, self.replicon_id, self.replicon_size, self.length_cm)
         # Add another attC at more than 4kb, same strand
         attc_df = pd.concat([attc_df,
                              pd.DataFrame({"Accession_number": [self.replicon_id, self.replicon_id, self.replicon_id],

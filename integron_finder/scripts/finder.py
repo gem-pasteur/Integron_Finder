@@ -49,6 +49,7 @@ from Bio import SeqIO
 from integron_finder import IntegronError, logger_set_level
 from integron_finder import utils
 from integron_finder import results
+from integron_finder import __commit__ as _if_commit , __version__ as _if_version
 from integron_finder.topology import Topology
 from integron_finder.config import Config
 from integron_finder.hmm import scan_hmm_bank
@@ -466,7 +467,7 @@ def header(args, hmmsearch, cmsearch, prodigal):
     :return: a header containing the name of the program, information about version and licensing.
     :rtype: string
     """
-    tpl = """
+    tpl = r"""
 **************************************************************************
  ___       _                               _____ _           _
 |_ _|_ __ | |_ ___  __ _ _ __ ___  _ __   |  ___(_)_ __   __| | ___ _ __
@@ -477,7 +478,7 @@ def header(args, hmmsearch, cmsearch, prodigal):
 
 **************************************************************************
 
-{version}
+{version} {commit}
 
                      =======================
 
@@ -505,6 +506,7 @@ command used: integron_finder {cmd}
     header = tpl.format(version=integron_finder.get_version_message(hmmsearch=hmmsearch,
                                                                     cmsearch=cmsearch,
                                                                     prodigal=prodigal),
+                        commit=_if_commit,
                         cmd=' '.join(args)
                         )
     return header
@@ -664,15 +666,18 @@ Please install prodigal package or setup 'prodigal' binary path with --prodigal 
         merged_integron_path = outfile_base_name + ".integrons"
         if not agg_integrons.empty:
             with open(merged_integron_path, 'w') as merged_integron_file:
+                merged_integron_file.write(f"# integron_finder {_if_version} {_if_commit}\n")
                 merged_integron_file.write(f"# cmd: integron_finder {' '.join(args)}\n")
                 agg_integrons.to_csv(merged_integron_file, sep="\t", index=False, na_rep="NA")
         else:
             with open(merged_integron_path, "w") as merged_integron_file:
+                merged_integron_file.write(f"# integron_finder {_if_version} {_if_commit}\n")
                 merged_integron_file.write(f"# cmd: integron_finder {' '.join(args)}\n")
                 merged_integron_file.write("# No Integron found\n")
 
         merged_summary_path = outfile_base_name + ".summary"
         with open(merged_summary_path, 'w') as merged_summary_file:
+            merged_summary_file.write(f"# integron_finder {_if_version} {_if_commit}\n")
             merged_summary_file.write(f"# cmd: integron_finder {' '.join(args)}\n")
             agg_summary.to_csv(merged_summary_file, sep="\t")
 

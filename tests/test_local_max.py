@@ -57,25 +57,25 @@ def read_infernal_mock(tmp_dir):
     """
     _cache = {
         (os.path.join(tmp_dir, 'LIAN.001.C02_10_942899_947099_subseq_attc_table.res'),
-         'LIAN.001.C02_10', 47, 1.0, 200, 40):
+         'LIAN.001.C02_10', 988134, 47, 1.0, 200, 40):
             pd.DataFrame([['LIAN.001.C02_10', 'attC_4', 1, 47, 371, 496, '+', 0.130000],
                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 1109, 1234, '+', 0.049000],
                           ['LIAN.001.C02_10', 'attC_4', 1, 47, 1573, 1699, '+', 0.000005]],
                          columns=['Accession_number', 'cm_attC', 'cm_debut',
                                   'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']),
         (os.path.join(tmp_dir, 'LIAN.001.C02_10_946899_951099_subseq_attc_table.res'),
-         'LIAN.001.C02_10', 47, 1.0, 200, 40):
+         'LIAN.001.C02_10', 988134, 47, 1.0, 200, 40):
             pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut',
                          'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']),
         (os.path.join(tmp_dir, 'LIAN.001.C02_10_930689_934889_subseq_attc_table.res'),
-         'LIAN.001.C02_10', 47, 1.0, 200, 40):
+         'LIAN.001.C02_10', 988134, 47, 1.0, 200, 40):
             pd.DataFrame(columns=['Accession_number', 'cm_attC', 'cm_debut',
                          'cm_fin', 'pos_beg', 'pos_end', 'sens', 'evalue']),
               }
 
-    def fake_read_infernal(tblout_path, replicon_name, len_model_attc,
+    def fake_read_infernal(tblout_path, replicon_name, replicon_size, len_model_attc,
                            evalue=None, size_max_attc=None, size_min_attc=None):
-        args = (tblout_path, replicon_name, len_model_attc, evalue, size_max_attc, size_min_attc)
+        args = (tblout_path, replicon_name, replicon_size, len_model_attc, evalue, size_max_attc, size_min_attc)
         return _cache[args]
     return fake_read_infernal
 
@@ -178,6 +178,7 @@ class TestLocalMax(IntegronTest):
         strand_search = 'both'
 
         local_max_received = infernal.local_max(self.replicon,
+
                                                 win_beg, win_end,
                                                 self.model_attc_path,
                                                 strand_search=strand_search,
