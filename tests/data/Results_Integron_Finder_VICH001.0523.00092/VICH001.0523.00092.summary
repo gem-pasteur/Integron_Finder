@@ -1,0 +1,5 @@
+# integron_finder 20240513.dev e63e4c1
+# cmd: integron_finder --circ --local-max --cpu 4 --gembase --gembase-path tests/data/Gembase/Gembase2/ tests/data/Gembase/Gembase2/Replicons/VICH001.0523.00092.fna
+ID_replicon	CALIN	complete	In0	topology	size
+VICH001.0523.00092.001C	0	0	0	circ	2961149
+VICH001.0523.00092.002C	0	1	0	circ	1072315

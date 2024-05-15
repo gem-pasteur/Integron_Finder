@@ -196,8 +196,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
                         used indirectly by some called functions as :func:`infernal.local_max` or `infernal.expand`.
     :param str cmsearch_bin: The path to the `cmsearch_bin` binary to use
     :param int cpu: call local_max with the right number of cpu
-    :return:
-    :rtype: :class:`pd.DataFrame` object
+    :return: a table of attC site
+    :rtype: :class:`pd.DataFrame` object with monotonic indexes
 
     """
     size_replicon = len(replicon)
@@ -393,7 +393,8 @@ def find_attc_max(integrons, replicon, distance_threshold,
                                      cpu=cpu)
         to_concat = [df for df in [max_final, max_elt] if not df.empty]
         if to_concat:
-            max_final = pd.concat(to_concat)
+            max_final = pd.concat(to_concat, ignore_index=True)
         max_final.drop_duplicates(subset=max_final.columns[:-1], inplace=True)
+        max_final.index = range(len(max_final)) # this line is important for next step the index must be monotonic
     max_final = max_final.astype(dtype=data_type)
     return max_final
