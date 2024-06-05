@@ -73,9 +73,9 @@
             "givenName": "Amandine"
         }
     ],
-    "dateModified": "2024-05-02",
+    "dateModified": "2024-06-05",
     "description": "Integron_Finder is a program that detects integrons in DNA sequences.",
-    "downloadUrl": "https://files.pythonhosted.org/packages/4a/39/816165ed051a41560c9167590bf974a83de34e5a43509e9501f79cdf4ba4/integron_finder-2.0.2.tar.gz",
+    "downloadUrl": "https://pypi.org/project/integron-finder/",
     "funder": {
         "type": "Organization",
         "name": "Institut Pasteur, CNRS"
