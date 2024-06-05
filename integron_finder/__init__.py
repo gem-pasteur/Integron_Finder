@@ -32,7 +32,7 @@ import  subprocess
 from time import localtime, strftime
 
 
-__version__ = '2.0.4dev1'
+__version__ = '2.0.4'
 
 
 def get_git_revision_short_hash():
