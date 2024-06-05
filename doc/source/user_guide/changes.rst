@@ -9,7 +9,7 @@ What's new ?
 .. _changesV2:
 
 
-V2.0.4
+V2.0.5
 ======
 
 - fix **major** bug introduce in 2.0.3 in the fix of pandas deprecation warning.
