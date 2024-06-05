@@ -45,7 +45,7 @@ def get_git_revision_short_hash():
                                              stderr=subprocess.DEVNULL,
                                              cwd=os.path.dirname(os.path.abspath(__file__)))
         short_hash = str(short_hash, "utf-8").strip()
-    except subprocess.CalledProcessError:
+    except Exception:
         short_hash = ''
     return short_hash
 
