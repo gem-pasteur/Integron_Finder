@@ -17,7 +17,7 @@ V2.0.4
 - fix issue `Wrong coordinates in results <https://github.com/gem-pasteur/Integron_Finder/issues/114>`_
   If an attC site is find on the very first position and the model is truncated the computation of the position
   was wrong.
-
+- add support of new gembase format
 
 V2.0.3
 ======
