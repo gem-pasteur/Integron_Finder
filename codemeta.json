@@ -105,7 +105,7 @@
         "- INFERNAL >=1.1.2,<=1.1.4",
         "- Prodigal >=2.6.2,<=V2.6.3"
     ],
-    "version": "2.0.4",
+    "version": "2.0.5",
     "developmentStatus": "active",
     "funding": "ANR-16-CONV-0005, EQU201903007835, ANR-10-LABX-62-IBEID",
     "issueTracker": "https://github.com/gem-pasteur/Integron_Finder/issues",

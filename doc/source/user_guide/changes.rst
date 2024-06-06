@@ -22,7 +22,7 @@ V2.0.5
 V2.0.3
 ======
 
-**DO NOT USE** this version (see V2.0.4)
+**DO NOT USE** this version (see V2.0.5)
 
 - Improve the support of gembase format (V1 and V2)
 - fix deprecation warning, in `biopython`, `pandas` and `python` to be compliant with latest version of these libraries.

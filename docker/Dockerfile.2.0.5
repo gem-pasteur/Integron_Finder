@@ -3,7 +3,7 @@ FROM python:3.12.2-slim-bookworm
 LABEL maintainer="Bertrand Neron"
 LABEL maintainer.email="bneron@pasteur.fr"
 LABEL authors="Bertrand Neron; Eloi Littner; Matthieu Haudiquet; Amandine Perrin,Jean Cury and Eduardo PC Rocha"
-LABEL package.version="2.0.4"
+LABEL package.version="2.0.5"
 LABEL package.license="GPLv3"
 LABEL package.homepage="https://github.com/gem-pasteur/Integron_Finder/"
 LABEL publications="https://doi.org/10.3390/microorganisms10040700"
@@ -15,7 +15,7 @@ RUN apt-get update -y &&\
     apt-get install -y --no-install-recommends hmmer infernal prodigal &&\
     apt-get clean -y
 
-RUN pip3 install integron_finder==2.0.4
+RUN pip3 install integron_finder==2.0.5
 
 ENV DEBIAN_FRONTEND=teletype
 ENV PYTHONIOENCODING=UTF-8
