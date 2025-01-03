@@ -1,5 +1,140 @@
+####################################################################################
+# Integron_Finder - Integron Finder aims at detecting integrons in DNA sequences   #
+# by finding particular features of the integron:                                  #
+#   - the attC sites                                                               #
+#   - the integrase                                                                #
+#   - and when possible attI site and promoters.                                   #
+#                                                                                  #
+# Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
+# Copyright (c) 2015 - 2025  Institut Pasteur, Paris and CNRS.                     #
+# See the COPYRIGHT file for details                                               #
+#                                                                                  #
+# integron_finder is free software: you can redistribute it and/or modify          #
+# it under the terms of the GNU General Public License as published by             #
+# the Free Software Foundation, either version 3 of the License, or                #
+# (at your option) any later version.                                              #
+#                                                                                  #
+# integron_finder is distributed in the hope that it will be useful,               #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of                   #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                    #
+# GNU General Public License for more details.                                     #
+#                                                                                  #
+# You should have received a copy of the GNU General Public License                #
+# along with this program (COPYING file).                                          #
+# If not, see <http://www.gnu.org/licenses/>.                                      #
+####################################################################################
+
 [build-system]
 requires = ["setuptools"]
-
 build-backend = "setuptools.build_meta"
 
+[project]
+dynamic = ["version"]
+name = "integron_finder"
+authors = [
+    {name="Jean Cury", email='jean.cury@normalesup.org'},
+    {name="Bertrand Neron", email='bneron@pasteur.fr'}
+    ]
+maintainers = [
+    {name="Bertrand Neron", email='bneron@pasteur.fr'}
+    ]
+description = 'Integron Finder aims at detecting integrons in DNA sequences.'
+readme = "README.md"
+license = {file="COPYING"}
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX",
+    "Environment :: Console",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics"
+]
+
+requires-python = ">=3.10"
+
+dependencies = [
+    'numpy>=1.26',
+    'matplotlib>=3.8',
+    'pandas>=2',
+    'biopython>=1.82',
+    'colorlog',
+]
+
+[project.optional-dependencies]
+dev = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "coverage[toml]",
+    "build",
+    "ruff",
+    "pre-commit",
+]
+
+[project.scripts]
+integron_finder = "integron_finder.scripts.finder:main"
+integron_split = "integron_finder.scripts.split:main"
+integron_merge = "integron_finder.scripts.merge:main"
+
+[project.urls]
+Homepage = "https://github.com/gem-pasteur/Integron_Finder"
+Documentation = "https://integronfinder.readthedocs.io/en/latest/"
+Repository = "https://github.com/gem-pasteur/macsyfinder/"
+Issues = "https://github.com/gem-pasteur/Integron_Finder/issues"
+Changelog = "https://integronfinder.readthedocs.io/en/latest/user_guide/changes.html"
+
+[tool.setuptools.packages.find]
+include = ["integron_finder*"]
+namespaces = false
+
+[tool.setuptools.dynamic]
+version = {attr = "integron_finder.__version__"}
+
+[tool.setuptools.package-data]
+integron_finder = [
+    "data/Models/*",
+    "data/Functional_annotation/*"
+]
+
+[tool.coverage.run]
+branch = true
+source = ["integron_finder"]
+command_line = "-m unittest discover -vv"
+
+[tool.coverage.html]
+directory = "coverage_html"
+
+[tool.ruff]
+target-version = "py310"
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".eggs",
+    ".git",
+    ".ipynb_checkpoints",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "build",
+    "dist",
+    "site-packages",
+    "venv",
+]
+
+# Same as Black.
+line-length = 120
+indent-width = 4
+
+src = ['integron_finder', 'tests', 'pyproject.toml']
+
+[tool.ruff.format]
+indent-style = "space"

@@ -66,12 +66,7 @@ def expand_data(data_to_expand):
 
 if __name__ == "__main__":
     setuptools.setup(
-        package_data={
-          "integron_finder": ["data/Models/*",
-                              "data/Functional_annotation/*"]
-        },
         data_files=expand_data([('share/integron_finder/doc/html', ['doc/build/html']),
                                 ('share/integron_finder/doc/pdf', ['doc/build/latex/IntegronFinder.pdf'])
                                ]),
-        test_suite='tests.run_tests.discover',
     )
