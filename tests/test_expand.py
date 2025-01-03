@@ -151,14 +151,18 @@ def local_max_mock():
                   pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_over_ori_35271_39381_top.csv')),
 
               # test_expand_circular_both_window_in_rep
-              ('NZ_CP016323.1', 23108, 27308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_23108_27308_both.csv')),
-              ('NZ_CP016323.1', 27108, 31308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_27108_31308_both.csv')),
-              ('NZ_CP016323.1', 31108, 35308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_31108_35308_both.csv')),
-              ('NZ_CP016323.1', 35108, 39308, 'attc_4', 'both'):
-                  pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_35108_39308_both.csv')),
+              # same as local_max_linear_23108_27308_both.csv
+              # ('NZ_CP016323.1', 23108, 27308, 'attc_4', 'both'):
+              #     pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_23108_27308_both.csv')),
+              # same as local_max_linear_27108_31308_both.csv
+              # ('NZ_CP016323.1', 27108, 31308, 'attc_4', 'both'):
+              #     pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_27108_31308_both.csv')),
+              # same as local_max_linear_31108_35308_both.csv
+              # ('NZ_CP016323.1', 31108, 35308, 'attc_4', 'both'):
+              #     pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_31108_35308_both.csv')),
+              # same as local_max_linear_31108_35308_both.csv
+              #('NZ_CP016323.1', 35108, 39308, 'attc_4', 'both'):
+              #    pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_35108_39308_both.csv')),
               ('NZ_CP016323.1', 39108, 2458, 'attc_4', 'both'):
                   pd.read_csv(TestExpand.find_data('expand_mock', 'local_max_circ_right_win_in_rep_39108_2458_both.csv')),
               ('NZ_CP016323.1', 2258, 6458, 'attc_4', 'both'):

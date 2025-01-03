@@ -32,7 +32,6 @@ import tempfile
 import shutil
 import re
 
-import numpy as np
 from Bio import SeqIO, Seq
 
 try:
@@ -249,7 +248,8 @@ class TestGemBase(IntegronTest):
                 log_msg = log.get_value().strip()
             self.assertEqual(log_msg,
                              f"The LST file '{lst_path}' seems not to be in gembase V1 draft format.")
-
+        self.assertEqual(str(ctx.exception),
+                         f"The LST file '{lst_path}' seems not to be in gembase V1 draft format.")
 
         replicon_id = 'SAEN001.0321.00753.P003'
         lst_path = os.path.join(self.tmp_dir, f'{replicon_id}.fst')
@@ -260,6 +260,7 @@ class TestGemBase(IntegronTest):
                 log_msg = log.get_value().strip()
             self.assertEqual(log_msg,
                              f" Error while parsing {lst_path} file: No columns to parse from file")
+
 
     def test_gembase2_complete_parser(self):
         replicon_name = 'VICH001.0523.00090'
@@ -287,6 +288,8 @@ class TestGemBase(IntegronTest):
                 log_msg = log.get_value().strip()
             self.assertEqual(log_msg,
                              f" Error while parsing {lst_path} file: No columns to parse from file")
+        self.assertEqual(str(ctx.exception),
+                         f"Error while parsing {lst_path} file: No columns to parse from file")
 
         replicon_id = 'SAEN001.0321.00753.P003'
         lst_path = self.find_data('Gembase', 'Gembase1', 'LSTINF', f'{replicon_id}.lst')
@@ -296,6 +299,8 @@ class TestGemBase(IntegronTest):
                 log_msg = log.get_value().strip()
             self.assertEqual(log_msg,
                              f" The LST file '{lst_path}' seems not to be in gembase V2 draft format.")
+        self.assertEqual(str(ctx.exception), f"The LST file '{lst_path}' seems not to be in gembase V2 draft format.")
+
 
     def test_gembase2_draft_parser(self):
         replicon_name = 'VIBR.0322.11443'
@@ -770,7 +775,7 @@ class TestCustomDB(IntegronTest):
 
         with self.assertRaises(RuntimeError) as ctx:
             with self.catch_log():
-                db = CustomDB(replicon, cfg, protein_path)
+                CustomDB(replicon, cfg, protein_path)
         self.assertEqual(str(ctx.exception),
                          f"Cannot import custom --annot-parser '{self.args.annot_parser}': "
                          f"'NoneType' object has no attribute 'loader'")
@@ -938,9 +943,9 @@ class TestCustomDB(IntegronTest):
             with self.catch_log():
                 db.get_description(seq_id)
         self.assertEqual(str(ctx.exception),
-                         f"Error during protein file parsing: "
-                         f"expected seq_id: str, start: positive int, stop: positive int, strand 1/-1. got: "
-                         f"ACBA.007.P01_13_23, 19721, 20254, -1")
+                         "Error during protein file parsing: "
+                         "expected seq_id: str, start: positive int, stop: positive int, strand 1/-1. got: "
+                         "ACBA.007.P01_13_23, 19721, 20254, -1")
 
 
 class TestRepliconType(IntegronTest):

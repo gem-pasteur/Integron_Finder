@@ -422,7 +422,6 @@ class TestFunctional(IntegronTest):
     @unittest.skipIf(not shutil.which('prodigal'), 'prodigal binary not found.')
     def test_acba_simple_no_gbk_no_pdf(self):
         replicon_filename = 'acba.007.p01.13'
-        replicon_id = 'ACBA.007.P01_13'
         output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
         command = "integron_finder " \
@@ -464,7 +463,6 @@ class TestFunctional(IntegronTest):
         # It contains 2 contigs 0001 and 0002.
         # 0002 does not contains integrons
         replicon_filename = 'ACBA.0917.00019'
-        contig_id = 'ACBA.0917.00019.0001'
         output_filename = 'Results_Integron_Finder_{}'.format(replicon_filename)
         test_result_dir = os.path.join(self.out_dir, output_filename)
         command = "integron_finder " \

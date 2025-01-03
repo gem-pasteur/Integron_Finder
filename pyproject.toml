@@ -138,3 +138,9 @@ src = ['integron_finder', 'tests', 'pyproject.toml']
 
 [tool.ruff.format]
 indent-style = "space"
+
+[tool.ruff.lint.per-file-ignores]
+
+#E402 Module level import not at top of file
+"integron_finder/scripts/finder.py" = ["E402"]
+

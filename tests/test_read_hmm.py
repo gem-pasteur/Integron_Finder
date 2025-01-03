@@ -28,8 +28,6 @@
 
 import os
 import argparse
-import tempfile
-import shutil
 
 import pandas as pd
 import pandas.testing as pdt

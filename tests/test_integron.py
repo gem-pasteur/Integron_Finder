@@ -220,11 +220,6 @@ class TestIntegron(IntegronTest):
             sequences_db.topologies = topologies
             replicon = next(sequences_db)
 
-        ## integron_finder.SIZE_REPLICON = 148711
-        prot_file = os.path.join(self._data_dir,
-                                 'Proteins',
-                                 '{}.prt'.format(replicon_name))
-
         # to test promoter we need to ad attC and integrase first
         # as add_promoter use attc and integrase
         attC = pd.DataFrame({'pos_beg': [104651, 105162, 106018, 107567, 108423, 108743],

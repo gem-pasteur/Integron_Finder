@@ -180,5 +180,5 @@ sequence seq_(4|2) is too short \(32 bp\), the sequence is skipped \(must be > 5
 
 
     def test_log_level(self):
-        for v, q, l in [(0, 0, 20), (0, 2, 40), (0, 5, 50), (1, 0, 10), (3, 0, 10), (2, 2, 20)]:
-            self.assertEqual(utils.log_level(v, q), l)
+        for verbose, quiet, expected_level in [(0, 0, 20), (0, 2, 40), (0, 5, 50), (1, 0, 10), (3, 0, 10), (2, 2, 20)]:
+            self.assertEqual(utils.log_level(verbose, quiet), expected_level)

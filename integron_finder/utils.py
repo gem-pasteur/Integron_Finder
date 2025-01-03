@@ -92,7 +92,7 @@ class FastaIterator:
         """
         try:
             self.alphabet = Seq.IUPAC.ambiguous_dna
-        except AttributeError as err:
+        except AttributeError:
             self.alphabet = None
         if self.alphabet:
             self.seq_index = SeqIO.index(path, "fasta",  alphabet=self.alphabet)

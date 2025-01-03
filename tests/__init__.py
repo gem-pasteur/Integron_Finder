@@ -29,7 +29,6 @@
 import os
 import sys
 import unittest
-import platform
 import functools
 import colorlog
 from io import StringIO
