@@ -66,6 +66,7 @@ class ProteinDB(ABC):
         self.replicon = replicon
         self._prot_file = self._make_protfile(path=prot_file)
         self._prot_db = self._make_db()
+        self._pseudo_genes = set()
 
 
     @abstractmethod
@@ -130,6 +131,21 @@ class ProteinDB(ABC):
         """
         return self._prot_file
 
+    @abstractmethod
+    def coding_prot_ids(self):
+        """
+        :return: a generator which iterate on coding genes seq_ids (the non coding genes are discarded)
+        :rtype: generartor
+        """
+        pass
+
+    def is_pseudo_gene(self, seq_id):
+        """
+
+        :param seq_id: The sequence id to test
+        :return: True if the seq_id correspond to gene which is a pseudo gene, False otherwise
+        """
+        return seq_id in self._pseudo_genes
 
 
 class GembaseType(Enum):
@@ -240,6 +256,7 @@ class GembaseDB(ProteinDB):
         else:
             self._gembase_path = os.path.realpath(gembase_path)
         self.replicon = replicon
+        self._pseudo_genes = set()
         # in GemBase Draft the files ar based on replicon id
         # but one file can contains several contig
         # the sequence id contains the contig number
@@ -385,6 +402,7 @@ class GembaseDB(ProteinDB):
                         seq = all_prots[seq_id]
                         SeqIO.write(seq, prot_file, 'fasta')
                     except KeyError:
+                        self._pseudo_genes.add(seq_id)
                         _log.warning(f'Sequence describe in LSTINF file {seq_id} is not present in {all_prot_path}')
         return prot_file_path
 
@@ -585,10 +603,21 @@ class GembaseDB(ProteinDB):
 
     def __iter__(self):
         """
-        :return: a generator which iterate on the protein seq_id which constitute the contig.
+        :return: a generator which iterate on the gene seq_ids which constitute the contig (genes and pseudogenes).
         :rtype: generator
         """
         return (seq_id for seq_id in self._info[4])
+
+
+    def coding_prot_ids(self):
+        """
+
+        :return: a generator which iterate on coding genes seq_ids (the non coding genes are discarded)
+        :rtype: generartor
+        """
+        all_seq_ids = self._info[4]
+        coding_seqid = all_seq_ids[~all_seq_ids.isin(self._pseudo_genes)]
+        return (seq_id for seq_id in coding_seqid)
 
 
     def get_description(self, gene_id):
@@ -674,8 +703,16 @@ class ProdigalDB(ProteinDB):
         """
         :return: a generator which iterate on the protein seq_id which constitute the contig.
         :rtype: generator
-                """
+        """
         return (seq_id for seq_id in self._prot_db)
+
+
+    def coding_prot_ids(self):
+        """
+        :return: a generator which iterate on coding genes seq_ids (the non coding genes are discarded)
+        :rtype: generartor
+        """
+        return self.__iter__()
 
 
     def get_description(self, gene_id):
@@ -740,6 +777,14 @@ class CustomDB(ProteinDB):
         :rtype: generator
                 """
         return (seq_id for seq_id in self._prot_db)
+
+
+    def coding_prot_ids(self):
+        """
+        :return: a generator which iterate on coding genes seq_ids (the non coding genes are discarded)
+        :rtype: generartor
+        """
+        return self.__iter__()
 
 
     def get_description(self, gene_id):
