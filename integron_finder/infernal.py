@@ -141,14 +141,14 @@ def find_attc(replicon_path, replicon_id, cmsearch_path, out_dir, model_attc, in
                                                                     mod_attc=model_attc.replace(' ', '\\ '),
                                                                     infile=replicon_path.replace(' ', '\\ '))
     try:
-        _log.debug("run cmsearch: {}".format(cmsearch_cmd))
+        _log.debug(f"run cmsearch: {cmsearch_cmd}")
         with open(os.devnull, 'w') as dev_null:
             cmd = shlex.split(cmsearch_cmd)
             completed_process = subprocess.run(cmd, stdout=dev_null)
     except Exception as err:
-        raise RuntimeError(f"{cmd} failed : {err}")
+        raise RuntimeError(f"{' '.join(cmd)} failed : {err}")
     if completed_process.returncode != 0:
-        raise RuntimeError(f"{cmd} failed returncode = {completed_process.returncode}")
+        raise RuntimeError(f"{' '.join(cmd)} failed returncode = {completed_process.returncode}")
 
 
 def local_max(replicon,
