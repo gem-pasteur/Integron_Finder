@@ -85,7 +85,7 @@ def func_annot(integrons, replicon, prot_db, hmm_files, cfg, out_dir='.', evalue
                                                       "pos_beg", "pos_end", "evalue"])
 
             prot_to_annotate = []
-            for prot_nb, prot_id in enumerate(prot_db, 1):
+            for prot_nb, prot_id in enumerate(prot_db.coding_prot_ids(), 1):
                 if prot_id in integron.proteins.index:
                     prot_to_annotate.append(prot_db[prot_id])
 
