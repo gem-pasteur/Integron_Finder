@@ -143,4 +143,5 @@ indent-style = "space"
 
 #E402 Module level import not at top of file
 "integron_finder/scripts/finder.py" = ["E402"]
+"integron_finder/hmm.py" = ["E402"]
 

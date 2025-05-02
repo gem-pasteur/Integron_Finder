@@ -567,7 +567,7 @@ class GembaseDB(ProteinDB):
             lst = lst.astype(dtype)
             genome_info = lst.loc[lst[4].str.contains(replicon_id, regex=True)]
             prots_info = genome_info.loc[genome_info[3] == 'CDS']
-        except Exception as err:
+        except Exception:
             msg = f"The LST file '{lst_path}' seems not to be in gembase V2 draft format."
             _log.error(msg)
             raise IntegronError(msg) from None
@@ -632,7 +632,7 @@ class ProdigalDB(ProteinDB):
         :return: the path of the created protfile
         :rtype: str
         """
-        assert self.cfg.prodigal, f"'prodigal' not found."
+        assert self.cfg.prodigal, "'prodigal' not found."
         if path:
             prot_file_path = path
         else:
