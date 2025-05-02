@@ -1,0 +1,60 @@
+stages:
+  - linting
+  - test
+  - coverage
+  - pages
+
+variables:
+  MACSY_VERSION: ${CI_COMMIT_REF_NAME}
+
+ruff:
+  stage: linting
+  image: ubuntu-latest
+  script:
+    - python3 -m pip install .[dev]
+    - ruff check --output-format=gitlab integron_finder/ tests/
+
+testing:
+  stage: test
+  image: ubuntu_latest
+  script:
+    - apt-get install -v python3 python3-pip infernal prodigal hmmer
+    - python3 -m pip install .[dev]
+    - python3 -m unittest discover -vv
+  except:
+    - /^feat.*$/
+    - /^fix.*$/
+
+coverage:
+  stage: coverage
+  image: ubuntu_latest
+  script:
+    - python3 -m pip install .[dev]
+    - coverage run
+    - coverage html
+    - coverage report
+
+  artifacts:
+    paths:
+      - htmlcov/
+  except:
+    - /^feat.*$/
+    - /^fix.*$/
+
+pages:
+  stage: pages
+  image: ubuntu_latest
+  dependencies:
+    - coverage
+  script:
+    - python3 -m pip install .
+    - cd ${CI_PROJECT_DIR}/doc/
+    - make html
+    - cd ${CI_PROJECT_DIR}
+    - mv ${CI_PROJECT_DIR}/doc/build/html/ public
+    - mv htmlcov public/coverage
+  artifacts:
+    paths:
+      - public
+  only:
+    - dev
