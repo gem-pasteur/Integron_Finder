@@ -44,12 +44,17 @@ import integron_finder.scripts.split as split
 
 class TestSplit(IntegronTest):
 
+    def setUpClass():
+        split._log= split.colorlog.getLogger('integron_finder.split')
+
+
     def setUp(self):
         tmp_dir = tempfile.gettempdir()
         self.out_dir = os.path.join(tmp_dir, 'test_integron_split')
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
+
 
     def tearDown(self):
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
@@ -60,19 +65,20 @@ class TestSplit(IntegronTest):
         chunk_names = split.split(replicon_path, outdir=self.out_dir)
 
         try:
-            seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        except AttributeError:
             seq_index = SeqIO.index(replicon_path, "fasta")
-        files_expected = [os.path.join(self.out_dir, r + '.fst') for r in seq_index]
-        self.assertListEqual(files_expected, chunk_names)
-        for one_chunk in chunk_names:
-            with open(one_chunk) as f:
-                seq_it = SeqIO.parse(f, 'fasta')
-                for s in seq_it:
-                    ref_seq = seq_index[s.id]
-                    self.assertEqual(s.id, ref_seq.id)
-                    self.assertEqual(s.description, ref_seq.description)
-                    self.assertEqual(s.seq, ref_seq.seq)
+            files_expected = [os.path.join(self.out_dir, r + '.fst') for r in seq_index]
+            self.assertListEqual(files_expected, chunk_names)
+            for one_chunk in chunk_names:
+                with open(one_chunk) as f:
+                    seq_it = SeqIO.parse(f, 'fasta')
+                    for s in seq_it:
+                        ref_seq = seq_index[s.id]
+                        self.assertEqual(s.id, ref_seq.id)
+                        self.assertEqual(s.description, ref_seq.description)
+                        self.assertEqual(s.seq, ref_seq.seq)
+        finally:
+            seq_index.close()
+
 
     def test_split_avoid_overwriting(self):
         replicon_path = self.find_data(os.path.join('Replicons', 'ESCO001.B.00018.P002.fst'))
@@ -90,19 +96,19 @@ class TestSplit(IntegronTest):
         chunk_names = split.split(replicon_path, outdir=self.out_dir, chunk=chunk)
 
         try:
-            seq_index = SeqIO.index(replicon_path, "fasta", alphabet=Seq.IUPAC.unambiguous_dna)
-        except AttributeError:
             seq_index = SeqIO.index(replicon_path, "fasta")
-        files_expected = [os.path.join(self.out_dir, "multi_fasta_chunk_{}.fst".format(i)) for i in range(1, chunk + 1)]
-        self.assertListEqual(files_expected, chunk_names)
-        for one_chunk in chunk_names:
-            with open(one_chunk) as f:
-                seq_it = SeqIO.parse(f, 'fasta')
-                for s in seq_it:
-                    ref_seq = seq_index[s.id]
-                    self.assertEqual(s.id, ref_seq.id)
-                    self.assertEqual(s.description, ref_seq.description)
-                    self.assertEqual(s.seq, ref_seq.seq)
+            files_expected = [os.path.join(self.out_dir, "multi_fasta_chunk_{}.fst".format(i)) for i in range(1, chunk + 1)]
+            self.assertListEqual(files_expected, chunk_names)
+            for one_chunk in chunk_names:
+                with open(one_chunk) as f:
+                    seq_it = SeqIO.parse(f, 'fasta')
+                    for s in seq_it:
+                        ref_seq = seq_index[s.id]
+                        self.assertEqual(s.id, ref_seq.id)
+                        self.assertEqual(s.description, ref_seq.description)
+                        self.assertEqual(s.seq, ref_seq.seq)
+        finally:
+            seq_index.close()
 
 
 class TestParseArgs(IntegronTest):

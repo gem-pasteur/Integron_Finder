@@ -60,6 +60,7 @@ class TestAddFeature(IntegronTest):
                                                      "tmp_{}".format(self.replicon_id),
                                                      "{}.prt".format(self.replicon_id)))
         args = argparse.Namespace()
+        args.replicon = self.replicon_path
         args.gembase = False
         args.prot_file = False
         args.cmsearch = __file__
@@ -68,13 +69,6 @@ class TestAddFeature(IntegronTest):
         cfg = Config(args)
         self.prot_db = ProdigalDB(self.seq, cfg, prot_file=self.prot_file)
         self.dist_threshold = 4000
-
-
-    def tearDown(self):
-        """
-        To do after each test. remove output directory if it was generated
-        """
-        pass
 
 
     def test_integron_1elem_prot(self):
