@@ -44,7 +44,7 @@ class TestUtils(IntegronTest):
     def test_read_multi_prot_fasta(self):
         replicon_id = 'ACBA.007.P01_13'
         replicon_path = self.find_data(os.path.join('Proteins', replicon_id + '.prt'))
-        replicon = utils.read_multi_fasta(replicon_path)
+        replicon = utils.MultiFastaReader(replicon_path)
         expected_seq_id = ['{}_{}'.format(replicon_id, i) for i in range(1, 24)]
         received_seq_id = [seq.id for seq in replicon]
         self.assertListEqual(expected_seq_id, received_seq_id)
