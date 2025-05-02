@@ -779,11 +779,11 @@ class Integron(object):
                 color=colors_alpha, zorder=z_order, ec=None,
                 align="edge")  # edgecolor=ec,
         xlims = ax.get_xlim()
-        for c, l in zip(["#749FCD", "#DD654B", "#6BC865", "#D06CC0", "#C3B639", "#e8950e", "#d3d3d3"],
+        for color, label in zip(["#749FCD", "#DD654B", "#6BC865", "#D06CC0", "#C3B639", "#e8950e", "#d3d3d3"],
                         ["attC", "integrase", "Promoter/attI class 1",
                          "Promoter/attI class 2", "Promoter/attI class 3",
                          "Functional Annotation", "Hypothetical Protein"]):
-            ax.bar(0, 0, color=c, label=l)
+            ax.bar(0, 0, color=color, label=label)
         plt.legend(loc=[1.01, 0.4])
         ax.set_xlim(xlims)
         fig.subplots_adjust(left=0.05, right=0.80)

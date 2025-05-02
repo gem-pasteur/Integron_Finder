@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import logging
 ####################################################################################
 # Integron_Finder - Integron Finder aims at detecting integrons in DNA sequences   #
 # by finding particular features of the integron:                                  #
