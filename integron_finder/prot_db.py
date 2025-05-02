@@ -38,7 +38,7 @@ from enum import Enum
 
 import colorlog
 import pandas as pd
-from Bio import SeqIO, Seq
+from Bio import SeqIO
 from integron_finder import IntegronError
 
 _log = colorlog.getLogger(__name__)
