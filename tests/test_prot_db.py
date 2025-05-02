@@ -486,6 +486,45 @@ class TestGemBase(IntegronTest):
         self.assertSetEqual(non_common_seq, diff)
 
 
+    def test_codig_prot_ids(self):
+        seq_name = 'ESCO001.C.00001.C001'
+        ext = '.fst'
+        replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
+        seq_db = read_multi_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        with self.catch_log():
+            db = GembaseDB(replicon, cfg)
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')), 'fasta',
+                              alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')), 'fasta')
+
+        specie, date, strain, contig = replicon.id.split('.')
+        pattern = fr'{specie}\.{date}\.{strain}\.\w?{contig}'
+        seqid_from_gembase_protfile = set([i for i in idx if re.match(pattern, i)])
+        seqid_from_if = set([i for i in db.coding_prot_ids()])
+        self.assertSetEqual(seqid_from_if, seqid_from_gembase_protfile)
+
+
+    def test_is_pseudo_gene(self):
+        seq_name = 'ESCO001.C.00001.C001'
+        ext = '.fst'
+        replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
+        seq_db = read_multi_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        with self.catch_log():
+            db = GembaseDB(replicon, cfg)
+            self.assertTrue(db.is_pseudo_gene('ESCO001.C.00001.C001_03974'))
+            self.assertFalse(db.is_pseudo_gene('ESCO001.C.00001.C001_03975'))
+
+
     def test_get_description(self):
         # SeqDesc(id, strand, statt, stop)
         file_name = {('ACBA.0917.00019', '.fna'):
@@ -692,6 +731,27 @@ class TestProdigalDB(IntegronTest):
         for exp_seq_id, get_seq_id in zip(idx, db):
             self.assertEqual(exp_seq_id, get_seq_id)
 
+    def test_iter(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        self.args.replicon = replicon_path
+        cfg = Config(self.args)
+        seq_db = read_multi_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        db = ProdigalDB(replicon, cfg)
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta',
+                               alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta')
+        # there is no pseudo genes in prodigalDB so iterating on coding_prot_ids == iteratiing on whole DB
+        for exp_seq_id, get_seq_id in zip(idx, db.coding_prot_ids()):
+            self.assertEqual(exp_seq_id, get_seq_id)
+
 
     def test_get_description(self):
         # SeqDesc(id, strand, strat, stop)
@@ -849,6 +909,29 @@ class TestCustomDB(IntegronTest):
         except AttributeError:
             idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta')
         for exp_seq_id, get_seq_id in zip(idx, db):
+            self.assertEqual(exp_seq_id, get_seq_id)
+
+    def test_coding_prot_ids(self):
+        file_name = 'acba.007.p01.13'
+        prot_name = 'ACBA.007.P01_13.prt'
+        replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
+        protein_path = self.find_data('Proteins', prot_name)
+        self.args.replicon = replicon_path
+        self.args.prot_file = protein_path
+        cfg = Config(self.args)
+        seq_db = read_multi_fasta(replicon_path)
+        replicon = next(seq_db)
+        replicon.path = replicon_path
+        os.makedirs(cfg.tmp_dir(replicon.id))
+
+        db = CustomDB(replicon, cfg, protein_path)
+        try:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta',
+                              alphabet=Seq.IUPAC.extended_protein)
+        except AttributeError:
+            idx = SeqIO.index(self.find_data(os.path.join('Proteins', prot_name)), 'fasta')
+        # there is no pseudgenes in customdb
+        for exp_seq_id, get_seq_id in zip(idx, db.coding_prot_ids()):
             self.assertEqual(exp_seq_id, get_seq_id)
 
 
