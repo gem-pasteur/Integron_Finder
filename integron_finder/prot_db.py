@@ -69,6 +69,18 @@ class ProteinDB(ABC):
         self._pseudo_genes = set()
 
 
+    def __del__(self):
+        ##### CAUTION #########
+        # self._make_db() use biopython SeqIO.index
+        # and index open a fileIO but not close it
+        self.close()
+
+
+    def close(self):
+        if hasattr(self, '_prot_db'):
+            self._prot_db.close()
+
+
     @abstractmethod
     def __getitem__(self, prot_seq_id):
         """
@@ -103,12 +115,7 @@ class ProteinDB(ABC):
         """
         :return: an index of the sequence contains in protfile corresponding to the replicon
         """
-        try:
-            # for biopython < 1.78
-            idx = SeqIO.index(self._prot_file, "fasta", alphabet=Seq.IUPAC.extended_protein)
-        except AttributeError:
-            # for biopython > 1.76
-            idx = SeqIO.index(self._prot_file, "fasta")
+        idx = SeqIO.index(self._prot_file, "fasta")
         return idx
 
 
@@ -281,6 +288,7 @@ class GembaseDB(ProteinDB):
             self._prot_file = prot_file
         self._prot_db = self._make_db()
 
+
     @staticmethod
     def get_lst_dir( gembase_path):
         """
@@ -390,20 +398,21 @@ class GembaseDB(ProteinDB):
         else:
             all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._gembase_file_basename + '.prt')
             try:
-                all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
-            except AttributeError:
                 all_prots = SeqIO.index(all_prot_path, "fasta")
-            if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
-                os.makedirs(self.cfg.tmp_dir(self.replicon.id))
-            prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')
-            with open(prot_file_path, 'w') as prot_file:
-                for seq_id in self._info[4]:
-                    try:
-                        seq = all_prots[seq_id]
-                        SeqIO.write(seq, prot_file, 'fasta')
-                    except KeyError:
-                        self._pseudo_genes.add(seq_id)
-                        _log.warning(f'Sequence describe in LSTINF file {seq_id} is not present in {all_prot_path}')
+                if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
+                    os.makedirs(self.cfg.tmp_dir(self.replicon.id))
+                prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')
+                with open(prot_file_path, 'w') as prot_file:
+                    for seq_id in self._info[4]:
+                        try:
+                            seq = all_prots[seq_id]
+                            SeqIO.write(seq, prot_file, 'fasta')
+                        except KeyError:
+                            self._pseudo_genes.add(seq_id)
+                            _log.warning(f'Sequence describe in LSTINF file {seq_id} is not present in {all_prot_path}')
+            finally:
+                all_prots.close()
+
         return prot_file_path
 
 
@@ -613,7 +622,7 @@ class GembaseDB(ProteinDB):
         """
 
         :return: a generator which iterate on coding genes seq_ids (the non coding genes are discarded)
-        :rtype: generartor
+        :rtype: generator
         """
         all_seq_ids = self._info[4]
         coding_seqid = all_seq_ids[~all_seq_ids.isin(self._pseudo_genes)]
@@ -750,6 +759,7 @@ class CustomDB(ProteinDB):
             self._parser = custom_module.description_parser
         except Exception as err:
             raise RuntimeError(f"Cannot import custom --annot-parser '{parser_path}': {err}")
+
 
     def _make_protfile(self, path=None):
         if path is None:
