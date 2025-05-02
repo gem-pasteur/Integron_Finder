@@ -55,7 +55,8 @@ class TestGemBase(IntegronTest):
         self.args = argparse.Namespace()
         self.args.gembase = True
         self.args.prot_file = False
-        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
         self.args.outdir = self.tmp_dir
         self.args.prodigal = None
         self.args.cmsearch = __file__
@@ -67,10 +68,7 @@ class TestGemBase(IntegronTest):
 
 
     def tearDown(self):
-        try:
-            shutil.rmtree(self.tmp_dir)
-        except:
-            pass
+        self._tmp_dir.cleanup()
 
 
     def test_ProteinDB(self):
@@ -568,7 +566,8 @@ class TestProdigalDB(IntegronTest):
         self.args = argparse.Namespace()
         self.args.gembase = False
         self.args.prot_file = False
-        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
         self.args.outdir = self.tmp_dir
         self.args.prodigal = shutil.which("prodigal")
         self.args.cmsearch = __file__
@@ -579,10 +578,8 @@ class TestProdigalDB(IntegronTest):
 
 
     def tearDown(self):
-        try:
-            shutil.rmtree(self.tmp_dir)
-        except:
-            pass
+        self._tmp_dir.cleanup()
+
 
     def test_ProteinDB(self):
         file_name = 'acba.007.p01.13'
@@ -789,7 +786,8 @@ class TestCustomDB(IntegronTest):
         self.args.prodigal = None
         self.args.cmsearch = __file__
         self.args.hmmsearch = __file__
-        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
         self.args.outdir = self.tmp_dir
         self.args.annot_parser = self.find_data('prodigal_annot_parser.py')
 
@@ -799,11 +797,8 @@ class TestCustomDB(IntegronTest):
 
 
     def tearDown(self):
-        try:
-            shutil.rmtree(self.tmp_dir)
-            pass
-        except:
-            pass
+        self._tmp_dir.cleanup()
+
 
     def test_ProteinDB(self):
         file_name = 'acba.007.p01.13'

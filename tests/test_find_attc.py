@@ -57,7 +57,8 @@ class TestFindAttc(IntegronTest):
             self.local_install = False
             self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
         if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
@@ -70,10 +71,7 @@ class TestFindAttc(IntegronTest):
 
 
     def tearDown(self):
-        try:
-            shutil.rmtree(self.tmp_dir)
-        except:
-            pass
+        self._tmp_dir.cleanup()
         infernal.subprocess.run = _run_ori
 
 

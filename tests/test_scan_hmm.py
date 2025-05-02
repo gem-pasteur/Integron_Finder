@@ -44,14 +44,14 @@ class TestScanHmmBank(IntegronTest):
 
     def setUp(self):
         logger_set_level('INFO')
-        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
         if os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
 
     def tearDown(self):
-        if os.path.isdir(self.tmp_dir):
-            shutil.rmtree(self.tmp_dir)
+        self._tmp_dir.cleanup()
 
     def test_wrong_path(self):
         """
