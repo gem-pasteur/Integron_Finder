@@ -8,6 +8,11 @@ What's new ?
 
 .. _changesV2:
 
+V2.0.6
+======
+
+- fix issue about pseudo genes https://github.com/gem-pasteur/Integron_Finder/issues/118
+- use pyproject.toml for packaging
 
 V2.0.5
 ======
