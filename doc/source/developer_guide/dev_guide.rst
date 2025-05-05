@@ -64,12 +64,23 @@ or clone your repository manually, then install it ::
     cd Integron_Finder
     pip install -e ".[dev]"
 
+install tools to ensure coding style::
+
+    pre-commit install
+
 It installs the requirements and create a directory in the virtualenv src/integron_finder
 and create links in the virtualenv. So ``integron_finder`` is runnable and you can modify the sources and run it again
 without to reinstall the project.
 
 .. note::
     `[dev]` allow to install extra dependencies to generate documentation, compute test coverage ...
+
+.. note::
+
+    from 2.0.6 version, *Integron_Finder* has adopted `ruff <https://docs.astral.sh/ruff/>`_ as linter
+    and *pre-commit* to ensure the coding style.
+    please read `CONTRIBUTING.md <https://github.com/gem-pasteur/macsyfinder/blob/master/CONTRIBUTING.md>`_ guide lines.
+
 
 .. warning::
     Debian/Ubuntu distribution `--user` is the default. So the `--prefix` option does not work
