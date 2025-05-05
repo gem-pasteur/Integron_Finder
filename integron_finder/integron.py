@@ -462,7 +462,10 @@ class Integron(object):
         for seq_rec in pc:
             seq_len = len(seq_rec)
             d[seq_len] = d.get(seq_len, []) + [seq_rec.seq.upper()]
-
+        if not pc.stream.closed:
+            # Biopython open file in SeqIO.parse but not close it
+            pc.stream.close()
+        
         for k, i in d.items():
             motifs_Pc.append(motifs.create(i))
             motifs_Pc[-1].name = "Pc_int1"

@@ -178,7 +178,7 @@ def main(args=None, log_level=None):
     if not os.path.exists(parsed_args.outdir):
         os.makedirs(parsed_args.outdir)
     elif not os.path.isdir(parsed_args.outdir):
-        raise RuntimeError(f"The outdir '{parsed_args.outdir}' alredy exist and is not a directory.")
+        raise RuntimeError(f"The outdir '{parsed_args.outdir}' already exist and is not a directory.")
     integron_finder.init_logger(log_file=os.path.join(parsed_args.outdir, 'integron_split.out'),
                                 out=not parsed_args.mute)
     _log = colorlog.getLogger('integron_finder.split')
