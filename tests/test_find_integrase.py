@@ -267,7 +267,7 @@ class TestFindIntegrase(IntegronTest):
             prot_file = os.path.join(self.tmp_dir, "foo.prt")
             open(prot_file, 'w').close()
             with self.catch_log():
-                with self.assertRaises(EmptyFileError) as ctx:
+                with self.assertRaises(EmptyFileError):
                     integrase.find_integrase(replicon.id,  prot_file, self.tmp_dir, cfg)
         finally:
             replicon.__class__.__len__ = len_ori

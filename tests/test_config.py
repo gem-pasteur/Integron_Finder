@@ -99,6 +99,7 @@ class TestConfig(IntegronTest):
         self.args.cmsearch = __file__
         self.args.hmmsearch = __file__
         cf = config.Config(self.args)
+        self.assertTrue(isinstance(cf, config.Config))
 
         # check that we can instanciate a config
         # if a prodigal, hmmsearch and cmsearch are provided
@@ -109,6 +110,7 @@ class TestConfig(IntegronTest):
         self.args.cmsearch = __file__
         self.args.hmmsearch = __file__
         cf = config.Config(self.args)
+        self.assertTrue(isinstance(cf, config.Config))
 
         # check that we cannot instanciate a config
         # if prodigal is not provided and it's not a gambase nor a custom prot_file
@@ -263,11 +265,11 @@ class TestConfig(IntegronTest):
 
 
     def test_log_level(self):
-        for v, q, l in [(0, 0, 20), (0, 2, 40), (0, 5, 50), (1, 0, 10), (3, 0, 10), (2, 2, 20)]:
+        for v, q, exp_level in [(0, 0, 20), (0, 2, 40), (0, 5, 50), (1, 0, 10), (3, 0, 10), (2, 2, 20)]:
             self.args.verbose = v
             self.args.quiet = q
             cf = config.Config(self.args)
-            self.assertEqual(cf.log_level, l)
+            self.assertEqual(cf.log_level, exp_level)
 
     def test_prot_file(self):
         self.args.prot_file = 'nimportnaoik'

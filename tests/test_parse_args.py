@@ -282,7 +282,7 @@ class TestParseArgs(IntegronTest):
         with self.catch_io(out=True):
             try:
                 _ = parse_args(['--version'])
-            except TypeError as err:
+            except TypeError:
                 msg = sys.stdout.getvalue()
                 msg_expected = """integron_finder version {i_f} {commit}
 Using:

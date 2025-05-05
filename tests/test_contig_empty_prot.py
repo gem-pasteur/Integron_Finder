@@ -33,18 +33,12 @@ import tempfile
 import pandas as pd
 import pandas.testing as pdt
 
-# from Bio import BiopythonExperimentalWarning
-# import warnings
-# warnings.simplefilter('ignore', BiopythonExperimentalWarning)
-from Bio import SeqIO
-
 try:
     from tests import IntegronTest
 except ImportError as err:
     msg = "Cannot import integron_finder: {0!s}".format(err)
     raise ImportError(msg)
 
-from integron_finder import integrase
 from integron_finder.scripts.finder import main
 import integron_finder.scripts.finder as finder
 

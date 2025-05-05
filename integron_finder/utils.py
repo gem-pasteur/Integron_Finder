@@ -35,37 +35,44 @@ from Bio import SeqIO
 _log = colorlog.getLogger(__name__)
 
 
-def make_multi_fasta_reader(alphabet):
+class MultiFastaReader:
     """
-    fasta generator maker
-
-    :param alphabet: the alphabet store in the fasta generator closure
-    :return: generator to iterate on the fasta file in the same order as in fasta file
+    Iterate over sequence of a fasta file
     """
-
-    def fasta_iterator(path):
+    def __init__(self, path):
         """
-        :param path: The path to the fasta file.
-        :return: The sequence parsed.
-        :rtype: :class:`Bio.SeqRecord.SeqRecord` object.
+        :param str path: the path to the fasta file
         """
-        name = get_name_from_path(path)
-        if alphabet:
-            seq_it = SeqIO.parse(path, "fasta", alphabet=alphabet)
-        else:
-            seq_it = SeqIO.parse(path, "fasta")
-        for seq in seq_it:
-            seq.name = name
-            yield seq
+        self.path = path
+        self.name = get_name_from_path(path)
+        self._seq_it = SeqIO.parse(path, "fasta")
 
-    return fasta_iterator
+    def __iter__(self):
+        return self
 
+    def __next__(self):
+        """
 
-try:
-    Seq.IUPAC
-    read_multi_fasta = make_multi_fasta_reader(Seq.IUPAC.extended_protein)
-except AttributeError:
-    read_multi_fasta = make_multi_fasta_reader(None)
+        :return: The next sequence in the file
+        :rtype: :class:`Bio.Seq.SeqRecord` object
+        """
+        seq = next(self._seq_it)
+        seq.name = self.name
+        return seq
+
+    def close(self):
+        """
+        Close the file handle on the fasta file
+        If it iterate until the end of the file, the file handle is automatically closed
+        But if it stop before the end it is the responsability of the caller to close it.
+        :return: None
+        """
+        # close the stream if the object is deleted before to iterate until the end
+        if not self._seq_it.stream.closed:
+            self._seq_it.stream.close()
+
+    def __del__(self):
+        self.close()
 
 
 class FastaIterator:
@@ -92,7 +99,7 @@ class FastaIterator:
         """
         try:
             self.alphabet = Seq.IUPAC.ambiguous_dna
-        except AttributeError as err:
+        except AttributeError:
             self.alphabet = None
         if self.alphabet:
             self.seq_index = SeqIO.index(path, "fasta",  alphabet=self.alphabet)
@@ -102,6 +109,7 @@ class FastaIterator:
         self._topologies = None
         self.replicon_name = replicon_name
         self.dist_threshold = dist_threshold
+
 
     def _set_topologies(self, topologies):
         """

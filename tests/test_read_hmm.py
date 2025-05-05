@@ -28,8 +28,6 @@
 
 import os
 import argparse
-import tempfile
-import shutil
 
 import pandas as pd
 import pandas.testing as pdt
@@ -43,7 +41,7 @@ except ImportError as err:
 from integron_finder.config import Config
 from integron_finder.hmm import read_hmm
 from integron_finder.prot_db import GembaseDB, ProdigalDB
-from integron_finder.utils import read_multi_fasta
+from integron_finder.utils import MultiFastaReader
 
 
 class TestReadHMM(IntegronTest):
@@ -70,7 +68,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_fasta(replicon_path)
+        sequences_db = MultiFastaReader(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -98,7 +96,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_fasta(replicon_path)
+        sequences_db = MultiFastaReader(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -130,7 +128,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_fasta(replicon_path)
+        sequences_db = MultiFastaReader(replicon_path)
         replicon = next(sequences_db)
         with self.catch_log():
             prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
@@ -163,7 +161,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_fasta(replicon_path)
+        sequences_db = MultiFastaReader(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -203,7 +201,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        seq_db = read_multi_fasta(replicon_path)
+        seq_db = MultiFastaReader(replicon_path)
         replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -235,7 +233,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_fasta(replicon_path)
+        sequences_db = MultiFastaReader(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -273,7 +271,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_fasta(replicon_path)
+        sequences_db = MultiFastaReader(replicon_path)
         replicon = next(sequences_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
@@ -306,7 +304,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = read_multi_fasta(replicon_path)
+        sequences_db = MultiFastaReader(replicon_path)
         replicon = next(sequences_db)
         with self.catch_log():
             prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
@@ -339,7 +337,7 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        seq_db = read_multi_fasta(replicon_path)
+        seq_db = MultiFastaReader(replicon_path)
         replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 

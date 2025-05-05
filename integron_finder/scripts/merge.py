@@ -36,11 +36,12 @@ import integron_finder
 
 # must be done after import 'integron_finder'
 import colorlog
-_log = None
 
 from integron_finder import IntegronError, logger_set_level
 from integron_finder import utils
 from integron_finder import results
+
+_log = None
 
 
 def merge_integrons(out_file, *in_dirs):

@@ -442,7 +442,7 @@ def find_integron_in_one_replicon(replicon, config):
         # all summaries are merged in results.merge_results function
         summary.to_csv(summary_file, sep="\t", na_rep="NA")
 
-    except integron_finder.EmptyFileError as err:
+    except integron_finder.EmptyFileError:
         _log.warning('############ Skip replicon {} ############'.format(replicon.name))
         integron_file = ''
         summary_file = ''
@@ -455,7 +455,7 @@ def find_integron_in_one_replicon(replicon, config):
             shutil.rmtree(result_tmp_dir)
         except Exception as err:
             _log.warning("Cannot remove temporary results : '{} : {}'".format(result_tmp_dir, str(err)))
-
+    protein_db.close()
     return integron_file, summary_file
 
 

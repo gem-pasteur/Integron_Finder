@@ -66,6 +66,19 @@ class ProteinDB(ABC):
         self.replicon = replicon
         self._prot_file = self._make_protfile(path=prot_file)
         self._prot_db = self._make_db()
+        self._pseudo_genes = set()
+
+
+    def __del__(self):
+        ##### CAUTION #########
+        # self._make_db() use biopython SeqIO.index
+        # and index open a fileIO but not close it
+        self.close()
+
+
+    def close(self):
+        if hasattr(self, '_prot_db'):
+            self._prot_db.close()
 
 
     @abstractmethod
@@ -102,12 +115,7 @@ class ProteinDB(ABC):
         """
         :return: an index of the sequence contains in protfile corresponding to the replicon
         """
-        try:
-            # for biopython < 1.78
-            idx = SeqIO.index(self._prot_file, "fasta", alphabet=Seq.IUPAC.extended_protein)
-        except AttributeError:
-            # for biopython > 1.76
-            idx = SeqIO.index(self._prot_file, "fasta")
+        idx = SeqIO.index(self._prot_file, "fasta")
         return idx
 
 
@@ -130,6 +138,21 @@ class ProteinDB(ABC):
         """
         return self._prot_file
 
+    @abstractmethod
+    def coding_prot_ids(self):
+        """
+        :return: a generator which iterate on coding genes seq_ids (the non coding genes are discarded)
+        :rtype: generartor
+        """
+        pass
+
+    def is_pseudo_gene(self, seq_id):
+        """
+
+        :param seq_id: The sequence id to test
+        :return: True if the seq_id correspond to gene which is a pseudo gene, False otherwise
+        """
+        return seq_id in self._pseudo_genes
 
 
 class GembaseType(Enum):
@@ -240,6 +263,7 @@ class GembaseDB(ProteinDB):
         else:
             self._gembase_path = os.path.realpath(gembase_path)
         self.replicon = replicon
+        self._pseudo_genes = set()
         # in GemBase Draft the files ar based on replicon id
         # but one file can contains several contig
         # the sequence id contains the contig number
@@ -263,6 +287,7 @@ class GembaseDB(ProteinDB):
         else:
             self._prot_file = prot_file
         self._prot_db = self._make_db()
+
 
     @staticmethod
     def get_lst_dir( gembase_path):
@@ -373,19 +398,21 @@ class GembaseDB(ProteinDB):
         else:
             all_prot_path = os.path.join(self._gembase_path, 'Proteins', self._gembase_file_basename + '.prt')
             try:
-                all_prots = SeqIO.index(all_prot_path, "fasta", alphabet=Seq.IUPAC.extended_protein)
-            except AttributeError:
                 all_prots = SeqIO.index(all_prot_path, "fasta")
-            if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
-                os.makedirs(self.cfg.tmp_dir(self.replicon.id))
-            prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')
-            with open(prot_file_path, 'w') as prot_file:
-                for seq_id in self._info[4]:
-                    try:
-                        seq = all_prots[seq_id]
-                        SeqIO.write(seq, prot_file, 'fasta')
-                    except KeyError:
-                        _log.warning(f'Sequence describe in LSTINF file {seq_id} is not present in {all_prot_path}')
+                if not os.path.exists(self.cfg.tmp_dir(self.replicon.id)):
+                    os.makedirs(self.cfg.tmp_dir(self.replicon.id))
+                prot_file_path = os.path.join(self.cfg.tmp_dir(self.replicon.id), self.replicon.id + '.prt')
+                with open(prot_file_path, 'w') as prot_file:
+                    for seq_id in self._info[4]:
+                        try:
+                            seq = all_prots[seq_id]
+                            SeqIO.write(seq, prot_file, 'fasta')
+                        except KeyError:
+                            self._pseudo_genes.add(seq_id)
+                            _log.warning(f'Sequence describe in LSTINF file {seq_id} is not present in {all_prot_path}')
+            finally:
+                all_prots.close()
+
         return prot_file_path
 
 
@@ -567,7 +594,7 @@ class GembaseDB(ProteinDB):
             lst = lst.astype(dtype)
             genome_info = lst.loc[lst[4].str.contains(replicon_id, regex=True)]
             prots_info = genome_info.loc[genome_info[3] == 'CDS']
-        except Exception as err:
+        except Exception:
             msg = f"The LST file '{lst_path}' seems not to be in gembase V2 draft format."
             _log.error(msg)
             raise IntegronError(msg) from None
@@ -585,10 +612,21 @@ class GembaseDB(ProteinDB):
 
     def __iter__(self):
         """
-        :return: a generator which iterate on the protein seq_id which constitute the contig.
+        :return: a generator which iterate on the gene seq_ids which constitute the contig (genes and pseudogenes).
         :rtype: generator
         """
         return (seq_id for seq_id in self._info[4])
+
+
+    def coding_prot_ids(self):
+        """
+
+        :return: a generator which iterate on coding genes seq_ids (the non coding genes are discarded)
+        :rtype: generator
+        """
+        all_seq_ids = self._info[4]
+        coding_seqid = all_seq_ids[~all_seq_ids.isin(self._pseudo_genes)]
+        return (seq_id for seq_id in coding_seqid)
 
 
     def get_description(self, gene_id):
@@ -632,7 +670,7 @@ class ProdigalDB(ProteinDB):
         :return: the path of the created protfile
         :rtype: str
         """
-        assert self.cfg.prodigal, f"'prodigal' not found."
+        assert self.cfg.prodigal, "'prodigal' not found."
         if path:
             prot_file_path = path
         else:
@@ -674,8 +712,16 @@ class ProdigalDB(ProteinDB):
         """
         :return: a generator which iterate on the protein seq_id which constitute the contig.
         :rtype: generator
-                """
+        """
         return (seq_id for seq_id in self._prot_db)
+
+
+    def coding_prot_ids(self):
+        """
+        :return: a generator which iterate on coding genes seq_ids (the non coding genes are discarded)
+        :rtype: generartor
+        """
+        return self.__iter__()
 
 
     def get_description(self, gene_id):
@@ -714,6 +760,7 @@ class CustomDB(ProteinDB):
         except Exception as err:
             raise RuntimeError(f"Cannot import custom --annot-parser '{parser_path}': {err}")
 
+
     def _make_protfile(self, path=None):
         if path is None:
             raise IntegronError("If use CustomDB prot_file must be specified")
@@ -740,6 +787,14 @@ class CustomDB(ProteinDB):
         :rtype: generator
                 """
         return (seq_id for seq_id in self._prot_db)
+
+
+    def coding_prot_ids(self):
+        """
+        :return: a generator which iterate on coding genes seq_ids (the non coding genes are discarded)
+        :rtype: generartor
+        """
+        return self.__iter__()
 
 
     def get_description(self, gene_id):

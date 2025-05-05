@@ -28,11 +28,11 @@
 
 import os
 from importlib import resources as impresources
-
 import colorlog
-_log = colorlog.getLogger(__name__)
 
 from . import utils
+
+_log = colorlog.getLogger(__name__)
 
 
 class Config:

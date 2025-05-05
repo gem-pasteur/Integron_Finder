@@ -74,3 +74,11 @@ work/
 # jupyter checkpoints #
 #######################
 \.ipynb_checkpoints/
+
+#########
+# Stuff #
+#########
+
+Sandbox/
+bioconda_notes.md
+test_nf/

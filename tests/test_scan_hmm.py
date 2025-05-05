@@ -93,7 +93,7 @@ class TestScanHmmBank(IntegronTest):
         it raise a ValueError
         """
         mypath = self.find_data(os.path.join("Replicons", 'multi_fasta.fst'))
-        with self.catch_log() as log:
+        with self.catch_log():
             with self.assertRaises(ValueError) as ctx:
                 _ = scan_hmm_bank(mypath)
             self.assertTrue(str(ctx.exception).startswith("Too many lines with no hmm file in {}.".format(mypath)))
