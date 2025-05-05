@@ -6,8 +6,38 @@ This part is for developers, who want to work on IntegronFinder scripts.
 
 .. _install_dev:
 
+**********************
 Developer installation
-======================
+**********************
+
+=============
+Depenedencies
+=============
+**Python version >=3.10** is required to run Integron_Finder: https://docs.python.org/3.10/index.html
+
+Integron_Finder has one program dependency:
+
+ - The *HMMER* program, version 3.1 or greater (http://hmmer.org/).
+ - The Infernal program version 1.1.2 or greater (http://eddylab.org/infernal/)
+ - The Prodigal program version 2.6.2 or greater (https://github.com/hyattpd/Prodigal)
+
+The *hmmsearch, cmsearch and prodigal* programs should be installed (*e.g.*, in the PATH) in order to use integron_finder.
+Otherwise, the paths to these executables must be specified via the command-line: see options `--hmmsearch` `--cmsearch` `--prodigal`
+
+Integron_Finder also relies on some Python library dependencies:
+
+ - colorlog
+ - pandas
+ - matplotlib
+ - sphinx
+ - sphinx_rtd_theme
+ - coverage
+ - build
+ - ruff
+ - pre-commit
+
+These dependencies will be automatically retrieved and installed when using `pip` for installation (see below).
+
 
 If you are not part of the project, start by forking IntegronFinder repository.
 For that, sign in to your account on github, and go to https://github.com/gem-pasteur/Integron_Finder.
@@ -46,6 +76,252 @@ without to reinstall the project.
     and the `--root` option has unexpected behavior. Therefore the best solution is to use `--user` or a virtualenv.
 
 
+.. _tests:
+
+==================================
+Integron_Finder testing procedures
+==================================
+
+Integron_Finder project use `unittest` framework (included in the standard library) to test the code.
+
+All tests stuff is in `tests` directory.
+
+* The data directory contains data needed by the tests
+* in the __init__.py file a IntegronTest class is defined and should be the base of all testcase use in the project
+* each test_*.py represent a file containing unit or functional tests
+
+To run all the tests (in the virtualenv)
+
+.. code-block:: shell
+
+    python -m unittest discover
+
+To increase verbosity of output
+
+.. code-block:: shell
+
+    python -m unittest discover -vv
+
+.. code-block:: text
+
+    test_integron_1elem_int (tests.test_add_feature.TestAddFeature.test_integron_1elem_int) ... ok
+    test_integron_1elem_prom (tests.test_add_feature.TestAddFeature.test_integron_1elem_prom) ... ok
+    test_integron_1elem_prot (tests.test_add_feature.TestAddFeature.test_integron_1elem_prot) ... ok
+    test_integron_2int_nelem (tests.test_add_feature.TestAddFeature.test_integron_2int_nelem) ... ok
+    test_integron_long_seqname (tests.test_add_feature.TestAddFeature.test_integron_long_seqname) ... ok
+    test_integron_nelem (tests.test_add_feature.TestAddFeature.test_integron_nelem) ... ok
+    test_config (tests.test_config.TestConfig.test_config) ... ok
+    test_default_topology (tests.test_config.TestConfig.test_default_topology) ... ok
+    test_func_annot_path (tests.test_config.TestConfig.test_func_annot_path) ... ok
+    test_getattr (tests.test_config.TestConfig.test_getattr) ... ok
+    test_input_dir (tests.test_config.TestConfig.test_input_dir) ... ok
+    test_log_level (tests.test_config.TestConfig.test_log_level) ... ok
+    test_model_attc_name (tests.test_config.TestConfig.test_model_attc_name) ... ok
+    test_model_attc_path (tests.test_config.TestConfig.test_model_attc_path) ... ok
+    test_model_dir (tests.test_config.TestConfig.test_model_dir) ... ok
+    test_model_integrase (tests.test_config.TestConfig.test_model_integrase) ... ok
+    test_model_len (tests.test_config.TestConfig.test_model_len) ... ok
+    test_model_phage_int (tests.test_config.TestConfig.test_model_phage_int) ... ok
+    ...
+
+    ----------------------------------------------------------------------
+    Ran 246 tests in 400.863s
+
+    OK
+
+The tests must be in python file (`.py`) starting with with `test\_` \
+It's possible to specify one or several test files, one module, or one class in a module or a method in a Test class.
+
+Test the `test_pprot_db` module
+
+.. code-block:: shell
+
+    python -m unittest -vv tests.test_prot_db
+
+.. code-block:: text
+
+    test_ProteinDB (tests.test_prot_db.TestCustomDB.test_ProteinDB) ... ok
+    test_ProteinDB_bad_parser (tests.test_prot_db.TestCustomDB.test_ProteinDB_bad_parser) ... ok
+    test_coding_prot_ids (tests.test_prot_db.TestCustomDB.test_coding_prot_ids) ... ok
+    test_get_description (tests.test_prot_db.TestCustomDB.test_get_description) ... ok
+    test_get_description_lazy_parser (tests.test_prot_db.TestCustomDB.test_get_description_lazy_parser) ... ok
+    test_get_description_stupid_parser (tests.test_prot_db.TestCustomDB.test_get_description_stupid_parser) ... ok
+    test_get_description_stupid_parser2 (tests.test_prot_db.TestCustomDB.test_get_description_stupid_parser2) ... ok
+    test_getitem (tests.test_prot_db.TestCustomDB.test_getitem) ... ok
+    test_iter (tests.test_prot_db.TestCustomDB.test_iter) ... ok
+    test_protfile (tests.test_prot_db.TestCustomDB.test_protfile) ... ok
+    test_ProteinDB (tests.test_prot_db.TestGemBase.test_ProteinDB) ... ok
+    test_codig_prot_ids (tests.test_prot_db.TestGemBase.test_codig_prot_ids) ... ok
+    test_find_gembase_file_basename (tests.test_prot_db.TestGemBase.test_find_gembase_file_basename) ... ok
+    ...
+    test_ProteinDB_no_prodigal (tests.test_prot_db.TestProdigalDB.test_ProteinDB_no_prodigal) ... ok
+    test_coding_prot_ids (tests.test_prot_db.TestProdigalDB.test_coding_prot_ids) ... ok
+    test_get_description (tests.test_prot_db.TestProdigalDB.test_get_description) ... ok
+    test_getitem (tests.test_prot_db.TestProdigalDB.test_getitem) ... ok
+    test_iter (tests.test_prot_db.TestProdigalDB.test_iter) ... ok
+    test_make_protfile (tests.test_prot_db.TestProdigalDB.test_make_protfile) ... ok
+    test_make_protfile_no_dir (tests.test_prot_db.TestProdigalDB.test_make_protfile_no_dir) ... ok
+    test_make_protfile_prodigal_failed (tests.test_prot_db.TestProdigalDB.test_make_protfile_prodigal_failed) ... ok
+    test_protfile (tests.test_prot_db.TestProdigalDB.test_protfile) ... ok
+    test_str (tests.test_prot_db.TestRepliconType.test_str) ... ok
+
+    ----------------------------------------------------------------------
+    Ran 41 tests in 5.249s
+
+    OK
+
+
+Test only the class `TestProdigalDB` (this module contains 5 classes)
+
+.. code-block:: shell
+
+    python -m unittest -vv tests.test_prot_db.TestProdigalDB
+
+.. code-block:: text
+
+    test_ProteinDB (tests.test_prot_db.TestProdigalDB.test_ProteinDB) ... ok
+    test_ProteinDB_no_prodigal (tests.test_prot_db.TestProdigalDB.test_ProteinDB_no_prodigal) ... ok
+    test_coding_prot_ids (tests.test_prot_db.TestProdigalDB.test_coding_prot_ids) ... ok
+    test_get_description (tests.test_prot_db.TestProdigalDB.test_get_description) ... ok
+    test_getitem (tests.test_prot_db.TestProdigalDB.test_getitem) ... ok
+    test_iter (tests.test_prot_db.TestProdigalDB.test_iter) ... ok
+    test_make_protfile (tests.test_prot_db.TestProdigalDB.test_make_protfile) ... ok
+    test_make_protfile_no_dir (tests.test_prot_db.TestProdigalDB.test_make_protfile_no_dir) ... ok
+    test_make_protfile_prodigal_failed (tests.test_prot_db.TestProdigalDB.test_make_protfile_prodigal_failed) ... ok
+    test_protfile (tests.test_prot_db.TestProdigalDB.test_protfile) ... ok
+
+    ----------------------------------------------------------------------
+    Ran 10 tests in 0.857s
+
+    OK
+
+
+Test only the method `test_protfile` from the test Class `TestProdigalDB` in module `test_prot_db`
+
+.. code-block:: shell
+
+    python -m unittest -vv tests.test_prot_db.TestProdigalDB.test_protfile
+
+.. code-block:: text
+
+    test_protfile (tests.test_prot_db.TestProdigalDB.test_protfile) ... ok
+
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.112s
+
+    OK
+
+
+Coverage
+========
+
+To compute the tests coverage, we use the `coverage <https://pypi.org/project/coverage/>`_ package.
+The package is automatically installed if you have installed `integron_finder` with the `dev` target see :ref:`installation <dev_installation>`
+The coverage package is setup in the `pyproject.toml` configuration file
+
+To compute the coverage
+
+.. code-block:: shell
+
+    coverage run
+
+.. code-block:: text
+
+    ...
+    test_w_chunk (tests.test_split.TestMain.test_w_chunk) ... ok
+    test_wo_chunk (tests.test_split.TestMain.test_wo_chunk) ... ok
+    test_mute (tests.test_split.TestParseArgs.test_mute) ... ok
+    test_parse_chunk (tests.test_split.TestParseArgs.test_parse_chunk) ... ok
+    test_parse_outdir (tests.test_split.TestParseArgs.test_parse_outdir) ... ok
+    test_parse_replicon (tests.test_split.TestParseArgs.test_parse_replicon) ... ok
+    test_quiet (tests.test_split.TestParseArgs.test_quiet) ... ok
+    test_verbose (tests.test_split.TestParseArgs.test_verbose) ... ok
+    test_split_avoid_overwriting (tests.test_split.TestSplit.test_split_avoid_overwriting) ... ok
+    test_split_w_chunk (tests.test_split.TestSplit.test_split_w_chunk) ... ok
+    test_split_wo_chunk (tests.test_split.TestSplit.test_split_wo_chunk) ... ok
+    test_getitem (tests.test_topology.TestTopology.test_getitem) ... ok
+    test_getitem_cmdline_topofile (tests.test_topology.TestTopology.test_getitem_cmdline_topofile) ... ok
+    test_getitem_gembase (tests.test_topology.TestTopology.test_getitem_gembase) ... ok
+    test_parse (tests.test_topology.TestTopology.test_parse) ... ok
+    test_parse_topology (tests.test_topology.TestTopology.test_parse_topology) ... ok
+    test_FastaIterator (tests.test_utils.TestUtils.test_FastaIterator) ... ok
+    test_FastaIterator_test_topologies (tests.test_utils.TestUtils.test_FastaIterator_test_topologies) ... ok
+    test_get_name_from_path (tests.test_utils.TestUtils.test_get_name_from_path) ... ok
+    test_log_level (tests.test_utils.TestUtils.test_log_level) ... ok
+    test_model_len (tests.test_utils.TestUtils.test_model_len) ... ok
+    test_read_multi_prot_fasta (tests.test_utils.TestUtils.test_read_multi_prot_fasta) ... ok
+
+    ----------------------------------------------------------------------
+    Ran 246 tests in 400.863s
+
+    OK
+
+
+Then display a report
+
+.. code-block:: shell
+
+    coverage report
+
+
+.. code-block:: text
+
+    Name                                  Stmts   Miss Branch BrPart  Cover
+    -----------------------------------------------------------------------
+    integron_finder/__init__.py              81     12     18      4    84%
+    integron_finder/annotation.py            84      0     30      0   100%
+    integron_finder/argparse_utils.py        14      1      2      1    88%
+    integron_finder/attc.py                 152      0     62      4    98%
+    integron_finder/config.py               104      2     48      2    97%
+    integron_finder/hmm.py                   89      0     28      1    99%
+    integron_finder/infernal.py             147      0     60      2    99%
+    integron_finder/integrase.py             33      0     12      2    96%
+    integron_finder/integron.py             403     11    146      8    97%
+    integron_finder/prot_db.py              374     17    122      7    95%
+    integron_finder/results.py               45      0     10      0   100%
+    integron_finder/scripts/__init__.py       0      0      0      0   100%
+    integron_finder/scripts/finder.py       284     28    116     19    87%
+    integron_finder/scripts/merge.py         82      3     30      4    94%
+    integron_finder/scripts/split.py         76      5     28      6    89%
+    integron_finder/topology.py              39      0     22      1    98%
+    integron_finder/utils.py                 96      1     26      2    98%
+    -----------------------------------------------------------------------
+    TOTAL                                  2103     80    760     63    95%
+
+
+or generate a html report
+
+.. code-block:: shell
+
+    coverage html
+
+.. code-block:: text
+
+    Wrote HTML report to htmlcov/index.html
+
+The results are in the `htmlcov` directory. With you favourite web browser, open the `index.html` file.
+for more options please refer to the `coverage documentation <https://coverage.readthedocs.io/en/latest/>`_ .
+
+.. _documentation:
+
+=============
+Documentation
+=============
+
+Documentation is done using ``sphinx``. Source files are located in ``doc/sources``.
+To generate the documentation you just have to run the makefile located in *doc* directory. ::
+
+    make html
+
+To generate the documentation in *html* format or ::
+
+    make latexpdf
+
+to generate the documentation in pdf format (for this option you need to have latex installed on your compute)
+
+You can complete them.
+
+===================
 Build a new release
 ===================
 
@@ -63,7 +339,7 @@ Build a new release
 
 it will create a source *tar.gz* distribution and a *wheel*
 
-
+===================================
 Send changes to upstream repository
 ===================================
 
@@ -90,72 +366,3 @@ create a pull request.
     - A green 'Able to merge' text should appear if git is able to automatically merge the 2 branches.
       In that case, click on 'Create pull request', write your comments on the changes you made, why etc,
       and save. We will receive the pull request.
-
-
-.. _tests:
-
-Tests
-=====
-
-IntegronFinder is provided with unit tests. You can find them in ``tests`` directory.
-You can use them to check that your changes did not break the previous features,
-and you can update them, and add your own tests for the new features.
-
-Tests are done using unittest.
-
-.. _runtest:
-
-Running tests
--------------
-
-To run the tests -v option is to increase the verbosity of the output::
-
-    python setup.py test
-
-or::
-
-    python tests/run_tests.py -vv
-
-or::
-
-    python tests/run_tests.py -vv tests/test_utils.py
-
-to run specific tests.
-
-If you also want to get code coverage (you need to install coverage)::
-
-    coverage run  --source integron_finder tests/run_tests.py
-
-Add ``-vv`` to get more details on each test passed/failed.
-If you want to see the coverage in html output, run (after executing the command above)::
-
-     coverage html
-
-The html coverage report will be generated in ``coverage_html/index.html``.
-
-
-Adding tests
-------------
-
-If you want to create a new test file, adding a file in tests directory, must start with ``test_``.
-Then, write your TestCase by inherits from IntegronTest and your tests using unittest framework
-(see examples in existing files), and :ref:`run them<runtest>`.
-
-
-.. _documentation:
-
-Documentation
-=============
-
-Documentation is done using ``sphinx``. Source files are located in ``doc/sources``.
-To generate the documentation you just have to run the makefile located in *doc* directory. ::
-
-    make html
-
-To generate the documentation in *html* format or ::
-
-    make latexpdf
-
-to generate the documentation in pdf format (for this option you need to have latex installed on your compute)
-
-You can complete them.
