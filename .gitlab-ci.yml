@@ -9,16 +9,17 @@ variables:
 
 ruff:
   stage: linting
-  image: ubuntu-latest
+  image: python:3.13-slim-bookworm
   script:
     - python3 -m pip install .[dev]
     - ruff check --output-format=gitlab integron_finder/ tests/
 
 testing:
   stage: test
-  image: ubuntu_latest
+  image: python:3.13-slim-bookworm
   script:
-    - apt-get install -v python3 python3-pip infernal prodigal hmmer
+    - apt-get update -y
+    - apt-get install -y --no-install-recommends infernal prodigal hmmer
     - python3 -m pip install .[dev]
     - python3 -m unittest discover -vv
   except:
@@ -27,7 +28,7 @@ testing:
 
 coverage:
   stage: coverage
-  image: ubuntu_latest
+  image: python:3.13-slim-bookworm
   script:
     - python3 -m pip install .[dev]
     - coverage run
@@ -43,7 +44,7 @@ coverage:
 
 pages:
   stage: pages
-  image: ubuntu_latest
+  image: python:3.13-slim-bookworm
   dependencies:
     - coverage
   script:
