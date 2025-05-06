@@ -68,8 +68,8 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = MultiFastaReader(replicon_path)
-        replicon = next(sequences_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data(os.path.join("fictive_results", "{}_intI-empty.res".format(replicon_id)))
@@ -96,8 +96,8 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = MultiFastaReader(replicon_path)
-        replicon = next(sequences_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data(os.path.join("Results_Integron_Finder_{}".format(rep_name),
@@ -128,8 +128,8 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = MultiFastaReader(replicon_path)
-        replicon = next(sequences_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         with self.catch_log():
             prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
 
@@ -161,8 +161,8 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = MultiFastaReader(replicon_path)
-        replicon = next(sequences_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data("Results_Integron_Finder_{}".format(rep_name),
@@ -201,8 +201,8 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data("fictive_results", "{}_intI.res".format(replicon_id))
@@ -233,8 +233,8 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = MultiFastaReader(replicon_path)
-        replicon = next(sequences_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data("Results_Integron_Finder_{}".format(rep_name),
@@ -271,8 +271,8 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = MultiFastaReader(replicon_path)
-        replicon = next(sequences_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data("fictive_results", "{}_intI.res".format(replicon_id))
@@ -304,8 +304,8 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        sequences_db = MultiFastaReader(replicon_path)
-        replicon = next(sequences_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         with self.catch_log():
             prot_db = GembaseDB(replicon, cfg, prot_file=prot_file)
 
@@ -337,8 +337,8 @@ class TestReadHMM(IntegronTest):
         self.args.replicon = replicon_path
         cfg = Config(self.args)
 
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         prot_db = ProdigalDB(replicon, cfg, prot_file=prot_file)
 
         infile = self.find_data("fictive_results",
