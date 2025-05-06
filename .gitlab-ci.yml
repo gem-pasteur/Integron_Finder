@@ -30,6 +30,8 @@ coverage:
   stage: coverage
   image: python:3.13-slim-bookworm
   script:
+    - apt-get update -y
+    - apt-get install -y --no-install-recommends infernal prodigal hmmer
     - python3 -m pip install .[dev]
     - coverage run
     - coverage html
