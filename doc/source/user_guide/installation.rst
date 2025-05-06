@@ -11,13 +11,13 @@ Installation
 IntegronFinder dependencies
 ===========================
 
-IntegronFinder is built with Python >= 3.4, and a few libraries are needed:
+IntegronFinder is built with Python >= 3.10, and a few libraries are needed:
 
-- Python >=3.7,<=3.10
-- Pandas >=1.1.5,<=1.4.0
-- Numpy >=1.19.4,<=1.22.1
-- Biopython >=1.78,<=1.79
-- Matplotlib >=3.3.3,<=3.5.1
+- Python >=3.10
+- Numpy >=1.26
+- Matplotlib >=3.8
+- Pandas >=2
+- Biopython >=1.82
 - colorlog
 
 From version 1.5.1, integron_finder will check and install theses libraries for you.
@@ -26,9 +26,9 @@ In addition, IntegronFinder has external dependencies, which have to be
 installed prior the use of the program (click to access the corresponding
 website).
 
-- `HMMER`_ >=3.1b2,<=3.3.2
-- `INFERNAL`_ >=1.1.2,<=1.1.4
-- `Prodigal`_ >V2.6.2,<=V2.6.3
+- `HMMER`_ >=3.1b2
+- `INFERNAL`_ >=1.1.2
+- `Prodigal`_ >V2.6.2
 - `Nextflow`_ (for parallelization)
 
 After installation of these programs, they should be in your ``$PATH`` (*i.e.*
@@ -110,7 +110,7 @@ activate you virtualenv::
 The name of the virtualenv appear in parenthesis at the beginning of the prompt.
 Then install integron_finder::
 
-    pip install integron_finder
+    python3 -m pip install integron_finder
 
 
 To run integron finder, you have to activate (once per session) the virtual environment::
@@ -136,7 +136,6 @@ Integron_finder is in [bioconda](https://bioconda.github.io/) channel.
 1. install conda
 2. Set up channels ::
 
-    conda config --add channels defaults
     conda config --add channels conda-forge
     conda config --add channels bioconda
 
@@ -220,7 +219,7 @@ However, if you don't know how to install libraries, we recommend to re-install 
 There are two main distributions (click to access website):
 
 - `Enthought Canopy`_
-- `Anaconda`_
+- `conda-forge`_
 
 Download version 3.x which correspond to your machine,
 then make sure that python from these distributions is the default one
@@ -230,14 +229,14 @@ Make sure Biopython is installed, otherwise, you will have to install Biopython.
 
 It works as follow::
 
-    (sudo) pip install Biopython==1.71
+    (sudo) pip install Biopython==1.82
 
-To install version 1.71 of Biopython (recommended for IntegronFinder).
+To install version 1.82 of Biopython (recommended for IntegronFinder).
 
 .. note::
     If you don't manage to install all the packages, try googling the error, or don't hesitate to ask a question on `stackoverflow`_.
 
-.. _`Anaconda`: https://www.anaconda.com/download/
+.. _`conda-forge`: https://conda-forge.org/
 .. _`Enthought Canopy`: https://store.enthought.com/
 .. _`Canopy for Academics`: https://store.enthought.com/#canopy-academic
 .. _`stackoverflow`: http://stackoverflow.com/
