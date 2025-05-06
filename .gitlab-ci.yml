@@ -50,7 +50,9 @@ pages:
   dependencies:
     - coverage
   script:
-    - python3 -m pip install .
+    - apt-get update -y
+    - apt-get install -y --no-install-recommends make
+    - python3 -m pip install .[dev]
     - cd ${CI_PROJECT_DIR}/doc/
     - make html
     - cd ${CI_PROJECT_DIR}
