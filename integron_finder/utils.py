@@ -60,6 +60,19 @@ class MultiFastaReader:
         seq.name = self.name
         return seq
 
+
+    def __enter__(self):
+        return self
+
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+
+    def __del__(self):
+        self.close()
+
+
     def close(self):
         """
         Close the file handle on the fasta file
@@ -70,9 +83,6 @@ class MultiFastaReader:
         # close the stream if the object is deleted before to iterate until the end
         if not self._seq_it.stream.closed:
             self._seq_it.stream.close()
-
-    def __del__(self):
-        self.close()
 
 
 class FastaIterator:
