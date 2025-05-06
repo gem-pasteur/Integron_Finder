@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2024  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2025  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -49,16 +49,17 @@ class TestSplit(IntegronTest):
 
 
     def setUp(self):
-        tmp_dir = tempfile.gettempdir()
-        self.out_dir = os.path.join(tmp_dir, 'test_integron_split')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
+        self.out_dir = os.path.join(self.tmp_dir, 'test_integron_split')
         if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
             shutil.rmtree(self.out_dir)
         os.makedirs(self.out_dir)
 
 
     def tearDown(self):
-        if os.path.exists(self.out_dir) and os.path.isdir(self.out_dir):
-            shutil.rmtree(self.out_dir)
+        self._tmp_dir.cleanup()
+        
 
     def test_split_wo_chunk(self):
         replicon_path = self.find_data(os.path.join('Replicons', 'multi_fasta.fst'))
@@ -181,7 +182,7 @@ class TestMain(IntegronTest):
         with self.assertRaises(RuntimeError) as ctx:
             split.main(command.split()[1:], log_level="WARNING")
         self.assertEqual(str(ctx.exception),
-                         "The outdir '/tmp/test_integron_split/foo_file.txt' alredy exist and is not a directory.")
+                         "The outdir '/tmp/test_integron_split/foo_file.txt' already exist and is not a directory.")
 
     def test_wo_chunk(self):
         replicon_path = self.find_data(os.path.join('Replicons', 'multi_fasta.fst'))
@@ -196,12 +197,15 @@ class TestMain(IntegronTest):
         chunk_names = sorted(glob.glob(os.path.join(self.out_dir, '*.fst')))
         self.assertListEqual(files_expected, chunk_names)
         for f in chunk_names:
-            seq_it = SeqIO.parse(f, 'fasta')
-            for s in seq_it:
-                ref_seq = seq_index[s.id]
-                self.assertEqual(s.id, ref_seq.id)
-                self.assertEqual(s.description, ref_seq.description)
-                self.assertEqual(s.seq, ref_seq.seq)
+            try:
+                seq_it = SeqIO.parse(f, 'fasta')
+                for s in seq_it:
+                    ref_seq = seq_index[s.id]
+                    self.assertEqual(s.id, ref_seq.id)
+                    self.assertEqual(s.description, ref_seq.description)
+                    self.assertEqual(s.seq, ref_seq.seq)
+            finally:
+                seq_it.stream.close()
         seq_index.close()
 
 
@@ -221,10 +225,13 @@ class TestMain(IntegronTest):
         chunk_names = sorted(glob.glob(os.path.join(self.out_dir, '*.fst')))
         self.assertListEqual(files_expected, chunk_names)
         for f in chunk_names:
-            seq_it = SeqIO.parse(f, 'fasta')
-            for s in seq_it:
-                ref_seq = seq_index[s.id]
-                self.assertEqual(s.id, ref_seq.id)
-                self.assertEqual(s.description, ref_seq.description)
-                self.assertEqual(s.seq, ref_seq.seq)
+            try:
+                seq_it = SeqIO.parse(f, 'fasta')
+                for s in seq_it:
+                    ref_seq = seq_index[s.id]
+                    self.assertEqual(s.id, ref_seq.id)
+                    self.assertEqual(s.description, ref_seq.description)
+                    self.assertEqual(s.seq, ref_seq.seq)
+            finally:
+                seq_it.stream.close()
         seq_index.close()

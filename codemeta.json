@@ -1,5 +1,5 @@
 {
-    "@context": "https://w3id.org/codemeta/3.0",
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
     "type": "SoftwareSourceCode",
     "applicationCategory": "Bioinformatic",
     "author": [
@@ -15,11 +15,11 @@
             "givenName": "Bertrand"
         },
         {
-            "id": "_:author_2",
+            "id": "https://orcid.org/0000-0002-6462-8783",
             "type": "Person",
             "affiliation": {
                 "type": "Organization",
-                "name": "Laboratoire Interdisciplinaire des Sciences du Numérique, Université Paris-Saclay, CNRS UMR 9015, INRIA, 91400 Orsay, France"
+                "name": "Molecular diversity of microbes, Institut Pasteur, Université de Paris Cité, CNRS UMR3525, 75015 Paris, France"
             },
             "email": "jean.cury@normalesup.org",
             "familyName": "Cury",
@@ -37,7 +37,7 @@
             "givenName": "Eduardo"
         }
     ],
-    "codeRepository": "git+https://github.com/gem-pasteur/Integron_Finder",
+    "codeRepository": "https://github.com/gem-pasteur/Integron_Finder",
     "contributor": [
         {
             "id": "https://orcid.org/0000-0002-8793-9584",
@@ -73,7 +73,8 @@
             "givenName": "Amandine"
         }
     ],
-    "dateModified": "2024-06-05",
+    "dateModified": "2025-06-05",
+    "datePublished": "2015-06-19",
     "description": "Integron_Finder is a program that detects integrons in DNA sequences.",
     "downloadUrl": "https://pypi.org/project/integron-finder/",
     "funder": {
@@ -93,19 +94,23 @@
         "macOS"
     ],
     "programmingLanguage": "Python 3",
-    "relatedLink": "https://integronfinder.readthedocs.io/en/v2.0.4/",
+    "relatedLink": "https://integronfinder.readthedocs.io/en/v2.0.6/",
     "softwareRequirements": [
-        "- Python >=3.10,<=3.12",
-        "- Pandas >=2",
-        "- Numpy >=1.26",
-        "- Biopython >=1.82,<=1.83",
-        "- Matplotlib >=3.8",
-        "- colorlog",
-        "- HMMER >=3.1b2,<=3.3.2",
-        "- INFERNAL >=1.1.2,<=1.1.4",
-        "- Prodigal >=2.6.2,<=V2.6.3"
+        "https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz",
+        "https://pypi.org/project/pandas/2.2.3/",
+        "https://pypi.org/project/numpy/2.2.5/",
+        "https://pypi.org/project/biopython/1.85/",
+        "https://pypi.org/project/matplotlib/3.10.1/",
+        "https://pypi.org/pypi/colorlog/",
+        "http://eddylab.org/software/hmmer/hmmer-3.4.tar.gz",
+        "http://eddylab.org/infernal/infernal-1.1.5.tar.gz",
+        "https://github.com/hyattpd/Prodigal/archive/refs/tags/v2.6.3.tar.gz"
     ],
-    "version": "2.0.5",
+    "version": "2.0.6",
+    "contIntegration": "https://github.com/gem-pasteur/Integron_Finder/actions",
+    "codemeta:continuousIntegration": {
+        "id": "https://github.com/gem-pasteur/Integron_Finder/actions"
+    },
     "developmentStatus": "active",
     "funding": "ANR-16-CONV-0005, EQU201903007835, ANR-10-LABX-62-IBEID",
     "issueTracker": "https://github.com/gem-pasteur/Integron_Finder/issues",

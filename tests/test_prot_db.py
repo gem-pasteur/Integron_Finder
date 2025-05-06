@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2024  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2025  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -55,7 +55,8 @@ class TestGemBase(IntegronTest):
         self.args = argparse.Namespace()
         self.args.gembase = True
         self.args.prot_file = False
-        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
         self.args.outdir = self.tmp_dir
         self.args.prodigal = None
         self.args.cmsearch = __file__
@@ -67,10 +68,7 @@ class TestGemBase(IntegronTest):
 
 
     def tearDown(self):
-        try:
-            shutil.rmtree(self.tmp_dir)
-        except:
-            pass
+        self._tmp_dir.cleanup()
 
 
     def test_ProteinDB(self):
@@ -106,8 +104,8 @@ class TestGemBase(IntegronTest):
         shutil.copy(replicon_path, replicon_copy)
         self.args.replicon = replicon_copy
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_copy)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_copy) as seq_db:
+            replicon = next(seq_db)
         with self.assertRaises(IntegronError) as ctx:
             GembaseDB(replicon, cfg)
         self.assertEqual(str(ctx.exception),
@@ -131,8 +129,8 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data('Gembase', f'Gembase{gbv}', 'Replicons', rep_file_name)
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = MultiFastaReader(replicon_path)
-            replicon = next(seq_db)
+            with MultiFastaReader(replicon_path) as seq_db:
+                replicon = next(seq_db)
             replicon.path = replicon_path
 
             with self.subTest(file_name=rep_file_name):
@@ -160,8 +158,8 @@ class TestGemBase(IntegronTest):
         self.args.replicon = extra_replicon_path
         self.args.gembase_path = gembase_path_dest
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(extra_replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(extra_replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = extra_replicon_path
 
         with self.assertRaises(FileNotFoundError) as ctx:
@@ -377,8 +375,8 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = MultiFastaReader(replicon_path)
-            replicon = next(seq_db)
+            with MultiFastaReader(replicon_path) as seq_db:
+                replicon = next(seq_db)
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -386,7 +384,8 @@ class TestGemBase(IntegronTest):
                 db = GembaseDB(replicon, cfg)
             for seq_nb, seqs in enumerate(zip(
                     MultiFastaReader(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt'))),
-                    MultiFastaReader(db.protfile)), 1):
+                    MultiFastaReader(db.protfile)),
+                    1):
                 expected, test = seqs
                 self.assertEqual(expected.id, test.id)
             self.assertEqual(seq_nb, seq_nb)
@@ -398,8 +397,8 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = MultiFastaReader(replicon_path)
-            replicon = next(seq_db)
+            with MultiFastaReader(replicon_path) as seq_db:
+                replicon = next(seq_db)
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -414,24 +413,23 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = MultiFastaReader(replicon_path)
-            replicon = next(seq_db)
+            with MultiFastaReader(replicon_path) as seq_db:
+                replicon = next(seq_db)
             os.makedirs(cfg.tmp_dir(replicon.id))
 
             with self.catch_log():
                 db = GembaseDB(replicon, cfg)
-            exp = MultiFastaReader(self.find_data(os.path.join('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')))
+            with MultiFastaReader(self.find_data('Gembase', 'Gembase1', 'Proteins', seq_name + '.prt')) as exp:
+                specie, date, strain, contig = replicon.id.split('.')
+                pattern = rf'{specie}\.{date}\.{strain}\.\w?{contig}'
 
-            specie, date, strain, contig = replicon.id.split('.')
-            pattern = rf'{specie}\.{date}\.{strain}\.\w?{contig}'
-
-            for prot_expected in exp:
-                if re.match(pattern, prot_expected.id):
-                    prot_received = db[prot_expected.id]
-                    self.assertEqual(prot_received.id,
-                                     prot_expected.id)
-                    self.assertEqual(prot_received.seq,
-                                     prot_expected.seq)
+                for prot_expected in exp:
+                    if re.match(pattern, prot_expected.id):
+                        prot_received = db[prot_expected.id]
+                        self.assertEqual(prot_received.id,
+                                         prot_expected.id)
+                        self.assertEqual(prot_received.seq,
+                                         prot_expected.seq)
         with self.assertRaises(KeyError) as ctx:
             db['nimport_naoik']
         self.assertEqual(str(ctx.exception), "'nimport_naoik'")
@@ -444,8 +442,8 @@ class TestGemBase(IntegronTest):
         replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         try:
             with self.catch_log():
@@ -464,9 +462,8 @@ class TestGemBase(IntegronTest):
         replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
-        seq_db.close()
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         try:
             with self.catch_log():
@@ -492,8 +489,8 @@ class TestGemBase(IntegronTest):
         replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         seq_db.close()
         replicon.path = replicon_path
         try:
@@ -517,8 +514,8 @@ class TestGemBase(IntegronTest):
         replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         with self.catch_log():
             db = GembaseDB(replicon, cfg)
@@ -537,8 +534,8 @@ class TestGemBase(IntegronTest):
             replicon_path = self.find_data(os.path.join('Gembase', 'Gembase1', 'Replicons', seq_name + ext))
             self.args.replicon = replicon_path
             cfg = Config(self.args)
-            seq_db = MultiFastaReader(replicon_path)
-            replicon = next(seq_db)
+            with MultiFastaReader(replicon_path) as seq_db:
+                replicon = next(seq_db)
             replicon.path = replicon_path
             os.makedirs(cfg.tmp_dir(replicon.id))
             with self.catch_log():
@@ -568,7 +565,8 @@ class TestProdigalDB(IntegronTest):
         self.args = argparse.Namespace()
         self.args.gembase = False
         self.args.prot_file = False
-        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
         self.args.outdir = self.tmp_dir
         self.args.prodigal = shutil.which("prodigal")
         self.args.cmsearch = __file__
@@ -579,18 +577,16 @@ class TestProdigalDB(IntegronTest):
 
 
     def tearDown(self):
-        try:
-            shutil.rmtree(self.tmp_dir)
-        except:
-            pass
+        self._tmp_dir.cleanup()
+
 
     def test_ProteinDB(self):
         file_name = 'acba.007.p01.13'
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -603,8 +599,8 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -621,8 +617,8 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         del seq_db
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -644,8 +640,8 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
 
         db = ProdigalDB(replicon, cfg)
@@ -663,8 +659,8 @@ class TestProdigalDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prodigal = self.find_data('fake_prodigal')
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
 
         with self.assertRaises(RuntimeError) as ctx:
@@ -678,8 +674,8 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -693,19 +689,19 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
         db = ProdigalDB(replicon, cfg)
-        exp = MultiFastaReader(self.find_data(os.path.join('Proteins', prot_name)))
-        for prot_expected in exp:
-            prot_received = db[prot_expected.id]
-            self.assertEqual(prot_received.id,
-                             prot_expected.id)
-            self.assertEqual(prot_received.seq,
-                             prot_expected.seq)
+        with MultiFastaReader(self.find_data('Proteins', prot_name)) as exp:
+            for prot_expected in exp:
+                prot_received = db[prot_expected.id]
+                self.assertEqual(prot_received.id,
+                                 prot_expected.id)
+                self.assertEqual(prot_received.seq,
+                                 prot_expected.seq)
         with self.assertRaises(IntegronError) as ctx:
             gene_id = 'nimport_naoik'
             db[gene_id]
@@ -721,8 +717,8 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -741,8 +737,8 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -762,8 +758,8 @@ class TestProdigalDB(IntegronTest):
         replicon_path = self.find_data(os.path.join('Replicons', file_name + '.fst'))
         self.args.replicon = replicon_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -789,7 +785,8 @@ class TestCustomDB(IntegronTest):
         self.args.prodigal = None
         self.args.cmsearch = __file__
         self.args.hmmsearch = __file__
-        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
         self.args.outdir = self.tmp_dir
         self.args.annot_parser = self.find_data('prodigal_annot_parser.py')
 
@@ -799,11 +796,8 @@ class TestCustomDB(IntegronTest):
 
 
     def tearDown(self):
-        try:
-            shutil.rmtree(self.tmp_dir)
-            pass
-        except:
-            pass
+        self._tmp_dir.cleanup()
+
 
     def test_ProteinDB(self):
         file_name = 'acba.007.p01.13'
@@ -813,8 +807,8 @@ class TestCustomDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prot_file = protein_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -831,8 +825,8 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('df_max_input_1.csv')
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -852,8 +846,8 @@ class TestCustomDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prot_file = protein_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -870,8 +864,8 @@ class TestCustomDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prot_file = protein_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -900,8 +894,8 @@ class TestCustomDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prot_file = protein_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
         try:
@@ -921,8 +915,8 @@ class TestCustomDB(IntegronTest):
         self.args.replicon = replicon_path
         self.args.prot_file = protein_path
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         seq_db.close()
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
@@ -950,8 +944,8 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('prodigal_annot_parser.py')
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -972,8 +966,8 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('stupid_annot_parser.py')
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -996,8 +990,8 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('stupid_annot_parser2.py')
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 
@@ -1020,8 +1014,8 @@ class TestCustomDB(IntegronTest):
         self.args.prot_file = protein_path
         self.args.annot_parser = self.find_data('lazy_annot_parser.py')
         cfg = Config(self.args)
-        seq_db = MultiFastaReader(replicon_path)
-        replicon = next(seq_db)
+        with MultiFastaReader(replicon_path) as seq_db:
+            replicon = next(seq_db)
         replicon.path = replicon_path
         os.makedirs(cfg.tmp_dir(replicon.id))
 

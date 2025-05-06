@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2024  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2025  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -38,7 +38,7 @@ from enum import Enum
 
 import colorlog
 import pandas as pd
-from Bio import SeqIO, Seq
+from Bio import SeqIO
 from integron_finder import IntegronError
 
 _log = colorlog.getLogger(__name__)

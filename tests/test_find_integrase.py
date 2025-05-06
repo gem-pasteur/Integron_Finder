@@ -8,7 +8,7 @@
 #   - and when possible attI site and promoters.                                   #
 #                                                                                  #
 # Authors: Jean Cury, Bertrand Neron, Eduardo PC Rocha                             #
-# Copyright (c) 2015 - 2024  Institut Pasteur, Paris and CNRS.                     #
+# Copyright (c) 2015 - 2025  Institut Pasteur, Paris and CNRS.                     #
 # See the COPYRIGHT file for details                                               #
 #                                                                                  #
 # integron_finder is free software: you can redistribute it and/or modify          #
@@ -56,8 +56,8 @@ class TestFindIntegrase(IntegronTest):
         else:
             self.local_install = False
             self.integron_home = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-
-        self.tmp_dir = os.path.join(tempfile.gettempdir(), 'tmp_test_integron_finder')
+        self._tmp_dir = tempfile.TemporaryDirectory(prefix='tmp_test_integron_finder')
+        self.tmp_dir = self._tmp_dir.name
         if os.path.exists(self.tmp_dir) and os.path.isdir(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
         os.makedirs(self.tmp_dir)
@@ -74,11 +74,7 @@ class TestFindIntegrase(IntegronTest):
 
     def tearDown(self):
         integrase.subprocess.run = _run_ori
-        try:
-            shutil.rmtree(self.tmp_dir)
-            pass
-        except:
-            pass
+        self._tmp_dir.cleanup()
 
 
     def test_find_integrase_gembase(self):
