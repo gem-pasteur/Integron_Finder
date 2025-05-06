@@ -39,7 +39,7 @@ coverage:
 
   artifacts:
     paths:
-      - htmlcov/
+      - coverage_html/
   except:
     - /^feat.*$/
     - /^fix.*$/
