@@ -10,9 +10,9 @@ This part is for developers, who want to work on IntegronFinder scripts.
 Developer installation
 **********************
 
-=============
-Depenedencies
-=============
+============
+Dependencies
+============
 **Python version >=3.10** is required to run Integron_Finder: https://docs.python.org/3.10/index.html
 
 Integron_Finder has one program dependency:
@@ -227,7 +227,7 @@ Coverage
 ========
 
 To compute the tests coverage, we use the `coverage <https://pypi.org/project/coverage/>`_ package.
-The package is automatically installed if you have installed `integron_finder` with the `dev` target see :ref:`installation <dev_installation>`
+The package is automatically installed if you have installed `integron_finder` with the `dev` target see :ref:`installation <install_dev>`
 The coverage package is setup in the `pyproject.toml` configuration file
 
 To compute the coverage
