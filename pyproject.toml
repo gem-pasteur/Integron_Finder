@@ -39,7 +39,7 @@ maintainers = [
     {name="Bertrand Neron", email='bneron@pasteur.fr'}
     ]
 description = 'Integron Finder aims at detecting integrons in DNA sequences.'
-keywords = ['bioinformatics', 'genomic', 'prokaryote', 'integron', 'antibioyic resistance']
+keywords = ['science', 'research', 'bioinformatics', 'genomic', 'prokaryote', 'integron', 'antibioyic resistance']
 readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["COPYING"]
