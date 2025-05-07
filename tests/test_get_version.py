@@ -89,8 +89,8 @@ Citation:
 
  Haft, DH et al., Nucleic Acids Res. 2018 Jan 4;46(D1):D851-D860
  PMID: 29112715
-""".format(i_f=integron_finder.__version__,
-           commit=integron_finder.__commit__,
+""".format(i_f=integron_finder.__version__ ,
+           commit=integron_finder.__commit__ if 'dev' in integron_finder.__version__ else '',
             py=sys.version.replace('\n', ' '),
             np=np_vers,
             pd=pd_vers,
