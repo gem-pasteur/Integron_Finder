@@ -301,8 +301,8 @@ Authors:
 
 Citation:
 
- Néron, B.; Littner, E.; Haudiquet, M.; Perrin, A.; Cury, J.; Rocha, E.P.C. 
- IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria, with a Focus on Antibiotic Resistance in Klebsiella. 
+ Néron, B.; Littner, E.; Haudiquet, M.; Perrin, A.; Cury, J.; Rocha, E.P.C.
+ IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria, with a Focus on Antibiotic Resistance in Klebsiella.
  Microorganisms 2022, 10, 700. https://doi.org/10.3390/microorganisms10040700
 
  If you use --func-annot in conjunction with file NCBIfam-AMRFinder.hmm please also cite
@@ -323,4 +323,3 @@ Citation:
             finally:
                 sys.exit = real_exit
             self.assertEqual(msg.strip(), msg_expected.strip())
-
