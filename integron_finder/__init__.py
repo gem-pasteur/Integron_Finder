@@ -29,10 +29,9 @@
 import sys
 import os
 import  subprocess
-from time import localtime, strftime
 
 
-__version__ = f'{strftime("%Y%m%d", localtime())}.dev'
+__version__ = '2.0.6'
 
 
 def get_git_revision_short_hash():
@@ -124,8 +123,8 @@ Authors:
 
 Citation:
 
- Néron, B.; Littner, E.; Haudiquet, M.; Perrin, A.; Cury, J.; Rocha, E.P.C. 
- IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria, with a Focus on Antibiotic Resistance in Klebsiella. 
+ Néron, B.; Littner, E.; Haudiquet, M.; Perrin, A.; Cury, J.; Rocha, E.P.C.
+ IntegronFinder 2.0: Identification and Analysis of Integrons across Bacteria, with a Focus on Antibiotic Resistance in Klebsiella.
  Microorganisms 2022, 10, 700. https://doi.org/10.3390/microorganisms10040700
 
  If you use --func-annot in conjunction with file NCBIfam-AMRFinder.hmm please also cite
