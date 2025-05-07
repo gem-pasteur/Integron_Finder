@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.12"]
+        python-version: ["3.10", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
       - name: Install Integron_Finder
         run: python -m pip install .[dev]
       - name: Test and Compute the code coverage
-        run: coverage run --source integron_finder tests/run_tests.py -vvv
+        run: coverage run
       - uses: codecov/codecov-action@v4
         with:
           name: codecov-umbrella
