@@ -415,43 +415,86 @@ class Integron(object):
 
             motifs_Pint = [p_intI1_mot]
 
-            seq_p_int = self.replicon.seq[int(self.integrase.pos_beg.min()) - dist_prom:
-                                          int(self.integrase.pos_end.max()) + dist_prom]
-
-            for m in motifs_Pint:
-                if self.integrase.strand.values[0] == 1:
-                    generator_motifs = seq_p_int[:dist_prom].search(p_intI1_mot.alignment.sequences)
-                    for pos, s in generator_motifs:
-                        tmp_df = pd.DataFrame(columns=self._columns)
-                        tmp_df = tmp_df.astype(dtype=self._dtype)
-                        tmp_df["pos_beg"] = [self.integrase.pos_beg.values[0] - dist_prom + pos]
-                        tmp_df["pos_end"] = [self.integrase.pos_beg.values[0] - dist_prom + pos + len(s)]
-                        tmp_df["strand"] = [self.integrase.strand.values[0]]
-                        tmp_df["evalue"] = [np.nan]
-                        tmp_df["type_elt"] = "Promoter"
-                        tmp_df["annotation"] = "Pint_%s" %(m.name[-1])
-                        tmp_df["model"] = "NA"
-                        tmp_df.index = [m.name]
-                        tmp_df["distance_2attC"] = [np.nan]
-                        self.promoter = pd.concat([self.promoter, tmp_df])
-                else:
-                    # generator_motifs = m.instances.reverse_complement().search(seq_p_int[-dist_prom:])
-                    generator_motifs = seq_p_int[-dist_prom:].search(m.reverse_complement().alignment.sequences)
-                    for pos, s in generator_motifs:
-                        tmp_df = pd.DataFrame(columns=self._columns)
-                        tmp_df = tmp_df.astype(dtype=self._dtype)
-                        tmp_df["pos_beg"] = [self.integrase.pos_end.max() + pos]
-                        tmp_df["pos_end"] = [self.integrase.pos_end.max() + pos + len(s)]
-                        tmp_df["strand"] = [self.integrase.strand.values[0]]
-                        tmp_df["evalue"] = [np.nan]
-                        tmp_df["type_elt"] = "Promoter"
-                        tmp_df["annotation"] = "Pint_%s" % (m.name[-1])
-                        tmp_df["model"] = "NA"
-                        tmp_df.index = [m.name]
-                        tmp_df["distance_2attC"] = [np.nan]
-                        self.promoter = pd.concat([self.promoter, tmp_df])
             integrase_start = int(self.integrase.pos_beg.values[0])
             integrase_end = int(self.integrase.pos_end.values[-1])
+
+            if self.replicon.topology == 'circ':
+                seq_p_int = self.replicon.seq[integrase_start - dist_prom:
+                                              integrase_end + dist_prom]
+
+                upstream_seq = seq_p_int[:dist_prom]
+                downstream_seq = seq_p_int[-dist_prom:]
+                upstream_offset = self.integrase.pos_beg.values[0] - dist_prom
+                downstream_offset = self.integrase.pos_end.max()
+
+                for m in motifs_Pint:
+                    if self.integrase.strand.values[0] == 1:
+                        generator_motifs = upstream_seq.search(p_intI1_mot.alignment.sequences)
+                        for pos, s in generator_motifs:
+                            tmp_df = pd.DataFrame(columns=self._columns)
+                            tmp_df = tmp_df.astype(dtype=self._dtype)
+                            tmp_df["pos_beg"] = [upstream_offset + pos]
+                            tmp_df["pos_end"] = [upstream_offset + pos + len(s)]
+                            tmp_df["strand"] = [self.integrase.strand.values[0]]
+                            tmp_df["evalue"] = [np.nan]
+                            tmp_df["type_elt"] = "Promoter"
+                            tmp_df["annotation"] = "Pint_%s" % (m.name[-1])
+                            tmp_df["model"] = "NA"
+                            tmp_df.index = [m.name]
+                            tmp_df["distance_2attC"] = [np.nan]
+                            self.promoter = pd.concat([self.promoter, tmp_df])
+                    else:
+                        generator_motifs = downstream_seq.search(m.reverse_complement().alignment.sequences)
+                        for pos, s in generator_motifs:
+                            tmp_df = pd.DataFrame(columns=self._columns)
+                            tmp_df = tmp_df.astype(dtype=self._dtype)
+                            tmp_df["pos_beg"] = [downstream_offset + pos]
+                            tmp_df["pos_end"] = [downstream_offset + pos + len(s)]
+                            tmp_df["strand"] = [self.integrase.strand.values[0]]
+                            tmp_df["evalue"] = [np.nan]
+                            tmp_df["type_elt"] = "Promoter"
+                            tmp_df["annotation"] = "Pint_%s" % (m.name[-1])
+                            tmp_df["model"] = "NA"
+                            tmp_df.index = [m.name]
+                            tmp_df["distance_2attC"] = [np.nan]
+                            self.promoter = pd.concat([self.promoter, tmp_df])
+            else:
+                window_left = max(integrase_start - dist_prom, 0)
+                window_right = min(integrase_end + dist_prom, self.replicon_size)
+                upstream_seq = self.replicon.seq[window_left:integrase_start]
+                downstream_seq = self.replicon.seq[integrase_end:window_right]
+
+                for m in motifs_Pint:
+                    if self.integrase.strand.values[0] == 1:
+                        generator_motifs = upstream_seq.search(p_intI1_mot.alignment.sequences)
+                        for pos, s in generator_motifs:
+                            tmp_df = pd.DataFrame(columns=self._columns)
+                            tmp_df = tmp_df.astype(dtype=self._dtype)
+                            tmp_df["pos_beg"] = [window_left + pos]
+                            tmp_df["pos_end"] = [window_left + pos + len(s)]
+                            tmp_df["strand"] = [self.integrase.strand.values[0]]
+                            tmp_df["evalue"] = [np.nan]
+                            tmp_df["type_elt"] = "Promoter"
+                            tmp_df["annotation"] = "Pint_%s" % (m.name[-1])
+                            tmp_df["model"] = "NA"
+                            tmp_df.index = [m.name]
+                            tmp_df["distance_2attC"] = [np.nan]
+                            self.promoter = pd.concat([self.promoter, tmp_df])
+                    else:
+                        generator_motifs = downstream_seq.search(m.reverse_complement().alignment.sequences)
+                        for pos, s in generator_motifs:
+                            tmp_df = pd.DataFrame(columns=self._columns)
+                            tmp_df = tmp_df.astype(dtype=self._dtype)
+                            tmp_df["pos_beg"] = [integrase_end + pos]
+                            tmp_df["pos_end"] = [integrase_end + pos + len(s)]
+                            tmp_df["strand"] = [self.integrase.strand.values[0]]
+                            tmp_df["evalue"] = [np.nan]
+                            tmp_df["type_elt"] = "Promoter"
+                            tmp_df["annotation"] = "Pint_%s" % (m.name[-1])
+                            tmp_df["model"] = "NA"
+                            tmp_df.index = [m.name]
+                            tmp_df["distance_2attC"] = [np.nan]
+                            self.promoter = pd.concat([self.promoter, tmp_df])
         ######## Promoter of K7 #########
 
         # Pc-int1
@@ -606,12 +649,17 @@ class Integron(object):
             right = attc_end
             strand_array = self.attC.strand.unique()[0]
 
-        if left < right:
-            seq_attI = self.replicon.seq[left - dist_atti:right + dist_atti]
+        if self.replicon.topology == 'circ':
+            if left < right:
+                seq_attI = self.replicon.seq[left - dist_atti:right + dist_atti]
+            else:
+                seq_attI1 = self.replicon.seq[left - dist_atti:self.replicon_size]
+                seq_attI2 = self.replicon.seq[:right + dist_atti]
+                seq_attI = seq_attI1 + seq_attI2
         else:
-            seq_attI1 = self.replicon.seq[left - dist_atti:self.replicon_size]
-            seq_attI2 = self.replicon.seq[:right + dist_atti]
-            seq_attI = seq_attI1 + seq_attI2
+            window_left = max(left - dist_atti, 0)
+            window_right = min(right + dist_atti, self.replicon_size)
+            seq_attI = self.replicon.seq[window_left:window_right]
 
         for m in motif_attI:
 
@@ -626,8 +674,12 @@ class Integron(object):
                 for pos, s in seq_attI.search(mo.alignment.sequences):  #  mo.instances.search(seq_attI) is depprecated
                     tmp_df = pd.DataFrame(columns=self._columns)
                     tmp_df = tmp_df.astype(dtype=self._dtype)
-                    tmp_df["pos_beg"] = [(left - dist_atti + pos) % self.replicon_size]
-                    tmp_df["pos_end"] = [(left - dist_atti + pos + len(s)) % self.replicon_size]
+                    if self.replicon.topology == 'circ':
+                        tmp_df["pos_beg"] = [(left - dist_atti + pos) % self.replicon_size]
+                        tmp_df["pos_end"] = [(left - dist_atti + pos + len(s)) % self.replicon_size]
+                    else:
+                        tmp_df["pos_beg"] = [window_left + pos]
+                        tmp_df["pos_end"] = [window_left + pos + len(s)]
                     tmp_df["strand"] = [strand_array] if strand_array != "both" else [sa * 2 - 1]
                     tmp_df["evalue"] = [np.nan]
                     tmp_df["type_elt"] = "attI"

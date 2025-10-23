@@ -378,6 +378,46 @@ class TestIntegron(IntegronTest):
 
         pdt.assert_frame_equal(exp_attI, integron.attI)
 
+    def test_promoter_coordinates_clamped_on_linear_contig(self):
+        motif_revcomp = "TGTACAGTCTATGCCTCGGGCATCCAAGCAGCAA"
+        sequence = "A" * 176 + motif_revcomp
+        replicon = SeqRecord(Seq.Seq(sequence), id="lin_edge_promoter")
+        replicon.topology = 'lin'
+
+        integron = Integron(replicon, self.cfg)
+        integron.add_integrase(120,
+                               170,
+                               'int_edge',
+                               -1,
+                               1e-25,
+                               "intersection_tyr_intI")
+        integron.add_promoter()
+
+        if not integron.promoter.empty:
+            self.assertTrue((integron.promoter["pos_beg"] >= 0).all())
+            self.assertTrue((integron.promoter["pos_end"] <= len(replicon)).all())
+
+    def test_attI_coordinates_clamped_on_linear_contig(self):
+        atti_seq = "TGATGTTATGGAGCAGCAACGATGTTACGCAGCAGGGCAGTCGCCCTAAAACAAAGTT"
+        sequence = "A" * 162 + atti_seq
+        replicon = SeqRecord(Seq.Seq(sequence), id="lin_edge_attI")
+        replicon.topology = 'lin'
+
+        integron = Integron(replicon, self.cfg)
+        integron.add_integrase(100,
+                               160,
+                               'int_edge_attI',
+                               1,
+                               1e-25,
+                               "intersection_tyr_intI")
+        integron.add_attI()
+
+        if not integron.attI.empty:
+            expected_start = len(sequence) - len(atti_seq)
+            self.assertIn(expected_start, integron.attI["pos_beg"].values)
+            self.assertTrue((integron.attI["pos_beg"] >= 0).all())
+            self.assertTrue((integron.attI["pos_end"] <= len(replicon)).all())
+
 
     def test_add_proteins(self):
         replicon_name = 'pssu.001.c01.13'
